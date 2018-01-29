@@ -12,8 +12,6 @@ import com.king.app.tcareer.base.TApplication;
  */
 public class SettingProperty {
 
-    private static final String SETTING_FILE = "TCareer";
-
     private static final String getString(String key) {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(TApplication.getInstance());
         return sp.getString(key, "");

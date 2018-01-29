@@ -33,11 +33,11 @@ public abstract class BaseFragment extends Fragment {
     public void onAttach(Context context) {
         super.onAttach(context);
         if (context instanceof IFragmentHolder) {
-            onBindHolder((IFragmentHolder) context);
+            bindFragmentHolder((IFragmentHolder) context);
         }
     }
 
-    protected abstract void onBindHolder(IFragmentHolder context);
+    protected abstract void bindFragmentHolder(IFragmentHolder holder);
 
     @Nullable
     @Override

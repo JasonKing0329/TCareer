@@ -8,6 +8,7 @@ import android.widget.LinearLayout;
 
 import com.king.app.tcareer.R;
 import com.king.app.tcareer.base.BaseMvpActivity;
+import com.king.app.tcareer.page.match.common.MatchCommonActivity;
 import com.king.app.tcareer.page.setting.SettingActivity;
 import com.tbruyelle.rxpermissions2.RxPermissions;
 
@@ -122,6 +123,8 @@ public class LoginActivity extends BaseMvpActivity<LoginPresenter> implements Lo
 
     @Override
     public void permitLogin() {
-        startActivity(new Intent(this, SettingActivity.class));
+        Intent intent = new Intent(this, MatchCommonActivity.class);
+        intent.putExtra(MatchCommonActivity.KEY_MATCH, 1);
+        startActivity(intent);
     }
 }

@@ -48,6 +48,9 @@
 
         <activity android:name=".page.setting.SettingActivity"
             android:screenOrientation="portrait"/>
+
+        <activity android:name=".page.match.common.MatchCommonActivity"
+            android:screenOrientation="portrait"/>
     </application>
 
 </manifest>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Default screen margins, per the Android Design guidelines. -->
+    <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
+
+    <dimen name="vertical_divider">1px</dimen>
+    <dimen name="custom_dialog_toolbar_icon">30dp</dimen>
+    <dimen name="custom_dialog_title_text_size">20dp</dimen>
+    <dimen name="custom_dialog_icon_frame_radius">17dp</dimen>
+    <dimen name="custom_dialog_search_height">30dp</dimen>
+    <dimen name="custom_dialog_title_frame_radius">12dp</dimen>
+    <dimen name="custom_dialog_icon_frame_width">0dp</dimen>
+
+</resources>

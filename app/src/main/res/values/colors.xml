@@ -11,4 +11,14 @@
     <color name="yellowF7D23E">#FFF7D23E</color>
     <color name="green34A350">#FF34A350</color>
 
+    <color name="dialog_background">#eeeeeeee</color>
+    <color name="custom_dialog_title_text">#00a5c4</color>
+    <color name="custom_dialog_icon_bk_pressed">#cc6600</color>
+    <color name="white">#ffffff</color>
+    <color name="yellow">#ffff00</color>
+
+    <color name="mview_layout_insert_bk">#3300a5c4</color>
+    <color name="mview_layout_search_bk">#33ef9801</color>
+    <color name="mview_layout_h2h_bk">#33a91980</color>
+    <color name="mview_layout_rank_bk">#3319a993</color>
 </resources>

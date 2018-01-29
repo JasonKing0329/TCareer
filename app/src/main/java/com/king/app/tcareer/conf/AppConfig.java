@@ -28,6 +28,11 @@ public class AppConfig {
     public static final String IMG_DEFAULT_BASE = BASE_IMG + "/img_default/";
     public static final String IMG_PLAYER_HEAD = BASE_IMG + "/img_player/head/";
 
+    public static final String DEF_IMG_HARD = "hard.jpg";
+    public static final String DEF_IMG_INNERHARD = "innerhard.jpg";
+    public static final String DEF_IMG_CLAY = "clay.jpg";
+    public static final String DEF_IMG_GRASS = "grass.jpg";
+
     public static final String[] DIRS = new String[] {
             DEF_CONTENT, EXPORT_BASE, HISTORY_BASE, DOWNLOAD_BASE, DOWNLOAD_IMAGE, CONF_DIR
             , TEMP_DIR, BASE_IMG, IMG_PLAYER_BASE, IMG_MATCH_BASE, IMG_BK_BASE, IMG_DEFAULT_BASE, IMG_PLAYER_HEAD
