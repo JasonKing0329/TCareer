@@ -34,7 +34,7 @@ public class ProgressDialogFragment extends DialogFragment {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        setCancelable(false);
+        setCancelable(true);
         setStyle(android.app.DialogFragment.STYLE_NORMAL, R.style.LoadingDialog);
         super.onCreate(savedInstanceState);
     }
@@ -63,11 +63,6 @@ public class ProgressDialogFragment extends DialogFragment {
             ft.add(this, tag);
         }
         ft.commitAllowingStateLoss();
-    }
-
-    @Override
-    public void dismiss() {
-        dismissAllowingStateLoss();
     }
 
     @Override

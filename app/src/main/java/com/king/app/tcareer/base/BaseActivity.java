@@ -67,7 +67,7 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     public void dismissProgress() {
         if (progressDialogFragment != null) {
-            progressDialogFragment.dismiss();
+            progressDialogFragment.dismissAllowingStateLoss();
         }
     }
 

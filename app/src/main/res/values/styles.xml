@@ -8,6 +8,18 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <style name="HomeTheme" parent="AppTheme">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <!--toolbar的背景-->
+        <item name="colorPrimary">@color/white</item>
+        <item name="colorPrimaryDark">#eeeeee</item>
+        <!--toolbar的文字颜色-->
+        <item name="android:textColorPrimary">#3F51B5</item>
+        <!--<item name="android:textColorSecondary">#00ff00</item>-->
+        <item name="android:actionMenuTextColor">#3F51B5</item>
+    </style>
+
     <style name="BASEDialog" parent="@android:style/Theme.Dialog">
         <item name="android:windowFrame">@null</item>
         <item name="android:windowNoTitle">true</item>

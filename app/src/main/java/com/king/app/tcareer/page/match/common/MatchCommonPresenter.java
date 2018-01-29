@@ -4,7 +4,6 @@ import com.king.app.tcareer.base.BasePresenter;
 import com.king.app.tcareer.base.TApplication;
 import com.king.app.tcareer.conf.AppConstants;
 import com.king.app.tcareer.model.db.entity.MatchBean;
-import com.king.app.tcareer.model.db.entity.MatchBeanDao;
 import com.king.app.tcareer.model.db.entity.MatchNameBean;
 import com.king.app.tcareer.model.db.entity.MatchNameBeanDao;
 import com.king.app.tcareer.model.db.entity.Record;
@@ -12,8 +11,6 @@ import com.king.app.tcareer.model.db.entity.RecordDao;
 import com.king.app.tcareer.model.db.entity.User;
 import com.king.app.tcareer.model.db.entity.UserDao;
 import com.king.app.tcareer.utils.DebugLog;
-
-import org.greenrobot.greendao.query.WhereCondition;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -45,6 +42,7 @@ public class MatchCommonPresenter extends BasePresenter<MatchCommonView> {
         User user;
         String h2h;
         String years;
+        boolean isFinished;
     }
 
     public void loadMatch(long matchNameId) {
@@ -67,7 +65,12 @@ public class MatchCommonPresenter extends BasePresenter<MatchCommonView> {
 
                     @Override
                     public void onNext(MessageBean message) {
-                        view.showUserInfor(message.user, message.h2h, message.years);
+                        if (message.isFinished) {
+                            view.dismissLoading();
+                        }
+                        else {
+                            view.showUserInfor(message.user, message.h2h, message.years);
+                        }
                     }
 
                     @Override
@@ -78,7 +81,7 @@ public class MatchCommonPresenter extends BasePresenter<MatchCommonView> {
 
                     @Override
                     public void onComplete() {
-                        view.dismissLoading();
+
                     }
                 });
     }
@@ -163,7 +166,10 @@ public class MatchCommonPresenter extends BasePresenter<MatchCommonView> {
                     messageBean.years = years;
                     observer.onNext(messageBean);
                 }
-                observer.onComplete();
+
+                MessageBean messageBean = new MessageBean();
+                messageBean.isFinished = true;
+                observer.onNext(messageBean);
             }
         };
     }

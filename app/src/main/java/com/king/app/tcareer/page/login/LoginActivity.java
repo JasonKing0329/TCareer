@@ -9,7 +9,7 @@ import android.widget.LinearLayout;
 import com.king.app.tcareer.R;
 import com.king.app.tcareer.base.BaseMvpActivity;
 import com.king.app.tcareer.page.match.common.MatchCommonActivity;
-import com.king.app.tcareer.page.setting.SettingActivity;
+import com.king.app.tcareer.utils.DBExportor;
 import com.tbruyelle.rxpermissions2.RxPermissions;
 
 import butterknife.BindView;
@@ -68,6 +68,8 @@ public class LoginActivity extends BaseMvpActivity<LoginPresenter> implements Lo
     }
 
     private void initCreate() {
+        // 每次进入导出一次数据库
+        DBExportor.execute();
         presenter.prepare();
     }
 
@@ -124,7 +126,7 @@ public class LoginActivity extends BaseMvpActivity<LoginPresenter> implements Lo
     @Override
     public void permitLogin() {
         Intent intent = new Intent(this, MatchCommonActivity.class);
-        intent.putExtra(MatchCommonActivity.KEY_MATCH, 1);
+        intent.putExtra(MatchCommonActivity.KEY_MATCH, 1l);
         startActivity(intent);
     }
 }

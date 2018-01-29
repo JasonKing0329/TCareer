@@ -7,14 +7,28 @@ android {
         applicationId "com.king.app.tcareer"
         minSdkVersion 21
         targetSdkVersion 26
-        versionCode 2
-        versionName "1.1"
+        versionCode 3
+        versionName "1.1.1"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
+
+    signingConfigs {
+        releaseConfig {
+            storeFile file("../keystore/myapp_key.keystore")
+            storePassword "1010520"
+            keyAlias "myapp"
+            keyPassword "1010520"
+        }
+    }
+
     buildTypes {
+        debug {
+            signingConfig signingConfigs.releaseConfig
+        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.releaseConfig
         }
     }
 }

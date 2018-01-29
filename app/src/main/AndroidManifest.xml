@@ -50,6 +50,7 @@
             android:screenOrientation="portrait"/>
 
         <activity android:name=".page.match.common.MatchCommonActivity"
+            android:theme="@style/HomeTheme"
             android:screenOrientation="portrait"/>
     </application>
 

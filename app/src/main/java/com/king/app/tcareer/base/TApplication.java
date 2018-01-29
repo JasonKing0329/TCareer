@@ -45,11 +45,13 @@ public class TApplication extends Application {
 	public void onCreate() {
 		instance = this;
 		super.onCreate();
-
-		initGreenDao();
 	}
 
-	private void initGreenDao() {
+	/**
+	 * 程序初始化使用外置数据库
+	 * 需要由外部调用，如果在onCreate里直接初始化会创建新的数据库
+	 */
+	public void createGreenDao() {
 		DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(getApplicationContext(), "khcareer.db");
 		Database db = helper.getWritableDb();
 		daoSession = new DaoMaster(db).newSession();

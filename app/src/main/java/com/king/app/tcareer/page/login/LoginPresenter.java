@@ -1,6 +1,7 @@
 package com.king.app.tcareer.page.login;
 
 import com.king.app.tcareer.base.BasePresenter;
+import com.king.app.tcareer.base.TApplication;
 import com.king.app.tcareer.conf.AppConfig;
 import com.king.app.tcareer.page.setting.SettingProperty;
 import com.king.app.tcareer.utils.FileUtil;
@@ -42,6 +43,7 @@ public class LoginPresenter extends BasePresenter<LoginView> {
                     public void onNext(Object o) {
                         view.dismissLoading();
 
+                        TApplication.getInstance().createGreenDao();
                         if (SettingProperty.isEnableFingerPrint()) {
                             view.showFingerPrint();
                         }
