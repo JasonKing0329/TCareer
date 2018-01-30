@@ -56,6 +56,16 @@ public abstract class BaseActivity extends AppCompatActivity {
                 .show();
     }
 
+    public void showConfirmCancelMessage(String msg, DialogInterface.OnClickListener okListener
+            , DialogInterface.OnClickListener cancelListener) {
+        new AlertDialog.Builder(this)
+                .setTitle(null)
+                .setMessage(msg)
+                .setPositiveButton(getString(R.string.ok), okListener)
+                .setNegativeButton(getString(R.string.cancel), cancelListener)
+                .show();
+    }
+
     public void showProgress(String msg) {
         progressDialogFragment = new ProgressDialogFragment();
         if (TextUtils.isEmpty(msg)) {

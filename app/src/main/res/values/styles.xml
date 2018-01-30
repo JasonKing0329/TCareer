@@ -8,9 +8,12 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
-    <style name="HomeTheme" parent="AppTheme">
+    <style name="NoActionBarTheme" parent="AppTheme">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="HomeTheme" parent="NoActionBarTheme">
         <!--toolbar的背景-->
         <item name="colorPrimary">@color/white</item>
         <item name="colorPrimaryDark">#eeeeee</item>
@@ -93,5 +96,22 @@
         <item name="android:gravity">center</item>
     </style>
 
-    <color name="tab_actionbar_text_focus">#FFD600</color>
+    <style name="V7ActionbarActionIcon">
+        <item name="android:layout_width">@dimen/view7_actionbar_action_icon_size</item>
+        <item name="android:layout_height">@dimen/view7_actionbar_action_icon_size</item>
+        <item name="android:padding">@dimen/view7_actionbar_action_icon_padding</item>
+        <item name="android:background">?android:attr/selectableItemBackgroundBorderless</item>
+        <item name="android:scaleType">fitCenter</item>
+    </style>
+
+    <style name="MatchManageItem">
+        <item name="android:textColor">#3c3c3c</item>
+        <item name="android:textSize">16dp</item>
+    </style>
+
+    <style name="MatchManageItemSub">
+        <item name="android:textColor">#7f7f7f</item>
+        <item name="android:textSize">14dp</item>
+    </style>
+
 </resources>

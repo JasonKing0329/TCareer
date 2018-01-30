@@ -6,4 +6,22 @@
         <attr name="borderWidth" format="dimension" />
     </declare-styleable>
 
+    <!-- 圆形头像 -->
+    <declare-styleable name="CircleImageView">
+        <!-- 边框宽度 -->
+        <attr name="civ_border_width" format="dimension" />
+        <!-- 边框颜色 -->
+        <attr name="civ_border_color" format="color" />
+        <attr name="civ_border_overlay" format="boolean" />
+        <!-- 头像内填充色 -->
+        <attr name="civ_fill_color" format="color" />
+    </declare-styleable>
+
+    <declare-styleable name="SideBarParams">
+        <attr name="sideBackground" />
+        <attr name="indexTextSize" />
+        <attr name="indexColor" />
+        <attr name="indexColorFocus" />
+    </declare-styleable>
+
 </resources>

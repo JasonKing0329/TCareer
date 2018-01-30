@@ -12,6 +12,13 @@ import com.king.app.tcareer.base.TApplication;
  */
 public class SettingProperty {
 
+    /**
+     * sort type of match mange page
+     */
+    public static final int VALUE_SORT_MATCH_WEEK = 0;
+    public static final int VALUE_SORT_MATCH_NAME = 1;
+    public static final int VALUE_SORT_MATCH_LEVEL = 2;
+
     private static final String getString(String key) {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(TApplication.getInstance());
         return sp.getString(key, "");
@@ -54,5 +61,21 @@ public class SettingProperty {
 
     public static boolean isEnableFingerPrint() {
         return getBoolean("enable_finger_print");
+    }
+
+    public static void setMatchManageGridMode(boolean mode) {
+        setBoolean("key_match_manage_grid", mode);
+    }
+
+    public static boolean isMatchManageGridMode() {
+        return getBoolean("key_match_manage_grid");
+    }
+
+    public static void setMatchSortMode(int mode) {
+        setInt("key_sort_match", mode);
+    }
+
+    public static int getMatchSortMode() {
+        return getInt("key_sort_match");
     }
 }

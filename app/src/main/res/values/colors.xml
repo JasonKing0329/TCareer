@@ -21,4 +21,11 @@
     <color name="mview_layout_search_bk">#33ef9801</color>
     <color name="mview_layout_h2h_bk">#33a91980</color>
     <color name="mview_layout_rank_bk">#3319a993</color>
+
+    <color name="tab_actionbar_text_focus">#FFD600</color>
+
+    <color name="swipecard_index_popup_bk">#aaef9801</color>
+    <color name="swipecard_index_text_focus">#ef9801</color>
+    <color name="swipecard_indexbar_bk">#aa4a5ebc</color>
+    <color name="swipecard_text_hard">#00a5c4</color>
 </resources>

@@ -221,8 +221,9 @@ public abstract class DraggableDialogFragment extends BaseDialogFragment {
                 onClickPlay();
                 break;
             case R.id.iv_ok:
-                onClickOk();
-                dismiss();
+                if (onClickOk()) {
+                    dismiss();
+                }
                 break;
             case R.id.iv_save:
                 onClickSave();
@@ -244,7 +245,8 @@ public abstract class DraggableDialogFragment extends BaseDialogFragment {
     /**
      * 由子类选择实现
      */
-    protected void onClickOk() {
+    protected boolean onClickOk() {
+        return true;
     }
 
     /**
@@ -303,7 +305,7 @@ public abstract class DraggableDialogFragment extends BaseDialogFragment {
         }
     }
 
-    public static abstract class ContentFragmentV4 extends BaseFragment {
+    public static abstract class ContentFragment extends BaseFragment {
 
         @Override
         protected void bindFragmentHolder(IFragmentHolder holder) {

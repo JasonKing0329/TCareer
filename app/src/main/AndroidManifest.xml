@@ -52,6 +52,11 @@
         <activity android:name=".page.match.common.MatchCommonActivity"
             android:theme="@style/HomeTheme"
             android:screenOrientation="portrait"/>
+
+        <activity android:name=".page.match.manage.MatchManageActivity"
+            android:theme="@style/NoActionBarTheme"
+            android:screenOrientation="portrait">
+        </activity>
     </application>
 
 </manifest>
