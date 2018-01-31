@@ -27,6 +27,13 @@ public class AppConstants {
     public static final int WINNER_USER = 0;
     public static final int WINNER_COMPETITOR = 1;
 
+    /**
+     * 0: normal player
+     * 1: virtual player
+     */
+    public static final int COMPETITOR_NORMAL = 0;
+    public static final int COMPETITOR_VIRTUAL = 1;
+
     public static final String[] RECORD_MATCH_LEVELS = new String[] {
 
             "Grand Slam",

@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/manage_item_container">
+
+    <TextView
+        android:id="@+id/manage_item_index"
+        android:layout_width="30dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="5dp"
+        style="@style/MatchManageItem"
+        android:layout_centerVertical="true" />
+
+    <com.king.app.tcareer.view.widget.CircleImageView
+        android:id="@+id/manage_item_image"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"
+        android:src="@drawable/icon_list"
+        android:layout_toRightOf="@id/manage_item_index"
+        app:civ_border_width="0dp"
+        app:civ_border_color="@color/white" />
+
+    <LinearLayout
+        android:id="@+id/manage_item_group"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/manage_item_image"
+        android:layout_marginLeft="10dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:layout_centerVertical="true">
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+                <TextView
+                    android:id="@+id/manage_item_name"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    style="@style/MatchManageItem"/>
+                <TextView
+                    android:id="@+id/manage_item_birthday"
+                    android:layout_width="wrap_content"
+                    android:minWidth="50dp"
+                    android:gravity="right"
+                    android:layout_height="wrap_content"
+                    style="@style/MatchManageItemSub"/>
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                <TextView
+                    android:id="@+id/manage_item_name_eng"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    style="@style/MatchManageItemSub"/>
+                <TextView
+                    android:id="@+id/manage_item_country"
+                    android:layout_width="wrap_content"
+                    android:minWidth="50dp"
+                    android:gravity="right"
+                    android:layout_height="wrap_content"
+                    style="@style/MatchManageItemSub"/>
+            </LinearLayout>
+        </LinearLayout>
+        <CheckBox
+            android:id="@+id/manage_item_check"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:clickable="false"/>
+    </LinearLayout>
+</RelativeLayout>

@@ -2,6 +2,7 @@ package com.king.app.tcareer.utils;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Rect;
 import android.util.DisplayMetrics;
@@ -136,6 +137,12 @@ public class ScreenUtils
 		view.destroyDrawingCache();
 		return bp;
 
+	}
+
+	public static int dp2px(float dp){
+		DisplayMetrics metrics = Resources.getSystem().getDisplayMetrics();
+		float px = dp * (metrics.densityDpi / 160f);
+		return Math.round(px);
 	}
 
 }

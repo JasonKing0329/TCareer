@@ -14,4 +14,6 @@ public interface MatchManageView extends BaseView {
     void showMatches(List<MatchNameBean> list);
 
     void sortFinished(List<MatchNameBean> matchList);
+
+    void deleteSuccess();
 }

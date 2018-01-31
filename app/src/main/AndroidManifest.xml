@@ -50,13 +50,22 @@
             android:screenOrientation="portrait"/>
 
         <activity android:name=".page.match.common.MatchCommonActivity"
-            android:theme="@style/HomeTheme"
+            android:theme="@style/NoActionBarTheme"
             android:screenOrientation="portrait"/>
 
         <activity android:name=".page.match.manage.MatchManageActivity"
             android:theme="@style/NoActionBarTheme"
             android:screenOrientation="portrait">
         </activity>
+
+        <activity android:name=".page.player.manage.PlayerManageActivity"
+            android:theme="@style/NoActionBarTheme"
+            android:screenOrientation="portrait"/>
+
+        <activity android:name=".page.player.common.PlayerCommonActivity"
+            android:theme="@style/NoActionBarTheme"
+            android:screenOrientation="portrait"/>
+
     </application>
 
 </manifest>

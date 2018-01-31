@@ -128,8 +128,9 @@ public class MatchManagePresenter extends BasePresenter<MatchManageView> {
 
                     @Override
                     public void onNext(Object o) {
-                        view.dismissLoading();
+                        updateSortType(sortType);
                         SettingProperty.setMatchSortMode(sortType);
+                        view.dismissLoading();
                         view.sortFinished(matchList);
                     }
 
@@ -148,12 +149,16 @@ public class MatchManagePresenter extends BasePresenter<MatchManageView> {
     }
     }
 
+    private void updateSortType(int sortType) {
+        this.sortType = sortType;
+    }
+
     /**
      * delete match
-     * @param bean
+     * @param list
      */
-    public void deleteMatch(MatchNameBean bean) {
-        deleteMatchRx(bean)
+    public void deleteMatch(List<MatchNameBean> list) {
+        deleteMatchRx(list)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe(new Observer<Object>() {
@@ -165,6 +170,7 @@ public class MatchManagePresenter extends BasePresenter<MatchManageView> {
                     @Override
                     public void onNext(Object o) {
                         view.showMessage("Delete successfully");
+                        view.deleteSuccess();
                     }
 
                     @Override
@@ -180,21 +186,23 @@ public class MatchManagePresenter extends BasePresenter<MatchManageView> {
                 });
     }
 
-    private Observable<Object> deleteMatchRx(final MatchNameBean bean) {
+    private Observable<Object> deleteMatchRx(final List<MatchNameBean> list) {
         return Observable.create(new ObservableOnSubscribe<Object>() {
             @Override
             public void subscribe(ObservableEmitter<Object> e) throws Exception {
-                // 1对1的MatchNameBean还要删除MatchBean
-                if (bean.getMatchBean().getNameBeanList().size() == 1) {
-                    MatchBeanDao dao = TApplication.getInstance().getDaoSession().getMatchBeanDao();
-                    dao.queryBuilder().where(MatchBeanDao.Properties.Id.eq(bean.getMatchBean().getId()))
+                for (MatchNameBean bean:list) {
+                    // 1对1的MatchNameBean还要删除MatchBean
+                    if (bean.getMatchBean().getNameBeanList().size() == 1) {
+                        MatchBeanDao dao = TApplication.getInstance().getDaoSession().getMatchBeanDao();
+                        dao.queryBuilder().where(MatchBeanDao.Properties.Id.eq(bean.getMatchBean().getId()))
+                                .buildDelete()
+                                .executeDeleteWithoutDetachingEntities();
+                    }
+                    MatchNameBeanDao dao = TApplication.getInstance().getDaoSession().getMatchNameBeanDao();
+                    dao.queryBuilder().where(MatchNameBeanDao.Properties.Id.eq(bean.getId()))
                             .buildDelete()
                             .executeDeleteWithoutDetachingEntities();
                 }
-                MatchNameBeanDao dao = TApplication.getInstance().getDaoSession().getMatchNameBeanDao();
-                dao.queryBuilder().where(MatchNameBeanDao.Properties.Id.eq(bean.getId()))
-                        .buildDelete()
-                        .executeDeleteWithoutDetachingEntities();
             }
         });
     }

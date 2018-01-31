@@ -19,6 +19,15 @@ public class SettingProperty {
     public static final int VALUE_SORT_MATCH_NAME = 1;
     public static final int VALUE_SORT_MATCH_LEVEL = 2;
 
+    /**
+     * sort type of player mange page
+     */
+    public static final int VALUE_SORT_PLAYER_NAME = 0;
+    public static final int VALUE_SORT_PLAYER_NAME_ENG = 1;
+    public static final int VALUE_SORT_PLAYER_COUNTRY = 2;
+    public static final int VALUE_SORT_PLAYER_AGE = 3;
+    public static final int VALUE_SORT_PLAYER_CONSTELLATION = 4;
+
     private static final String getString(String key) {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(TApplication.getInstance());
         return sp.getString(key, "");
@@ -78,4 +87,21 @@ public class SettingProperty {
     public static int getMatchSortMode() {
         return getInt("key_sort_match");
     }
+
+    public static void setPlayerSortMode(int mode) {
+        setInt("key_sort_player", mode);
+    }
+
+    public static int getPlayerSortMode() {
+        return getInt("key_sort_player");
+    }
+
+    public static void setPlayerManageCardMode(boolean mode) {
+        setBoolean("key_player_manage_card", mode);
+    }
+
+    public static boolean isPlayerManageCardMode() {
+        return getBoolean("key_player_manage_card");
+    }
+
 }

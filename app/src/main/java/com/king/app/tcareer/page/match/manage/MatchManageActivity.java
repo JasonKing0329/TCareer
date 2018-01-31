@@ -17,7 +17,6 @@ import android.widget.TextView;
 
 import com.king.app.tcareer.R;
 import com.king.app.tcareer.base.BaseMvpActivity;
-import com.king.app.tcareer.model.db.entity.MatchBean;
 import com.king.app.tcareer.model.db.entity.MatchNameBean;
 import com.king.app.tcareer.page.match.common.MatchCommonActivity;
 import com.king.app.tcareer.page.setting.SettingProperty;
@@ -321,16 +320,14 @@ public class MatchManageActivity extends BaseMvpActivity<MatchManagePresenter> i
     }
 
     private void deleteMatchItems() {
-        List<MatchNameBean> list;
-        if (isGridMode) {
-            list = matchGridAdapter.getSelectedList();
+        List<MatchNameBean> list = getCurrentAdapter().getSelectedList();
+        if (list != null) {
+            presenter.deleteMatch(list);
         }
-        else {
-            list = matchItemAdapter.getSelectedList();
-        }
-        for (MatchNameBean bean:list) {
-            presenter.deleteMatch(bean);
-        }
+    }
+
+    @Override
+    public void deleteSuccess() {
         refreshList();
     }
 
@@ -361,14 +358,23 @@ public class MatchManageActivity extends BaseMvpActivity<MatchManagePresenter> i
 
     @Override
     public void sortFinished(List<MatchNameBean> matchList) {
+        getCurrentAdapter().setList(matchList);
+        getCurrentAdapter().notifyDataSetChanged();
         if (isGridMode) {
-            matchGridAdapter.notifyDataSetChanged();
             rvGrid.scrollToPosition(0);
         }
         else {
-            matchItemAdapter.notifyDataSetChanged();
             rvList.scrollToPosition(0);
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (isEditMode || isDeleteMode) {
+            updateActionbarStatus(false);
+            return;
+        }
+        super.onBackPressed();
     }
 
     public Animation getDisappearAnim(final View view) {
