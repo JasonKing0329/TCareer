@@ -21,4 +21,8 @@
     <dimen name="swipecard_indexbar_popup_size">100dp</dimen>
     <dimen name="swipecard_indexbar_popup_text_size">30dp</dimen>
     <dimen name="swipecard_indexbar_text_size">16dp</dimen>
+
+    <dimen name="record_item_player_size">45dp</dimen>
+    <dimen name="match_dialog_max_height">45dp</dimen>
+    <dimen name="margin_10">10dp</dimen>
 </resources>

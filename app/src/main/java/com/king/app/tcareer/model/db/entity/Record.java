@@ -66,14 +66,14 @@ public class Record {
      * 0: user
      * 1: competitor
      */
-    private long winnerFlag;
+    private int winnerFlag;
 
     /**
      * 0: no retire
      * 1: retire with score
      * 2: retire before match(W/0)
      */
-    private long retireFlag;
+    private int retireFlag;
 
     /** Used to resolve relations */
     @Generated(hash = 2040040024)
@@ -83,11 +83,11 @@ public class Record {
     @Generated(hash = 765166123)
     private transient RecordDao myDao;
 
-    @Generated(hash = 961687897)
+    @Generated(hash = 1997857599)
     public Record(Long id, long userId, int rankCpt, int rank, int seedpCpt,
             int seed, long playerId, int playerFlag, long matchNameId,
-            String dateStr, long dateLong, String round, long winnerFlag,
-            long retireFlag) {
+            String dateStr, long dateLong, String round, int winnerFlag,
+            int retireFlag) {
         this.id = id;
         this.userId = userId;
         this.rankCpt = rankCpt;
@@ -204,19 +204,19 @@ public class Record {
         this.round = round;
     }
 
-    public long getWinnerFlag() {
+    public int getWinnerFlag() {
         return this.winnerFlag;
     }
 
-    public void setWinnerFlag(long winnerFlag) {
+    public void setWinnerFlag(int winnerFlag) {
         this.winnerFlag = winnerFlag;
     }
 
-    public long getRetireFlag() {
+    public int getRetireFlag() {
         return this.retireFlag;
     }
 
-    public void setRetireFlag(long retireFlag) {
+    public void setRetireFlag(int retireFlag) {
         this.retireFlag = retireFlag;
     }
 

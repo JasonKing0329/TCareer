@@ -4,7 +4,7 @@ apply plugin: 'maven'
 android {
     compileSdkVersion 26
     defaultConfig {
-        minSdkVersion 9
+        minSdkVersion 14
         targetSdkVersion 26
         versionCode 3
         versionName '3.0.1'

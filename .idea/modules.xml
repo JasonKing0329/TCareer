@@ -6,6 +6,7 @@
       <module fileurl="file://$PROJECT_DIR$/TCareer.iml" filepath="$PROJECT_DIR$/TCareer.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/libtool/libtool.iml" filepath="$PROJECT_DIR$/libtool/libtool.iml" />
+      <module fileurl="file://$PROJECT_DIR$/shapimageview/shapimageview.iml" filepath="$PROJECT_DIR$/shapimageview/shapimageview.iml" />
     </modules>
   </component>
 </project>

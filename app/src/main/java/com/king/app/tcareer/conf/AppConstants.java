@@ -11,6 +11,10 @@ public class AppConstants {
 
     public static final String SCORE_RETIRE_NORMAL = "(对手退赛)";
 
+    public static final String CHAMPOION = "冠军";
+
+    public static final String RUNNERUP = "亚军";
+
     /**
      * 0: no retire
      * 1: retire with score
@@ -51,6 +55,32 @@ public class AppConstants {
             "红土",
             "草地",
             "室内硬地",
+    };
+
+    public static final String[] RECORD_MATCH_ROUNDS = new String[] {
+
+            "Final",
+            "Semi Final",
+            "1/4 Final",
+            "Round 16",
+            "Round 32",
+            "Round 64",
+            "Round 128",
+            "Group",
+            "Bronze medal"
+    };
+
+    public static final String[] RECORD_MATCH_ROUNDS_SHORT = new String[] {
+
+            "F",
+            "SF",
+            "QF",
+            "R16",
+            "R32",
+            "R64",
+            "R128",
+            "RR",
+            "BR"
     };
 
 }

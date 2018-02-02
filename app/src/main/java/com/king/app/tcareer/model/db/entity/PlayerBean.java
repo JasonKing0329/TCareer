@@ -1,11 +1,13 @@
 package com.king.app.tcareer.model.db.entity;
 
+import com.king.app.tcareer.model.bean.CompetitorBean;
+
 import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.annotation.Id;
 
 @Entity(nameInDb = "players")
-public class PlayerBean {
+public class PlayerBean implements CompetitorBean {
 
     @Id(autoincrement = true)
     private Long id;

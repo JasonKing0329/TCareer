@@ -30,6 +30,9 @@ import io.reactivex.schedulers.Schedulers;
  */
 
 public class PlayerCommonPresenter extends BasePresenter<PlayerCommonView> {
+
+    private PlayerViewBean mPlayerViewBean;
+
     @Override
     protected void onCreate() {
 
@@ -55,6 +58,7 @@ public class PlayerCommonPresenter extends BasePresenter<PlayerCommonView> {
 
                     @Override
                     public void onNext(PlayerViewBean playerBean) {
+                        mPlayerViewBean = playerBean;
                         view.showPlayer(playerBean);
                         loadH2H(playerId, isUser);
                     }
@@ -111,6 +115,10 @@ public class PlayerCommonPresenter extends BasePresenter<PlayerCommonView> {
                 e.onNext(viewBean);
             }
         });
+    }
+
+    public PlayerViewBean getmPlayerViewBean() {
+        return mPlayerViewBean;
     }
 
     private class H2HBean {

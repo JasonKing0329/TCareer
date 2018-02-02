@@ -1,6 +1,7 @@
 package com.king.app.tcareer.page.login;
 
 import android.Manifest;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.view.View;
 import android.widget.EditText;
@@ -9,6 +10,7 @@ import android.widget.LinearLayout;
 import com.king.app.tcareer.R;
 import com.king.app.tcareer.base.BaseMvpActivity;
 import com.king.app.tcareer.page.player.manage.PlayerManageActivity;
+import com.king.app.tcareer.page.setting.SettingActivity;
 import com.king.app.tcareer.utils.DBExportor;
 import com.tbruyelle.rxpermissions2.RxPermissions;
 
@@ -125,6 +127,26 @@ public class LoginActivity extends BaseMvpActivity<LoginPresenter> implements Lo
 
     @Override
     public void permitLogin() {
+        showYesNoMessage("是否打开设置页面？",
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        startSetting();
+                    }
+                }, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        startHome();
+                    }
+                });
+    }
+
+    private void startSetting() {
+        Intent intent = new Intent(this, SettingActivity.class);
+        startActivity(intent);
+    }
+
+    private void startHome() {
         Intent intent = new Intent(this, PlayerManageActivity.class);
         startActivity(intent);
     }

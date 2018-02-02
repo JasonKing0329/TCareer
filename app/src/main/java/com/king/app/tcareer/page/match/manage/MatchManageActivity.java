@@ -204,7 +204,7 @@ public class MatchManageActivity extends BaseMvpActivity<MatchManagePresenter> i
                     showSortPopup();
                     break;
                 case R.id.view7_actionbar_add:
-                    showConfirmCancelMessage("Only add match name from existed matches?"
+                    showYesNoMessage("Only add match name from existed matches?"
                             , new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialogInterface, int i) {

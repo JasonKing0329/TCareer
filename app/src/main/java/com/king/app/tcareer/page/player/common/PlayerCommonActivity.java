@@ -1,5 +1,6 @@
 package com.king.app.tcareer.page.player.common;
 
+import android.content.Intent;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.ImageView;
@@ -11,12 +12,15 @@ import com.king.app.tcareer.R;
 import com.king.app.tcareer.base.BaseMvpActivity;
 import com.king.app.tcareer.model.GlideOptions;
 import com.king.app.tcareer.model.ImageProvider;
+import com.king.app.tcareer.model.db.entity.PlayerBean;
 import com.king.app.tcareer.model.db.entity.User;
 import com.king.app.tcareer.page.player.manage.PlayerViewBean;
+import com.king.app.tcareer.page.player.page.PlayerPageActivity;
 import com.king.app.tcareer.utils.ConstellationUtil;
 import com.king.lib.tool.ui.RippleFactory;
 
 import butterknife.BindView;
+import butterknife.OnClick;
 
 /**
  * @desc
@@ -92,8 +96,7 @@ public class PlayerCommonActivity extends BaseMvpActivity<PlayerCommonPresenter>
         long playerId = getIntent().getLongExtra(KEY_PLAYER, -1);
         if (playerId == -1) {
             showMessage("player不存在");
-        }
-        else {
+        } else {
             presenter.loadPlayer(playerId, getIntent().getBooleanExtra(KEY_IS_USER, false));
         }
     }
@@ -104,16 +107,14 @@ public class PlayerCommonActivity extends BaseMvpActivity<PlayerCommonPresenter>
 
         if (TextUtils.isEmpty(playerBean.getNameEng()) || playerBean.getName().equals(playerBean.getNameEng())) {
             tvNameEng.setVisibility(View.GONE);
-        }
-        else {
+        } else {
             tvNameEng.setText(playerBean.getNameEng());
         }
         tvPlace.setText(playerBean.getCountry());
 
         if (TextUtils.isEmpty(playerBean.getBirthday())) {
             tvBirthday.setVisibility(View.GONE);
-        }
-        else {
+        } else {
             String constel = "";
             try {
                 constel = ConstellationUtil.getConstellationChn(playerBean.getBirthday());
@@ -140,18 +141,51 @@ public class PlayerCommonActivity extends BaseMvpActivity<PlayerCommonPresenter>
         if (user.getId() == 1) {
             tvKingH2h.setText(win + " - " + lose);
             tvKingName.setText(user.getNameChn());
-        }
-        else if (user.getId() == 2) {
+            groupKing.setTag(user);
+        } else if (user.getId() == 2) {
             tvFlamencoH2h.setText(win + " - " + lose);
             tvFlamencoName.setText(user.getNameChn());
-        }
-        else if (user.getId() == 3) {
+            groupFlamenco.setTag(user);
+        } else if (user.getId() == 3) {
             tvHenryH2h.setText(win + " - " + lose);
             tvHenryName.setText(user.getNameChn());
-        }
-        else if (user.getId() == 4) {
+            groupHenry.setTag(user);
+        } else if (user.getId() == 4) {
             tvQiH2h.setText(win + " - " + lose);
             tvQiName.setText(user.getNameChn());
+            groupQi.setTag(user);
         }
+    }
+
+    @OnClick({R.id.group_king, R.id.group_flamenco, R.id.group_henry, R.id.group_qi})
+    public void onViewClicked(View view) {
+        switch (view.getId()) {
+            case R.id.group_king:
+                startPlayerPage((User) groupKing.getTag());
+                break;
+            case R.id.group_flamenco:
+                startPlayerPage((User) groupFlamenco.getTag());
+                break;
+            case R.id.group_henry:
+                startPlayerPage((User) groupHenry.getTag());
+                break;
+            case R.id.group_qi:
+                startPlayerPage((User) groupQi.getTag());
+                break;
+        }
+    }
+
+    private void startPlayerPage(User user) {
+        Intent intent = new Intent(this, PlayerPageActivity.class);
+        Object data = presenter.getmPlayerViewBean().getData();
+        if (data instanceof User) {
+            intent.putExtra(PlayerPageActivity.KEY_COMPETITOR_IS_USER, true);
+            intent.putExtra(PlayerPageActivity.KEY_COMPETITOR_ID, ((User) data).getId());
+        }
+        else if (data instanceof PlayerBean) {
+            intent.putExtra(PlayerPageActivity.KEY_COMPETITOR_ID, ((PlayerBean) data).getId());
+        }
+        intent.putExtra(PlayerPageActivity.KEY_USER_ID, user.getId());
+        startActivity(intent);
     }
 }

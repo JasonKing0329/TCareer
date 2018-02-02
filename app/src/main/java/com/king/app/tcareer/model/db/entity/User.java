@@ -1,5 +1,7 @@
 package com.king.app.tcareer.model.db.entity;
 
+import com.king.app.tcareer.model.bean.CompetitorBean;
+
 import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.annotation.Id;
@@ -10,7 +12,7 @@ import org.greenrobot.greendao.annotation.Id;
  * <p/>创建时间: 2018/1/26 15:34
  */
 @Entity(nameInDb = "users")
-public class User {
+public class User implements CompetitorBean {
 
     @Id(autoincrement = true)
     private Long id;
