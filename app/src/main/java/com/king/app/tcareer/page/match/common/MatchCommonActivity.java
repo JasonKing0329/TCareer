@@ -1,5 +1,7 @@
 package com.king.app.tcareer.page.match.common;
 
+import android.content.Intent;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -10,10 +12,14 @@ import com.king.app.tcareer.base.BaseMvpActivity;
 import com.king.app.tcareer.model.GlideOptions;
 import com.king.app.tcareer.model.ImageProvider;
 import com.king.app.tcareer.model.db.entity.MatchNameBean;
+import com.king.app.tcareer.model.db.entity.PlayerBean;
 import com.king.app.tcareer.model.db.entity.User;
+import com.king.app.tcareer.page.match.page.MatchPageActivity;
+import com.king.app.tcareer.page.player.page.PlayerPageActivity;
 import com.king.lib.tool.ui.RippleFactory;
 
 import butterknife.BindView;
+import butterknife.OnClick;
 
 /**
  * 描述:
@@ -125,18 +131,47 @@ public class MatchCommonActivity extends BaseMvpActivity<MatchCommonPresenter> i
         if (user.getId() == 1) {
             tvKingH2h.setText(h2h);
             tvKingYear.setText(years);
+            groupKing.setTag(user);
         }
         else if (user.getId() == 2) {
             tvFlamencoH2h.setText(h2h);
             tvFlamencoYear.setText(years);
+            groupFlamenco.setTag(user);
         }
         else if (user.getId() == 3) {
             tvHenryH2h.setText(h2h);
             tvHenryYear.setText(years);
+            groupHenry.setTag(user);
         }
         else if (user.getId() == 4) {
             tvQiH2h.setText(h2h);
             tvQiYear.setText(years);
+            groupQi.setTag(user);
         }
+    }
+
+    @OnClick({R.id.group_king, R.id.group_flamenco, R.id.group_henry, R.id.group_qi})
+    public void onViewClicked(View view) {
+        switch (view.getId()) {
+            case R.id.group_king:
+                startPlayerPage((User) groupKing.getTag());
+                break;
+            case R.id.group_flamenco:
+                startPlayerPage((User) groupFlamenco.getTag());
+                break;
+            case R.id.group_henry:
+                startPlayerPage((User) groupHenry.getTag());
+                break;
+            case R.id.group_qi:
+                startPlayerPage((User) groupQi.getTag());
+                break;
+        }
+    }
+
+    private void startPlayerPage(User user) {
+        Intent intent = new Intent(this, MatchPageActivity.class);
+        intent.putExtra(MatchPageActivity.KEY_MATCH_NAME_ID, presenter.getmMatchNameBean().getId());
+        intent.putExtra(MatchPageActivity.KEY_USER_ID, user.getId());
+        startActivity(intent);
     }
 }

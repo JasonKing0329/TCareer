@@ -33,9 +33,15 @@ import io.reactivex.schedulers.Schedulers;
  */
 public class MatchCommonPresenter extends BasePresenter<MatchCommonView> {
 
+    private MatchNameBean mMatchNameBean;
+
     @Override
     protected void onCreate() {
 
+    }
+
+    public MatchNameBean getmMatchNameBean() {
+        return mMatchNameBean;
     }
 
     private class MessageBean {
@@ -51,6 +57,7 @@ public class MatchCommonPresenter extends BasePresenter<MatchCommonView> {
                 .flatMap(new Function<MatchNameBean, ObservableSource<MessageBean>>() {
                     @Override
                     public ObservableSource<MessageBean> apply(MatchNameBean matchNameBean) throws Exception {
+                        mMatchNameBean = matchNameBean;
                         view.postShowMatchInfor(matchNameBean);
                         return getPresentMessage(matchNameBean.getMatchBean());
                     }

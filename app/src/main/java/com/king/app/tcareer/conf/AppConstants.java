@@ -1,5 +1,7 @@
 package com.king.app.tcareer.conf;
 
+import android.text.TextUtils;
+
 /**
  * 描述:
  * <p/>作者：景阳
@@ -82,5 +84,27 @@ public class AppConstants {
             "RR",
             "BR"
     };
+
+    /**
+     * RECORD_MATCH_ROUNDS对照的RECORD_GS_ROUNDS_GLORY
+     * @param round
+     * @return
+     */
+    public static final String getMasterGloryForRound(String round) {
+        if (TextUtils.isEmpty(round)) {
+            return "--";
+        }
+        if (round.equals("Winner")) {
+            return "W";
+        }
+
+        String glory = "--";
+        for (int i = 0; i < RECORD_MATCH_ROUNDS.length; i ++) {
+            if (RECORD_MATCH_ROUNDS[i].equals(round)) {
+                glory = RECORD_MATCH_ROUNDS_SHORT[i];
+            }
+        }
+        return glory;
+    }
 
 }
