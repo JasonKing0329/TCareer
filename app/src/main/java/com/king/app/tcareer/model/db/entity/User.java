@@ -23,10 +23,10 @@ public class User implements CompetitorBean {
     private String country;
     private String city;
     private String birthday;
-
-    @Generated(hash = 905881135)
+    private String nameShort;
+    @Generated(hash = 153284863)
     public User(Long id, String nameEng, String nameChn, String namePinyin,
-            String country, String city, String birthday) {
+            String country, String city, String birthday, String nameShort) {
         this.id = id;
         this.nameEng = nameEng;
         this.nameChn = nameChn;
@@ -34,65 +34,58 @@ public class User implements CompetitorBean {
         this.country = country;
         this.city = city;
         this.birthday = birthday;
+        this.nameShort = nameShort;
     }
-
     @Generated(hash = 586692638)
     public User() {
     }
-
     public Long getId() {
-        return id;
+        return this.id;
     }
-
     public void setId(Long id) {
         this.id = id;
     }
-
     public String getNameEng() {
-        return nameEng;
+        return this.nameEng;
     }
-
     public void setNameEng(String nameEng) {
         this.nameEng = nameEng;
     }
-
     public String getNameChn() {
-        return nameChn;
+        return this.nameChn;
     }
-
     public void setNameChn(String nameChn) {
         this.nameChn = nameChn;
     }
-
     public String getNamePinyin() {
-        return namePinyin;
+        return this.namePinyin;
     }
-
     public void setNamePinyin(String namePinyin) {
         this.namePinyin = namePinyin;
     }
-
     public String getCountry() {
-        return country;
+        return this.country;
     }
-
     public void setCountry(String country) {
         this.country = country;
     }
-
     public String getCity() {
-        return city;
+        return this.city;
     }
-
     public void setCity(String city) {
         this.city = city;
     }
-
     public String getBirthday() {
-        return birthday;
+        return this.birthday;
     }
-
     public void setBirthday(String birthday) {
         this.birthday = birthday;
     }
+    public String getNameShort() {
+        return this.nameShort;
+    }
+    public void setNameShort(String nameShort) {
+        this.nameShort = nameShort;
+    }
+
 }

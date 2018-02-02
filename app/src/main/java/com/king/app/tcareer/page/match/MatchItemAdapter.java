@@ -76,9 +76,12 @@ public class MatchItemAdapter extends RecyclerView.Adapter<MatchItemAdapter.Matc
         // winner and score
         if (record.getWinnerFlag() == AppConstants.WINNER_COMPETITOR) {
             winner = competitor.getNameChn();
+            if (competitor instanceof User) {
+                winner = ((User) competitor).getNameShort();
+            }
         }
         else {
-            winner = record.getUser().getNameChn();
+            winner = record.getUser().getNameShort();
         }
         holder.tvScore.setText(winner + " " + ScoreParser.getScoreText(record.getScoreList(), record.getWinnerFlag(), record.getRetireFlag()));
 

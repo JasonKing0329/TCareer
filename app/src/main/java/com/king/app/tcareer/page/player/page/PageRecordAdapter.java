@@ -11,9 +11,11 @@ import com.bumptech.glide.request.RequestOptions;
 import com.github.siyamed.shapeimageview.BubbleImageView;
 import com.king.app.tcareer.R;
 import com.king.app.tcareer.conf.AppConstants;
+import com.king.app.tcareer.model.CompetitorParser;
 import com.king.app.tcareer.model.GlideOptions;
 import com.king.app.tcareer.model.ImageProvider;
 import com.king.app.tcareer.model.ScoreParser;
+import com.king.app.tcareer.model.bean.CompetitorBean;
 import com.king.app.tcareer.model.db.entity.MatchBean;
 import com.king.app.tcareer.model.db.entity.Record;
 import com.king.app.tcareer.model.db.entity.User;
@@ -90,14 +92,19 @@ public class PageRecordAdapter extends RecyclerView.Adapter implements View.OnCl
 
     private void onBindRecord(RecordHolder holder, Record record) {
         MatchBean matchBean = record.getMatch().getMatchBean();
+        CompetitorBean competitor = CompetitorParser.getCompetitorFrom(record);
         holder.tvLine1.setText(matchBean.getLevel() + "  " + record.getDateStr().split("-")[1] + "月  " + record.getRound());
         holder.tvLine2.setText(record.getMatch().getName() + "  " + matchBean.getCourt());
         if (record.getWinnerFlag() == AppConstants.WINNER_USER) {
-            holder.tvLine3.setText(user.getNameChn() + "  def.  " + record.getSeedpCpt() + "/" + record.getRankCpt());
+            holder.tvLine3.setText(user.getNameShort() + "  def.  " + record.getRankCpt() + "/" + record.getSeedpCpt());
             holder.tvLine3.setTextColor(holder.tvLine3.getResources().getColor(R.color.record_item_text_gray));
         }
         else {
-            holder.tvLine3.setText(record.getCompetitor().getNameChn() + " " + record.getSeedpCpt() + "/" + record.getRankCpt() + "  def.");
+            String winner = competitor.getNameChn();
+            if (competitor instanceof User) {
+                winner = ((User) competitor).getNameShort();
+            }
+            holder.tvLine3.setText(winner + " " + record.getRankCpt() + "/" + record.getSeedpCpt() + "  def.");
             holder.tvLine3.setTextColor(holder.tvLine3.getResources().getColor(R.color.red));
         }
         holder.tvLine4.setText(ScoreParser.getScoreText(record.getScoreList(), record.getWinnerFlag(), record.getRetireFlag()));

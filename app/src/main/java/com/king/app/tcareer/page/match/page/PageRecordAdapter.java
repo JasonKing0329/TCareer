@@ -92,7 +92,7 @@ public class PageRecordAdapter extends RecyclerView.Adapter implements View.OnCl
         holder.tvLevel.setText(AppConstants.getMasterGloryForRound(record.getRound()));
         holder.tvLine2.setText(competitor.getNameChn() + " " + record.getRankCpt() + "/" + record.getSeedpCpt());
         GradientDrawable drawable = (GradientDrawable) holder.tvLevel.getBackground();
-        String winner = record.getUser().getNameChn();
+        String winner = record.getUser().getNameShort();
         if (record.getWinnerFlag() == AppConstants.WINNER_USER) {
             if (record.getRound().equals(AppConstants.RECORD_MATCH_ROUNDS[0])) {
                 drawable.setColor(holder.tvLevel.getResources().getColor(R.color.colorAccent));
@@ -103,6 +103,9 @@ public class PageRecordAdapter extends RecyclerView.Adapter implements View.OnCl
         }
         else {
             winner = competitor.getNameChn();
+            if (competitor instanceof User) {
+                winner = ((User) competitor).getNameShort();
+            }
             drawable.setColor(holder.tvLevel.getResources().getColor(R.color.match_timeline));
         }
         holder.tvLevel.setBackground(drawable);
