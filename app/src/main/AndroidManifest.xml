@@ -74,6 +74,10 @@
             android:theme="@style/HomeTheme"
             android:screenOrientation="portrait"/>
 
+        <activity android:name=".page.player.slider.PlayerSlideActivity"
+            android:theme="@style/HomeTheme"
+            android:screenOrientation="portrait"/>
+
     </application>
 
 </manifest>

@@ -33,4 +33,6 @@
     <dimen name="dialog_bg_selector_item_padding">5dp</dimen>
     <dimen name="dialog_bg_selector_item_height">90dp</dimen>
     <dimen name="dialog_icon_right">8dp</dimen>
+    <dimen name="player_slide_left_offset">61dp</dimen>
+    <dimen name="player_slide_left_offset2">148dp</dimen>
 </resources>
