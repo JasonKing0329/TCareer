@@ -95,8 +95,10 @@ public class UpdatePresenter {
     public void clearAppFolder() {
         File file = new File(AppConfig.APP_UPDATE_DIR);
         File files[] = file.listFiles();
-        for (File f:files) {
-            f.delete();
+        if (files != null) {
+            for (File f:files) {
+                f.delete();
+            }
         }
     }
 }

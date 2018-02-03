@@ -2,9 +2,9 @@ package com.king.app.tcareer.page.update;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.FragmentManager;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.support.v4.app.FragmentActivity;
 import android.text.TextUtils;
 import android.widget.Toast;
 
@@ -13,6 +13,7 @@ import com.king.app.tcareer.conf.AppConfig;
 import com.king.app.tcareer.model.http.Command;
 import com.king.app.tcareer.model.http.bean.AppCheckBean;
 import com.king.app.tcareer.page.download.DownloadDialog;
+import com.king.app.tcareer.page.download.DownloadDialogApp;
 import com.king.app.tcareer.page.download.DownloadItem;
 import com.king.app.tcareer.page.setting.SettingProperty;
 import com.king.app.tcareer.utils.DebugLog;
@@ -34,6 +35,10 @@ public class UpdateManager implements IUpdateView {
 
     private boolean showMessageWarning;
 
+    private FragmentManager fragmentManagerApp;
+
+    private android.support.v4.app.FragmentManager fragmentManager;
+
     public UpdateManager(Context context) {
         mContext = context;
         mPresenter = new UpdatePresenter(this);
@@ -45,6 +50,16 @@ public class UpdateManager implements IUpdateView {
 
     public void showMessageWarning() {
         showMessageWarning = true;
+    }
+
+    public void startCheck(FragmentManager fragmentManager) {
+        this.fragmentManagerApp = fragmentManager;
+        startCheck();
+    }
+
+    public void startCheck(android.support.v4.app.FragmentManager fragmentManager) {
+        this.fragmentManager = fragmentManager;
+        startCheck();
     }
 
     public void startCheck() {
@@ -150,6 +165,37 @@ public class UpdateManager implements IUpdateView {
         List<DownloadItem> list = new ArrayList<>();
         list.add(item);
 
+        if (fragmentManager != null) {
+            showDownloadDialog(list);
+        }
+        else if (fragmentManagerApp != null) {
+            showDownloadDialogApp(list);
+        }
+    }
+
+    private void showDownloadDialogApp(List<DownloadItem> list) {
+        final DownloadDialogApp downloadDialog = new DownloadDialogApp();
+        downloadDialog.setDownloadList(list);
+        downloadDialog.setSavePath(AppConfig.APP_UPDATE_DIR);
+        downloadDialog.setStartNoOption(true);
+        downloadDialog.setOnDownloadListener(new DownloadDialogApp.OnDownloadListener() {
+            @Override
+            public void onDownloadFinish(DownloadItem item) {
+                isUpdating = false;
+                mPresenter.installApp((Activity) mContext, item.getPath());
+                downloadDialog.dismiss();
+                android.os.Process.killProcess(android.os.Process.myPid());
+            }
+
+            @Override
+            public void onDownloadFinish(List<DownloadItem> downloadList) {
+
+            }
+        });
+        downloadDialog.show(fragmentManagerApp, "DownloadDialog");
+    }
+
+    private void showDownloadDialog(List<DownloadItem> list) {
         final DownloadDialog downloadDialog = new DownloadDialog();
         downloadDialog.setDownloadList(list);
         downloadDialog.setSavePath(AppConfig.APP_UPDATE_DIR);
@@ -168,7 +214,7 @@ public class UpdateManager implements IUpdateView {
 
             }
         });
-        downloadDialog.show(((FragmentActivity) mContext).getSupportFragmentManager(), "DownloadDialog");
+        downloadDialog.show(fragmentManager, "DownloadDialog");
     }
 
     public boolean isUpdating() {

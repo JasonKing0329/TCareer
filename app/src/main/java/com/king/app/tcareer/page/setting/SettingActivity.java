@@ -205,7 +205,7 @@ public class SettingActivity extends AppCompatPreferenceActivity {
                 else {
                     UpdateManager manager = new UpdateManager(SettingActivity.this);
                     manager.showMessageWarning();
-                    manager.startCheck();
+                    manager.startCheck(getFragmentManager());
                 }
                 return true;
             }
