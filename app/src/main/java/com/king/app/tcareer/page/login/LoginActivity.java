@@ -9,7 +9,6 @@ import android.widget.LinearLayout;
 
 import com.king.app.tcareer.R;
 import com.king.app.tcareer.base.BaseMvpActivity;
-import com.king.app.tcareer.page.match.manage.MatchManageActivity;
 import com.king.app.tcareer.page.player.manage.PlayerManageActivity;
 import com.king.app.tcareer.page.setting.SettingActivity;
 import com.king.app.tcareer.utils.DBExportor;
@@ -148,7 +147,7 @@ public class LoginActivity extends BaseMvpActivity<LoginPresenter> implements Lo
     }
 
     private void startHome() {
-        Intent intent = new Intent(this, MatchManageActivity.class);
+        Intent intent = new Intent(this, PlayerManageActivity.class);
         startActivity(intent);
     }
 }

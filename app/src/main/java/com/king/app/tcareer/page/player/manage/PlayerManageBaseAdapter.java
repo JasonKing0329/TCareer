@@ -1,5 +1,6 @@
 package com.king.app.tcareer.page.player.manage;
 
+import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.SparseBooleanArray;
 import android.view.View;
@@ -13,6 +14,10 @@ import com.king.app.tcareer.model.GlideOptions;
 import com.king.app.tcareer.model.ImageProvider;
 import com.king.app.tcareer.model.db.entity.PlayerBean;
 import com.king.app.tcareer.model.db.entity.User;
+import com.king.app.tcareer.model.http.Command;
+import com.king.app.tcareer.model.http.bean.ImageUrlBean;
+import com.king.app.tcareer.page.imagemanager.DataController;
+import com.king.app.tcareer.page.imagemanager.ImageManager;
 import com.king.app.tcareer.page.setting.SettingProperty;
 import com.king.app.tcareer.utils.ConstellationUtil;
 
@@ -42,6 +47,8 @@ public abstract class PlayerManageBaseAdapter extends RecyclerView.Adapter imple
      * 保存首次从文件夹加载的图片序号
      */
     protected Map<String, Integer> playerImageIndexMap;
+
+    private FragmentManager fragmentManager;
 
     public PlayerManageBaseAdapter(List<PlayerViewBean> list) {
         this.list = list;
@@ -85,12 +92,12 @@ public abstract class PlayerManageBaseAdapter extends RecyclerView.Adapter imple
      * @param view
      */
     protected void updateItemBackground(int position, View view) {
-//        if (position < PubDataProvider.VIRTUAL_PLAYER) {// 显示为浅灰背景
-//            view.setBackgroundColor(context.getResources().getColor(R.color.lightgrey));
-//        }
-//        else {
-//            view.setBackgroundColor(context.getResources().getColor(R.color.white));
-//        }
+        if (list.get(position).getData() instanceof User) {// 显示为浅灰背景
+            view.setBackgroundColor(view.getContext().getResources().getColor(R.color.lightgrey));
+        }
+        else {
+            view.setBackgroundColor(view.getContext().getResources().getColor(R.color.white));
+        }
     }
 
     protected boolean isSortByConstellation() {
@@ -184,10 +191,10 @@ public abstract class PlayerManageBaseAdapter extends RecyclerView.Adapter imple
         else if (v instanceof ImageView) {
             nGroupPosition = (int) v.getTag(R.id.tag_record_list_player_group_index);
 
-//            ImageManager imageManager = new ImageManager(v.getContext());
-//            imageManager.setOnActionListener(imageActionListener);
-//            imageManager.setDataProvider(dataProvider);
-//            imageManager.showOptions(list.get(nGroupPosition).getNameChn(), nGroupPosition, Command.TYPE_IMG_PLAYER, list.get(nGroupPosition).getNameChn());
+            ImageManager imageManager = new ImageManager(v.getContext());
+            imageManager.setOnActionListener(imageActionListener);
+            imageManager.setDataProvider(dataProvider);
+            imageManager.showOptions(list.get(nGroupPosition).getName(), nGroupPosition, Command.TYPE_IMG_PLAYER, list.get(nGroupPosition).getName());
         }
     }
 
@@ -222,33 +229,42 @@ public abstract class PlayerManageBaseAdapter extends RecyclerView.Adapter imple
         }
     }
 
-//    ImageManager.DataProvider dataProvider = new ImageManager.DataProvider() {
-//
-//        @Override
-//        public ImageUrlBean createImageUrlBean(InteractionController interactionController) {
-//            ImageUrlBean bean = interactionController.getPlayerImageUrlBean(list.get(nGroupPosition).getNameChn());
-//            return bean;
-//        }
-//    };
-//
-//    ImageManager.OnActionListener imageActionListener = new ImageManager.OnActionListener() {
-//        @Override
-//        public void onRefresh(int position) {
-//            String name = list.get(position).getNameChn();
-//            ImageFactory.getPlayerHeadPath(name, playerImageIndexMap);
-//            notifyDataSetChanged();
-//        }
-//
-//        @Override
-//        public void onManageFinished() {
-//            notifyDataSetChanged();
-//        }
-//
-//        @Override
-//        public void onDownloadFinished() {
-//            notifyDataSetChanged();
-//        }
-//    };
+    public void setFragmentManager(FragmentManager manager) {
+        this.fragmentManager = manager;
+    }
+
+    ImageManager.DataProvider dataProvider = new ImageManager.DataProvider() {
+
+        @Override
+        public ImageUrlBean createImageUrlBean(DataController dataController) {
+            ImageUrlBean bean = dataController.getPlayerImageUrlBean(list.get(nGroupPosition).getName());
+            return bean;
+        }
+    };
+
+    ImageManager.OnActionListener imageActionListener = new ImageManager.OnActionListener() {
+        @Override
+        public void onRefresh(int position) {
+            String name = list.get(position).getName();
+            ImageProvider.getPlayerHeadPath(name, playerImageIndexMap);
+            notifyDataSetChanged();
+        }
+
+        @Override
+        public void onManageFinished() {
+            notifyDataSetChanged();
+        }
+
+        @Override
+        public void onDownloadFinished() {
+            notifyDataSetChanged();
+        }
+
+        @Override
+        public FragmentManager getFragmentManager() {
+            return fragmentManager;
+        }
+    };
 
     public interface OnPlayerItemClickListener {
         void onPlayerItemClick(PlayerViewBean bean);

@@ -6,7 +6,7 @@
     <dimen name="activity_vertical_margin">16dp</dimen>
 
     <dimen name="vertical_divider">1px</dimen>
-    <dimen name="custom_dialog_toolbar_icon">30dp</dimen>
+    <dimen name="custom_dialog_toolbar_icon">26dp</dimen>
     <dimen name="custom_dialog_title_text_size">20dp</dimen>
     <dimen name="custom_dialog_icon_frame_radius">17dp</dimen>
     <dimen name="custom_dialog_search_height">30dp</dimen>
@@ -27,4 +27,10 @@
     <dimen name="margin_10">10dp</dimen>
     <dimen name="match_page_line_left">20dp</dimen>
     <dimen name="player_basic_head_height">200dp</dimen>
+    <dimen name="download_dlg_height">400dp</dimen>
+    <dimen name="dlg_loadfrom_list_height">400dp</dimen>
+    <dimen name="dialog_bg_selector_padding">10dp</dimen>
+    <dimen name="dialog_bg_selector_item_padding">5dp</dimen>
+    <dimen name="dialog_bg_selector_item_height">90dp</dimen>
+    <dimen name="dialog_icon_right">8dp</dimen>
 </resources>

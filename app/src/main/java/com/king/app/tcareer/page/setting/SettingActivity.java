@@ -12,10 +12,13 @@ import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBar;
+import android.text.TextUtils;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.king.app.tcareer.R;
 import com.king.app.tcareer.page.login.FingerPrintController;
+import com.king.app.tcareer.page.update.UpdateManager;
 
 import java.util.List;
 
@@ -196,14 +199,14 @@ public class SettingActivity extends AppCompatPreferenceActivity {
         findPreference("pref_http_update").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-//                if (TextUtils.isEmpty(SettingProperty.getServerBaseUrl(SettingActivityK4.this))) {
-//                    Toast.makeText(SettingActivityK4.this, R.string.server_url_empty, Toast.LENGTH_LONG).show();
-//                }
-//                else {
-//                    UpdateManager manager = new UpdateManager(SettingActivityK4.this);
-//                    manager.showMessageWarning();
-//                    manager.startCheck();
-//                }
+                if (TextUtils.isEmpty(SettingProperty.getServerBaseUrl())) {
+                    Toast.makeText(SettingActivity.this, R.string.server_url_empty, Toast.LENGTH_LONG).show();
+                }
+                else {
+                    UpdateManager manager = new UpdateManager(SettingActivity.this);
+                    manager.showMessageWarning();
+                    manager.startCheck();
+                }
                 return true;
             }
         });

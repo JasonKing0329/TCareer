@@ -145,7 +145,7 @@ public class MatchManageActivity extends BaseMvpActivity<MatchManagePresenter> i
             if (matchGridAdapter == null) {
                 matchGridAdapter = new MatchGridAdapter(list);
                 matchGridAdapter.setOnMatchItemClickListener(onMatchItemClickListener);
-
+                matchGridAdapter.setFragmentManager(getSupportFragmentManager());
                 rvGrid.setAdapter(matchGridAdapter);
             }
             else {
@@ -157,7 +157,7 @@ public class MatchManageActivity extends BaseMvpActivity<MatchManagePresenter> i
             if (matchItemAdapter == null) {
                 matchItemAdapter = new MatchItemAdapter(list);
                 matchItemAdapter.setOnMatchItemClickListener(onMatchItemClickListener);
-
+                matchGridAdapter.setFragmentManager(getSupportFragmentManager());
                 rvList.setAdapter(matchItemAdapter);
             }
             else {

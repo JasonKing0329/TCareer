@@ -12,7 +12,7 @@
         android:gravity="center_vertical"
         android:layout_marginLeft="@dimen/activity_horizontal_margin"
         android:layout_marginRight="@dimen/activity_horizontal_margin"
-        android:layout_marginTop="@dimen/activity_horizontal_margin"
+        android:layout_marginTop="@dimen/margin_10"
         android:orientation="horizontal">
 
         <LinearLayout
@@ -22,20 +22,19 @@
             android:gravity="center_vertical"
             android:orientation="horizontal"
             android:paddingBottom="5dp"
-            android:paddingLeft="10dp"
             android:paddingRight="10dp"
             android:paddingTop="5dp">
 
             <ImageView
                 android:layout_width="@dimen/custom_dialog_toolbar_icon"
                 android:layout_height="@dimen/custom_dialog_toolbar_icon"
+                android:visibility="gone"
                 android:src="@drawable/dialog_title_icon" />
 
             <TextView
                 android:id="@+id/tv_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="5dp"
                 android:textColor="@color/custom_dialog_title_text"
                 android:textSize="@dimen/custom_dialog_title_text_size"
                 android:textStyle="bold" />
@@ -52,43 +51,33 @@
         <ImageView
             android:id="@+id/iv_search"
             style="@style/CustomDialogIcon_L"
-            android:layout_width="@dimen/custom_dialog_toolbar_icon"
-            android:layout_height="@dimen/custom_dialog_toolbar_icon"
             android:src="@drawable/ic_search_white_36dp"
             android:visibility="gone" />
 
         <ImageView
             android:id="@+id/iv_play"
             style="@style/CustomDialogIcon_L"
-            android:layout_width="@dimen/custom_dialog_toolbar_icon"
-            android:layout_height="@dimen/custom_dialog_toolbar_icon"
-            android:layout_marginRight="5dp"
+            android:layout_marginRight="@dimen/dialog_icon_right"
             android:src="@drawable/ic_play_arrow_white_36dp"
             android:visibility="gone" />
 
         <ImageView
             android:id="@+id/iv_ok"
             style="@style/CustomDialogIcon_L"
-            android:layout_width="@dimen/custom_dialog_toolbar_icon"
-            android:layout_height="@dimen/custom_dialog_toolbar_icon"
-            android:layout_marginRight="5dp"
+            android:layout_marginRight="@dimen/dialog_icon_right"
             android:src="@drawable/ic_check_white_36dp"
             android:visibility="gone" />
 
         <ImageView
             android:id="@+id/iv_save"
             style="@style/CustomDialogIcon_L"
-            android:layout_width="@dimen/custom_dialog_toolbar_icon"
-            android:layout_height="@dimen/custom_dialog_toolbar_icon"
-            android:layout_marginRight="5dp"
+            android:layout_marginRight="@dimen/dialog_icon_right"
             android:src="@drawable/ic_save_white_36dp"
             android:visibility="gone" />
 
         <ImageView
             android:id="@+id/iv_close"
             style="@style/CustomDialogIcon_L"
-            android:layout_width="@dimen/custom_dialog_toolbar_icon"
-            android:layout_height="@dimen/custom_dialog_toolbar_icon"
             android:src="@drawable/ic_close_white_36dp"
             android:visibility="gone" />
 

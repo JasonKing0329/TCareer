@@ -104,4 +104,12 @@ public class SettingProperty {
         return getBoolean("key_player_manage_card");
     }
 
+    public static void setServerBaseUrl(String url) {
+        setString("pref_http_server", url);
+    }
+
+    public static String getServerBaseUrl() {
+        return getString("pref_http_server");
+    }
+
 }

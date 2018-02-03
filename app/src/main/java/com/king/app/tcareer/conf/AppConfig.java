@@ -19,6 +19,7 @@ public class AppConfig {
     public static final String DOWNLOAD_IMAGE = DOWNLOAD_BASE + "/img";
     public static final String CONF_DIR = DEF_CONTENT + "/conf";
     public static final String TEMP_DIR = DEF_CONTENT + "/temp";
+    public static final String APP_UPDATE_DIR = DEF_CONTENT + "/apk";
 
     // TODO 暂时沿用mytennis的图片目录
     public static final String BASE_IMG = SDCARD + "/mytennis";

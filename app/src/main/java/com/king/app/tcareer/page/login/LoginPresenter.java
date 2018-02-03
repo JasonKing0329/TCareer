@@ -3,6 +3,7 @@ package com.king.app.tcareer.page.login;
 import com.king.app.tcareer.base.BasePresenter;
 import com.king.app.tcareer.base.TApplication;
 import com.king.app.tcareer.conf.AppConfig;
+import com.king.app.tcareer.model.http.BaseUrl;
 import com.king.app.tcareer.page.setting.SettingProperty;
 import com.king.app.tcareer.utils.FileUtil;
 import com.king.app.tcareer.utils.MD5Util;
@@ -80,6 +81,9 @@ public class LoginPresenter extends BasePresenter<LoginView> {
 
                 // 检查数据库是否存在
                 FileUtil.copyDbFromAssets("khcareer.db");
+
+                // init server url
+                BaseUrl.getInstance().setBaseUrl(SettingProperty.getServerBaseUrl());
 
                 e.onNext(new Object());
                 e.onComplete();

@@ -55,6 +55,9 @@
     <style name="CustomDialogIcon_L">
         <item name="android:background">@drawable/selector_custom_dialog_icon_bk_l</item>
         <item name="android:padding">5dp</item>
+        <item name="android:layout_width">@dimen/custom_dialog_toolbar_icon</item>
+        <item name="android:layout_height">@dimen/custom_dialog_toolbar_icon</item>
+        <item name="android:scaleType">fitCenter</item>
     </style>
 
     <style name="CommonPlayerGroup">

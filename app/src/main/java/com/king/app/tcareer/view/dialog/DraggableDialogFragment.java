@@ -184,6 +184,11 @@ public abstract class DraggableDialogFragment extends BaseDialogFragment {
         currentButtonList.add(ivOk);
     }
 
+    public void requestOkAction(int srcRes) {
+        requestOkAction();
+        ivOk.setImageResource(srcRes);
+    }
+
     public void requestCloseAction() {
         ivClose.setVisibility(View.VISIBLE);
         currentButtonList.add(ivClose);

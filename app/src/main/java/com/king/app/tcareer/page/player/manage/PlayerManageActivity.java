@@ -156,7 +156,7 @@ public class PlayerManageActivity extends BaseMvpActivity<PlayerManagePresenter>
             if (playerStaggerAdapter == null) {
                 playerStaggerAdapter = new PlayerStaggerAdapter(list, ScreenUtils.getScreenWidth(this) / 2 - ScreenUtils.dp2px(10) * 2);
                 playerStaggerAdapter.setOnPlayerItemClickListener(playerItemClickListener);
-
+                playerStaggerAdapter.setFragmentManager(getSupportFragmentManager());
                 rvStagger.setAdapter(playerStaggerAdapter);
             }
             else {
@@ -168,7 +168,7 @@ public class PlayerManageActivity extends BaseMvpActivity<PlayerManagePresenter>
             if (playerItemAdapter == null) {
                 playerItemAdapter = new PlayerItemAdapter(list);
                 playerItemAdapter.setOnPlayerItemClickListener(playerItemClickListener);
-
+                playerItemAdapter.setFragmentManager(getSupportFragmentManager());
                 rvList.setAdapter(playerItemAdapter);
             }
             else {
