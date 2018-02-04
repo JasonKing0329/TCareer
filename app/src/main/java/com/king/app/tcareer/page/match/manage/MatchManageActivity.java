@@ -157,7 +157,7 @@ public class MatchManageActivity extends BaseMvpActivity<MatchManagePresenter> i
             if (matchItemAdapter == null) {
                 matchItemAdapter = new MatchItemAdapter(list);
                 matchItemAdapter.setOnMatchItemClickListener(onMatchItemClickListener);
-                matchGridAdapter.setFragmentManager(getSupportFragmentManager());
+                matchItemAdapter.setFragmentManager(getSupportFragmentManager());
                 rvList.setAdapter(matchItemAdapter);
             }
             else {

@@ -82,6 +82,10 @@
             android:theme="@style/HomeTheme"
             android:screenOrientation="portrait"/>
 
+        <activity android:name=".page.rank.RankManageActivity"
+            android:theme="@style/NoActionBarTheme"
+            android:screenOrientation="portrait"/>
+
     </application>
 
 </manifest>
