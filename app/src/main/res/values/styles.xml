@@ -150,4 +150,9 @@
         <item name="android:ellipsize">end</item>
     </style>
 
+    <style name="ClickableImageView">
+        <item name="android:clickable">true</item>
+        <item name="android:background">?android:attr/selectableItemBackgroundBorderless</item>
+    </style>
+
 </resources>

@@ -12,10 +12,8 @@ import com.king.app.tcareer.base.BaseMvpActivity;
 import com.king.app.tcareer.model.GlideOptions;
 import com.king.app.tcareer.model.ImageProvider;
 import com.king.app.tcareer.model.db.entity.MatchNameBean;
-import com.king.app.tcareer.model.db.entity.PlayerBean;
 import com.king.app.tcareer.model.db.entity.User;
 import com.king.app.tcareer.page.match.page.MatchPageActivity;
-import com.king.app.tcareer.page.player.page.PlayerPageActivity;
 import com.king.lib.tool.ui.RippleFactory;
 
 import butterknife.BindView;

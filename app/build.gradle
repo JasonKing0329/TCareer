@@ -7,8 +7,8 @@ android {
         applicationId "com.king.app.tcareer"
         minSdkVersion 21
         targetSdkVersion 26
-        versionCode 11
-        versionName "1.6.2"
+        versionCode 12
+        versionName "1.6.3"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
 

@@ -62,6 +62,10 @@
             android:theme="@style/HomeTheme"
             android:screenOrientation="portrait"/>
 
+        <activity android:name=".page.match.gallery.UserMatchActivity"
+            android:theme="@style/HomeTheme"
+            android:screenOrientation="portrait"/>
+
         <activity android:name=".page.player.manage.PlayerManageActivity"
             android:theme="@style/NoActionBarTheme"
             android:screenOrientation="portrait"/>
