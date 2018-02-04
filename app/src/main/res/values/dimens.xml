@@ -36,4 +36,5 @@
     <dimen name="player_slide_left_offset">61dp</dimen>
     <dimen name="player_slide_left_offset2">148dp</dimen>
     <dimen name="rank_chart_height">300dp</dimen>
+    <dimen name="view7_datebar_height">34dp</dimen>
 </resources>

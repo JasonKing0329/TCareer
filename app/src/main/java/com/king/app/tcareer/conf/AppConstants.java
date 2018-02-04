@@ -17,6 +17,8 @@ public class AppConstants {
 
     public static final String RUNNERUP = "亚军";
 
+    public static final String MATCH_CONST_MONTECARLO = "蒙特卡洛大师赛";
+
     /**
      * 0: no retire
      * 1: retire with score

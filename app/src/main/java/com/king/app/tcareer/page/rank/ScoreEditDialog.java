@@ -241,5 +241,6 @@ public class ScoreEditDialog extends DraggableDialogFragment {
 
     public interface OnRankListener {
         void onSaveYearRank(Rank rank);
+        void onSaveCountRank(RankBean rank);
     }
 }

@@ -32,6 +32,9 @@
     <color name="swipecard_text_hard">#00a5c4</color>
 
     <color name="actionbar_bk_blue">#00a5c4</color>
+    <color name="actionbar_bk_green">#419814</color>
+    <color name="actionbar_bk_orange">#ef9801</color>
+    <color name="actionbar_bk_deepblue">#197ba9</color>
     <color name="record_item_text_gray">#999999</color>
     <color name="red">#ff0000</color>
     <color name="icon_grey">#D8D8D8</color>

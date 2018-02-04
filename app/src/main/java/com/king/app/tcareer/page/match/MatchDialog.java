@@ -215,6 +215,9 @@ public class MatchDialog extends DraggableDialogFragment {
         }
 
         private void showRecords(List<Record> recordList) {
+            if (recordList.size() == 0) {
+                return;
+            }
             // 已按降序排列
             Record record = recordList.get(0);
             tvRank.setText("Rank(" + record.getRank() + ")");

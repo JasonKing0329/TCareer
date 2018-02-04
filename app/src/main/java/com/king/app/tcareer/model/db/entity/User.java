@@ -24,9 +24,12 @@ public class User implements CompetitorBean {
     private String city;
     private String birthday;
     private String nameShort;
-    @Generated(hash = 153284863)
+    private int height;
+    private double weight;
+    @Generated(hash = 598643048)
     public User(Long id, String nameEng, String nameChn, String namePinyin,
-            String country, String city, String birthday, String nameShort) {
+            String country, String city, String birthday, String nameShort,
+            int height, double weight) {
         this.id = id;
         this.nameEng = nameEng;
         this.nameChn = nameChn;
@@ -35,6 +38,8 @@ public class User implements CompetitorBean {
         this.city = city;
         this.birthday = birthday;
         this.nameShort = nameShort;
+        this.height = height;
+        this.weight = weight;
     }
     @Generated(hash = 586692638)
     public User() {
@@ -86,6 +91,18 @@ public class User implements CompetitorBean {
     }
     public void setNameShort(String nameShort) {
         this.nameShort = nameShort;
+    }
+    public int getHeight() {
+        return this.height;
+    }
+    public void setHeight(int height) {
+        this.height = height;
+    }
+    public double getWeight() {
+        return this.weight;
+    }
+    public void setWeight(double weight) {
+        this.weight = weight;
     }
 
 }
