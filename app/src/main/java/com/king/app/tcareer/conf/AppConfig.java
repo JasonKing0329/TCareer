@@ -9,6 +9,8 @@ import android.os.Environment;
  */
 public class AppConfig {
 
+    public static final java.lang.String DB_NAME = "khcareer.db";
+
     public static final String SDCARD = Environment.getExternalStorageDirectory().getPath();
 
     public static final String DEF_CONTENT = SDCARD + "/tcareer";
@@ -38,5 +40,4 @@ public class AppConfig {
             DEF_CONTENT, EXPORT_BASE, HISTORY_BASE, DOWNLOAD_BASE, DOWNLOAD_IMAGE, CONF_DIR, APP_UPDATE_DIR
             , TEMP_DIR, BASE_IMG, IMG_PLAYER_BASE, IMG_MATCH_BASE, IMG_BK_BASE, IMG_DEFAULT_BASE, IMG_PLAYER_HEAD
     };
-
 }

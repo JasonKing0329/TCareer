@@ -3,6 +3,7 @@ package com.king.app.tcareer.base;
 import android.app.Application;
 import android.os.Build;
 
+import com.king.app.tcareer.conf.AppConfig;
 import com.king.app.tcareer.model.db.entity.DaoMaster;
 import com.king.app.tcareer.model.db.entity.DaoSession;
 
@@ -52,7 +53,7 @@ public class TApplication extends Application {
 	 * 需要由外部调用，如果在onCreate里直接初始化会创建新的数据库
 	 */
 	public void createGreenDao() {
-		DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(getApplicationContext(), "khcareer.db");
+		DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(getApplicationContext(), AppConfig.DB_NAME);
 		Database db = helper.getWritableDb();
 		daoSession = new DaoMaster(db).newSession();
 

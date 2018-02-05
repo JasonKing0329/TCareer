@@ -96,4 +96,10 @@
         <item>@color/dragsidebar_sec6_green</item>
     </array>
 
+    <array name="gradientPureWhite">
+        <item>@color/white</item>
+        <item>@color/white</item>
+        <item>@color/white</item>
+    </array>
+
 </resources>

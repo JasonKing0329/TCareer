@@ -17,9 +17,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class PlayerSlideAdapter extends RecyclerView.Adapter<PlayerSlideAdapter.SliderCard> implements View.OnClickListener {
+public abstract class PlayerSlideAdapter<T> extends RecyclerView.Adapter<PlayerSlideAdapter.SliderCard> implements View.OnClickListener {
 
-    private List<H2hBean> list;
+    private List<T> list;
     private OnPlayerItemListener onPlayerItemListener;
 
     private RequestOptions starOptions;
@@ -46,7 +46,7 @@ public class PlayerSlideAdapter extends RecyclerView.Adapter<PlayerSlideAdapter.
     @Override
     public void onBindViewHolder(SliderCard holder, int position) {
 
-        String key = list.get(position).getCompetitor().getNameChn();
+        String key = getImageKey(list.get(position));
         String filePath;
         if (imageIndexMap.get(key) == null) {
             filePath = ImageProvider.getPlayerHeadPath(key, imageIndexMap);
@@ -67,12 +67,14 @@ public class PlayerSlideAdapter extends RecyclerView.Adapter<PlayerSlideAdapter.
 
     }
 
+    protected abstract String getImageKey(T item);
+
     @Override
     public int getItemCount() {
         return list == null ? 0:list.size();
     }
 
-    public void setList(List<H2hBean> list) {
+    public void setList(List<T> list) {
         this.list = list;
     }
 
@@ -101,7 +103,7 @@ public class PlayerSlideAdapter extends RecyclerView.Adapter<PlayerSlideAdapter.
         }
     }
 
-    public interface OnPlayerItemListener {
-        void onClickPlayer(H2hBean bean, int position);
+    public interface OnPlayerItemListener<T> {
+        void onClickPlayer(T bean, int position);
     }
 }

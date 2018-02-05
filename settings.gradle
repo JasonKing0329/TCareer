@@ -1,1 +1,1 @@
-include ':app', ':libtool', ':MPChartLib', ':shapimageview'
+include ':app', ':libtool', ':MPChartLib', ':shapimageview', ':boommenu'

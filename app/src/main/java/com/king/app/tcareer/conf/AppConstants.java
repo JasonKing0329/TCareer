@@ -9,6 +9,8 @@ import android.text.TextUtils;
  */
 public class AppConstants {
 
+    public static final long USER_ID_KING = 1;
+
     public static final String SCORE_RETIRE = "W/O";
 
     public static final String SCORE_RETIRE_NORMAL = "(对手退赛)";

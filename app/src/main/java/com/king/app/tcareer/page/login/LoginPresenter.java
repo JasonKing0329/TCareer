@@ -80,7 +80,7 @@ public class LoginPresenter extends BasePresenter<LoginView> {
                 }
 
                 // 检查数据库是否存在
-                FileUtil.copyDbFromAssets("khcareer.db");
+                FileUtil.copyDbFromAssets(AppConfig.DB_NAME);
 
                 // init server url
                 BaseUrl.getInstance().setBaseUrl(SettingProperty.getServerBaseUrl());

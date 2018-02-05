@@ -37,4 +37,10 @@
     <dimen name="player_slide_left_offset2">148dp</dimen>
     <dimen name="rank_chart_height">300dp</dimen>
     <dimen name="view7_datebar_height">34dp</dimen>
+    <dimen name="home_scrim_visible_height">100dp</dimen>
+    <dimen name="boom_menu_btn_radius">30dp</dimen>
+
+    <dimen name="home_pop_menu_bottom">88dp</dimen>
+    <dimen name="home_pop_menu_right">10dp</dimen>
+    <dimen name="boom_menu_btn_margin_ver">10dp</dimen>
 </resources>

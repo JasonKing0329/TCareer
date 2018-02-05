@@ -113,9 +113,14 @@ public class PlayerSlideActivity extends BaseMvpActivity<SlidePresenter> impleme
     public void onPlayerLoaded(List<H2hBean> playerList) {
 
         if (playerSlideAdapter == null) {
-            playerSlideAdapter = new PlayerSlideAdapter();
+            playerSlideAdapter = new PlayerSlideAdapter<H2hBean>() {
+                @Override
+                protected String getImageKey(H2hBean item) {
+                    return item.getCompetitor().getNameChn();
+                }
+            };
             playerSlideAdapter.setList(playerList);
-            playerSlideAdapter.setOnPlayerItemListener(new PlayerSlideAdapter.OnPlayerItemListener() {
+            playerSlideAdapter.setOnPlayerItemListener(new PlayerSlideAdapter.OnPlayerItemListener<H2hBean>() {
                 @Override
                 public void onClickPlayer(H2hBean bean, int position) {
                     clickPlayer(bean, position);

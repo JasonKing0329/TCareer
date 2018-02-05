@@ -42,8 +42,6 @@ public class RankChartFragment extends BaseMvpFragment<RankPresenter> implements
 
     private static final String KEY_USER_ID = "user_id";
 
-    private IRankParent parent;
-
     @BindView(R.id.bar_chart_rank)
     BarChart barChartRank;
     @BindView(R.id.bar_fake)
@@ -76,7 +74,7 @@ public class RankChartFragment extends BaseMvpFragment<RankPresenter> implements
 
     @Override
     protected void bindFragmentHolder(IFragmentHolder holder) {
-        parent = (IRankParent) holder;
+
     }
 
     @Override
@@ -103,7 +101,6 @@ public class RankChartFragment extends BaseMvpFragment<RankPresenter> implements
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-//        parent.onChartCreated();
         super.onViewCreated(view, savedInstanceState);
     }
 

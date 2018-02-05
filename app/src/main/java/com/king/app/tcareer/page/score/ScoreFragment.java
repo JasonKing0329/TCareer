@@ -129,17 +129,12 @@ public class ScoreFragment extends BaseMvpFragment<ScorePresenter> implements IS
     }
 
     @Override
-    public void postShowUser(final User mUser) {
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                ivFlagBg.setImageResource(FlagProvider.getFlagRes(mUser.getCountry()));
-                tvPlayer.setText(mUser.getNameEng());
-                tvCountry.setText(mUser.getCountry());
-                tvBirthday.setText(mUser.getBirthday());
-                tvHeight.setText(mUser.getHeight() + "  " + mUser.getWeight());
-            }
-        });
+    public void showUser(User mUser) {
+        ivFlagBg.setImageResource(FlagProvider.getFlagRes(mUser.getCountry()));
+        tvPlayer.setText(mUser.getNameEng());
+        tvCountry.setText(mUser.getCountry());
+        tvBirthday.setText(mUser.getBirthday());
+        tvHeight.setText(mUser.getHeight() + "  " + mUser.getWeight());
     }
 
     private void onMatchClicked(ScoreBean bean) {

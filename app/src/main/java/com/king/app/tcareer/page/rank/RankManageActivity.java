@@ -24,7 +24,7 @@ import butterknife.OnClick;
  * <p/>作者：景阳
  * <p/>创建时间: 2017/3/22 19:07
  */
-public class RankManageActivity extends BaseMvpActivity<RankPresenter> implements RankView, View.OnClickListener, IRankParent {
+public class RankManageActivity extends BaseMvpActivity<RankPresenter> implements RankView, View.OnClickListener {
 
     public static final String KEY_USER_ID = "key_user_id";
 
@@ -97,10 +97,6 @@ public class RankManageActivity extends BaseMvpActivity<RankPresenter> implement
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         ft.replace(R.id.group_chart_container, ftChart, "RankChartFragment");
         ft.commit();
-    }
-
-    @Override
-    public void onChartCreated() {
     }
 
     /**

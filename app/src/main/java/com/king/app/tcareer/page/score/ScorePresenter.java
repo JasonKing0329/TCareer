@@ -82,7 +82,6 @@ public class ScorePresenter extends BasePresenter<IScorePageView> {
                     @Override
                     public ObservableSource<List<ScoreBean>> apply(User user) throws Exception {
                         mUser = user;
-                        view.postShowUser(mUser);
                         return scoreModel.queryYearRecords(user.getId(), currentYear);
                     }
                 })
@@ -102,6 +101,7 @@ public class ScorePresenter extends BasePresenter<IScorePageView> {
 
                     @Override
                     public void onNext(ScorePageData data) {
+                        view.showUser(mUser);
                         view.onPageDataLoaded(data);
                     }
 
@@ -129,7 +129,6 @@ public class ScorePresenter extends BasePresenter<IScorePageView> {
                     @Override
                     public ObservableSource<List<ScoreBean>> apply(User user) throws Exception {
                         mUser = user;
-                        view.postShowUser(mUser);
                         return scoreModel.query52WeekRecords(user.getId(), currentYear);
                     }
                 })
@@ -149,6 +148,7 @@ public class ScorePresenter extends BasePresenter<IScorePageView> {
 
                     @Override
                     public void onNext(ScorePageData data) {
+                        view.showUser(mUser);
                         view.onPageDataLoaded(data);
                     }
 
@@ -447,6 +447,12 @@ public class ScorePresenter extends BasePresenter<IScorePageView> {
         scorePageData.setCountScoreYear(countYear);
         scorePageData.setCountScoreLastYear(countLastYear);
 
+        // load rank
+        RankCareerDao rankCareerDao = TApplication.getInstance().getDaoSession().getRankCareerDao();
+        RankCareer career = rankCareerDao.queryBuilder()
+                .where(RankCareerDao.Properties.UserId.eq(mUser.getId()))
+                .build().unique();
+        scorePageData.setRank(career.getRankCurrent());
         return scorePageData;
     }
 
@@ -474,6 +480,10 @@ public class ScorePresenter extends BasePresenter<IScorePageView> {
 
     public User getUser() {
         return mUser;
+    }
+
+    public int getRank() {
+        return scorePageData.getRank();
     }
 
     /**

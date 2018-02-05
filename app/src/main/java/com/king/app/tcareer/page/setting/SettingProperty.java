@@ -52,6 +52,18 @@ public class SettingProperty {
         editor.commit();
     }
 
+    private static final long getLong(String key) {
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(TApplication.getInstance());
+        return sp.getLong(key, -1);
+    }
+
+    private static final void setLong(String key, long value) {
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(TApplication.getInstance());
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putLong(key, value);
+        editor.commit();
+    }
+
     private static final boolean getBoolean(String key) {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(TApplication.getInstance());
         return sp.getBoolean(key, false);
@@ -110,6 +122,14 @@ public class SettingProperty {
 
     public static String getServerBaseUrl() {
         return getString("pref_http_server");
+    }
+
+    public static void setUserId(long userId) {
+        setLong("key_user_id", userId);
+    }
+
+    public static long getUserId() {
+        return getLong("key_user_id");
     }
 
 }

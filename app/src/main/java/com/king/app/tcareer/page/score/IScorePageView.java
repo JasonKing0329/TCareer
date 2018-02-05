@@ -12,5 +12,5 @@ public interface IScorePageView extends BaseView {
 
     void onPageDataLoaded(ScorePageData data);
 
-    void postShowUser(User mUser);
+    void showUser(User mUser);
 }
