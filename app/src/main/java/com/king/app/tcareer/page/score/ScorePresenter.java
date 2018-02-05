@@ -3,11 +3,12 @@ package com.king.app.tcareer.page.score;
 import com.king.app.tcareer.base.BasePresenter;
 import com.king.app.tcareer.base.TApplication;
 import com.king.app.tcareer.conf.AppConstants;
-import com.king.app.tcareer.model.bean.RankBean;
 import com.king.app.tcareer.model.db.entity.MatchBean;
 import com.king.app.tcareer.model.db.entity.MatchBeanDao;
 import com.king.app.tcareer.model.db.entity.MatchNameBean;
 import com.king.app.tcareer.model.db.entity.MatchNameBeanDao;
+import com.king.app.tcareer.model.db.entity.RankCareer;
+import com.king.app.tcareer.model.db.entity.RankCareerDao;
 import com.king.app.tcareer.model.db.entity.User;
 
 import org.greenrobot.greendao.query.QueryBuilder;
@@ -69,11 +70,6 @@ public class ScorePresenter extends BasePresenter<IScorePageView> {
         thisWeek = Calendar.getInstance().get(Calendar.WEEK_OF_YEAR);
         currentYear = thisYear;
         scorePageData = new ScorePageData();
-    }
-
-    public RankBean loadRank() {
-//        return new FileIO().readRankBean(MultiUserManager.getInstance().getTargetRankFile(user));
-        return null;
     }
 
     public void queryYearRecords(long userId) {

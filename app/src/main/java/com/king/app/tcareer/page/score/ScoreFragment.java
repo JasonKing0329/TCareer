@@ -17,7 +17,7 @@ import com.king.app.tcareer.base.BaseMvpFragment;
 import com.king.app.tcareer.base.IFragmentHolder;
 import com.king.app.tcareer.conf.AppConstants;
 import com.king.app.tcareer.model.FlagProvider;
-import com.king.app.tcareer.model.bean.RankBean;
+import com.king.app.tcareer.model.db.entity.RankCareer;
 import com.king.app.tcareer.model.db.entity.User;
 import com.king.app.tcareer.page.match.MatchDialog;
 
@@ -162,11 +162,11 @@ public class ScoreFragment extends BaseMvpFragment<ScorePresenter> implements IS
     public void onPageDataLoaded(ScorePageData data) {
 
         // 获取排名
-        RankBean bean = presenter.loadRank();
+        RankCareer bean = holder.getRankCareer();
         if (bean == null) {
             tvRank.setText("--");
         } else {
-            tvRank.setText(String.valueOf(bean.getRank()));
+            tvRank.setText(String.valueOf(bean.getRankCurrent()));
         }
 
         List<ScoreBean> scoreList = new ArrayList<>();
@@ -291,9 +291,8 @@ public class ScoreFragment extends BaseMvpFragment<ScorePresenter> implements IS
         chartHelper.showPieChart(chartCourt, contents, percents, colors, style);
     }
 
-    public void onRankChanged(int rank) {
-        holder.setRankChanged();
-        tvRank.setText(String.valueOf(rank));
+    public void onRankChanged(RankCareer rank) {
+        tvRank.setText(String.valueOf(rank.getRankCurrent()));
     }
 
     @OnClick({R.id.iv_date_last, R.id.iv_date_next})

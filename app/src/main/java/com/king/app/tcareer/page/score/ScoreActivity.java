@@ -7,8 +7,9 @@ import android.widget.TextView;
 
 import com.king.app.tcareer.R;
 import com.king.app.tcareer.base.BaseActivity;
-import com.king.app.tcareer.model.bean.RankBean;
+import com.king.app.tcareer.base.BaseMvpActivity;
 import com.king.app.tcareer.model.db.entity.Rank;
+import com.king.app.tcareer.model.db.entity.RankCareer;
 import com.king.app.tcareer.page.rank.ScoreEditDialog;
 
 import butterknife.BindView;
@@ -19,7 +20,7 @@ import butterknife.OnClick;
  * <p/>作者：景阳
  * <p/>创建时间: 2017/2/20 16:21
  */
-public class ScoreActivity extends BaseActivity implements IScoreHolder {
+public class ScoreActivity extends BaseMvpActivity<ScoreHolderPresenter> implements IScoreHolder {
 
     public static final String KEY_USER_ID = "key_user_id";
 
@@ -41,8 +42,6 @@ public class ScoreActivity extends BaseActivity implements IScoreHolder {
 
     private ScoreEditDialog editDialog;
 
-    private boolean isRankChanged;
-
     @Override
     protected int getContentView() {
         return R.layout.activity_score;
@@ -50,7 +49,22 @@ public class ScoreActivity extends BaseActivity implements IScoreHolder {
 
     @Override
     protected void initView() {
+    }
+
+    @Override
+    protected ScoreHolderPresenter createPresenter() {
+        return new ScoreHolderPresenter();
+    }
+
+    @Override
+    protected void initData() {
+        presenter.loadRank(getIntent().getLongExtra(KEY_USER_ID, -1));
         show52WeekScores();
+    }
+
+    @Override
+    public RankCareer getRankCareer() {
+        return presenter.getRankCareer();
     }
 
     @OnClick({R.id.score_actionbar_year, R.id.score_actionbar_week, R.id.score_actionbar_edit, R.id.score_actionbar_back, R.id.score_actionbar_date})
@@ -74,14 +88,6 @@ public class ScoreActivity extends BaseActivity implements IScoreHolder {
         }
     }
 
-    @Override
-    public void onBackPressed() {
-        if (isRankChanged) {
-            setResult(RESULT_OK);
-        }
-        super.onBackPressed();
-    }
-
     private void showDateGroup() {
         ftYear.showDateGroup();
     }
@@ -89,18 +95,17 @@ public class ScoreActivity extends BaseActivity implements IScoreHolder {
     private void showScoreEditDialog() {
         editDialog = new ScoreEditDialog();
         editDialog.setMode(ScoreEditDialog.MODE_COUNT_RANK);
-        editDialog.setRank(null);
+        editDialog.setRankCareer(getRankCareer());
         editDialog.setOnRankListener(new ScoreEditDialog.OnRankListener() {
             @Override
             public void onSaveYearRank(Rank rank) {
             }
 
             @Override
-            public void onSaveCountRank(RankBean rank) {
-                ft52Week.onRankChanged(rank.getRank());
-                if (ftYear != null) {
-                    ftYear.onRankChanged(rank.getRank());
-                }
+            public void onSaveCountRank(RankCareer rank) {
+                presenter.updateRankCareer(rank);
+                getFocusFragment().onRankChanged(rank);
+                setResult(RESULT_OK);
             }
         });
         editDialog.show(getSupportFragmentManager(), "ScoreEditDialog");
@@ -140,6 +145,15 @@ public class ScoreActivity extends BaseActivity implements IScoreHolder {
         ft.commit();
     }
 
+    private ScoreFragment getFocusFragment() {
+        if (tvYear.isSelected()) {
+            return ftYear;
+        }
+        else {
+            return ft52Week;
+        }
+    }
+
     public void setFocusTab(TextView focusTab) {
         if (focusTab == tvYear) {
             tvYear.setSelected(true);
@@ -155,11 +169,6 @@ public class ScoreActivity extends BaseActivity implements IScoreHolder {
             vDividerWeeks.setVisibility(View.VISIBLE);
             ivDate.setVisibility(View.GONE);
         }
-    }
-
-    @Override
-    public void setRankChanged() {
-        isRankChanged = true;
     }
 
 }
