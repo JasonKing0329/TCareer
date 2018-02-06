@@ -2,6 +2,8 @@ package com.king.app.tcareer.model.db;
 
 import android.text.TextUtils;
 
+import com.king.app.tcareer.conf.AppConstants;
+
 /**
  * @desc
  * @auth 景阳
@@ -151,6 +153,20 @@ public class Sqls {
                 buffer.append(" DESC");
             }
         }
+        return buffer.toString();
+    }
+
+    public static String getH2h(long userId, long playerId, boolean competitorIsUser) {
+        StringBuffer buffer = new StringBuffer();
+        buffer.append("select player_id, player_flag, count(*) as total\n")
+                .append(", sum(case when winner_flag=0 and retire_flag!=2 then 1 else 0 end) as win \n")
+                .append(", sum(case when winner_flag=1 and retire_flag!=2 then 1 else 0 end) as lose \n")
+                .append(" from match_records\n")
+                .append(" where user_id=").append(userId)
+                .append(" and player_id=").append(playerId)
+                .append(" and player_flag=")
+                .append(competitorIsUser ? AppConstants.COMPETITOR_VIRTUAL:AppConstants.COMPETITOR_NORMAL)
+                .append(" group by player_id,player_flag \n");
         return buffer.toString();
     }
 }

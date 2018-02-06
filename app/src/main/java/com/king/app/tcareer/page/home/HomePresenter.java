@@ -38,8 +38,6 @@ public class HomePresenter extends BasePresenter<IHomeView> {
 
     private final int PLAYER_NUM = 10;
 
-    private User mUser;
-
     private List<User> mAllUsers;
 
     private List<UserMatchBean> matchList;
@@ -47,10 +45,6 @@ public class HomePresenter extends BasePresenter<IHomeView> {
     @Override
     protected void onCreate() {
 
-    }
-
-    public User getUser() {
-        return mUser;
     }
 
     public List<User> getAllUsers() {
@@ -176,19 +170,6 @@ public class HomePresenter extends BasePresenter<IHomeView> {
 
                     }
                 });
-    }
-
-    public Observable<User> queryUser(final long userId) {
-        return Observable.create(new ObservableOnSubscribe<User>() {
-            @Override
-            public void subscribe(ObservableEmitter<User> e) throws Exception {
-                UserDao dao = TApplication.getInstance().getDaoSession().getUserDao();
-                mUser = dao.queryBuilder()
-                        .where(UserDao.Properties.Id.eq(userId))
-                        .build().unique();
-                e.onNext(mUser);
-            }
-        });
     }
 
     public Observable<List<User>> queryAllUsers() {

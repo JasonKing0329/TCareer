@@ -36,6 +36,8 @@ public class MatchManageActivity extends BaseMvpActivity<MatchManagePresenter> i
     public static final String KEY_START_MODE = "key_start_mode";
     public static final int START_MODE_SELECT = 1;
 
+    public static final String RESPONSE_MATCH_NAME_ID = "resp_match_name_id";
+
     @BindView(R.id.rv_stagger)
     RecyclerView rvStagger;
     @BindView(R.id.rv_grid)
@@ -179,8 +181,8 @@ public class MatchManageActivity extends BaseMvpActivity<MatchManagePresenter> i
             }
             else {
                 if (isSelectMode) {
-//                    MatchCache.putMatchNameBean(bean);
                     Intent intent = new Intent();
+                    intent.putExtra(RESPONSE_MATCH_NAME_ID, bean.getId());
                     setResult(RESULT_OK, intent);
                     finish();
                 }

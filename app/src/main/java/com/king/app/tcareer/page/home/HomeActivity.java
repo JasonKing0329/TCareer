@@ -47,6 +47,7 @@ import com.king.app.tcareer.page.player.slider.PlayerSlideActivity;
 import com.king.app.tcareer.page.player.slider.PlayerSlideAdapter;
 import com.king.app.tcareer.page.rank.RankChartFragment;
 import com.king.app.tcareer.page.rank.RankManageActivity;
+import com.king.app.tcareer.page.record.editor.RecordEditorActivity;
 import com.king.app.tcareer.page.score.ScoreActivity;
 import com.king.app.tcareer.page.setting.SettingActivity;
 import com.king.app.tcareer.utils.DebugLog;
@@ -64,6 +65,7 @@ import butterknife.OnClick;
 public class HomeActivity extends BaseMvpActivity<HomePresenter> implements IHomeView, OnBMClickListener, IHomeHeaderHolder {
 
     private final int REQUEST_RANK = 101;
+    private final int REQUEST_ADD = 102;
     private final int REQUEST_SCORE = 104;
 
     private HomeHeadAdapter headAdapter;
@@ -541,11 +543,13 @@ public class HomeActivity extends BaseMvpActivity<HomePresenter> implements IHom
 
     }
 
+    @SuppressLint("RestrictedApi")
     private void startRecordEditorActivity() {
-//        Intent intent = new Intent().setClass(this, RecordEditorActivity.class);
-//        ActivityOptions transitionActivityOptions = ActivityOptions.makeSceneTransitionAnimation(this
-//                , Pair.create(findViewById(R.id.group_add),getString(R.string.anim_home_add)));
-//        startActivity(intent, transitionActivityOptions.toBundle());
+        Intent intent = new Intent().setClass(this, RecordEditorActivity.class);
+        intent.putExtra(RecordEditorActivity.KEY_USER_ID, presenter.getUser().getId());
+        ActivityOptions transitionActivityOptions = ActivityOptions.makeSceneTransitionAnimation(this
+                , Pair.create(findViewById(R.id.group_add),getString(R.string.anim_home_add)));
+        startActivityForResult(intent, REQUEST_ADD, transitionActivityOptions.toBundle());
     }
 
     private void startScoreActivity() {
@@ -613,6 +617,12 @@ public class HomeActivity extends BaseMvpActivity<HomePresenter> implements IHom
         else if (requestCode == REQUEST_SCORE) {
             if (resultCode == RESULT_OK) {
                 headAdapter.getItem(viewpagerHead.getCurrentItem()).onRankChanged();
+            }
+        }
+        else if (requestCode == REQUEST_ADD) {
+            if (resultCode == RESULT_OK) {
+                // 添加过新数据，刷新当前user
+                onUserChanged(presenter.getUser());
             }
         }
         super.onActivityResult(requestCode, resultCode, data);

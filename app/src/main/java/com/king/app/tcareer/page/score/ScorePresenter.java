@@ -53,8 +53,6 @@ public class ScorePresenter extends BasePresenter<IScorePageView> {
     private int startWeek, endWeek;
     private int startYear, endYear;
 
-    private User mUser;
-
     @Override
     protected void onCreate() {
         scoreModel = new ScoreModel();
@@ -77,7 +75,7 @@ public class ScorePresenter extends BasePresenter<IScorePageView> {
         endYear = currentYear;
         startWeek = 0;
         endWeek = 52;
-        scoreModel.queryUser(userId)
+        queryUser(userId)
                 .flatMap(new Function<User, ObservableSource<List<ScoreBean>>>() {
                     @Override
                     public ObservableSource<List<ScoreBean>> apply(User user) throws Exception {
@@ -124,7 +122,7 @@ public class ScorePresenter extends BasePresenter<IScorePageView> {
         startWeek = Calendar.getInstance().get(Calendar.WEEK_OF_YEAR);
         endWeek = startWeek - 1;
         startYear--;
-        scoreModel.queryUser(userId)
+        queryUser(userId)
                 .flatMap(new Function<User, ObservableSource<List<ScoreBean>>>() {
                     @Override
                     public ObservableSource<List<ScoreBean>> apply(User user) throws Exception {
@@ -476,10 +474,6 @@ public class ScorePresenter extends BasePresenter<IScorePageView> {
 
     public int getCurrentYear() {
         return currentYear;
-    }
-
-    public User getUser() {
-        return mUser;
     }
 
     public int getRank() {

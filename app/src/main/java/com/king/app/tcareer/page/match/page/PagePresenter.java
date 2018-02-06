@@ -8,7 +8,6 @@ import com.king.app.tcareer.model.db.entity.MatchNameBeanDao;
 import com.king.app.tcareer.model.db.entity.Record;
 import com.king.app.tcareer.model.db.entity.RecordDao;
 import com.king.app.tcareer.model.db.entity.User;
-import com.king.app.tcareer.model.db.entity.UserDao;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -20,10 +19,12 @@ import java.util.Map;
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.ObservableSource;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
+import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 
 /**
@@ -38,7 +39,6 @@ public class PagePresenter extends BasePresenter<IPageView> {
     private int win;
 
     private int lose;
-    private User mUser;
 
     @Override
     protected void onCreate() {
@@ -47,23 +47,24 @@ public class PagePresenter extends BasePresenter<IPageView> {
 
     public void loadData(final long matchNameId, final long userId) {
         view.showLoading();
-        Observable.create(new ObservableOnSubscribe<MatchNameBean>() {
-            @Override
-            public void subscribe(ObservableEmitter<MatchNameBean> e) throws Exception {
-                // load user
-                UserDao userDao = TApplication.getInstance().getDaoSession().getUserDao();
-                mUser = userDao.queryBuilder()
-                        .where(UserDao.Properties.Id.eq(userId))
-                        .build().unique();
-
-                // load match
-                MatchNameBeanDao dao = TApplication.getInstance().getDaoSession().getMatchNameBeanDao();
-                MatchNameBean bean = dao.queryBuilder()
-                        .where(MatchNameBeanDao.Properties.Id.eq(matchNameId))
-                        .build().unique();
-                e.onNext(bean);
-            }
-        }).observeOn(AndroidSchedulers.mainThread())
+        queryUser(userId)
+                .flatMap(new Function<User, ObservableSource<MatchNameBean>>() {
+                    @Override
+                    public ObservableSource<MatchNameBean> apply(User user) throws Exception {
+                        return new ObservableSource<MatchNameBean>() {
+                            @Override
+                            public void subscribe(Observer<? super MatchNameBean> observer) {
+                                // load match
+                                MatchNameBeanDao dao = TApplication.getInstance().getDaoSession().getMatchNameBeanDao();
+                                MatchNameBean bean = dao.queryBuilder()
+                                        .where(MatchNameBeanDao.Properties.Id.eq(matchNameId))
+                                        .build().unique();
+                                observer.onNext(bean);
+                            }
+                        };
+                    }
+                })
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe(new Observer<MatchNameBean>() {
                     @Override
@@ -196,9 +197,5 @@ public class PagePresenter extends BasePresenter<IPageView> {
                 lose ++;
             }
         }
-    }
-
-    public User getUser() {
-        return mUser;
     }
 }

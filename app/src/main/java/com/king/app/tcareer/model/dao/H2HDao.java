@@ -125,4 +125,26 @@ public class H2HDao {
             }
         });
     }
+
+    /**
+     * query player list with h2h order by insert sequence desc
+     * @param userId
+     * @return
+     */
+    public Observable<H2hBean> queryH2H(final long userId, final long playerId, final boolean competitorIsUser) {
+        return Observable.create(new ObservableOnSubscribe<H2hBean>() {
+            @Override
+            public void subscribe(ObservableEmitter<H2hBean> e) throws Exception {
+                H2hBean bean = new H2hBean();
+                Cursor cursor = TApplication.getInstance().getDaoSession().getDatabase()
+                        .rawQuery(Sqls.getH2h(userId, playerId, competitorIsUser), new String[]{});
+                if (cursor.moveToNext()) {
+                    bean = parseH2hBean(cursor);
+                }
+                cursor.close();
+                e.onNext(bean);
+            }
+        });
+    }
+
 }

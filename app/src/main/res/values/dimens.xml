@@ -43,4 +43,5 @@
     <dimen name="home_pop_menu_bottom">88dp</dimen>
     <dimen name="home_pop_menu_right">10dp</dimen>
     <dimen name="boom_menu_btn_margin_ver">10dp</dimen>
+    <dimen name="record_editor_item_height">40dp</dimen>
 </resources>

@@ -2,8 +2,11 @@ package com.king.app.tcareer.page.setting;
 
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import android.text.TextUtils;
 
+import com.google.gson.Gson;
 import com.king.app.tcareer.base.TApplication;
+import com.king.app.tcareer.model.bean.AutoFillMatchBean;
 
 /**
  * 描述:
@@ -130,6 +133,20 @@ public class SettingProperty {
 
     public static long getUserId() {
         return getLong("key_user_id");
+    }
+
+    public static void setAutoFillMatch(AutoFillMatchBean bean) {
+
+        setString("auto_fill_match", new Gson().toJson(bean));
+    }
+
+    public static AutoFillMatchBean getAutoFillMatch() {
+        String json = getString("auto_fill_match");
+        AutoFillMatchBean bean = null;
+        try {
+            bean = new Gson().fromJson(json, AutoFillMatchBean.class);
+        } catch (Exception e) {}
+        return bean;
     }
 
 }

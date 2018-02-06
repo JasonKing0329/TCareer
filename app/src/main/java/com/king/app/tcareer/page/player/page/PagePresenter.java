@@ -25,10 +25,12 @@ import java.util.Map;
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.ObservableSource;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
+import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 
 /**
@@ -42,8 +44,6 @@ public class PagePresenter extends BasePresenter<IPageView> {
 
     private CompetitorBean mCompetitor;
 
-    private User mUser;
-
     private List<Record> recordList;
 
     @Override
@@ -52,28 +52,31 @@ public class PagePresenter extends BasePresenter<IPageView> {
     }
 
     public void loadPlayerAndUser(final long playerId, final long userId, final boolean playerIsUser) {
-        Observable.create(new ObservableOnSubscribe<Object>() {
-            @Override
-            public void subscribe(ObservableEmitter<Object> e) throws Exception {
-                UserDao userDao = TApplication.getInstance().getDaoSession().getUserDao();
-                mUser = userDao.queryBuilder()
-                        .where(UserDao.Properties.Id.eq(userId))
-                        .build().unique();
-
-                if (playerIsUser) {
-                    mCompetitor = userDao.queryBuilder()
-                            .where(UserDao.Properties.Id.eq(playerId))
-                            .build().unique();
-                }
-                else {
-                    PlayerBeanDao playerBeanDao = TApplication.getInstance().getDaoSession().getPlayerBeanDao();
-                    mCompetitor = playerBeanDao.queryBuilder()
-                            .where(PlayerBeanDao.Properties.Id.eq(playerId))
-                            .build().unique();
-                }
-                e.onNext(new Object());
-            }
-        }).observeOn(AndroidSchedulers.mainThread())
+        queryUser(userId)
+                .flatMap(new Function<User, ObservableSource<?>>() {
+                    @Override
+                    public ObservableSource<?> apply(User user) throws Exception {
+                        return new ObservableSource<Object>() {
+                            @Override
+                            public void subscribe(Observer<? super Object> observer) {
+                                if (playerIsUser) {
+                                    UserDao userDao = TApplication.getInstance().getDaoSession().getUserDao();
+                                    mCompetitor = userDao.queryBuilder()
+                                            .where(UserDao.Properties.Id.eq(playerId))
+                                            .build().unique();
+                                }
+                                else {
+                                    PlayerBeanDao playerBeanDao = TApplication.getInstance().getDaoSession().getPlayerBeanDao();
+                                    mCompetitor = playerBeanDao.queryBuilder()
+                                            .where(PlayerBeanDao.Properties.Id.eq(playerId))
+                                            .build().unique();
+                                }
+                                observer.onNext(new Object());
+                            }
+                        };
+                    }
+                })
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe(new Observer<Object>() {
                     @Override
@@ -314,9 +317,5 @@ public class PagePresenter extends BasePresenter<IPageView> {
         bean.setWin(win);
         bean.setLose(lose);
         return bean;
-    }
-
-    public User getUser() {
-        return mUser;
     }
 }

@@ -20,6 +20,7 @@ public class ScoreParser {
         StringBuffer buffer = new StringBuffer();
         if (retireFlag == AppConstants.RETIRE_WO) {
             buffer.append(AppConstants.SCORE_RETIRE);
+            return buffer.toString();
         }
         else {
             for (int i = 0; i < scoreList.size(); i ++) {
@@ -38,11 +39,12 @@ public class ScoreParser {
             if (retireFlag == AppConstants.RETIRE_WITH_SCORE) {
                 buffer.append(AppConstants.SCORE_RETIRE_NORMAL);
             }
+
+            String text = buffer.toString();
+            if (text.length() > 1) {
+                text = text.substring(1);
+            }
+            return text;
         }
-        String text = buffer.toString();
-        if (text.length() > 1) {
-            text = text.substring(1);
-        }
-        return text;
     }
 }

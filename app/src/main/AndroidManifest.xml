@@ -53,6 +53,10 @@
         <activity android:name=".page.setting.SettingActivity"
             android:screenOrientation="portrait"/>
 
+        <activity android:name=".page.record.editor.RecordEditorActivity"
+            android:theme="@style/SubTheme"
+            android:screenOrientation="portrait"/>
+
         <activity android:name=".page.match.common.MatchCommonActivity"
             android:theme="@style/NoActionBarTheme"
             android:screenOrientation="portrait"/>

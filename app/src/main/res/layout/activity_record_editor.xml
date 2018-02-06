@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimary" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="20dp">
+
+        <TextView
+            android:id="@+id/tv_next_page"
+            style="@style/RecordEditorBtn"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="10dp"
+            android:text="@string/next_page" />
+
+        <TextView
+            android:id="@+id/tv_done"
+            style="@style/RecordEditorBtn"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="10dp"
+            android:text="@string/insert_done"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/tv_continue"
+            style="@style/RecordEditorBtn"
+            android:layout_centerHorizontal="true"
+            android:layout_marginRight="10dp"
+            android:text="@string/insert_continue"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/tv_previous_page"
+            style="@style/RecordEditorBtn"
+            android:layout_marginLeft="10dp"
+            android:text="@string/previous_page"
+            android:visibility="gone" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/toolbar"
+        android:layout_marginTop="30dp">
+
+        <include layout="@layout/page_editor_player" />
+
+        <include layout="@layout/page_editor_match" />
+    </RelativeLayout>
+</RelativeLayout>

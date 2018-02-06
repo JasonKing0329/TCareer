@@ -39,6 +39,9 @@ public class PlayerManageActivity extends BaseMvpActivity<PlayerManagePresenter>
     public static final String KEY_START_MODE = "key_start_mode";
     public static final int START_MODE_SELECT = 1;
 
+    public static final String RESPONSE_PLAYER_ID = "resp_player_id";
+    public static final String RESPONSE_PLAYER_IS_USER = "resp_player_is_user";
+
     @BindView(R.id.rv_stagger)
     RecyclerView rvStagger;
     @BindView(R.id.rv_grid)
@@ -211,13 +214,14 @@ public class PlayerManageActivity extends BaseMvpActivity<PlayerManagePresenter>
             }
             else {
                 if (isSelectMode) {
-                    Bundle bundle = new Bundle();
                     Intent intent = new Intent();
-//                    bundle.putString("name", mEditBean.getNameChn());
-//                    bundle.putString("name_eng", mEditBean.getNameEng());
-//                    bundle.putString("country", mEditBean.getCountry());
-//                    bundle.putString("birthday", mEditBean.getBirthday());
-                    intent.putExtras(bundle);
+                    if (bean.getData() instanceof User) {
+                        intent.putExtra(RESPONSE_PLAYER_ID, ((User) bean.getData()).getId());
+                        intent.putExtra(RESPONSE_PLAYER_IS_USER, true);
+                    }
+                    else {
+                        intent.putExtra(RESPONSE_PLAYER_ID, ((PlayerBean) bean.getData()).getId());
+                    }
                     setResult(RESULT_OK, intent);
                     finish();
                 }

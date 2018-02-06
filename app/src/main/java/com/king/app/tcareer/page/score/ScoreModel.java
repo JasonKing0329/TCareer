@@ -5,8 +5,6 @@ import com.king.app.tcareer.conf.AppConstants;
 import com.king.app.tcareer.model.db.entity.MatchNameBean;
 import com.king.app.tcareer.model.db.entity.Record;
 import com.king.app.tcareer.model.db.entity.RecordDao;
-import com.king.app.tcareer.model.db.entity.User;
-import com.king.app.tcareer.model.db.entity.UserDao;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -34,18 +32,6 @@ public class ScoreModel {
     public ScoreModel() {
         arrRound = AppConstants.RECORD_MATCH_ROUNDS;
         arrLevel = AppConstants.RECORD_MATCH_LEVELS;
-    }
-
-    public Observable<User> queryUser(final long userId) {
-        return Observable.create(new ObservableOnSubscribe<User>() {
-            @Override
-            public void subscribe(ObservableEmitter<User> e) throws Exception {
-                UserDao dao = TApplication.getInstance().getDaoSession().getUserDao();
-                e.onNext(dao.queryBuilder()
-                    .where(UserDao.Properties.Id.eq(userId))
-                    .build().unique());
-            }
-        });
     }
 
     public Observable<List<ScoreBean>> queryYearRecords(final long userId, final int year) {

@@ -89,6 +89,7 @@
     <color name="dragsidebar_sec1_green">#50a625</color>
     <color name="dragsidebar_sec3_green">#83c75d</color>
     <color name="dragsidebar_sec6_green">#e6f1d8</color>
+    <color name="ripple_white">#99ffffff</color>
 
     <array name="gradientCourtGrass">
         <item>@color/dragsidebar_sec1_green</item>

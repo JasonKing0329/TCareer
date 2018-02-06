@@ -33,8 +33,6 @@ import io.reactivex.schedulers.Schedulers;
  */
 public class SlidePresenter extends BasePresenter<ISlideView> {
 
-    private User mUser;
-
     private List<H2hBean> h2hList;
 
     private H2HDao h2HDao;
@@ -45,11 +43,13 @@ public class SlidePresenter extends BasePresenter<ISlideView> {
     }
 
     public void loadPlayers(final long userId) {
-        UserDao userDao = TApplication.getInstance().getDaoSession().getUserDao();
-        mUser = userDao.queryBuilder()
-                .where(UserDao.Properties.Id.eq(userId))
-                .build().unique();
-        h2HDao.queryH2HListOrderByInsert(userId)
+        queryUser(userId)
+                .flatMap(new Function<User, ObservableSource<List<H2hBean>>>() {
+                    @Override
+                    public ObservableSource<List<H2hBean>> apply(User user) throws Exception {
+                        return h2HDao.queryH2HListOrderByInsert(userId);
+                    }
+                })
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe(new Observer<List<H2hBean>>() {
@@ -166,7 +166,4 @@ public class SlidePresenter extends BasePresenter<ISlideView> {
         return bean;
     }
 
-    public User getUser() {
-        return mUser;
-    }
 }

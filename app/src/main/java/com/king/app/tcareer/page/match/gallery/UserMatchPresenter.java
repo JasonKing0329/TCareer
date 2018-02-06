@@ -20,9 +20,11 @@ import java.util.Map;
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.ObservableSource;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 
 /**
@@ -31,8 +33,6 @@ import io.reactivex.schedulers.Schedulers;
  * <p/>创建时间: 2017/3/15 10:12
  */
 public class UserMatchPresenter extends BasePresenter<UserMatchView> {
-
-    private User mUser;
 
     private String strChampion = "冠军";
     private String strRunnerup = "亚军";
@@ -44,8 +44,14 @@ public class UserMatchPresenter extends BasePresenter<UserMatchView> {
 
     }
 
-    public void loadMatches(long userId) {
-        queryMatches(userId)
+    public void loadMatches(final long userId) {
+        queryUser(userId)
+                .flatMap(new Function<User, ObservableSource<List<UserMatchBean>>>() {
+                    @Override
+                    public ObservableSource<List<UserMatchBean>> apply(User user) throws Exception {
+                        return queryMatches(userId);
+                    }
+                })
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe(new Observer<List<UserMatchBean>>() {
@@ -77,11 +83,6 @@ public class UserMatchPresenter extends BasePresenter<UserMatchView> {
         return Observable.create(new ObservableOnSubscribe<List<UserMatchBean>>() {
             @Override
             public void subscribe(ObservableEmitter<List<UserMatchBean>> e) throws Exception {
-                UserDao userDao = TApplication.getInstance().getDaoSession().getUserDao();
-                mUser = userDao.queryBuilder()
-                        .where(UserDao.Properties.Id.eq(userId))
-                        .build().unique();
-
                 RecordDao recordDao = TApplication.getInstance().getDaoSession().getRecordDao();
                 List<Record> recordList = recordDao.queryBuilder()
                         .where(RecordDao.Properties.UserId.eq(userId))
@@ -225,10 +226,6 @@ public class UserMatchPresenter extends BasePresenter<UserMatchView> {
      */
     public int findLatestWeekItem() {
         return new MatchModel().findLatestWeekItem(matchList);
-    }
-
-    public User getUser() {
-        return mUser;
     }
 
     public UserMatchBean getUserMatchBean(int position) {

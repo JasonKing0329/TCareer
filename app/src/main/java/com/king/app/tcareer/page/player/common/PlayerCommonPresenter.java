@@ -42,7 +42,7 @@ public class PlayerCommonPresenter extends BasePresenter<PlayerCommonView> {
         view.showLoading();
         Observable observable;
         if (isUser) {
-            observable = queryUser(playerId);
+            observable = queryUserPlayer(playerId);
         }
         else {
             observable = queryPlayer(playerId);
@@ -97,7 +97,7 @@ public class PlayerCommonPresenter extends BasePresenter<PlayerCommonView> {
         });
     }
 
-    private Observable<PlayerViewBean> queryUser(final long userId) {
+    private Observable<PlayerViewBean> queryUserPlayer(final long userId) {
         return Observable.create(new ObservableOnSubscribe<PlayerViewBean>() {
             @Override
             public void subscribe(ObservableEmitter<PlayerViewBean> e) throws Exception {
