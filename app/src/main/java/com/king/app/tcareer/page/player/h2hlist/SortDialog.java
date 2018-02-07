@@ -52,6 +52,7 @@ public class SortDialog extends DraggableDialogFragment {
     @Override
     protected Fragment getContentViewFragment() {
         sortFragment = new SortFragment();
+        sortFragment.setOnSortListener(onSortListener);
         return sortFragment;
     }
 

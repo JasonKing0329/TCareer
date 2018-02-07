@@ -74,8 +74,8 @@ public class Sqls {
      * @param desc
      * @return
      */
-    public static String getH2hOrderByPinyin(long userId, boolean desc) {
-        return getH2h(userId, "name_pinyin ", desc);
+    public static String getH2hNoOrderBy(long userId, boolean desc) {
+        return getH2h(userId, null, desc);
     }
 
     /**
@@ -168,5 +168,15 @@ public class Sqls {
                 .append(competitorIsUser ? AppConstants.COMPETITOR_VIRTUAL:AppConstants.COMPETITOR_NORMAL)
                 .append(" group by player_id,player_flag \n");
         return buffer.toString();
+    }
+    
+    public static String getAgainstTopCount(long userId, int winnerFlag, int year) {
+        return "select sum(case when rank_cpt between 1 and 10 and winner_flag=" + winnerFlag + " then 1 else 0 end) as top10\n" +
+                " ,sum(case when rank_cpt between 11 and 20 and winner_flag=" + winnerFlag + " then 1 else 0 end) as top20\n" +
+                " ,sum(case when rank_cpt between 21 and 50 and winner_flag=" + winnerFlag + " then 1 else 0 end) as top50\n" +
+                " ,sum(case when rank_cpt between 51 and 100 and winner_flag=" + winnerFlag + " then 1 else 0 end) as top100\n" +
+                " ,sum(case when (rank_cpt > 100 or rank_cpt=0) and winner_flag=" + winnerFlag + " then 1 else 0 end) as outof100\n" +
+                " FROM match_records where user_id=" + userId
+                + (year == 0 ? "" : " and date_str LIKE '" + year + "%'");
     }
 }

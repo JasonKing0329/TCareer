@@ -7,6 +7,7 @@
     <color name="main_bg">#e5e5e9</color>
 
     <color name="grayef">#efefef</color>
+    <color name="transparent">#00ffffff</color>
 
     <color name="redC93437">#FFC93437</color>
     <color name="blue375BF1">#FF375BF1</color>
@@ -107,5 +108,16 @@
     <color name="h2hlist_color_win">#ff0000</color>
     <color name="h2hlist_color_lose">#999999</color>
     <color name="h2hlist_color_tie">#FFD600</color>
+
+    <color name="pie_level_gs">#66FF6347</color> <!-- 西红柿色 -->
+    <color name="pie_level_mc">#663CB371</color> <!-- 中海蓝 -->
+    <color name="pie_level_1000">#66FF69B4</color> <!-- 热粉红色 -->
+    <color name="pie_level_500">#667B68EE</color> <!-- 中暗蓝色 -->
+    <color name="pie_level_250">#6600CED1</color> <!-- 暗宝石绿 -->
+    <color name="pie_level_oly">#663453d1</color>
+    <color name="pie_court_hard">#6600a5c4</color>
+    <color name="pie_court_clay">#66ef9801</color>
+    <color name="pie_court_grass">#6650a625</color>
+    <color name="pie_court_inhard">#663453d1</color>
 
 </resources>

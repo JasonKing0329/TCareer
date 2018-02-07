@@ -156,7 +156,7 @@
         app:bmb_buttonPlaceEnum="buttonPlace_vertical"
         app:bmb_buttonEnum="simpleCircle"/>
 
-    <com.king.khcareer.pubview.SideBar
+    <com.king.app.tcareer.view.widget.SideBar
         android:id="@+id/sidebar"
         android:layout_width="16dp"
         android:layout_height="match_parent"

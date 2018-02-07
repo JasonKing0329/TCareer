@@ -16,6 +16,7 @@ import com.king.app.tcareer.model.db.entity.UserDao;
 import org.greenrobot.greendao.query.WhereCondition;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,15 +39,15 @@ public class H2HDao {
      * @return
      */
     public Observable<List<H2hBean>> queryH2HListOrderByInsert(long userId) {
-        return queryH2HList(userId, Sqls.getH2hOrderByInsert(userId, true));
+        return queryH2HList(Sqls.getH2hOrderByInsert(userId, true));
     }
 
     /**
      * query player list with h2h
-     * @param userId
+     * @param sql
      * @return
      */
-    public Observable<List<H2hBean>> queryH2HList(final long userId, final String sql) {
+    public Observable<List<H2hBean>> queryH2HList(final String sql) {
         return Observable.create(new ObservableOnSubscribe<List<H2hBean>>() {
             @Override
             public void subscribe(ObservableEmitter<List<H2hBean>> e) throws Exception {
@@ -145,6 +146,25 @@ public class H2HDao {
                 e.onNext(bean);
             }
         });
+    }
+
+    /**
+     * count top10 win lose
+     * @return
+     */
+    public Integer[] getTotalCount(long userId, int winnerFlag, boolean isThisYear) {
+        String sql = Sqls.getAgainstTopCount(userId, winnerFlag, isThisYear ? Calendar.getInstance().get(Calendar.YEAR):0);
+        Integer[] count = new Integer[5];
+        Cursor cursor = TApplication.getInstance().getDaoSession().getDatabase()
+                .rawQuery(sql, new String[]{});
+        if (cursor.moveToNext()) {
+            count[0] = cursor.getInt(0);
+            count[1] = cursor.getInt(1);
+            count[2] = cursor.getInt(2);
+            count[3] = cursor.getInt(3);
+            count[4] = cursor.getInt(4);
+        }
+        return count;
     }
 
 }

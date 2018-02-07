@@ -6,7 +6,9 @@
       <module fileurl="file://$PROJECT_DIR$/TCareer.iml" filepath="$PROJECT_DIR$/TCareer.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/boommenu/boommenu.iml" filepath="$PROJECT_DIR$/boommenu/boommenu.iml" />
+      <module fileurl="file://E:\king\Devolopment\as_projects\TCareer\boommenu\boommenu.iml" filepath="E:\king\Devolopment\as_projects\TCareer\boommenu\boommenu.iml" />
       <module fileurl="file://$PROJECT_DIR$/expandablerecycleradapter/expandablerecycleradapter.iml" filepath="$PROJECT_DIR$/expandablerecycleradapter/expandablerecycleradapter.iml" />
+      <module fileurl="file://E:\king\Devolopment\as_projects\TCareer\expandablerecycleradapter\expandablerecycleradapter.iml" filepath="E:\king\Devolopment\as_projects\TCareer\expandablerecycleradapter\expandablerecycleradapter.iml" />
       <module fileurl="file://$PROJECT_DIR$/libtool/libtool.iml" filepath="$PROJECT_DIR$/libtool/libtool.iml" />
       <module fileurl="file://$PROJECT_DIR$/shapimageview/shapimageview.iml" filepath="$PROJECT_DIR$/shapimageview/shapimageview.iml" />
     </modules>

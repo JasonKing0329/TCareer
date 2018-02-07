@@ -29,7 +29,6 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.github.siyamed.shapeimageview.RoundedImageView;
-
 import com.king.app.tcareer.R;
 import com.king.app.tcareer.base.BaseMvpActivity;
 import com.king.app.tcareer.model.GlideOptions;
@@ -41,6 +40,7 @@ import com.king.app.tcareer.model.db.entity.User;
 import com.king.app.tcareer.page.match.gallery.UserMatchActivity;
 import com.king.app.tcareer.page.match.gallery.UserMatchBean;
 import com.king.app.tcareer.page.match.manage.MatchManageActivity;
+import com.king.app.tcareer.page.player.h2hlist.H2hListActivity;
 import com.king.app.tcareer.page.player.manage.PlayerManageActivity;
 import com.king.app.tcareer.page.player.page.PlayerPageActivity;
 import com.king.app.tcareer.page.player.slider.PlayerSlideActivity;
@@ -587,8 +587,9 @@ public class HomeActivity extends BaseMvpActivity<HomePresenter> implements IHom
     }
 
     private void startPlayerH2hActivity() {
-//        Intent intent = new Intent().setClass(this, H2hListActivity.class);
-//        startActivity(intent);
+        Intent intent = new Intent().setClass(this, H2hListActivity.class);
+        intent.putExtra(H2hListActivity.KEY_USER_ID, presenter.getUser().getId());
+        startActivity(intent);
     }
 
     private void startPlayerManageActivity() {
