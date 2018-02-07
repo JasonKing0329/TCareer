@@ -40,13 +40,17 @@ public class RecordPresenter extends BasePresenter<IRecordView> {
 
     }
 
+    public List<Record> getRecordList() {
+        return recordList;
+    }
+
     /**
      * 按照当前的recordList组装3级数据
      * @param recordList
      */
-    public void loadRecordDatas(ArrayList<Record> recordList) {
+    public void loadRecordDatas(List<Record> recordList) {
         this.recordList = recordList;
-        queryRecords()
+        parseRecords()
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe(new Observer<RecordPageData>() {
@@ -221,8 +225,12 @@ public class RecordPresenter extends BasePresenter<IRecordView> {
         data.setYearWin(nYearWin);
         data.setYearLose(nYear - nYearWin);
         DecimalFormat format = new DecimalFormat("##0.0");
-        data.setCareerRate(format.format((float) nCareerWin/ (float) nCareer * 100) + "%");
-        data.setYearRate(format.format((float) nYearWin/ (float) nYear * 100) + "%");
+        if (nCareer > 0) {
+            data.setCareerRate(format.format((float) nCareerWin/ (float) nCareer * 100) + "%");
+        }
+        if (nYear > 0) {
+            data.setYearRate(format.format((float) nYearWin/ (float) nYear * 100) + "%");
+        }
         return  data;
     }
 

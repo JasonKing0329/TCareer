@@ -7,6 +7,7 @@ import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.util.Pair;
 import android.view.View;
 import android.widget.ImageView;
@@ -24,7 +25,9 @@ import com.king.app.tcareer.model.db.entity.User;
 import com.king.app.tcareer.page.match.page.MatchPageActivity;
 import com.king.app.tcareer.page.player.page.PlayerPageActivity;
 import com.king.app.tcareer.page.record.editor.RecordEditorActivity;
+import com.king.app.tcareer.page.record.search.SearchDialog;
 import com.king.app.tcareer.utils.DebugLog;
+import com.king.app.tcareer.utils.ListUtil;
 import com.king.app.tcareer.view.dialog.AlertDialogFragment;
 import com.nightonke.boommenu.BoomButtons.ButtonPlaceAlignmentEnum;
 import com.nightonke.boommenu.BoomButtons.ButtonPlaceEnum;
@@ -34,6 +37,7 @@ import com.nightonke.boommenu.BoomMenuButton;
 import com.nightonke.boommenu.ButtonEnum;
 import com.nightonke.boommenu.Piece.PiecePlaceEnum;
 
+import java.util.Calendar;
 import java.util.List;
 
 import butterknife.BindView;
@@ -58,6 +62,8 @@ public class RecordActivity extends BaseMvpActivity<RecordPresenter> implements 
     TextView tvCareerWinlose;
     @BindView(R.id.tv_career_rate)
     TextView tvCareerRate;
+    @BindView(R.id.tv_year_title)
+    TextView tvYearTitle;
     @BindView(R.id.tv_year_winlose)
     TextView tvYearWinlose;
     @BindView(R.id.tv_year_rate)
@@ -151,9 +157,23 @@ public class RecordActivity extends BaseMvpActivity<RecordPresenter> implements 
     @Override
     public void onRecordDataLoaded(RecordPageData data) {
 
-        tvCareerRate.setText(data.getCareerRate());
+        if (TextUtils.isEmpty(data.getCareerRate())) {
+            tvCareerRate.setVisibility(View.GONE);
+        }
+        else {
+            tvCareerRate.setVisibility(View.VISIBLE);
+            tvCareerRate.setText(data.getCareerRate());
+        }
         tvCareerWinlose.setText("Win " + data.getCareerWin() + "   Lose " + data.getCareerLose());
-        tvYearRate.setText(data.getYearRate());
+        tvYearTitle.setText(String.valueOf(Calendar.getInstance().get(Calendar.YEAR)));
+
+        if (TextUtils.isEmpty(data.getYearRate())) {
+            tvYearRate.setVisibility(View.GONE);
+        }
+        else {
+            tvYearRate.setVisibility(View.VISIBLE);
+            tvYearRate.setText(data.getYearRate());
+        }
         tvYearWinlose.setText("Win " + data.getYearWin() + "   Lose " + data.getYearLose());
 
         // year默认展开
@@ -168,13 +188,15 @@ public class RecordActivity extends BaseMvpActivity<RecordPresenter> implements 
         } else {
             recordAdapter.updateData(data.getYearList());
         }
-        Record record = data.getYearList().get(0).getChildItemList().get(0).getRecord();
-        String path = ImageProvider.getMatchHeadPath(record.getMatch().getName(), record.getMatch().getMatchBean().getCourt());
+        if (!ListUtil.isEmpty(data.getYearList())) {
+            Record record = data.getYearList().get(0).getChildItemList().get(0).getRecord();
+            String path = ImageProvider.getMatchHeadPath(record.getMatch().getName(), record.getMatch().getMatchBean().getCourt());
 
-        Glide.with(this)
-                .load(path)
-                .apply(GlideOptions.getEditorMatchOptions())
-                .into(ivRecordHead);
+            Glide.with(this)
+                    .load(path)
+                    .apply(GlideOptions.getEditorMatchOptions())
+                    .into(ivRecordHead);
+        }
 
         // expand the first item, it's 1, not 0
         recordAdapter.expandParent(1);
@@ -190,26 +212,15 @@ public class RecordActivity extends BaseMvpActivity<RecordPresenter> implements 
     }
 
     private void showSearchDialog() {
-//        RecordFilterDialog dialog = new RecordFilterDialog(this, new CustomDialog.OnCustomDialogActionListener() {
-//            @Override
-//            public boolean onSave(Object object) {
-//                List<Record> list = (List<Record>) object;
-//                recordPresenter.loadRecordDatas((ArrayList<Record>) list);
-//                return true;
-//            }
-//
-//            @Override
-//            public boolean onCancel() {
-//                return true;
-//            }
-//
-//            @Override
-//            public void onLoadData(HashMap<String, Object> data) {
-//                data.put("data", recordPageData.getRecordList());
-//            }
-//        });
-//        dialog.setTitle(getString(R.string.filter_title));
-//        dialog.show();
+        SearchDialog searchDialog = new SearchDialog();
+        searchDialog.setRecordList(presenter.getRecordList());
+        searchDialog.setOnRecordFilterListener(new SearchDialog.OnRecordFilterListener() {
+            @Override
+            public void recordFiltered(List<Record> list) {
+                presenter.loadRecordDatas(list);
+            }
+        });
+        searchDialog.show(getSupportFragmentManager(), "SearchDialog");
     }
 
     @Override
