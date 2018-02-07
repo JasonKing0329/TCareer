@@ -197,34 +197,40 @@ public class EditorPresenter extends BasePresenter<IEditorView> {
         this.mCompetitor = mCompetitor;
     }
 
-    public void setMatchNameBean(MatchNameBean mMatchNameBean) {
-        this.mMatchNameBean = mMatchNameBean;
-    }
-
-    public void setScoreList(List<Score> mScoreList) {
-        this.mScoreList = mScoreList;
-    }
-
     public void insertOrUpdate() {
         Observable.create(new ObservableOnSubscribe<Boolean>() {
             @Override
             public void subscribe(ObservableEmitter<Boolean> e) throws Exception {
-                boolean isUpdate = mRecord.getId() != null;
-                RecordDao recordDao = TApplication.getInstance().getDaoSession().getRecordDao();
-                if (isUpdate) {
-                    recordDao.update(mRecord);
-                }
-                else {
-                    recordDao.insert(mRecord);
-                }
 
-                if (!ListUtil.isEmpty(mScoreList)) {
-                    for (Score score:mScoreList) {
-                        score.setRecordId(mRecord.getId());
+                final boolean isUpdate = mRecord.getId() != null;
+                // control in transaction
+                TApplication.getInstance().getDaoSession().runInTx(new Runnable() {
+                    @Override
+                    public void run() {
+                        RecordDao recordDao = TApplication.getInstance().getDaoSession().getRecordDao();
+                        ScoreDao scoreDao = TApplication.getInstance().getDaoSession().getScoreDao();
+                        // insert into or update from match_records
+                        if (isUpdate) {
+                            // delete from scores before update
+                            scoreDao.queryBuilder().where(ScoreDao.Properties.RecordId.eq(mRecord.getId()))
+                                    .buildDelete().executeDeleteWithoutDetachingEntities();
+
+                            recordDao.update(mRecord);
+                            // notify reset scoreList
+                            mRecord.resetScoreList();
+                        }
+                        else {
+                            recordDao.insert(mRecord);
+                        }
+                        // insert into scores
+                        if (!ListUtil.isEmpty(mScoreList)) {
+                            for (Score score:mScoreList) {
+                                score.setRecordId(mRecord.getId());
+                            }
+                            scoreDao.insertInTx(mScoreList);
+                        }
                     }
-                    ScoreDao scoreDao = TApplication.getInstance().getDaoSession().getScoreDao();
-                    scoreDao.insertInTx(mScoreList);
-                }
+                });
                 e.onNext(isUpdate);
             }
         }).observeOn(AndroidSchedulers.mainThread())

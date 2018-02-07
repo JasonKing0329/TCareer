@@ -39,6 +39,27 @@
     <style name="HomeTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light">
     </style>
 
+    <style name="RecordTheme" parent="AppTheme">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="android:textColorPrimary">@color/white</item>
+        <item name="android:textColorSecondary">#eeeeee</item>
+        <item name="android:actionMenuTextColor">@color/white</item>
+    </style>
+
+    <style name="RecordTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="android:textColorPrimary">@color/white</item>
+        <item name="android:textColorSecondary">#eeeeee</item>
+        <item name="android:actionMenuTextColor">@color/white</item>
+    </style>
+
+    <style name="RecordTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light">
+    </style>
+
     <style name="BASEDialog" parent="@android:style/Theme.Dialog">
         <item name="android:windowFrame">@null</item>
         <item name="android:windowNoTitle">true</item>

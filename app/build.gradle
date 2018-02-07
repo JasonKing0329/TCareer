@@ -7,8 +7,8 @@ android {
         applicationId "com.king.app.tcareer"
         minSdkVersion 21
         targetSdkVersion 26
-        versionCode 18
-        versionName "1.8.1"
+        versionCode 19
+        versionName "1.8.2"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     signingConfigs {
@@ -71,4 +71,5 @@ dependencies {
     implementation project(':MPChartLib')
     implementation project(':shapimageview')
     implementation project(':boommenu')
+    implementation project(':expandablerecycleradapter')
 }

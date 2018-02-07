@@ -48,6 +48,7 @@ import com.king.app.tcareer.page.player.slider.PlayerSlideAdapter;
 import com.king.app.tcareer.page.rank.RankChartFragment;
 import com.king.app.tcareer.page.rank.RankManageActivity;
 import com.king.app.tcareer.page.record.editor.RecordEditorActivity;
+import com.king.app.tcareer.page.record.list.RecordActivity;
 import com.king.app.tcareer.page.score.ScoreActivity;
 import com.king.app.tcareer.page.setting.SettingActivity;
 import com.king.app.tcareer.utils.DebugLog;
@@ -66,6 +67,7 @@ public class HomeActivity extends BaseMvpActivity<HomePresenter> implements IHom
 
     private final int REQUEST_RANK = 101;
     private final int REQUEST_ADD = 102;
+    private final int REQUEST_RECORD_LIST = 103;
     private final int REQUEST_SCORE = 104;
 
     private HomeHeadAdapter headAdapter;
@@ -168,7 +170,6 @@ public class HomeActivity extends BaseMvpActivity<HomePresenter> implements IHom
     }
 
     private void initAppBar() {
-//        toolbar.setTitle(presenter.getUser().getNameEng());
         setSupportActionBar(toolbar);
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -576,11 +577,13 @@ public class HomeActivity extends BaseMvpActivity<HomePresenter> implements IHom
         startActivity(intent);
     }
 
+    @SuppressLint("RestrictedApi")
     private void startRecordLineActivity() {
-//        Intent intent = new Intent().setClass(this, RecordActivity.class);
-//        ActivityOptions transitionActivityOptions = ActivityOptions.makeSceneTransitionAnimation(this
-//                , Pair.create(findViewById(R.id.iv_record_bk),getString(R.string.anim_home_date)));
-//        startActivity(intent, transitionActivityOptions.toBundle());
+        Intent intent = new Intent().setClass(this, RecordActivity.class);
+        intent.putExtra(RecordActivity.KEY_USER_ID, presenter.getUser().getId());
+        ActivityOptions transitionActivityOptions = ActivityOptions.makeSceneTransitionAnimation(this
+                , Pair.create(findViewById(R.id.iv_record_bk),getString(R.string.anim_home_date)));
+        startActivityForResult(intent, REQUEST_RECORD_LIST, transitionActivityOptions.toBundle());
     }
 
     private void startPlayerH2hActivity() {
@@ -622,6 +625,12 @@ public class HomeActivity extends BaseMvpActivity<HomePresenter> implements IHom
         else if (requestCode == REQUEST_ADD) {
             if (resultCode == RESULT_OK) {
                 // 添加过新数据，刷新record相关
+                presenter.setRecordChanged();
+            }
+        }
+        else if (requestCode == REQUEST_RECORD_LIST) {
+            if (resultCode == RESULT_OK) {
+                // 删除或修改过新数据，刷新record相关
                 presenter.setRecordChanged();
             }
         }
