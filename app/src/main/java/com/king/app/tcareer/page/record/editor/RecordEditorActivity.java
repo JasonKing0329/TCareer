@@ -162,18 +162,23 @@ public class RecordEditorActivity extends BaseMvpActivity<EditorPresenter> imple
                 showMatchView();
                 break;
             case R.id.tv_done:
-                String errorMsg = playerEditPage.fillRecord();
-                if (!TextUtils.isEmpty(errorMsg)) {
-                    showMessage(errorMsg);
-                    return;
+                if (tvContinue.getVisibility() == View.VISIBLE) {
+                    finish();
                 }
-                errorMsg = matchEditPage.fillRecord();
-                if (!TextUtils.isEmpty(errorMsg)) {
-                    showMessage(errorMsg);
-                    return;
+                else {
+                    String errorMsg = playerEditPage.fillRecord();
+                    if (!TextUtils.isEmpty(errorMsg)) {
+                        showMessage(errorMsg);
+                        return;
+                    }
+                    errorMsg = matchEditPage.fillRecord();
+                    if (!TextUtils.isEmpty(errorMsg)) {
+                        showMessage(errorMsg);
+                        return;
+                    }
+                    matchEditPage.saveAutoFill();
+                    presenter.insertOrUpdate();
                 }
-                matchEditPage.saveAutoFill();
-                presenter.insertOrUpdate();
                 break;
             case R.id.tv_continue:
                 continueInsert();
@@ -201,6 +206,7 @@ public class RecordEditorActivity extends BaseMvpActivity<EditorPresenter> imple
     }
 
     private void continueInsert() {
+        presenter.reset();
         tvContinue.setVisibility(View.GONE);
         toolbar.setTitle(getResources().getString(R.string.player_infor));
         tvPreviousPage.setVisibility(View.GONE);

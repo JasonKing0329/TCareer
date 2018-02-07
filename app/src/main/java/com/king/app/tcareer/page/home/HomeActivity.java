@@ -621,8 +621,8 @@ public class HomeActivity extends BaseMvpActivity<HomePresenter> implements IHom
         }
         else if (requestCode == REQUEST_ADD) {
             if (resultCode == RESULT_OK) {
-                // 添加过新数据，刷新当前user
-                onUserChanged(presenter.getUser());
+                // 添加过新数据，刷新record相关
+                presenter.setRecordChanged();
             }
         }
         super.onActivityResult(requestCode, resultCode, data);

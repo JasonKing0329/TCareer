@@ -125,21 +125,21 @@ public class PlayerEditPage implements View.OnClickListener {
         if (holder.getPresenter().getCompetitor() == null) {
             return holder.getActivity().getString(R.string.editor_null_player);
         }
-        int rankCpt = 0;
-        try {
-            rankCpt = Integer.parseInt(et_rankp1.getText().toString());
-        } catch (Exception e) {}
-        int seedCpt = 0;
-        try {
-            seedCpt = Integer.parseInt(et_seedp1.getText().toString());
-        } catch (Exception e) {}
         int rank = 0;
         try {
-            rank = Integer.parseInt(et_rank.getText().toString());
+            rank = Integer.parseInt(et_rankp1.getText().toString());
         } catch (Exception e) {}
         int seed = 0;
         try {
-            seed = Integer.parseInt(et_seed.getText().toString());
+            seed = Integer.parseInt(et_seedp1.getText().toString());
+        } catch (Exception e) {}
+        int rankCpt = 0;
+        try {
+            rankCpt = Integer.parseInt(et_rank.getText().toString());
+        } catch (Exception e) {}
+        int seedCpt = 0;
+        try {
+            seedCpt = Integer.parseInt(et_seed.getText().toString());
         } catch (Exception e) {}
 
         holder.getPresenter().fillPlayerPage(rank, seed, rankCpt, seedCpt);

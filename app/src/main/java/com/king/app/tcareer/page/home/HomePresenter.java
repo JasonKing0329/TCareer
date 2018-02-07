@@ -154,14 +154,50 @@ public class HomePresenter extends BasePresenter<IHomeView> {
                     @Override
                     public void onNext(List<UserMatchBean> list) {
                         matchList = list;
-                        view.dismissLoading();
                         view.showMatches(list);
                     }
 
                     @Override
                     public void onError(Throwable e) {
                         e.printStackTrace();
-                        view.dismissLoading();
+                        view.showMessage("errors: " + e.getMessage());
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
+    }
+
+    /**
+     * record changed, refresh last record and recent competitors
+     */
+    public void setRecordChanged() {
+        queryLastRecord()
+                .flatMap(new Function<Record, ObservableSource<List<CompetitorBean>>>() {
+                    @Override
+                    public ObservableSource<List<CompetitorBean>> apply(Record record) throws Exception {
+                        view.postShowLastRecord(record);
+                        return queryLastPlayers();
+                    }
+                })
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(new Observer<List<CompetitorBean>>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                        addDisposable(d);
+                    }
+
+                    @Override
+                    public void onNext(List<CompetitorBean> list) {
+                        view.postShowCompetitors(list);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        e.printStackTrace();
                         view.showMessage("errors: " + e.getMessage());
                     }
 

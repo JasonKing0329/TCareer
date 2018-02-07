@@ -285,7 +285,7 @@ public class EditorPresenter extends BasePresenter<IEditorView> {
 
     public void saveAutoFill(int yearIndex, String round) {
         AutoFillMatchBean item = new AutoFillMatchBean();
-        item.setMatchId(mMatchNameBean.getMatchId());
+        item.setMatchId(mMatchNameBean.getId());
         item.setIndexYear(yearIndex);
         item.setRound(round);
         SettingProperty.setAutoFillMatch(item);
@@ -312,5 +312,14 @@ public class EditorPresenter extends BasePresenter<IEditorView> {
         }
         mRecord.setDateStr(dateStr);
         mRecord.setDateLong(dateLong);
+    }
+
+    public void reset() {
+        mRecord = new Record();
+        mRecord.setUserId(mUser.getId());
+        mCompetitor = null;
+        mScoreList = null;
+        // mMatchNameBean不重置，继续保留上一次的
+//        mMatchNameBean = null;
     }
 }
