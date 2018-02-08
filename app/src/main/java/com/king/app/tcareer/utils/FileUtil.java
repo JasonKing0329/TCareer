@@ -3,8 +3,10 @@ package com.king.app.tcareer.utils;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.king.app.tcareer.base.TApplication;
+import com.king.app.tcareer.conf.AppConfig;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -58,4 +60,37 @@ public class FileUtil {
         }
     }
 
+    public static boolean replaceDatabase(File source) {
+        if (source == null || !source.exists()) {
+            return false;
+        }
+
+        // 删除源目录database
+        String dbPath = TApplication.getInstance().getFilesDir().getParent() + "/databases";
+        File targetFolder = new File(dbPath);
+        if (targetFolder.exists()) {
+            File[] files = targetFolder.listFiles();
+            for (File f:files) {
+                f.delete();
+            }
+        }
+        try {
+            InputStream in = new FileInputStream(source);
+            File file = new File(dbPath + "/" + AppConfig.DB_NAME);
+            OutputStream fileOut = new FileOutputStream(file);
+            byte[] buffer = new byte[1024];
+            int length;
+            while ((length = in.read(buffer))>0){
+                fileOut.write(buffer, 0, length);
+            }
+
+            fileOut.flush();
+            fileOut.close();
+            in.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+        return true;
+    }
 }

@@ -20,6 +20,7 @@ import com.king.app.tcareer.model.FlagProvider;
 import com.king.app.tcareer.model.db.entity.RankCareer;
 import com.king.app.tcareer.model.db.entity.User;
 import com.king.app.tcareer.page.match.MatchDialog;
+import com.king.app.tcareer.utils.FormatUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -134,7 +135,7 @@ public class ScoreFragment extends BaseMvpFragment<ScorePresenter> implements IS
         tvPlayer.setText(mUser.getNameEng());
         tvCountry.setText(mUser.getCountry());
         tvBirthday.setText(mUser.getBirthday());
-        tvHeight.setText(mUser.getHeight() + "  " + mUser.getWeight());
+        tvHeight.setText(mUser.getHeight() + "  " + FormatUtil.formatNumber(mUser.getWeight()) + "kg");
     }
 
     private void onMatchClicked(ScoreBean bean) {

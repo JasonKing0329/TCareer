@@ -338,15 +338,23 @@ public class RecordScoreDialog extends DraggableDialogFragment {
         private Score formatScore(ViewGroup group) {
             Score score = new Score();
             score.setSetNo(stackSet.size() + 1);
-            score.setUserPoint(Integer.parseInt(getUserPointEdit(group).getText().toString()));
-            score.setCompetitorPoint(Integer.parseInt(getCompetitorPointEdit(group).getText().toString()));
+            try {
+                score.setUserPoint(Integer.parseInt(getUserPointEdit(group).getText().toString()));
+            } catch (Exception e) {}
+            try {
+                score.setCompetitorPoint(Integer.parseInt(getCompetitorPointEdit(group).getText().toString()));
+            } catch (Exception e) {}
             if (getTieEdit(group).getVisibility() == View.VISIBLE) {
                 score.setIsTiebreak(true);
                 if (score.getUserPoint() > score.getCompetitorPoint()) {
-                    score.setCompetitorTiebreak(Integer.parseInt(getTieEdit(group).getText().toString()));
+                    try {
+                        score.setCompetitorTiebreak(Integer.parseInt(getTieEdit(group).getText().toString()));
+                    } catch (Exception e) {}
                 }
                 else {
-                    score.setUserTiebreak(Integer.parseInt(getTieEdit(group).getText().toString()));
+                    try {
+                        score.setUserTiebreak(Integer.parseInt(getTieEdit(group).getText().toString()));
+                    } catch (Exception e) {}
                 }
             }
             return score;

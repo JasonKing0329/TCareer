@@ -15,6 +15,7 @@ import com.king.app.tcareer.model.db.entity.User;
 import com.king.app.tcareer.page.score.IScorePageView;
 import com.king.app.tcareer.page.score.ScorePageData;
 import com.king.app.tcareer.page.score.ScorePresenter;
+import com.king.app.tcareer.utils.FormatUtil;
 import com.king.app.tcareer.utils.ScreenUtils;
 
 import butterknife.BindView;
@@ -99,7 +100,7 @@ public class HomeHeadFragment extends BaseMvpFragment<ScorePresenter> implements
         tvPlayer.setText(user.getNameEng());
         tvCountry.setText(user.getCountry());
         tvBirthday.setText(user.getBirthday());
-        tvHeight.setText(user.getHeight() + "  " + user.getWeight());
+        tvHeight.setText(user.getHeight() + "  " + FormatUtil.formatNumber(user.getWeight()) + "kg");
         ivFlagBg.setImageResource(FlagProvider.getFlagRes(user.getCountry()));
     }
 

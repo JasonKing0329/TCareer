@@ -15,6 +15,7 @@ public class TApplication extends Application {
 	private static TApplication instance;
 
 	private DaoSession daoSession;
+	private DaoMaster.DevOpenHelper helper;
 
 	public static int getSDKVersion() {
 		return Build.VERSION.SDK_INT;
@@ -53,12 +54,18 @@ public class TApplication extends Application {
 	 * 需要由外部调用，如果在onCreate里直接初始化会创建新的数据库
 	 */
 	public void createGreenDao() {
-		DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(getApplicationContext(), AppConfig.DB_NAME);
+		helper = new DaoMaster.DevOpenHelper(getApplicationContext(), AppConfig.DB_NAME);
 		Database db = helper.getWritableDb();
 		daoSession = new DaoMaster(db).newSession();
 
 		QueryBuilder.LOG_SQL = true;
 		QueryBuilder.LOG_VALUES = true;
+	}
+
+	public void reCreateGreenDao() {
+		daoSession.clear();
+		helper.close();
+		createGreenDao();
 	}
 
 	public DaoSession getDaoSession() {

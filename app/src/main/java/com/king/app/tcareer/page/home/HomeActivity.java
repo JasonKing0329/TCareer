@@ -31,6 +31,7 @@ import com.bumptech.glide.Glide;
 import com.github.siyamed.shapeimageview.RoundedImageView;
 import com.king.app.tcareer.R;
 import com.king.app.tcareer.base.BaseMvpActivity;
+import com.king.app.tcareer.base.TApplication;
 import com.king.app.tcareer.model.GlideOptions;
 import com.king.app.tcareer.model.ImageProvider;
 import com.king.app.tcareer.model.SeasonManager;
@@ -53,6 +54,8 @@ import com.king.app.tcareer.page.record.list.RecordActivity;
 import com.king.app.tcareer.page.score.ScoreActivity;
 import com.king.app.tcareer.page.setting.SettingActivity;
 import com.king.app.tcareer.utils.DebugLog;
+import com.king.app.tcareer.view.content.LoadFromContent;
+import com.king.app.tcareer.view.dialog.CommonDialog;
 import com.king.app.tcareer.view.widget.CircleImageView;
 import com.king.app.tcareer.view.widget.discrete.DiscreteScrollView;
 import com.king.app.tcareer.view.widget.discrete.transform.ScaleTransformer;
@@ -509,19 +512,7 @@ public class HomeActivity extends BaseMvpActivity<HomePresenter> implements IHom
                 startMatchManageActivity();
                 break;
             case R.id.group_nav_load:
-//                BasicOperation.showLoadFromDialog(this, new BasicOperation.DialogCallback() {
-//
-//                    @Override
-//                    public void onOk(Object result) {
-//                        Toast.makeText(HomeActivity.this, R.string.loading_ok, Toast.LENGTH_SHORT).show();
-//                        initData();
-//                    }
-//
-//                    @Override
-//                    public void onCancel(Object result) {
-//
-//                    }
-//                });
+                showLoadFromDialog();
                 break;
             case R.id.group_nav_setting:
                 startSettingActivity();
@@ -533,6 +524,20 @@ public class HomeActivity extends BaseMvpActivity<HomePresenter> implements IHom
             case R.id.tv_nav_v7:
                 break;
         }
+    }
+
+    private void showLoadFromDialog() {
+        LoadFromContent content = new LoadFromContent();
+        content.setOnDatabaseChangedListener(new LoadFromContent.OnDatabaseChangedListener() {
+            @Override
+            public void onDatabaseChanged() {
+                TApplication.getInstance().reCreateGreenDao();
+                initData();
+            }
+        });
+        CommonDialog<LoadFromContent> dialog = new CommonDialog<>();
+        dialog.setContentFragment(content);
+        dialog.show(getSupportFragmentManager(), "LoadFromContent");
     }
 
     @SuppressLint("RestrictedApi")
