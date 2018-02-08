@@ -2,10 +2,10 @@ package com.king.app.tcareer.page.setting;
 
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
-import android.text.TextUtils;
 
 import com.google.gson.Gson;
 import com.king.app.tcareer.base.TApplication;
+import com.king.app.tcareer.conf.AppConstants;
 import com.king.app.tcareer.model.bean.AutoFillMatchBean;
 
 /**
@@ -46,6 +46,11 @@ public class SettingProperty {
     private static final int getInt(String key) {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(TApplication.getInstance());
         return sp.getInt(key, -1);
+    }
+
+    private static final int getInt(String key, int defaultValue) {
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(TApplication.getInstance());
+        return sp.getInt(key, defaultValue);
     }
 
     private static final void setInt(String key, int value) {
@@ -147,6 +152,66 @@ public class SettingProperty {
             bean = new Gson().fromJson(json, AutoFillMatchBean.class);
         } catch (Exception e) {}
         return bean;
+    }
+
+    /**
+     * glory page
+     */
+    public static int getGloryPageIndex() {
+        return getInt("key_glory_page_index", 0);
+    }
+
+    /**
+     * glory page
+     * @param index
+     */
+    public static void setGloryPageIndex(int index) {
+        setInt("key_glory_page_index", index);
+    }
+
+    /**
+     * glory target: select win
+     */
+    public static boolean isGloryTargetWin() {
+        return getBoolean("key_glory_target_win");
+    }
+
+    /**
+     * glory target: select win
+     * @param check
+     */
+    public static void setGloryTargetWin(boolean check) {
+        setBoolean("key_glory_target_win", check);
+    }
+
+    /**
+     * glory champion group mode
+     */
+    public static int getGloryChampionGroupMode() {
+        return getInt("key_glory_champion_group_mode", AppConstants.GROUP_BY_ALL);
+    }
+
+    /**
+     * glory champion group mode
+     * @param mode
+     */
+    public static void setGloryChampionGroupMode(int mode) {
+        setInt("key_glory_champion_group_mode", mode);
+    }
+
+    /**
+     * glory runnerup group mode
+     */
+    public static int getGloryRunnerupGroupMode() {
+        return getInt("key_glory_runnerup_group_mode", AppConstants.GROUP_BY_ALL);
+    }
+
+    /**
+     * glory runnerup group mode
+     * @param mode
+     */
+    public static void setGloryRunnerupGroupMode(int mode) {
+        setInt("key_glory_runnerup_group_mode", mode);
     }
 
 }

@@ -106,6 +106,10 @@
             android:theme="@style/RecordTheme"
             android:screenOrientation="portrait"/>
 
+        <activity android:name=".page.glory.GloryActivity"
+            android:theme="@style/HomeTheme"
+            android:screenOrientation="portrait"/>
+
     </application>
 
 </manifest>

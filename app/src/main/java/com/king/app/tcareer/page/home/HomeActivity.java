@@ -37,6 +37,7 @@ import com.king.app.tcareer.model.SeasonManager;
 import com.king.app.tcareer.model.bean.CompetitorBean;
 import com.king.app.tcareer.model.db.entity.Record;
 import com.king.app.tcareer.model.db.entity.User;
+import com.king.app.tcareer.page.glory.GloryActivity;
 import com.king.app.tcareer.page.match.gallery.UserMatchActivity;
 import com.king.app.tcareer.page.match.gallery.UserMatchBean;
 import com.king.app.tcareer.page.match.manage.MatchManageActivity;
@@ -560,8 +561,9 @@ public class HomeActivity extends BaseMvpActivity<HomePresenter> implements IHom
     }
 
     private void startGloryActivity() {
-//        Intent intent = new Intent().setClass(this, GloryActivity.class);
-//        startActivity(intent);
+        Intent intent = new Intent().setClass(this, GloryActivity.class);
+        intent.putExtra(GloryActivity.KEY_USER_ID, presenter.getUser().getId());
+        startActivity(intent);
     }
 
     private void startPlayerActivity() {

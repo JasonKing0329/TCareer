@@ -169,7 +169,14 @@ public class Sqls {
                 .append(" group by player_id,player_flag \n");
         return buffer.toString();
     }
-    
+
+    /**
+     * 统计对阵top N 的胜负量
+     * @param userId
+     * @param winnerFlag
+     * @param year
+     * @return
+     */
     public static String getAgainstTopCount(long userId, int winnerFlag, int year) {
         return "select sum(case when rank_cpt between 1 and 10 and winner_flag=" + winnerFlag + " then 1 else 0 end) as top10\n" +
                 " ,sum(case when rank_cpt between 11 and 20 and winner_flag=" + winnerFlag + " then 1 else 0 end) as top20\n" +
@@ -178,5 +185,148 @@ public class Sqls {
                 " ,sum(case when (rank_cpt > 100 or rank_cpt=0) and winner_flag=" + winnerFlag + " then 1 else 0 end) as outof100\n" +
                 " FROM match_records where user_id=" + userId
                 + (year == 0 ? "" : " and date_str LIKE '" + year + "%'");
+    }
+
+    /**
+     * 统计各个级别赛事的决赛/冠军/亚军数量
+     * key value
+     * @param userId
+     * @param winnerFlag null则决赛，否则冠军或亚军
+     * @param year
+     * @return
+     */
+    public static String getCountFinalByLevel(long userId, String winnerFlag, String year) {
+        return countFinal(userId, winnerFlag, year, "matches.level");
+    }
+
+    /**
+     * 统计各个场地赛事的决赛/冠军/亚军数量
+     * key value
+     * @param userId
+     * @param winnerFlag null则决赛，否则冠军或亚军
+     * @param year
+     * @return
+     */
+    public static String getCountFinalByCourt(long userId, String winnerFlag, String year) {
+        return countFinal(userId, winnerFlag, year, "matches.court");
+    }
+
+    /**
+     * 统计决赛/冠军/亚军数量
+     * @param userId
+     * @param winnerFlag null则决赛，否则冠军或亚军
+     * @param year
+     * @param groupBy
+     * @return
+     */
+    private static String countFinal(long userId, String winnerFlag, String year, String groupBy) {
+        StringBuffer where = new StringBuffer();
+        where.append(" WHERE match_records.user_id=").append(userId)
+                .append(" AND match_records.round='Final'");
+        if (!TextUtils.isEmpty(winnerFlag)) {
+            where.append(" AND match_records.winner_flag=").append(winnerFlag);
+        }
+        if (!TextUtils.isEmpty(year)) {
+            where.append(" AND match_records.DATE_STR like '").append(year).append("%'");
+        }
+        return "SELECT " + groupBy + " AS key,COUNT(*) AS value \n" +
+                " FROM match_records \n" +
+                " JOIN match_names ON match_records.match_name_id=match_names._id\n" +
+                " JOIN matches ON match_names.match_id=matches._id\n" +
+                where.toString() +
+                " GROUP BY " + groupBy;
+    }
+
+    public static String getGroupGSWinLose(long userId, String year) {
+        return groupWinLose(userId, year, "Grand Slam");
+    }
+
+    /**
+     * 统计level赛事类型对应的胜负数量
+     * _id, name, win, lose
+     * @param userId
+     * @param year
+     * @return
+     */
+    public static String groupWinLose(long userId, String year, String level) {
+        return "SELECT matches._id, match_names.name, sum(CASE WHEN winner_flag=0 THEN 1 ELSE 0 END) AS win , sum(CASE WHEN winner_flag=0 THEN 0 ELSE 1 END) AS lose \n" +
+                " FROM match_records\n" +
+                " JOIN match_names ON match_records.match_name_id=match_names._id\n" +
+                " JOIN matches ON match_names.match_id=matches._id\n" +
+                " WHERE match_records.user_id=" + userId + " AND matches.level='" + level + "' \n" +
+                (year == null ? "":" AND date_str LIKE '" + year + "%'") +
+                " GROUP BY matches._id";
+    }
+
+    /**
+     * GS胜负数量
+     * level, win, lose
+     * @param userId
+     * @param year
+     * @return
+     */
+    public static String getGSWinLose(long userId, String year) {
+        return countWinLose(userId, year, "matches.level", "Grand Slam");
+    }
+
+    /**
+     * Atp1000胜负数量
+     * level, win, lose
+     * @param userId
+     * @param year
+     * @return
+     */
+    public static String getAtp1000WinLose(long userId, String year) {
+        return countWinLose(userId, year, "matches.level", "ATP1000");
+    }
+
+    /**
+     * 统计类型对应的胜负数量
+     * key, win, lose
+     * @param userId
+     * @param year
+     * @return
+     */
+    public static String countWinLose(long userId, String year, String key, String value) {
+        return "SELECT " + key + ", sum(CASE WHEN winner_flag=0 THEN 1 ELSE 0 END) AS win , sum(CASE WHEN winner_flag=0 THEN 0 ELSE 1 END) AS lose \n" +
+                " FROM match_records\n" +
+                " JOIN match_names ON match_records.match_name_id=match_names._id\n" +
+                " JOIN matches ON match_names.match_id=matches._id\n" +
+                " WHERE match_records.user_id=" + userId + " AND " + key + "='" + value + "' \n" +
+                (year == null ? "":" AND date_str LIKE '" + year + "%'");
+    }
+
+    /**
+     * 统计GS轮次
+     * @param userId
+     * @return
+     */
+    public static String getGsResults(long userId) {
+        return getMatchResults(userId, "Grand Slam");
+    }
+
+    /**
+     * 统计ATP1000轮次
+     * @param userId
+     * @return
+     */
+    public static String getATP1000Results(long userId) {
+        return getMatchResults(userId, "ATP1000");
+    }
+
+    /**
+     * 统计GS轮次
+     * match_id, name, date_str, result
+     * @param userId
+     * @return
+     */
+    public static String getMatchResults(long userId, String level) {
+        return "SELECT matches._id AS match_id, match_names._id AS match_name_id, match_names.name, match_records.date_str\n" +
+                ",(CASE WHEN winner_flag=0 THEN (CASE WHEN round='Final' THEN 'Winner' END) ELSE round END) AS result \n" +
+                " FROM match_records \n" +
+                " JOIN match_names ON match_records.match_name_id=match_names._id\n" +
+                " JOIN matches ON match_names.match_id=matches._id\n" +
+                " WHERE match_records.user_id=" + userId + " AND matches.level='" + level + "' \n" +
+                " GROUP BY matches._id,match_records.date_str";
     }
 }
