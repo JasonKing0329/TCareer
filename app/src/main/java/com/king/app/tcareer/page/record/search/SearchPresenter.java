@@ -5,6 +5,7 @@ import com.king.app.tcareer.conf.AppConstants;
 import com.king.app.tcareer.model.CompetitorParser;
 import com.king.app.tcareer.model.bean.CompetitorBean;
 import com.king.app.tcareer.model.db.entity.Record;
+import com.king.app.tcareer.model.db.entity.Score;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -84,6 +85,7 @@ public class SearchPresenter extends BasePresenter<SearchView> {
             isPass = isPass && checkRound(record, searchBean);
             isPass = isPass && checkDate(record, searchBean);
             isPass = isPass && checkUserWinner(record, searchBean);
+            isPass = isPass && checkScore(record, searchBean);
             if (isPass) {
                 newList.add(record);
             }
@@ -179,6 +181,25 @@ public class SearchPresenter extends BasePresenter<SearchView> {
             return record.getWinnerFlag() == (searchBean.isWinner() ? AppConstants.WINNER_USER:AppConstants.WINNER_COMPETITOR);
         }
         return true;
+    }
+
+    private boolean checkScore(Record record, SearchBean searchBean) {
+        boolean pass = false;
+        List<Score> scoreList = record.getScoreList();
+        for (Score score:scoreList) {
+            pass = score.getUserPoint() == searchBean.getScoreUser() && score.getCompetitorPoint() == searchBean.getScoreCpt();
+            if (pass) {
+                break;
+            }
+
+            if (searchBean.isScoreEachOther()) {
+                pass = score.getUserPoint() == searchBean.getScoreCpt() && score.getCompetitorPoint() == searchBean.getScoreUser();
+            }
+            if (pass) {
+                break;
+            }
+        }
+        return pass;
     }
 
 }

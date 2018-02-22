@@ -75,7 +75,9 @@ public class SearchDialog extends DraggableDialogFragment implements SearchHolde
         private String[] arr_round, arr_level, arr_court, arr_region;
         private String[] arr_year, arr_month;
         private CheckBox cbox_court, cbox_level, cbox_match, cbox_round, cbox_region, cbox_matchcountry, cbox_comp, cbox_compcountry, cbox_comprank, cbox_date, cbox_score, cbox_winlose, cbox_sql;
-        private EditText et_match, et_comp, et_compcountry, et_comprank_min, et_comprank_max, et_matchcountry, et_score, et_where, et_wherevalue;
+        private EditText et_match, et_comp, et_compcountry, et_comprank_min, et_comprank_max, et_matchcountry, et_where, et_wherevalue;
+        private CheckBox cbEachOther;
+        private EditText etScoreUser, etScoreCpt;
         private TextView hintTableText;
         private RadioGroup rgroup_winlose;
         private RadioButton radio_win, radio_lose;
@@ -230,7 +232,9 @@ public class SearchDialog extends DraggableDialogFragment implements SearchHolde
             et_comprank_min = (EditText) view.findViewById(R.id.search_rank_min);
             et_comprank_max = (EditText) view.findViewById(R.id.search_rank_max);
             et_matchcountry = (EditText) view.findViewById(R.id.search_et_matchcountry);
-            et_score = (EditText) view.findViewById(R.id.search_et_score);
+            cbEachOther = (CheckBox) view.findViewById(R.id.cb_score_each);
+            etScoreCpt = (EditText) view.findViewById(R.id.et_score_cpt);
+            etScoreUser = (EditText) view.findViewById(R.id.et_score_user);
             et_where = (EditText) view.findViewById(R.id.search_et_sql1);
             et_wherevalue = (EditText) view.findViewById(R.id.search_et_sql2);
             button_date_start = (Button) view.findViewById(R.id.button_date_start);
@@ -430,10 +434,14 @@ public class SearchDialog extends DraggableDialogFragment implements SearchHolde
                 }
             } else if (buttonView == cbox_score) {
                 if (isChecked) {
-                    et_score.setVisibility(View.VISIBLE);
+                    etScoreCpt.setVisibility(View.VISIBLE);
+                    etScoreUser.setVisibility(View.VISIBLE);
+                    cbEachOther.setVisibility(View.VISIBLE);
                     searchBean.setScoreOn(true);
                 } else {
-                    et_score.setVisibility(View.INVISIBLE);
+                    etScoreCpt.setVisibility(View.INVISIBLE);
+                    etScoreUser.setVisibility(View.INVISIBLE);
+                    cbEachOther.setVisibility(View.INVISIBLE);
                     searchBean.setScoreOn(false);
                 }
             } else if (buttonView == cbox_winlose) {
@@ -570,8 +578,11 @@ public class SearchDialog extends DraggableDialogFragment implements SearchHolde
             }
 
             if (cbox_score.isChecked()) {
-
-                searchBean.setScore(et_score.getText().toString());
+                try {
+                    searchBean.setScoreEachOther(cbEachOther.isChecked());
+                    searchBean.setScoreUser(Integer.parseInt(etScoreUser.getText().toString()));
+                    searchBean.setScoreCpt(Integer.parseInt(etScoreCpt.getText().toString()));
+                } catch (Exception e) {}
             }
         }
 

@@ -270,13 +270,36 @@
                     android:layout_centerVertical="true"
                     android:text="@string/search_score" />
 
-                <EditText
-                    android:id="@+id/search_et_score"
+                <CheckBox
+                    android:id="@+id/cb_score_each"
+                    style="@style/TvRecordFilterTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentRight="true"
                     android:layout_centerVertical="true"
-                    android:minWidth="@dimen/record_filter_spinner_input_large"
+                    android:layout_alignParentRight="true"
+                    android:text="each other"
+                    android:visibility="invisible" />
+                <EditText
+                    android:id="@+id/et_score_cpt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toLeftOf="@id/cb_score_each"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="10dp"
+                    android:hint="cpt"
+                    android:inputType="number"
+                    android:minWidth="@dimen/record_filter_spinner_input_short"
+                    android:visibility="invisible" />
+                <EditText
+                    android:id="@+id/et_score_user"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="20dp"
+                    android:layout_toLeftOf="@id/et_score_cpt"
+                    android:layout_centerVertical="true"
+                    android:hint="user"
+                    android:inputType="number"
+                    android:minWidth="@dimen/record_filter_spinner_input_short"
                     android:visibility="invisible" />
             </RelativeLayout>
 

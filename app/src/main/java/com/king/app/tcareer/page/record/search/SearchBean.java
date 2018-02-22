@@ -25,7 +25,8 @@ public class SearchBean {
 	private boolean isWinner;
 	private int rankMin, rankMax;
 	private long date_start, date_end;
-	private String score;
+	private int scoreUser, scoreCpt;
+	private boolean isScoreEachOther;
 
 	public boolean isCourtOn() {
 		return courtOn;
@@ -227,11 +228,27 @@ public class SearchBean {
 		this.date_end = date_end;
 	}
 
-	public String getScore() {
-		return score;
+	public int getScoreUser() {
+		return scoreUser;
 	}
 
-	public void setScore(String score) {
-		this.score = score;
+	public void setScoreUser(int scoreUser) {
+		this.scoreUser = scoreUser;
+	}
+
+	public int getScoreCpt() {
+		return scoreCpt;
+	}
+
+	public void setScoreCpt(int scoreCpt) {
+		this.scoreCpt = scoreCpt;
+	}
+
+	public boolean isScoreEachOther() {
+		return isScoreEachOther;
+	}
+
+	public void setScoreEachOther(boolean scoreEachOther) {
+		isScoreEachOther = scoreEachOther;
 	}
 }

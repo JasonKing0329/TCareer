@@ -120,6 +120,7 @@ public class H2HDao {
                 List<Record> list = recordDao.queryBuilder()
                         .where(RecordDao.Properties.UserId.eq(userId)
                             , conditions)
+                        .orderDesc(RecordDao.Properties.Id)
                         .build().list();
 
                 e.onNext(list);
