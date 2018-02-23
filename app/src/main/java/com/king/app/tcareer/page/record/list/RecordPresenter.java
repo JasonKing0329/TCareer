@@ -3,6 +3,7 @@ package com.king.app.tcareer.page.record.list;
 import com.king.app.tcareer.base.BasePresenter;
 import com.king.app.tcareer.base.TApplication;
 import com.king.app.tcareer.conf.AppConstants;
+import com.king.app.tcareer.model.db.entity.EarlierAchieve;
 import com.king.app.tcareer.model.db.entity.Record;
 import com.king.app.tcareer.model.db.entity.RecordDao;
 import com.king.app.tcareer.model.db.entity.ScoreDao;
@@ -220,8 +221,14 @@ public class RecordPresenter extends BasePresenter<IRecordView> {
                 }
             }
         }
-        data.setCareerWin(nCareerWin);
-        data.setCareerLose(nCareer - nCareerWin);
+        int earlierWin = 0;
+        int earlierLose = 0;
+        for (EarlierAchieve achieve:mUser.getEarlierAchieves()) {
+            earlierWin += achieve.getWin();
+            earlierLose += achieve.getLose();
+        }
+        data.setCareerWin(nCareerWin + earlierWin);
+        data.setCareerLose(nCareer - nCareerWin + earlierLose);
         data.setYearWin(nYearWin);
         data.setYearLose(nYear - nYearWin);
         DecimalFormat format = new DecimalFormat("##0.0");

@@ -122,6 +122,7 @@ public class RankManageActivity extends BaseMvpActivity<RankPresenter> implement
     private void addRank() {
         ScoreEditDialog dialog = new ScoreEditDialog();
         dialog.setMode(ScoreEditDialog.MODE_YEAR_RANK);
+        dialog.setUser(presenter.getUser());
         dialog.setOnRankListener(new ScoreEditDialog.OnRankListener() {
             @Override
             public void onSaveYearRank(Rank rank) {
@@ -143,6 +144,7 @@ public class RankManageActivity extends BaseMvpActivity<RankPresenter> implement
         ScoreEditDialog dialog = new ScoreEditDialog();
         dialog.setMode(ScoreEditDialog.MODE_YEAR_RANK);
         dialog.setRank(rank);
+        dialog.setUser(presenter.getUser());
         dialog.setOnRankListener(new ScoreEditDialog.OnRankListener() {
             @Override
             public void onSaveYearRank(Rank rank) {

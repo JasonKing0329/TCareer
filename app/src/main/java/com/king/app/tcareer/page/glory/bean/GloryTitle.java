@@ -23,6 +23,9 @@ public class GloryTitle {
     private int yearMatch;
     private int yearWin;
 
+    private int earlierWin;
+    private int earlierLose;
+
     public Title championTitle;
     public Title runnerupTitle;
 
@@ -78,6 +81,22 @@ public class GloryTitle {
 
     public void setTargetWinList(List<Record> targetWinList) {
         this.targetWinList = targetWinList;
+    }
+
+    public int getEarlierWin() {
+        return earlierWin;
+    }
+
+    public void setEarlierWin(int earlierWin) {
+        this.earlierWin = earlierWin;
+    }
+
+    public int getEarlierLose() {
+        return earlierLose;
+    }
+
+    public void setEarlierLose(int earlierLose) {
+        this.earlierLose = earlierLose;
     }
 
     public int getCareerMatch() {

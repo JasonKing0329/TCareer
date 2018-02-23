@@ -6,6 +6,7 @@ import com.king.app.tcareer.conf.AppConstants;
 import com.king.app.tcareer.model.GloryDao;
 import com.king.app.tcareer.model.bean.KeyValueCountBean;
 import com.king.app.tcareer.model.bean.MatchResultBean;
+import com.king.app.tcareer.model.db.entity.EarlierAchieve;
 import com.king.app.tcareer.model.db.entity.Record;
 import com.king.app.tcareer.model.db.entity.RecordDao;
 import com.king.app.tcareer.model.db.entity.User;
@@ -73,12 +74,20 @@ public class GloryPresenter extends BasePresenter<IGloryView> {
 
     private GloryTitle loadGloryDatas() {
         GloryTitle data = new GloryTitle();
+        int earlierWin = 0;
+        int earlierLose = 0;
+        for (EarlierAchieve achieve:mUser.getEarlierAchieves()) {
+            earlierWin += achieve.getWin();
+            earlierLose += achieve.getLose();
+        }
+        data.setEarlierWin(earlierWin);
+        data.setEarlierLose(earlierLose);
         data.setChampionList(gloryModel.getChampionRecords(mUser.getId()));
         data.setRunnerUpList(gloryModel.getRunnerupRecords(mUser.getId()));
-        data.setTargetList(gloryModel.getTargetRecords(mUser.getId(), AppConstants.GLORY_TARGET_FACTOR, false));
-        data.setTargetWinList(gloryModel.getTargetRecords(mUser.getId(), AppConstants.GLORY_TARGET_FACTOR, true));
-        data.setCareerMatch(gloryModel.getCareerRecordNumber(mUser.getId(), false));
-        data.setCareerWin(gloryModel.getCareerRecordNumber(mUser.getId(), true));
+        data.setTargetList(gloryModel.getTargetRecords(mUser.getId(), AppConstants.GLORY_TARGET_FACTOR, false, earlierWin, earlierLose));
+        data.setTargetWinList(gloryModel.getTargetRecords(mUser.getId(), AppConstants.GLORY_TARGET_FACTOR, true, earlierWin, earlierLose));
+        data.setCareerMatch(gloryModel.getCareerRecordNumber(mUser.getId(), false) + earlierLose + earlierWin);
+        data.setCareerWin(gloryModel.getCareerRecordNumber(mUser.getId(), true) + earlierWin);
         data.setYearMatch(gloryModel.getYearRecordNumber(mUser.getId(), false));
         data.setYearWin(gloryModel.getYearRecordNumber(mUser.getId(), true));
 

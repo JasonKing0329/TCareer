@@ -38,6 +38,13 @@ public class AppConstants {
     public static final int WINNER_COMPETITOR = 1;
 
     /**
+     * 0: challenge
+     * 1: qualify
+     */
+    public static final int ACHIEVE_CHALLENGE = 0;
+    public static final int ACHIEVE_QUALIFY = 1;
+
+    /**
      * 0: normal player
      * 1: virtual player
      */

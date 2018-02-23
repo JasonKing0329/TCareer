@@ -60,23 +60,26 @@ public class GloryDao {
      * @param userId
      * @param factor
      * @param isWinner
-     * @return
+     * @param earlierWin
+     *@param earlierLose @return
      */
-    public List<Record> getTargetRecords(long userId, int factor, boolean isWinner) {
+    public List<Record> getTargetRecords(long userId, int factor, boolean isWinner, int earlierWin, int earlierLose) {
         RecordDao dao = TApplication.getInstance().getDaoSession().getRecordDao();
         QueryBuilder<Record> builder = dao.queryBuilder();
+        builder.where(RecordDao.Properties.UserId.eq(userId));
         long total;
         if (isWinner) {
-            builder.where(RecordDao.Properties.UserId.eq(userId)
-                    , RecordDao.Properties.WinnerFlag.eq(0));
-        }
-        else {
-            builder.where(RecordDao.Properties.UserId.eq(userId));
+            builder.where(RecordDao.Properties.WinnerFlag.eq(0));
         }
         total = builder.buildCount().count();
 
-        int count = 0;
-        count += (factor - 1);
+        int count = factor - 1;
+        if (isWinner) {
+            count -= earlierWin;
+        }
+        else {
+            count -= (earlierLose + earlierWin);
+        }
         List<Record> list = new ArrayList<>();
         while (count < total) {
             Record record = builder.offset(count).limit(1)

@@ -20,7 +20,7 @@ import butterknife.OnClick;
  * <p/>作者：景阳
  * <p/>创建时间: 2017/2/20 16:21
  */
-public class ScoreActivity extends BaseMvpActivity<ScoreHolderPresenter> implements IScoreHolder {
+public class ScoreActivity extends BaseMvpActivity<ScoreHolderPresenter> implements IScoreHolder, ScoreView {
 
     public static final String KEY_USER_ID = "key_user_id";
 
@@ -59,6 +59,10 @@ public class ScoreActivity extends BaseMvpActivity<ScoreHolderPresenter> impleme
     @Override
     protected void initData() {
         presenter.loadRank(getIntent().getLongExtra(KEY_USER_ID, -1));
+    }
+
+    @Override
+    public void showRanks() {
         show52WeekScores();
     }
 
@@ -95,6 +99,7 @@ public class ScoreActivity extends BaseMvpActivity<ScoreHolderPresenter> impleme
     private void showScoreEditDialog() {
         editDialog = new ScoreEditDialog();
         editDialog.setMode(ScoreEditDialog.MODE_COUNT_RANK);
+        editDialog.setUser(presenter.getUser());
         editDialog.setRankCareer(getRankCareer());
         editDialog.setOnRankListener(new ScoreEditDialog.OnRankListener() {
             @Override

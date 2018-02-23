@@ -8,4 +8,5 @@ import com.king.app.tcareer.base.BaseView;
  * <p/>创建时间: 2018/2/5 10:23
  */
 public interface ScoreView extends BaseView {
+    void showRanks();
 }
