@@ -73,6 +73,10 @@ public class ScoreFragment extends BaseMvpFragment<ScorePresenter> implements IS
     ImageView ivDateNext;
     @BindView(R.id.group_date)
     RelativeLayout groupDate;
+    @BindView(R.id.tv_by_level)
+    TextView tvByLevel;
+    @BindView(R.id.tv_by_month)
+    TextView tvByMonth;
 
     private int pageMode;
 
@@ -165,57 +169,35 @@ public class ScoreFragment extends BaseMvpFragment<ScorePresenter> implements IS
             tvRank.setText(String.valueOf(bean.getRankCurrent()));
         }
 
-        List<ScoreBean> scoreList = new ArrayList<>();
-        // 积分、图表
-        // gs
-        ScoreBean titleBean = new ScoreBean();
-        titleBean.setTitle(AppConstants.RECORD_MATCH_LEVELS[0]);
-        titleBean.setTitle(true);
-        scoreList.add(titleBean);
-        scoreList.addAll(data.getGsList());
+        tvByLevel.setSelected(true);
+        showScoreByLevel();
 
-        // master cup
-        titleBean = new ScoreBean();
-        titleBean.setTitle(AppConstants.RECORD_MATCH_LEVELS[1]);
-        titleBean.setTitle(true);
-        scoreList.add(titleBean);
-        scoreList.addAll(data.getMasterCupList());
+        tvTotal.setText(String.valueOf(data.getCountScore()));
+        tvMatchNumber.setText("Match count " + String.valueOf(data.getScoreList().size()));
 
-        // 1000
-        titleBean = new ScoreBean();
-        titleBean.setTitle(AppConstants.RECORD_MATCH_LEVELS[2]);
-        titleBean.setTitle(true);
-        scoreList.add(titleBean);
-        scoreList.addAll(data.getAtp1000List());
+        // 显示场地胜率统计
+        showCourtChart(data);
+        // 52 week记录才显示去年占比和今年占比
+        if (pageMode == FLAG_52WEEK) {
+            showYearChart(data);
+        } else {
+            chartYear.setVisibility(View.GONE);
+        }
+    }
 
-        // 500
-        titleBean = new ScoreBean();
-        titleBean.setTitle(AppConstants.RECORD_MATCH_LEVELS[3]);
-        titleBean.setTitle(true);
-        scoreList.add(titleBean);
-        scoreList.addAll(data.getAtp500List());
+    private void showScoreByLevel() {
+        List<ScoreBean> scoreList = presenter.getScoresByLevel();
 
-        // 250
-        titleBean = new ScoreBean();
-        titleBean.setTitle(AppConstants.RECORD_MATCH_LEVELS[4]);
-        titleBean.setTitle(true);
-        scoreList.add(titleBean);
-        scoreList.addAll(data.getAtp250List());
+        showScores(scoreList);
+    }
 
-        // replace
-        titleBean = new ScoreBean();
-        titleBean.setTitle("Replace");
-        titleBean.setTitle(true);
-        scoreList.add(titleBean);
-        scoreList.addAll(data.getReplaceList());
+    private void showScoreByMonth() {
+        List<ScoreBean> scoreList = presenter.getScoresByMonth();
 
-        // other
-        titleBean = new ScoreBean();
-        titleBean.setTitle("Other");
-        titleBean.setTitle(true);
-        scoreList.add(titleBean);
-        scoreList.addAll(data.getOtherList());
+        showScores(scoreList);
+    }
 
+    private void showScores(List<ScoreBean> scoreList) {
         if (scoreItemAdapter == null) {
             scoreItemAdapter = new ScoreItemAdapter(scoreList);
             scoreItemAdapter.setOnScoreItemClickListener(new ScoreItemAdapter.OnScoreItemClickListener() {
@@ -228,18 +210,6 @@ public class ScoreFragment extends BaseMvpFragment<ScorePresenter> implements IS
         } else {
             scoreItemAdapter.setList(scoreList);
             scoreItemAdapter.notifyDataSetChanged();
-        }
-
-        tvTotal.setText(String.valueOf(data.getCountScore()));
-        tvMatchNumber.setText("Match count " + String.valueOf(data.getScoreList().size()));
-
-        // 显示场地胜率统计
-        showCourtChart(data);
-        // 52 week记录才显示去年占比和今年占比
-        if (pageMode == FLAG_52WEEK) {
-            showYearChart(data);
-        } else {
-            chartYear.setVisibility(View.GONE);
         }
     }
 
@@ -291,7 +261,7 @@ public class ScoreFragment extends BaseMvpFragment<ScorePresenter> implements IS
         tvRank.setText(String.valueOf(rank.getRankCurrent()));
     }
 
-    @OnClick({R.id.iv_date_last, R.id.iv_date_next})
+    @OnClick({R.id.iv_date_last, R.id.iv_date_next, R.id.tv_by_level, R.id.tv_by_month})
     public void onClickView(View v) {
         switch (v.getId()) {
             case R.id.iv_date_last:
@@ -299,6 +269,22 @@ public class ScoreFragment extends BaseMvpFragment<ScorePresenter> implements IS
                 break;
             case R.id.iv_date_next:
                 showNextYear();
+                break;
+            case R.id.tv_by_level:
+                if (!tvByLevel.isSelected()) {
+                    tvByMonth.setSelected(false);
+                    tvByLevel.setSelected(true);
+                    showScoreByLevel();
+                    rvScoreList.scrollToPosition(0);
+                }
+                break;
+            case R.id.tv_by_month:
+                if (!tvByMonth.isSelected()) {
+                    tvByLevel.setSelected(false);
+                    tvByMonth.setSelected(true);
+                    showScoreByMonth();
+                    rvScoreList.scrollToPosition(0);
+                }
                 break;
         }
     }

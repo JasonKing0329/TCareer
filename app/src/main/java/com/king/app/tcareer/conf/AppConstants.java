@@ -189,6 +189,22 @@ public class AppConstants {
             "December"
     };
 
+    public static final String[] MONTH_CHN = new String[] {
+
+            "1月",
+            "2月",
+            "3月",
+            "4月",
+            "5月",
+            "6月",
+            "7月",
+            "8月",
+            "9月",
+            "10月",
+            "11月",
+            "12月"
+    };
+
     public static final int GROUP_BY_ALL = 0;
     public static final int GROUP_BY_LEVEL = 1;
     public static final int GROUP_BY_YEAR = 2;

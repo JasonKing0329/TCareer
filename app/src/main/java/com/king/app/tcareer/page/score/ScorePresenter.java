@@ -7,8 +7,10 @@ import com.king.app.tcareer.model.db.entity.MatchBean;
 import com.king.app.tcareer.model.db.entity.MatchBeanDao;
 import com.king.app.tcareer.model.db.entity.MatchNameBean;
 import com.king.app.tcareer.model.db.entity.MatchNameBeanDao;
+import com.king.app.tcareer.model.db.entity.Rank;
 import com.king.app.tcareer.model.db.entity.RankCareer;
 import com.king.app.tcareer.model.db.entity.RankCareerDao;
+import com.king.app.tcareer.model.db.entity.RankDao;
 import com.king.app.tcareer.model.db.entity.User;
 
 import org.greenrobot.greendao.query.QueryBuilder;
@@ -246,12 +248,20 @@ public class ScorePresenter extends BasePresenter<IScorePageView> {
             map.put(bean.getMatchBean().getName(), bean);
         }
 
-        // FIXME 待优化
-        int[] firstTop30Year = new int[] {
-                2011, 2015, 2015, 2017
-        };
+        // 查询上一年的年终排名
+        Rank rank = null;
+        try {
+            rank = TApplication.getInstance().getDaoSession().getRankDao()
+                    .queryBuilder()
+                    .where(RankDao.Properties.UserId.eq(mUser.getId())
+                            , RankDao.Properties.Year.eq(currentYear - 1))
+                    .build().unique();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
-        boolean isForce = currentYear > firstTop30Year[(int) (mUser.getId() - 1)];
+        // 上一年年终top30才有强制
+        boolean isForce = rank == null ? false:(rank.getRank() > 0 && rank.getRank() <= 30);
 
         List<ScoreBean> replaceList = new ArrayList<>();
 
@@ -478,6 +488,126 @@ public class ScorePresenter extends BasePresenter<IScorePageView> {
 
     public int getRank() {
         return scorePageData.getRank();
+    }
+
+    public List<ScoreBean> getScoresByLevel() {
+        List<ScoreBean> scoreList = new ArrayList<>();
+        // 积分、图表
+        // gs
+        ScoreBean titleBean = new ScoreBean();
+        titleBean.setTitle(AppConstants.RECORD_MATCH_LEVELS[0]);
+        titleBean.setTitle(true);
+        scoreList.add(titleBean);
+        scoreList.addAll(scorePageData.getGsList());
+
+        // master cup
+        titleBean = new ScoreBean();
+        titleBean.setTitle(AppConstants.RECORD_MATCH_LEVELS[1]);
+        titleBean.setTitle(true);
+        scoreList.add(titleBean);
+        scoreList.addAll(scorePageData.getMasterCupList());
+
+        // 1000
+        titleBean = new ScoreBean();
+        titleBean.setTitle(AppConstants.RECORD_MATCH_LEVELS[2]);
+        titleBean.setTitle(true);
+        scoreList.add(titleBean);
+        scoreList.addAll(scorePageData.getAtp1000List());
+
+        // 500
+        titleBean = new ScoreBean();
+        titleBean.setTitle(AppConstants.RECORD_MATCH_LEVELS[3]);
+        titleBean.setTitle(true);
+        scoreList.add(titleBean);
+        scoreList.addAll(scorePageData.getAtp500List());
+
+        // 250
+        titleBean = new ScoreBean();
+        titleBean.setTitle(AppConstants.RECORD_MATCH_LEVELS[4]);
+        titleBean.setTitle(true);
+        scoreList.add(titleBean);
+        scoreList.addAll(scorePageData.getAtp250List());
+
+        // replace
+        titleBean = new ScoreBean();
+        titleBean.setTitle("Replace");
+        titleBean.setTitle(true);
+        scoreList.add(titleBean);
+        scoreList.addAll(scorePageData.getReplaceList());
+
+        // other
+        titleBean = new ScoreBean();
+        titleBean.setTitle("Other");
+        titleBean.setTitle(true);
+        scoreList.add(titleBean);
+        scoreList.addAll(scorePageData.getOtherList());
+        return scoreList;
+    }
+
+    public List<ScoreBean> getScoresByMonth() {
+        List<ScoreBean> scoreList = new ArrayList<>();
+
+        // 先将计入积分的赛事按week升序排序
+        List<ScoreBean> validList = new ArrayList<>();
+        validList.addAll(scorePageData.getGsList());
+        validList.addAll(scorePageData.getMasterCupList());
+        validList.addAll(scorePageData.getAtp1000List());
+        validList.addAll(scorePageData.getAtp500List());
+        validList.addAll(scorePageData.getAtp250List());
+        Collections.sort(validList, new Comparator<ScoreBean>() {
+            @Override
+            public int compare(ScoreBean left, ScoreBean right) {
+                int l = left.getMatchBean() == null ? 0:left.getMatchBean().getMatchBean().getWeek();
+                int r = right.getMatchBean() == null ? 0:right.getMatchBean().getMatchBean().getWeek();
+                return  l- r;
+            }
+        });
+
+        List<ScoreBean> punishList = new ArrayList<>();
+        // 组装title与sub
+        int lastMonth = 0;
+        for (ScoreBean bean:validList) {
+            // 罚分
+            if (bean.getMatchBean() == null) {
+                punishList.add(bean);
+                continue;
+            }
+
+            int month = bean.getMatchBean().getMatchBean().getMonth();
+            if (month != lastMonth) {
+                ScoreBean titleBean = new ScoreBean();
+                titleBean.setTitle(AppConstants.MONTH_CHN[month - 1]);
+                titleBean.setTitle(true);
+                scoreList.add(titleBean);
+                lastMonth = month;
+            }
+            scoreList.add(bean);
+        }
+
+        // punish
+        ScoreBean titleBean;
+        if (punishList.size() > 0) {
+            titleBean = new ScoreBean();
+            titleBean.setTitle("罚分");
+            titleBean.setTitle(true);
+            scoreList.add(titleBean);
+            scoreList.addAll(punishList);
+        }
+
+        // replace
+        titleBean = new ScoreBean();
+        titleBean.setTitle("Replace");
+        titleBean.setTitle(true);
+        scoreList.add(titleBean);
+        scoreList.addAll(scorePageData.getReplaceList());
+
+        // other
+        titleBean = new ScoreBean();
+        titleBean.setTitle("Other");
+        titleBean.setTitle(true);
+        scoreList.add(titleBean);
+        scoreList.addAll(scorePageData.getOtherList());
+        return scoreList;
     }
 
     /**
