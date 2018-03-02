@@ -361,6 +361,14 @@ public abstract class BaseExpandableAdapter extends RecyclerView.Adapter impleme
     protected void expandParentListItem(ExpandableListItem expandableListItem, int parentIndex, boolean expansionTriggeredByListItemClick, boolean isExpandAllChildren) {
         if (!expandableListItem.isExpanded()) {
             List<?> childItemList = expandableListItem.getChildItemList();
+            /**
+             * @JingYang 支持动态加载
+             */
+            if (childItemList == null) {
+                expandableListItem.loadChildItems();
+            }
+            childItemList = expandableListItem.getChildItemList();
+
             if (childItemList != null && !childItemList.isEmpty()) {
                 expandableListItem.setExpanded(true);
                 int childListItemCount = childItemList.size();
@@ -385,6 +393,12 @@ public abstract class BaseExpandableAdapter extends RecyclerView.Adapter impleme
                             expandParentListItem((ExpandableListItem) o, newIndex, expansionTriggeredByListItemClick, isExpandAllChildren);
                         }
                 }
+
+                /**
+                 * @JingYang 支持动态加载
+                 */
+                notifyItemChanged(parentIndex);
+
                 // notifyItemRangeInserted(parentIndex + 1, childListItemCount);
                 int positionStart = parentIndex + childListItemCount;
                 if (parentIndex != mDataList.size() - 1)

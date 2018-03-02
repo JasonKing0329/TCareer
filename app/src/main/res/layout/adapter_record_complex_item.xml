@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
+	android:id="@+id/group_item"
+	android:layout_width="match_parent"
+	android:layout_height="wrap_content"
+	android:paddingTop="3dp"
+	android:paddingBottom="3dp"
+	android:paddingLeft="10dp"
+	android:paddingRight="10dp"
+	android:background="?android:attr/selectableItemBackground">
+	<LinearLayout
+		android:id="@+id/group_record"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:orientation="horizontal"
+		android:gravity="center_vertical">
+		<com.king.app.tcareer.view.widget.CircleImageView
+			android:id="@+id/iv_user"
+			android:layout_width="@dimen/record_item_player_size"
+			android:layout_height="@dimen/record_item_player_size"
+			android:layout_margin="1dp"
+			android:src="@drawable/icon_list"
+			android:layout_gravity="center_vertical"
+			app:civ_border_width="0dp"
+			app:civ_border_color="@color/white" />
+		<com.king.app.tcareer.view.widget.CircleImageView
+			android:id="@+id/iv_player"
+			android:layout_width="@dimen/record_item_player_size"
+			android:layout_height="@dimen/record_item_player_size"
+			android:layout_margin="1dp"
+			android:src="@drawable/icon_list"
+			android:layout_gravity="center_vertical"
+			android:layout_marginLeft="5dp"
+			app:civ_border_width="0dp"
+			app:civ_border_color="@color/white" />
+		<LinearLayout
+			android:layout_width="0dp"
+			android:layout_weight="1"
+			android:layout_height="wrap_content"
+			android:layout_marginLeft="10dp"
+			android:layout_gravity="center_vertical"
+			android:orientation="vertical" >
+			<LinearLayout
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:orientation="horizontal" >
+				<TextView
+					android:id="@+id/tv_player"
+					android:layout_width="0dp"
+					android:layout_weight="1"
+					android:layout_height="wrap_content"
+					android:maxLines="1"
+					android:ellipsize="end"
+					android:textStyle="bold"
+					android:textSize="16sp"
+					android:textColor="@color/colorPrimary"/>
+				<TextView
+					android:id="@+id/tv_rank_seed"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:textSize="14sp"
+					android:textColor="@color/record_item_text_gray"/>
+			</LinearLayout>
+			<TextView
+				android:id="@+id/tv_score"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:textSize="14sp"
+				android:textColor="@color/record_item_text_gray"/>
+		</LinearLayout>
+
+		<com.nightonke.boommenu.BoomMenuButton
+			android:id="@+id/bmb_menu"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			app:bmb_buttonEnum="ham"
+			app:bmb_piecePlaceEnum="piecePlace_ham_4"
+			app:bmb_buttonPlaceEnum="buttonPlace_ham_4"
+			app:bmb_inList="true"/>
+
+	</LinearLayout>
+
+	<TextView
+		android:id="@+id/tv_round"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:textSize="16dp"
+		android:textColor="@color/text_color_secondary"/>
+</RelativeLayout>

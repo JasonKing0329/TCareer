@@ -36,4 +36,9 @@ public class HeaderItem implements ExpandableListItem {
     public void setExpanded(boolean isExpanded) {
         mExpanded = isExpanded;
     }
+
+    @Override
+    public void loadChildItems() {
+
+    }
 }

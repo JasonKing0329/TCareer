@@ -57,6 +57,10 @@
             android:theme="@style/RecordTheme"
             android:screenOrientation="portrait"/>
 
+        <activity android:name=".page.record.complex.RecordComplexActivity"
+            android:theme="@style/RecordTheme"
+            android:screenOrientation="portrait"/>
+
         <activity android:name=".page.record.editor.RecordEditorActivity"
             android:theme="@style/SubTheme"
             android:screenOrientation="portrait"/>

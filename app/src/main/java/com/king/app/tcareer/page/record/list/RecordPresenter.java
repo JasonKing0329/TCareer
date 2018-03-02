@@ -187,7 +187,7 @@ public class RecordPresenter extends BasePresenter<IRecordView> {
             }
             List<HeaderItem> headerList = yearItem.getChildItemList();
 
-            String keyHeader = record.getMatch() + "-" + record.getDateStr();
+            String keyHeader = record.getMatch().getName() + "-" + record.getDateStr();
             HeaderItem item = headerMap.get(keyHeader);
             if (item == null) {
                 item = new HeaderItem();

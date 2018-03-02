@@ -124,12 +124,20 @@ public abstract class AbstractExpandableAdapterItem extends AbstractAdapterItem 
      * expand or unexpand item
      */
     protected void doExpandOrUnexpand() {
-        if (mExpandableListItem != null && mExpandableListItem.getChildItemList() != null
-                && !mExpandableListItem.getChildItemList().isEmpty()) {
-            if (getExpandableListItem().isExpanded()) {
-                collapseView();
-            } else {
-                expandView();
+        if (mExpandableListItem != null) {
+            /**
+             * @JingYang 支持动态加载
+             */
+            if (mExpandableListItem.getChildItemList() == null) {
+                mExpandableListItem.loadChildItems();
+            }
+            if (mExpandableListItem.getChildItemList() != null
+                    && !mExpandableListItem.getChildItemList().isEmpty()) {
+                if (getExpandableListItem().isExpanded()) {
+                    collapseView();
+                } else {
+                    expandView();
+                }
             }
         }
     }

@@ -27,4 +27,9 @@ public interface ExpandableListItem {
      * @param isExpanded
      */
     void setExpanded(boolean isExpanded);
+
+    /**
+     * @JingYang 支持动态加载
+     */
+    void loadChildItems();
 }

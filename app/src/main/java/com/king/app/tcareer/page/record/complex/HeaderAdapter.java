@@ -1,4 +1,4 @@
-package com.king.app.tcareer.page.record.list;
+package com.king.app.tcareer.page.record.complex;
 
 import android.view.View;
 import android.view.ViewGroup;
@@ -7,7 +7,6 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.king.app.tcareer.R;
-import com.king.app.tcareer.conf.AppConstants;
 import com.king.app.tcareer.model.GlideOptions;
 import com.king.app.tcareer.model.ImageProvider;
 import com.king.app.tcareer.model.db.entity.Record;
@@ -19,7 +18,7 @@ import com.zaihuishou.expandablerecycleradapter.viewholder.AbstractExpandableAda
  * <p/>作者：景阳
  * <p/>创建时间: 2017/4/21 16:15
  */
-public class HeaderAdapter extends AbstractExpandableAdapterItem implements View.OnClickListener {
+public class HeaderAdapter extends AbstractExpandableAdapterItem {
 
 //    private TextView tvMatchFirst;
     private ImageView ivMatch;
@@ -29,12 +28,6 @@ public class HeaderAdapter extends AbstractExpandableAdapterItem implements View
     private TextView tvMatchRound;
     private ImageView ivWinnerCup;
     private ViewGroup groupCard;
-
-    private OnHeadLongClickListener onHeadLongClickListener;
-
-    public HeaderAdapter(OnHeadLongClickListener onHeadLongClickListener) {
-        this.onHeadLongClickListener = onHeadLongClickListener;
-    }
 
     @Override
     public int getLayoutResId() {
@@ -73,17 +66,10 @@ public class HeaderAdapter extends AbstractExpandableAdapterItem implements View
 
         Record record = item.getRecord();
         tvMatchName.setText(record.getMatch().getName());
-        // champion
-        if (AppConstants.RECORD_MATCH_ROUNDS[0].equals(record.getRound())
-                && record.getWinnerFlag() == AppConstants.WINNER_USER) {
-            ivWinnerCup.setVisibility(View.VISIBLE);
-            tvMatchRound.setVisibility(View.GONE);
-        }
-        else {
-            ivWinnerCup.setVisibility(View.GONE);
-            tvMatchRound.setVisibility(View.VISIBLE);
-            tvMatchRound.setText(record.getRound());
-        }
+
+        ivWinnerCup.setVisibility(View.GONE);
+        tvMatchRound.setVisibility(View.GONE);
+
         tvMatchDate.setText(record.getDateStr());
         tvMatchLevel.setText(record.getMatch().getMatchBean().getLevel());
 
@@ -92,12 +78,6 @@ public class HeaderAdapter extends AbstractExpandableAdapterItem implements View
                 .load(ImageProvider.getMatchHeadPath(record.getMatch().getName(), court))
                 .apply(GlideOptions.getDefaultMatchOptions())
                 .into(ivMatch);
-
-        // 设置onLongClickListener会导致无法展开
-//        groupCard.setTag(item);
-//        groupCard.setOnLongClickListener(this);
-        ivMatch.setTag(R.id.tag_record_group_match, item);
-        ivMatch.setOnClickListener(this);
     }
 
     @Override
@@ -110,8 +90,4 @@ public class HeaderAdapter extends AbstractExpandableAdapterItem implements View
 
     }
 
-    @Override
-    public void onClick(View v) {
-        onHeadLongClickListener.onLongClickHead(v, (HeaderItem) v.getTag(R.id.tag_record_group_match));
-    }
 }

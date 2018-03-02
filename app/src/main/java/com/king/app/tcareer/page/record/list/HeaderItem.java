@@ -52,4 +52,9 @@ public class HeaderItem implements ExpandableListItem {
     public void setYearPosition(int yearPosition) {
         this.yearPosition = yearPosition;
     }
+
+    @Override
+    public void loadChildItems() {
+
+    }
 }

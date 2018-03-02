@@ -1,4 +1,4 @@
-package com.king.app.tcareer.page.record.list;
+package com.king.app.tcareer.page.record.complex;
 
 import com.zaihuishou.expandablerecycleradapter.model.ExpandableListItem;
 

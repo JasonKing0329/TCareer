@@ -49,6 +49,7 @@ import com.king.app.tcareer.page.player.slider.PlayerSlideActivity;
 import com.king.app.tcareer.page.player.slider.PlayerSlideAdapter;
 import com.king.app.tcareer.page.rank.RankChartFragment;
 import com.king.app.tcareer.page.rank.RankManageActivity;
+import com.king.app.tcareer.page.record.complex.RecordComplexActivity;
 import com.king.app.tcareer.page.record.editor.RecordEditorActivity;
 import com.king.app.tcareer.page.record.list.RecordActivity;
 import com.king.app.tcareer.page.score.ScoreActivity;
@@ -110,12 +111,6 @@ public class HomeActivity extends BaseMvpActivity<HomePresenter> implements IHom
     ViewGroup groupLoad;
     @BindView(R.id.group_nav_setting)
     ViewGroup groupSetting;
-    @BindView(R.id.tv_nav_classic)
-    TextView tvNavClassic;
-    @BindView(R.id.tv_nav_scrollcard)
-    TextView tvNavScrollcard;
-    @BindView(R.id.tv_nav_v7)
-    TextView tvNavV7;
     @BindView(R.id.scroll_home)
     NestedScrollView scrollHome;
     // v4.3.2弃用
@@ -502,7 +497,8 @@ public class HomeActivity extends BaseMvpActivity<HomePresenter> implements IHom
         }
     }
 
-    @OnClick({R.id.tv_nav_classic, R.id.tv_nav_scrollcard, R.id.tv_nav_v7, R.id.group_nav_player, R.id.group_nav_match, R.id.group_nav_load, R.id.group_nav_setting})
+    @OnClick({R.id.tv_nav_complex, R.id.group_nav_player
+            , R.id.group_nav_match, R.id.group_nav_load, R.id.group_nav_setting})
     public void onClickNav(View view) {
         switch (view.getId()) {
             case R.id.group_nav_player:
@@ -517,11 +513,9 @@ public class HomeActivity extends BaseMvpActivity<HomePresenter> implements IHom
             case R.id.group_nav_setting:
                 startSettingActivity();
                 break;
-            case R.id.tv_nav_classic:
-                break;
-            case R.id.tv_nav_scrollcard:
-                break;
-            case R.id.tv_nav_v7:
+            case R.id.tv_nav_complex:
+                Intent intent = new Intent().setClass(this, RecordComplexActivity.class);
+                startActivity(intent);
                 break;
         }
     }
