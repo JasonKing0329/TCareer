@@ -74,6 +74,7 @@ public class HomeActivity extends BaseMvpActivity<HomePresenter> implements IHom
     private final int REQUEST_ADD = 102;
     private final int REQUEST_RECORD_LIST = 103;
     private final int REQUEST_SCORE = 104;
+    private final int REQUEST_RECORD_COMPLEX = 105;
 
     private HomeHeadAdapter headAdapter;
 
@@ -515,7 +516,7 @@ public class HomeActivity extends BaseMvpActivity<HomePresenter> implements IHom
                 break;
             case R.id.tv_nav_complex:
                 Intent intent = new Intent().setClass(this, RecordComplexActivity.class);
-                startActivity(intent);
+                startActivityForResult(intent, REQUEST_RECORD_COMPLEX);
                 break;
         }
     }
@@ -631,6 +632,12 @@ public class HomeActivity extends BaseMvpActivity<HomePresenter> implements IHom
             }
         }
         else if (requestCode == REQUEST_RECORD_LIST) {
+            if (resultCode == RESULT_OK) {
+                // 删除或修改过新数据，刷新record相关
+                presenter.setRecordChanged();
+            }
+        }
+        else if (requestCode == REQUEST_RECORD_COMPLEX) {
             if (resultCode == RESULT_OK) {
                 // 删除或修改过新数据，刷新record相关
                 presenter.setRecordChanged();

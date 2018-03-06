@@ -1,5 +1,7 @@
 package com.king.app.tcareer.page.record.complex;
 
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -10,11 +12,18 @@ import android.widget.ImageView;
 import com.bumptech.glide.Glide;
 import com.king.app.tcareer.R;
 import com.king.app.tcareer.base.BaseMvpActivity;
+import com.king.app.tcareer.model.CompetitorParser;
 import com.king.app.tcareer.model.GlideOptions;
 import com.king.app.tcareer.model.ImageProvider;
+import com.king.app.tcareer.model.bean.CompetitorBean;
 import com.king.app.tcareer.model.db.entity.Record;
+import com.king.app.tcareer.model.db.entity.User;
+import com.king.app.tcareer.page.player.page.PlayerPageActivity;
+import com.king.app.tcareer.page.record.editor.RecordEditorActivity;
 import com.king.app.tcareer.page.record.list.OnItemMenuListener;
 import com.king.app.tcareer.page.record.list.RecordItem;
+import com.king.app.tcareer.utils.DebugLog;
+import com.king.app.tcareer.view.dialog.AlertDialogFragment;
 import com.nightonke.boommenu.BoomButtons.ButtonPlaceAlignmentEnum;
 import com.nightonke.boommenu.BoomButtons.ButtonPlaceEnum;
 import com.nightonke.boommenu.BoomButtons.OnBMClickListener;
@@ -170,12 +179,38 @@ public class RecordComplexActivity extends BaseMvpActivity<ComplexPresenter> imp
 
     @Override
     public void onUpdateRecord(RecordItem record) {
-
+        mUpdatePosition = record.getItemPosition();
+        Intent intent = new Intent().setClass(this, RecordEditorActivity.class);
+        intent.putExtra(RecordEditorActivity.KEY_USER_ID, record.getRecord().getUserId());
+        intent.putExtra(RecordEditorActivity.KEY_RECORD_ID, record.getRecord().getId());
+        startActivityForResult(intent, REQUEST_UPDATE);
     }
 
     @Override
-    public void onDeleteRecord(RecordItem record) {
+    public void onDeleteRecord(final RecordItem record) {
+        new AlertDialogFragment()
+                .setMessage(getString(R.string.delete_confirm))
+                .setPositiveText(getString(R.string.ok))
+                .setPositiveListener(new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        doDelete(record);
+                    }
+                })
+                .setNegativeText(getString(R.string.cancel))
+                .show(getSupportFragmentManager(), "AlertDialogFragment");
+    }
 
+    private void doDelete(RecordItem record) {
+        presenter.delete(record.getRecord(), record.getItemPosition());
+    }
+
+    @Override
+    public void deleteSuccess(int viewPosition) {
+        setResult(RESULT_OK);
+        // delete from list
+        // 通过调试发现，itemPosition是在整个recycler view里的position，框架对根据position做的3级显示，整个position都是顺序排列的
+        recordAdapter.removedItem(viewPosition);
     }
 
     @Override
@@ -190,6 +225,27 @@ public class RecordComplexActivity extends BaseMvpActivity<ComplexPresenter> imp
 
     @Override
     public void onItemClicked(View view, RecordItem record) {
+        Intent intent = new Intent();
+        intent.setClass(this, PlayerPageActivity.class);
+        intent.putExtra(PlayerPageActivity.KEY_USER_ID, record.getRecord().getUserId());
+        CompetitorBean competitor = CompetitorParser.getCompetitorFrom(record.getRecord());
+        if (competitor instanceof User) {
+            intent.putExtra(PlayerPageActivity.KEY_COMPETITOR_IS_USER, true);
+        }
+        intent.putExtra(PlayerPageActivity.KEY_COMPETITOR_ID, competitor.getId());
+        startActivity(intent);
+    }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch (requestCode) {
+            case REQUEST_UPDATE:
+                DebugLog.e("update " + mUpdatePosition);
+                recordAdapter.notifyItemChanged(mUpdatePosition);
+                // notify home
+                setResult(RESULT_OK);
+                break;
+        }
     }
 }

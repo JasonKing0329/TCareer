@@ -4,6 +4,7 @@ import com.king.app.tcareer.base.BasePresenter;
 import com.king.app.tcareer.base.TApplication;
 import com.king.app.tcareer.model.db.entity.Record;
 import com.king.app.tcareer.model.db.entity.RecordDao;
+import com.king.app.tcareer.model.db.entity.ScoreDao;
 
 import org.greenrobot.greendao.query.Query;
 
@@ -128,5 +129,55 @@ public class ComplexPresenter extends BasePresenter<ComplexView> {
                 e.onNext(yearList);
             }
         });
+    }
+
+    public void delete(final Record record, final int viewPosition) {
+        Observable.create(new ObservableOnSubscribe<Object>() {
+            @Override
+            public void subscribe(ObservableEmitter<Object> e) throws Exception {
+                // control in transaction
+                TApplication.getInstance().getDaoSession().runInTx(new Runnable() {
+                    @Override
+                    public void run() {
+                        // delete from match_records
+                        RecordDao dao = TApplication.getInstance().getDaoSession().getRecordDao();
+                        dao.queryBuilder()
+                                .where(RecordDao.Properties.Id.eq(record.getId()))
+                                .buildDelete()
+                                .executeDeleteWithoutDetachingEntities();
+                        // delete from scores
+                        ScoreDao scoreDao = TApplication.getInstance().getDaoSession().getScoreDao();
+                        scoreDao.queryBuilder()
+                                .where(ScoreDao.Properties.RecordId.eq(record.getId()))
+                                .buildDelete()
+                                .executeDeleteWithoutDetachingEntities();
+                    }
+                });
+                e.onNext(new Object());
+            }
+        }).observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(new Observer<Object>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                        addDisposable(d);
+                    }
+
+                    @Override
+                    public void onNext(Object object) {
+                        view.deleteSuccess(viewPosition);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        e.printStackTrace();
+                        view.showMessage("Delete record failed: " + e.getMessage());
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
     }
 }

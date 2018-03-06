@@ -14,4 +14,6 @@ public interface ComplexView extends BaseView {
     void postShowHeadRecord(Record record);
 
     void showItems(List<YearItem> yearItems);
+
+    void deleteSuccess(int viewPosition);
 }
