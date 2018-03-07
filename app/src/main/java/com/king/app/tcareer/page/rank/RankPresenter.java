@@ -110,6 +110,11 @@ public class RankPresenter extends BasePresenter<RankView> {
                 });
     }
 
+    /**
+     * query rank of year
+     * @param userId
+     * @return
+     */
     private Observable<List<Rank>> queryYearRank(final long userId) {
         return Observable.create(new ObservableOnSubscribe<List<Rank>>() {
             @Override
@@ -123,6 +128,11 @@ public class RankPresenter extends BasePresenter<RankView> {
         });
     }
 
+    /**
+     * query rank of week
+     * @param userId
+     * @return
+     */
     private Observable<List<RankWeek>> queryWeekRank(final long userId) {
         return Observable.create(new ObservableOnSubscribe<List<RankWeek>>() {
             @Override

@@ -191,7 +191,6 @@ public class ScoreCalculator extends DraggableDialogFragment {
             mDate = buffer.toString();
             btnStart.setText(mDate);
 
-            etRank.setText("");
             etScore.setText("");
             // 查询是否已录入rank
             queryRankWeek(mDate)
@@ -206,7 +205,9 @@ public class ScoreCalculator extends DraggableDialogFragment {
                         @Override
                         public void onNext(RankWeek rankWeek) {
                             if (rankWeek != null) {
-                                etRank.setText(String.valueOf(rankWeek.getRank()));
+                                if (rankWeek.getId() != null) {
+                                    etRank.setText(String.valueOf(rankWeek.getRank()));
+                                }
                                 etScore.setText(String.valueOf(rankWeek.getScore()));
                             }
                         }
@@ -320,7 +321,8 @@ public class ScoreCalculator extends DraggableDialogFragment {
                     RankWeek week = null;
                     try {
                         week = dao.queryBuilder()
-                                .where(RankWeekDao.Properties.Date.eq(date))
+                                .where(RankWeekDao.Properties.Date.eq(date)
+                                    , RankWeekDao.Properties.UserId.eq(mUserId))
                                 .build().unique();
                     } catch (Exception exception) {}
                     if (week == null) {

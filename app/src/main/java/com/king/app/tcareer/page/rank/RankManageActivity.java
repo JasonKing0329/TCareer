@@ -253,11 +253,11 @@ public class RankManageActivity extends BaseMvpActivity<RankPresenter> implement
 
     private void showScoreCalculator() {
         ScoreCalculator calculator = new ScoreCalculator();
-        calculator.setUserId(presenter.getUser().getId());
+        calculator.setUserId(userId);
         calculator.setOnDismissListener(new DialogInterface.OnDismissListener() {
             @Override
             public void onDismiss(DialogInterface dialogInterface) {
-                presenter.loadRanks(presenter.getUser().getId());
+                presenter.loadRanks(userId);
             }
         });
         calculator.show(getSupportFragmentManager(), "ScoreCalculator");
