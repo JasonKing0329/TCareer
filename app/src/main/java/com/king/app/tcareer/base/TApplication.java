@@ -9,6 +9,7 @@ import com.king.app.tcareer.conf.AppConfig;
 import com.king.app.tcareer.model.db.entity.DaoMaster;
 import com.king.app.tcareer.model.db.entity.DaoSession;
 import com.king.app.tcareer.model.db.entity.EarlierAchieveDao;
+import com.king.app.tcareer.model.db.entity.RankWeekDao;
 import com.king.app.tcareer.utils.DebugLog;
 
 import org.greenrobot.greendao.database.Database;
@@ -91,6 +92,9 @@ public class TApplication extends Application {
 			DebugLog.e(" oldVersion=" + oldVersion + ", newVersion=" + newVersion);
 			if (newVersion == 2) {
 				EarlierAchieveDao.createTable(db, true);
+			}
+			if (newVersion == 3) {
+				RankWeekDao.createTable(db, true);
 			}
 		}
 	}

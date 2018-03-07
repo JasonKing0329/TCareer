@@ -23,6 +23,7 @@ import com.king.app.tcareer.base.BaseMvpFragment;
 import com.king.app.tcareer.base.BasePresenter;
 import com.king.app.tcareer.base.IFragmentHolder;
 import com.king.app.tcareer.model.db.entity.Rank;
+import com.king.app.tcareer.model.db.entity.RankWeek;
 import com.king.app.tcareer.utils.DebugLog;
 
 import java.util.ArrayList;
@@ -107,12 +108,22 @@ public class RankChartFragment extends BaseMvpFragment<RankPresenter> implements
     @Override
     protected void onCreateData() {
         userId = getArguments().getLong(KEY_USER_ID);
-        presenter.loadRanks(userId);
+        presenter.loadYearRanks(userId);
     }
 
     @Override
-    public void showRanks(List<Rank> list) {
-        initChart(list);
+    public void postShowRanks(final List<Rank> list) {
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                initChart(list);
+            }
+        });
+    }
+
+    @Override
+    public void showWeekRanks(List<RankWeek> ranks) {
+
     }
 
     /**

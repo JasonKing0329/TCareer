@@ -2,6 +2,7 @@ package com.king.app.tcareer.page.rank;
 
 import com.king.app.tcareer.base.BaseView;
 import com.king.app.tcareer.model.db.entity.Rank;
+import com.king.app.tcareer.model.db.entity.RankWeek;
 
 import java.util.List;
 
@@ -12,5 +13,7 @@ import java.util.List;
  */
 
 public interface RankView extends BaseView {
-    void showRanks(List<Rank> list);
+    void postShowRanks(List<Rank> list);
+
+    void showWeekRanks(List<RankWeek> ranks);
 }

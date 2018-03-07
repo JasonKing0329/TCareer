@@ -1,6 +1,7 @@
 package com.king.app.tcareer.page.score;
 
 import com.king.app.tcareer.model.db.entity.MatchNameBean;
+import com.king.app.tcareer.model.db.entity.Record;
 
 /**
  * 描述:
@@ -12,6 +13,7 @@ public class ScoreBean {
     private int year;
     private boolean isChampion;
     private boolean isCompleted;
+    private Record record;
     private MatchNameBean matchBean;
 
     private String title;
@@ -39,6 +41,14 @@ public class ScoreBean {
 
     public void setMatchBean(MatchNameBean matchBean) {
         this.matchBean = matchBean;
+    }
+
+    public Record getRecord() {
+        return record;
+    }
+
+    public void setRecord(Record record) {
+        this.record = record;
     }
 
     public boolean isChampion() {

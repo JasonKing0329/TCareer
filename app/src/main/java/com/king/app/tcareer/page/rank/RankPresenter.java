@@ -4,8 +4,21 @@ import com.king.app.tcareer.base.BasePresenter;
 import com.king.app.tcareer.base.TApplication;
 import com.king.app.tcareer.model.db.entity.Rank;
 import com.king.app.tcareer.model.db.entity.RankDao;
+import com.king.app.tcareer.model.db.entity.RankWeek;
+import com.king.app.tcareer.model.db.entity.RankWeekDao;
+import com.king.app.tcareer.model.db.entity.User;
 
 import java.util.List;
+
+import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.ObservableSource;
+import io.reactivex.Observer;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Function;
+import io.reactivex.schedulers.Schedulers;
 
 /**
  * 描述:
@@ -19,12 +32,109 @@ public class RankPresenter extends BasePresenter<RankView> {
 
     }
 
-    public void loadRanks(long userId) {
-        RankDao dao = TApplication.getInstance().getDaoSession().getRankDao();
-        List<Rank> list = dao.queryBuilder()
-                    .where(RankDao.Properties.UserId.eq(userId))
-                    .build().list();
-        view.showRanks(list);
+    public void loadYearRanks(final long userId) {
+        queryUser(userId)
+                .flatMap(new Function<User, ObservableSource<List<Rank>>>() {
+                    @Override
+                    public ObservableSource<List<Rank>> apply(User user) throws Exception {
+                        return queryYearRank(userId);
+                    }
+                })
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(new Observer<List<Rank>>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                        addDisposable(d);
+                    }
+
+                    @Override
+                    public void onNext(List<Rank> ranks) {
+                        view.postShowRanks(ranks);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        e.printStackTrace();
+                        view.showMessage("Load rank error: " + e.getMessage());
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
+    }
+
+    public void loadRanks(final long userId) {
+        view.showLoading();
+        queryUser(userId)
+                .flatMap(new Function<User, ObservableSource<List<Rank>>>() {
+                    @Override
+                    public ObservableSource<List<Rank>> apply(User user) throws Exception {
+                        return queryYearRank(userId);
+                    }
+                })
+                .flatMap(new Function<List<Rank>, ObservableSource<List<RankWeek>>>() {
+                    @Override
+                    public ObservableSource<List<RankWeek>> apply(List<Rank> ranks) throws Exception {
+                        view.postShowRanks(ranks);
+                        return queryWeekRank(userId);
+                    }
+                })
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(new Observer<List<RankWeek>>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                        addDisposable(d);
+                    }
+
+                    @Override
+                    public void onNext(List<RankWeek> ranks) {
+                        view.dismissLoading();
+                        view.showWeekRanks(ranks);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        e.printStackTrace();
+                        view.dismissLoading();
+                        view.showMessage("Load rank error: " + e.getMessage());
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
+    }
+
+    private Observable<List<Rank>> queryYearRank(final long userId) {
+        return Observable.create(new ObservableOnSubscribe<List<Rank>>() {
+            @Override
+            public void subscribe(ObservableEmitter<List<Rank>> e) throws Exception {
+                RankDao dao = TApplication.getInstance().getDaoSession().getRankDao();
+                List<Rank> list = dao.queryBuilder()
+                        .where(RankDao.Properties.UserId.eq(userId))
+                        .build().list();
+                e.onNext(list);
+            }
+        });
+    }
+
+    private Observable<List<RankWeek>> queryWeekRank(final long userId) {
+        return Observable.create(new ObservableOnSubscribe<List<RankWeek>>() {
+            @Override
+            public void subscribe(ObservableEmitter<List<RankWeek>> e) throws Exception {
+                RankWeekDao dao = TApplication.getInstance().getDaoSession().getRankWeekDao();
+                List<RankWeek> list = dao.queryBuilder()
+                        .where(RankWeekDao.Properties.UserId.eq(userId))
+                        .orderAsc(RankWeekDao.Properties.Date)
+                        .build().list();
+                e.onNext(list);
+            }
+        });
     }
 
     public void saveRankFinal(Rank bean) {

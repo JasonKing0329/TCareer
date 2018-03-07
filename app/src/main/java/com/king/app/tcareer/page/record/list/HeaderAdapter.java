@@ -85,7 +85,12 @@ public class HeaderAdapter extends AbstractExpandableAdapterItem implements View
             tvMatchRound.setText(record.getRound());
         }
         tvMatchDate.setText(record.getDateStr());
-        tvMatchLevel.setText(record.getMatch().getMatchBean().getLevel());
+        StringBuffer level = new StringBuffer(record.getMatch().getMatchBean().getLevel());
+        level.append("  rank(").append(record.getRank()).append(")");
+        if (record.getSeed() > 0) {
+            level.append(" seed(").append(record.getSeed()).append(")");
+        }
+        tvMatchLevel.setText(level);
 
         String court = record.getMatch().getMatchBean().getCourt();
         Glide.with(ivMatch.getContext())

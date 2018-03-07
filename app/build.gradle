@@ -7,8 +7,8 @@ android {
         applicationId "com.king.app.tcareer"
         minSdkVersion 21
         targetSdkVersion 26
-        versionCode 29
-        versionName "2.1.1"
+        versionCode 30
+        versionName "2.2"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     signingConfigs {
@@ -32,7 +32,7 @@ android {
     }
 
     greendao {
-        schemaVersion 2
+        schemaVersion 3
     }
 }
 

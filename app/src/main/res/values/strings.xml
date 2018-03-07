@@ -26,6 +26,7 @@
     <string name="no_content">No content</string>
     <string name="default_directory">Directory: </string>
     <string name="delete_confirm">Sure to delete?</string>
+    <string name="query">Query</string>
     <!-- ***************************upload********************************* -->
     <string name="uploading">uploading...</string>
     <string name="upload_ok">upload successed!</string>

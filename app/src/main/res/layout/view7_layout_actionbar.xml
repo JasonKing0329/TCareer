@@ -82,6 +82,12 @@
 				android:layout_marginRight="10dp"/>
 		</LinearLayout>
 		<ImageView
+			android:id="@+id/iv_chart"
+			android:src="@drawable/ic_pie_chart_white_36dp"
+			android:visibility="gone"
+			style="@style/V7ActionbarActionIcon"
+			android:layout_marginRight="10dp"/>
+		<ImageView
 			android:id="@+id/view7_actionbar_menu"
 			android:layout_width="@dimen/view7_actionbar_height"
 			android:layout_height="@dimen/view7_actionbar_height"

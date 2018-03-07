@@ -2,15 +2,26 @@ package com.king.app.tcareer.page.score;
 
 import com.king.app.tcareer.base.TApplication;
 import com.king.app.tcareer.conf.AppConstants;
+import com.king.app.tcareer.model.db.entity.MatchBean;
+import com.king.app.tcareer.model.db.entity.MatchBeanDao;
 import com.king.app.tcareer.model.db.entity.MatchNameBean;
+import com.king.app.tcareer.model.db.entity.MatchNameBeanDao;
+import com.king.app.tcareer.model.db.entity.Rank;
+import com.king.app.tcareer.model.db.entity.RankDao;
 import com.king.app.tcareer.model.db.entity.Record;
 import com.king.app.tcareer.model.db.entity.RecordDao;
+
+import org.greenrobot.greendao.DaoException;
+import org.greenrobot.greendao.query.QueryBuilder;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -173,6 +184,8 @@ public class ScoreModel {
         }
         if (needAdd) {
             bean.setMatchBean(matchNameBean);
+            bean.setTitle(matchNameBean.getName());
+            bean.setRecord(record);
             bean.setYear(year);
             bean.setYear(recordYear);
             bean.setChampion(arrRound[0].equals(record.getRound()) && record.getWinnerFlag() == AppConstants.WINNER_USER);
@@ -298,6 +311,300 @@ public class ScoreModel {
         }
         long time = date.getTime();
         return time;
+    }
+
+    public Observable<List<ScoreBean>> queryScoreToDate(final String strDate, final long userId) {
+        return Observable.create(new ObservableOnSubscribe<List<ScoreBean>>() {
+            @Override
+            public void subscribe(ObservableEmitter<List<ScoreBean>> e) throws Exception {
+                e.onNext(getScoresByDate(strDate, userId));
+            }
+        });
+    }
+
+    /**
+     * 根据日期获取截止到指定日期的52周参赛记录
+     * @param strDate must matched yyyy-MM-dd，例如2011-05-02是星期一，那么就取从这一天的上周开始往前累计52个星期
+     * @return
+     */
+    private List<ScoreBean> getScoresByDate(String strDate, long userId) throws ParseException {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        Date date = sdf.parse(strDate);
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        int endWeek = calendar.get(Calendar.WEEK_OF_YEAR) - 1;
+        int endYear = calendar.get(Calendar.YEAR);
+        GregorianCalendar gc = new GregorianCalendar();
+        gc.setTime(date);
+        gc.add(Calendar.WEEK_OF_YEAR, -52);
+        int startYear = gc.get(Calendar.YEAR);
+        int startWeek = gc.get(Calendar.WEEK_OF_YEAR);
+        RecordDao dao = TApplication.getInstance().getDaoSession().getRecordDao();
+        String[] args = new String[] {
+                String.valueOf(userId),
+                endYear + "%",
+                String.valueOf(endWeek),
+                startYear + "%",
+                String.valueOf(startWeek)
+        };
+        List<Record> list = dao.queryRaw(
+                " JOIN match_names mn ON T.match_name_id = mn._id\n" +
+                        " JOIN matches m ON mn.match_id = m._id\n" +
+                        " WHERE T.user_id = ? AND ((T.date_str like ? AND m.week <= ?) OR\n" +
+                        " (T.date_str like ? AND m.week >= ?))\n" +
+                        " ORDER BY T.date_str DESC, m.week DESC"
+            , args);
+        return countScoreList(list, endYear, endWeek - 1, endWeek);
+    }
+
+    /**
+     * 处理周期内所有积分的 有效积分/替换积分/罚分等
+     * @param list
+     * @param userId
+     * @param strDate 周期的结束日期，例如2011-05-02是星期一，那么就取从这一天的上周开始往前累计52个星期
+     * @return
+     */
+    public Observable<ValidScores> countValidScores(final List<ScoreBean> list, final long userId, final String strDate) {
+        return Observable.create(new ObservableOnSubscribe<ValidScores>() {
+            @Override
+            public void subscribe(ObservableEmitter<ValidScores> e) throws Exception {
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                Date date = sdf.parse(strDate);
+                Calendar calendar = Calendar.getInstance();
+                calendar.setTime(date);
+                int lastYear = calendar.get(Calendar.YEAR) - 1;
+
+                RankDao rankDao = TApplication.getInstance().getDaoSession().getRankDao();
+                boolean isTo30 = false;
+                try {
+                    Rank rank = rankDao.queryBuilder()
+                            .where(RankDao.Properties.UserId.eq(userId)
+                                    , RankDao.Properties.Year.eq(lastYear))
+                            .build().uniqueOrThrow();
+                    if (rank.getRank() <= 30) {
+                        isTo30 = true;
+                    }
+                } catch (DaoException exception) {}
+
+                ValidScores validScores = pickScores(list, isTo30, calendar.get(Calendar.YEAR), calendar.get(Calendar.WEEK_OF_YEAR));
+                e.onNext(validScores);
+            }
+        });
+    }
+
+    /**
+     // 戴维斯杯的积分情况较为复杂，本系统不考虑这种情况，按照other赛事0分处理
+     // 4大满贯+年终总决赛+8站强制ATP1000+6站最好
+     // 上一年年终top30的有500赛强制罚分，必须参加4项500赛，且有一项是美网后（蒙卡算500赛），只要参加即刻，可以不计入6站最好（比如6个250夺冠，就不计算4个500赛首轮游）
+     // 非top30 按照取18站最好成绩的做法，若参加了大满贯和8站强制1000赛需要强制计入
+     * @param list
+     * @param isTo30
+     * @param targetYear 周期结束的年份
+     * @param weekOfYear 周期结束的周数
+     * @return
+     */
+    private ValidScores pickScores(List<ScoreBean> list, boolean isTo30, int targetYear, int weekOfYear) {
+        ValidScores scores = new ValidScores();
+        scores.setAllList(list);
+
+        List<ScoreBean> validList = new ArrayList<>();
+        List<ScoreBean> replaceList = new ArrayList<>();
+        List<ScoreBean> otherList = new ArrayList<>();
+        scores.setValidList(validList);
+        scores.setReplaceList(replaceList);
+        scores.setOtherList(otherList);
+
+        List<ScoreBean> tempList = new ArrayList<>();
+        List<ScoreBean> temp500List = new ArrayList<>();
+
+        // 1.记录所有参加的赛事
+        for (ScoreBean bean:list) {
+            String level = bean.getMatchBean().getMatchBean().getLevel();
+            // 大满贯强制计分
+            if (level.equals(arrLevel[0])) {
+                validList.add(bean);
+            }
+            // 大师杯
+            else if (level.equals(arrLevel[1])) {
+                validList.add(bean);
+            }
+            // ATP1000
+            else if (level.equals(arrLevel[2])) {
+                // 蒙特卡洛非强制，top30球员可视作参加了ATP500
+                if (bean.getMatchBean().getMatchId() == AppConstants.ATP_1000_MATCH_ID[2]) {
+                    if (isTo30) {
+                        temp500List.add(bean);
+                    }
+                    else {
+                        tempList.add(bean);
+                    }
+                }
+                // 其他8站ATP1000强制计分
+                else {
+                    validList.add(bean);
+                }
+            }
+            // ATP500
+            else if (level.equals(arrLevel[3])) {
+                if (isTo30) {
+                    temp500List.add(bean);
+                }
+                else {
+                    tempList.add(bean);
+                }
+            }
+            // ATP250
+            else if (level.equals(arrLevel[4])) {
+                tempList.add(bean);
+            }
+            else {
+                otherList.add(bean);
+            }
+
+        }
+
+        ScoreComparator scoreComparator = new ScoreComparator();
+        if (isTo30) {
+            // 2.top30检查大满贯强制计0
+            List<MatchNameBean> matchList = queryMatches(arrLevel[0]);
+            for (MatchNameBean match:matchList) {
+                boolean attended = false;
+                for (ScoreBean bean:validList) {
+                    if (bean.getMatchBean().getMatchId() == match.getMatchId()) {
+                        attended = true;
+                        break;
+                    }
+                }
+                if (!attended) {
+                    validList.add(addForce0Score(match, targetYear, weekOfYear));
+                }
+            }
+            // 3.top30检查ATP1000强制计0
+            matchList = queryMatches(arrLevel[2]);
+            for (MatchNameBean match:matchList) {
+                // 蒙卡不强制
+                if (match.getMatchId() == AppConstants.ATP_1000_MATCH_ID[2]) {
+                    continue;
+                }
+                boolean attended = false;
+                for (ScoreBean bean:validList) {
+                    if (bean.getMatchBean().getMatchId() == match.getMatchId()) {
+                        attended = true;
+                        break;
+                    }
+                }
+                if (!attended) {
+                    validList.add(addForce0Score(match, targetYear, weekOfYear));
+                }
+            }
+            // 4.top30检查ATP500罚分
+            int punishCount = 0;
+            int value = temp500List.size() - 4;
+            // 需要罚分
+            if (value < 0) {
+                for (int i = 0; i < -value; i ++) {
+                    validList.add(addPunishScore());
+                    punishCount ++;
+                }
+            }
+            // 5.top30选择余下的最好6-punishCount站赛事进入validList，其余的进入replaceList
+            for (int i = 0; i < temp500List.size(); i ++) {
+                tempList.add(temp500List.get(i));
+            }
+            Collections.sort(tempList, scoreComparator);
+            // 计算起记分
+            if (tempList.size() > 5) {
+                scores.setStartScore(tempList.get(4).getScore());
+            }
+            else {
+                scores.setStartScore(0);
+            }
+            for (int i = 0; i < tempList.size(); i ++) {
+                if (i < 6 - punishCount) {
+                    validList.add(tempList.get(i));
+                }
+                else {
+                    replaceList.add(tempList.get(i));
+                }
+            }
+        }
+        // 2.非top30直接取18-validList.size()最好比赛进入validList
+        else {
+            int count = 18 - validList.size();
+            Collections.sort(tempList, new ScoreComparator());
+            for (int i = 0; i < tempList.size(); i ++) {
+                if (i < count) {
+                    validList.add(tempList.get(i));
+                }
+                else {
+                    replaceList.add(tempList.get(i));
+                }
+            }
+        }
+
+        // 计算总积分
+        int sum = 0;
+        for (ScoreBean bean:validList) {
+            sum += bean.getScore();
+        }
+        scores.setValidScore(sum);
+
+        return scores;
+    }
+
+    /**
+     * top30强制计0赛事
+     * MatchNameBean不为空
+     * @return
+     */
+    private ScoreBean addForce0Score(MatchNameBean match, int targetYear, int weekOfYear) {
+        ScoreBean bean = new ScoreBean();
+        bean.setTitle(match.getName());
+        bean.setScore(0);
+        bean.setMatchBean(match);
+        if (match.getMatchBean().getWeek() < weekOfYear) {
+            bean.setYear(targetYear);
+        }
+        else {
+            bean.setYear(targetYear - 1);
+        }
+        return bean;
+    }
+
+    /**
+     * top30 500赛未参加够，罚分
+     * @return MatchNameBean为空
+     */
+    private ScoreBean addPunishScore() {
+        ScoreBean bean = new ScoreBean();
+        bean.setTitle("500赛罚分");
+        bean.setScore(0);
+        return bean;
+    }
+
+    private List<MatchNameBean> queryMatches(String level) {
+        MatchNameBeanDao dao = TApplication.getInstance().getDaoSession().getMatchNameBeanDao();
+        QueryBuilder<MatchNameBean> queryBuilder = dao.queryBuilder();
+        queryBuilder.join(MatchNameBeanDao.Properties.MatchId, MatchBean.class)
+                .where(MatchBeanDao.Properties.Level.eq(level));
+        return queryBuilder.build().list();
+    }
+
+    private class ScoreComparator implements Comparator<ScoreBean> {
+
+        @Override
+        public int compare(ScoreBean left, ScoreBean right) {
+            int result = right.getScore() - left.getScore();
+            if (result < 0) {
+                return -1;
+            }
+            else if (result > 0) {
+                return 1;
+            }
+            else {
+                return 0;
+            }
+        }
     }
 
 }
