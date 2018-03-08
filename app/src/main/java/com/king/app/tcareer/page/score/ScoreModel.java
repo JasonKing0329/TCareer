@@ -334,11 +334,8 @@ public class ScoreModel {
         calendar.setTime(date);
         int endWeek = calendar.get(Calendar.WEEK_OF_YEAR) - 1;
         int endYear = calendar.get(Calendar.YEAR);
-        GregorianCalendar gc = new GregorianCalendar();
-        gc.setTime(date);
-        gc.add(Calendar.WEEK_OF_YEAR, -52);
-        int startYear = gc.get(Calendar.YEAR);
-        int startWeek = gc.get(Calendar.WEEK_OF_YEAR);
+        int startYear = endYear - 1;
+        int startWeek = endWeek + 1;
         RecordDao dao = TApplication.getInstance().getDaoSession().getRecordDao();
         String[] args = new String[] {
                 String.valueOf(userId),
@@ -354,7 +351,86 @@ public class ScoreModel {
                         " (T.date_str like ? AND m.week >= ?))\n" +
                         " ORDER BY T.date_str DESC, m.week DESC"
             , args);
-        return countScoreList(list, endYear, endWeek - 1, endWeek);
+        return countFromList(list);
+    }
+
+    /**
+     * 计算list内的积分item
+     * @param list
+     * @return
+     */
+    private List<ScoreBean> countFromList(List<Record> list) {
+        List<ScoreBean> scoreList = new ArrayList<>();
+
+        ScoreBean masterCupBean = null;
+        Map<Long, ScoreBean> recMap = new HashMap<>();
+        for (int i = 0; i < list.size(); i ++) {
+            Record record = list.get(i);
+
+            // 大师杯积分不走通用情况
+            if (arrLevel[1].equals(record.getMatch().getMatchBean().getLevel())) {
+                if (masterCupBean == null) {
+                    masterCupBean = new ScoreBean();
+                }
+                parseScoreFrom(scoreList, masterCupBean, record);
+            }
+            else {
+                ScoreBean bean = recMap.get(record.getMatch().getMatchId());
+                if (bean == null) {
+                    bean = new ScoreBean();
+                    recMap.put(record.getMatch().getMatchId(), bean);
+                }
+                // 出现负场，该项赛事结束
+                if (record.getWinnerFlag() == AppConstants.WINNER_COMPETITOR) {
+                    parseScoreFrom(scoreList, bean, record);
+                }
+                // 一直胜场，直到Final也是胜，该项赛事结束
+                else if (arrRound[0].equals(record.getRound())) {
+                    parseScoreFrom(scoreList, bean, record);
+                }
+                //其他情况表示赛事未结束或者无积分
+            }
+        }
+        if (masterCupBean != null && masterCupBean.getMatchBean() != null) {
+            scoreList.add(masterCupBean);
+        }
+        return scoreList;
+    }
+
+    /**
+     * 添加没有规则的score bean
+     * @param scoreList
+     * @param bean
+     * @param record
+     */
+    private void parseScoreFrom(List<ScoreBean> scoreList, ScoreBean bean, Record record) {
+        MatchNameBean matchNameBean = record.getMatch();
+
+        bean.setMatchBean(matchNameBean);
+        bean.setTitle(matchNameBean.getName());
+        bean.setRecord(record);
+        bean.setYear(Integer.parseInt(record.getDateStr().split("-")[0]));
+        bean.setChampion(arrRound[0].equals(record.getRound()) && record.getWinnerFlag() == AppConstants.WINNER_USER);
+
+        // 大师杯积分不走通用情况，这里只累计积分
+        if (arrLevel[1].equals(record.getMatch().getMatchBean().getLevel())) {
+            // 按照ATP的规则，只有胜才积分，负没有分
+            if (record.getWinnerFlag() == AppConstants.WINNER_USER) {
+                if (arrRound[7].equals(record.getRound())) {// group, 一场200
+                    bean.setScore(bean.getScore() + 200);
+                }
+                if (arrRound[1].equals(record.getRound())) {// semi final胜多加400
+                    bean.setScore(bean.getScore() + 400);
+                }
+                if (arrRound[0].equals(record.getRound())) {// final胜多加500
+                    bean.setScore(bean.getScore() + 500);
+                }
+            }
+        }
+        else {
+            bean.setScore(getMatchScore(record));
+            scoreList.add(bean);
+        }
     }
 
     /**
