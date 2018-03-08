@@ -54,6 +54,8 @@ public class ScoreCalculator extends DraggableDialogFragment {
 
     private long mUserId;
 
+    private RankWeek mUpdateData;
+
     @Override
     protected View getToolbarView(ViewGroup groupToolbar) {
         setTitle("Score calculator");
@@ -73,6 +75,7 @@ public class ScoreCalculator extends DraggableDialogFragment {
     protected Fragment getContentViewFragment() {
         ftCalculator = new CalculatorFragment();
         ftCalculator.setUserId(mUserId);
+        ftCalculator.setUpdateData(mUpdateData);
         return ftCalculator;
     }
 
@@ -84,10 +87,16 @@ public class ScoreCalculator extends DraggableDialogFragment {
         this.onDismissListener = onDismissListener;
     }
 
+    public void setUpdateData(RankWeek updateData) {
+        this.mUpdateData = updateData;
+    }
+
     public static class CalculatorFragment extends ContentFragment {
 
         @BindView(R.id.btn_start)
         Button btnStart;
+        @BindView(R.id.btn_ok)
+        Button btnOk;
         @BindView(R.id.btn_insert)
         Button btnInsert;
         @BindView(R.id.tv_score)
@@ -115,6 +124,10 @@ public class ScoreCalculator extends DraggableDialogFragment {
 
         private ValidScores mValidScore;
 
+        private RankWeek mUpdateData;
+
+        private SimpleDateFormat dateFormat;
+
         @Override
         protected int getContentLayoutRes() {
             return R.layout.dialog_score_calculator;
@@ -125,6 +138,19 @@ public class ScoreCalculator extends DraggableDialogFragment {
             unbinder = ButterKnife.bind(this, view);
             scoreModel = new ScoreModel();
             progressBar.setVisibility(View.INVISIBLE);
+
+            dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+
+            if (mUpdateData != null) {
+                mDate = dateFormat.format(mUpdateData.getDate());
+                btnOk.setVisibility(View.GONE);
+                btnInsert.setText("Update");
+                btnStart.setText(mDate);
+                btnStart.setEnabled(false);
+                etRank.setText(String.valueOf(mUpdateData.getRank()));
+                etScore.setText(String.valueOf(mUpdateData.getScore()));
+                calculateScore();
+            }
         }
 
         @Override
@@ -192,6 +218,10 @@ public class ScoreCalculator extends DraggableDialogFragment {
             btnStart.setText(mDate);
 
             etScore.setText("");
+            onDateChanged();
+        }
+
+        private void onDateChanged() {
             // 查询是否已录入rank
             queryRankWeek(mDate)
                     .observeOn(AndroidSchedulers.mainThread())
@@ -316,8 +346,7 @@ public class ScoreCalculator extends DraggableDialogFragment {
                 @Override
                 public void subscribe(ObservableEmitter<RankWeek> e) throws Exception {
                     RankWeekDao dao = TApplication.getInstance().getDaoSession().getRankWeekDao();
-                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-                    Date date = sdf.parse(strDate);
+                    Date date = dateFormat.parse(strDate);
                     RankWeek week = null;
                     try {
                         week = dao.queryBuilder()
@@ -350,9 +379,8 @@ public class ScoreCalculator extends DraggableDialogFragment {
                                 @Override
                                 public void subscribe(Observer<? super Object> observer) {
                                     RankWeek week = rankWeek;
-                                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
                                     try {
-                                        Date date = sdf.parse(mDate);
+                                        Date date = dateFormat.parse(mDate);
                                         week.setUserId(mUserId);
                                         week.setRank(Integer.parseInt(rank));
                                         int score = mValidScore.getValidScore();
@@ -401,6 +429,10 @@ public class ScoreCalculator extends DraggableDialogFragment {
 
                         }
                     });
+        }
+
+        public void setUpdateData(RankWeek updateData) {
+            this.mUpdateData = updateData;
         }
 
         /**

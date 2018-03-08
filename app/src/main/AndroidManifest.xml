@@ -102,6 +102,10 @@
             android:theme="@style/NoActionBarTheme"
             android:screenOrientation="portrait"/>
 
+        <activity android:name=".page.rank.RankDetailActivity"
+            android:theme="@style/NoActionBarTheme"
+            android:screenOrientation="portrait"/>
+
         <activity android:name=".page.score.ScoreActivity"
             android:theme="@style/NoActionBarTheme"
             android:screenOrientation="portrait"/>

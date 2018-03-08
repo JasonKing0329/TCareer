@@ -4,18 +4,39 @@
     android:layout_height="match_parent"
     android:background="@color/main_bg" >
 
-    <include
-        android:id="@+id/rank_manage_actionbar"
-        layout="@layout/view7_layout_actionbar" />
+	<RelativeLayout
+		android:id="@+id/group_actionbar"
+		android:layout_width="match_parent"
+		android:layout_height="@dimen/view7_actionbar_height"
+		android:background="@color/colorPrimary" >
+		<ImageView
+			android:id="@+id/iv_back"
+			android:layout_width="35dp"
+			android:layout_height="match_parent"
+			android:padding="6dp"
+			android:layout_marginLeft="5dp"
+			android:layout_centerVertical="true"
+			android:src="@drawable/actionbar_back"
+			android:scaleType="fitCenter" />
+		<TextView
+			android:id="@+id/tv_title"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_centerVertical="true"
+			android:layout_marginLeft="5dp"
+			android:layout_toRightOf="@id/iv_back"
+			android:textSize="20sp"
+			android:textColor="@color/white"
+			android:textStyle="bold" />
+	</RelativeLayout>
 
 	<ScrollView
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"
-		android:layout_below="@id/rank_manage_actionbar">
+		android:layout_below="@id/group_actionbar">
 		<LinearLayout
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			android:layout_below="@id/rank_manage_actionbar"
 			android:paddingLeft="@dimen/activity_horizontal_margin"
 			android:paddingRight="@dimen/activity_horizontal_margin"
 			android:paddingBottom="@dimen/activity_horizontal_margin"
@@ -59,6 +80,17 @@
 				android:background="?android:attr/selectableItemBackgroundBorderless"
 				android:src="@drawable/ic_add"/>
 
+			<TextView
+				android:id="@+id/tv_details"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:paddingTop="15dp"
+				android:paddingBottom="15dp"
+				android:gravity="center"
+				android:background="?android:attr/selectableItemBackground"
+				android:textColor="@color/colorPrimary"
+				android:textSize="20dp"
+				android:text="Details"/>
 		</LinearLayout>
 	</ScrollView>
 </RelativeLayout>

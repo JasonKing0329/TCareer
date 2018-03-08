@@ -1,6 +1,7 @@
 package com.king.app.tcareer.page.rank;
 
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Color;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -46,14 +47,10 @@ public class RankManageActivity extends BaseMvpActivity<RankPresenter> implement
 
     public static final String KEY_USER_ID = "key_user_id";
 
-    @BindView(R.id.view7_actionbar_back)
-    ImageView ivBack;
-    @BindView(R.id.view7_actionbar_title)
+    private static final int REQUEST_DETAIL = 100;
+
+    @BindView(R.id.tv_title)
     TextView tvTitle;
-    @BindView(R.id.view7_actionbar_menu)
-    ImageView ivMenu;
-    @BindView(R.id.iv_chart)
-    ImageView ivChart;
     @BindView(R.id.group_chart_container)
     ViewGroup groupChartContainer;
     @BindView(R.id.rank_manage_list)
@@ -74,9 +71,6 @@ public class RankManageActivity extends BaseMvpActivity<RankPresenter> implement
 
     @Override
     protected void initView() {
-        ivBack.setVisibility(View.VISIBLE);
-        ivChart.setVisibility(View.VISIBLE);
-        ivMenu.setVisibility(View.GONE);
         tvTitle.setText("Rank");
         LinearLayoutManager manager = new LinearLayoutManager(this);
         manager.setOrientation(LinearLayoutManager.VERTICAL);
@@ -233,20 +227,23 @@ public class RankManageActivity extends BaseMvpActivity<RankPresenter> implement
         setResult(RESULT_OK);
     }
 
-    @OnClick({R.id.view7_actionbar_back, R.id.iv_chart, R.id.iv_add, R.id.iv_add_week})
+    @OnClick({R.id.iv_back, R.id.iv_add, R.id.iv_add_week, R.id.tv_details})
     public void onClick(View view) {
         switch (view.getId()) {
-            case R.id.view7_actionbar_back:
+            case R.id.iv_back:
                 // 加入了转场动画，必须用onBackPressed，finish无效果
                 onBackPressed();
                 break;
             case R.id.iv_add:
                 addRank();
                 break;
-            case R.id.iv_chart:
-                break;
             case R.id.iv_add_week:
                 showScoreCalculator();
+                break;
+            case R.id.tv_details:
+                Intent intent = new Intent().setClass(this, RankDetailActivity.class);
+                intent.putExtra(RankDetailActivity.KEY_USER_ID, userId);
+                startActivityForResult(intent, REQUEST_DETAIL);
                 break;
         }
     }
@@ -310,4 +307,14 @@ public class RankManageActivity extends BaseMvpActivity<RankPresenter> implement
         initData();
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_DETAIL) {
+            if (resultCode == RESULT_OK) {
+                tagUpdated();
+                refreshRanks();
+            }
+        }
+    }
 }
