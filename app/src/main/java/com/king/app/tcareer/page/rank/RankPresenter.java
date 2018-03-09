@@ -4,8 +4,6 @@ import com.king.app.tcareer.base.BasePresenter;
 import com.king.app.tcareer.base.TApplication;
 import com.king.app.tcareer.model.db.entity.Rank;
 import com.king.app.tcareer.model.db.entity.RankDao;
-import com.king.app.tcareer.model.db.entity.RankWeek;
-import com.king.app.tcareer.model.db.entity.RankWeekDao;
 import com.king.app.tcareer.model.db.entity.User;
 
 import java.util.List;
@@ -50,56 +48,12 @@ public class RankPresenter extends BasePresenter<RankView> {
 
                     @Override
                     public void onNext(List<Rank> ranks) {
-                        view.postShowRanks(ranks);
+                        view.showRanks(ranks);
                     }
 
                     @Override
                     public void onError(Throwable e) {
                         e.printStackTrace();
-                        view.showMessage("Load rank error: " + e.getMessage());
-                    }
-
-                    @Override
-                    public void onComplete() {
-
-                    }
-                });
-    }
-
-    public void loadRanks(final long userId) {
-        view.showLoading();
-        queryUser(userId)
-                .flatMap(new Function<User, ObservableSource<List<Rank>>>() {
-                    @Override
-                    public ObservableSource<List<Rank>> apply(User user) throws Exception {
-                        return queryYearRank(userId);
-                    }
-                })
-                .flatMap(new Function<List<Rank>, ObservableSource<List<RankWeek>>>() {
-                    @Override
-                    public ObservableSource<List<RankWeek>> apply(List<Rank> ranks) throws Exception {
-                        view.postShowRanks(ranks);
-                        return queryWeekRank(userId);
-                    }
-                })
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.io())
-                .subscribe(new Observer<List<RankWeek>>() {
-                    @Override
-                    public void onSubscribe(Disposable d) {
-                        addDisposable(d);
-                    }
-
-                    @Override
-                    public void onNext(List<RankWeek> ranks) {
-                        view.dismissLoading();
-                        view.showWeekRanks(ranks);
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        e.printStackTrace();
-                        view.dismissLoading();
                         view.showMessage("Load rank error: " + e.getMessage());
                     }
 
@@ -122,25 +76,6 @@ public class RankPresenter extends BasePresenter<RankView> {
                 RankDao dao = TApplication.getInstance().getDaoSession().getRankDao();
                 List<Rank> list = dao.queryBuilder()
                         .where(RankDao.Properties.UserId.eq(userId))
-                        .build().list();
-                e.onNext(list);
-            }
-        });
-    }
-
-    /**
-     * query rank of week
-     * @param userId
-     * @return
-     */
-    private Observable<List<RankWeek>> queryWeekRank(final long userId) {
-        return Observable.create(new ObservableOnSubscribe<List<RankWeek>>() {
-            @Override
-            public void subscribe(ObservableEmitter<List<RankWeek>> e) throws Exception {
-                RankWeekDao dao = TApplication.getInstance().getDaoSession().getRankWeekDao();
-                List<RankWeek> list = dao.queryBuilder()
-                        .where(RankWeekDao.Properties.UserId.eq(userId))
-                        .orderAsc(RankWeekDao.Properties.Date)
                         .build().list();
                 e.onNext(list);
             }

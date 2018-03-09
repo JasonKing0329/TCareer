@@ -3,6 +3,7 @@ package com.king.app.tcareer.page.rank;
 import android.content.DialogInterface;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.View;
 
 import com.king.app.tcareer.R;
 import com.king.app.tcareer.base.BaseMvpActivity;
@@ -28,6 +29,8 @@ public class RankDetailActivity extends BaseMvpActivity<RankDetailPresenter> imp
 
     private RankDetailAdapter detailAdapter;
 
+    private RankDetailFragment ftDetail;
+
     @Override
     protected int getContentView() {
         return R.layout.activity_rank_detail;
@@ -47,7 +50,15 @@ public class RankDetailActivity extends BaseMvpActivity<RankDetailPresenter> imp
     @Override
     protected void initData() {
         long userId = getIntent().getLongExtra(KEY_USER_ID, -1);
-        presenter.loadRanks(userId);
+        initChart(userId);
+        presenter.loadRanks(userId, true);
+    }
+
+    private void initChart(long userId) {
+        ftDetail = RankDetailFragment.newInstance(userId);
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.group_ft_container, ftDetail, "RankDetailFragment")
+                .commit();
     }
 
     @Override
@@ -65,6 +76,8 @@ public class RankDetailActivity extends BaseMvpActivity<RankDetailPresenter> imp
                         @Override
                         public void onDismiss(DialogInterface dialogInterface) {
                             detailAdapter.notifyItemChanged(position);
+                            ftDetail.refresh();
+                            setResult(RESULT_OK);
                         }
                     });
                     scoreCalculator.show(getSupportFragmentManager(), "ScoreCalculator");
@@ -79,21 +92,43 @@ public class RankDetailActivity extends BaseMvpActivity<RankDetailPresenter> imp
                                     presenter.deleteRank(item);
                                     detailAdapter.removeItem(position);
                                     detailAdapter.notifyItemRemoved(position);
+                                    ftDetail.refresh();
+                                    setResult(RESULT_OK);
                                 }
                             }, null);
                 }
             });
             rvRanks.setAdapter(detailAdapter);
-        }
-        else {
+        } else {
             detailAdapter.setList(list);
             detailAdapter.notifyDataSetChanged();
         }
     }
 
-    @OnClick(R.id.iv_back)
-    public void onViewClicked() {
-        finish();
+    @OnClick({R.id.iv_back, R.id.iv_add})
+    public void onViewClicked(View view) {
+        switch (view.getId()) {
+            case R.id.iv_back:
+                finish();
+                break;
+            case R.id.iv_add:
+                showScoreCalculator();
+                break;
+        }
+    }
+
+    private void showScoreCalculator() {
+        ScoreCalculator calculator = new ScoreCalculator();
+        calculator.setUserId(presenter.getUser().getId());
+        calculator.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialogInterface) {
+                ftDetail.refresh();
+                presenter.loadRanks(presenter.getUser().getId(), true);
+                setResult(RESULT_OK);
+            }
+        });
+        calculator.show(getSupportFragmentManager(), "ScoreCalculator");
     }
 
 }

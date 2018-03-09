@@ -13,6 +13,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Pair;
@@ -22,6 +23,9 @@ import android.view.View;
 import android.view.ViewAnimationUtils;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.Animation;
+import android.view.animation.TranslateAnimation;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -48,6 +52,8 @@ import com.king.app.tcareer.page.player.page.PlayerPageActivity;
 import com.king.app.tcareer.page.player.slider.PlayerSlideActivity;
 import com.king.app.tcareer.page.player.slider.PlayerSlideAdapter;
 import com.king.app.tcareer.page.rank.RankChartFragment;
+import com.king.app.tcareer.page.rank.RankDetailActivity;
+import com.king.app.tcareer.page.rank.RankDetailFragment;
 import com.king.app.tcareer.page.rank.RankManageActivity;
 import com.king.app.tcareer.page.record.complex.RecordComplexActivity;
 import com.king.app.tcareer.page.record.editor.RecordEditorActivity;
@@ -75,6 +81,7 @@ public class HomeActivity extends BaseMvpActivity<HomePresenter> implements IHom
     private final int REQUEST_RECORD_LIST = 103;
     private final int REQUEST_SCORE = 104;
     private final int REQUEST_RECORD_COMPLEX = 105;
+    private final int REQUEST_RANK_DETAIL = 106;
 
     private HomeHeadAdapter headAdapter;
 
@@ -123,6 +130,10 @@ public class HomeActivity extends BaseMvpActivity<HomePresenter> implements IHom
     ImageView ivNavImage;
     @BindView(R.id.bmb_menu)
     BoomMenuButton bmbMenu;
+    @BindView(R.id.rv_notify)
+    RecyclerView rvNotify;
+    @BindView(R.id.group_notify)
+    LinearLayout groupNotify;
 
     private HomeMatchAdapter matchAdapter;
 
@@ -130,9 +141,13 @@ public class HomeActivity extends BaseMvpActivity<HomePresenter> implements IHom
 
     private RankChartFragment ftChart;
 
+    private RankDetailFragment ftRankDetail;
+
     private BoomMenuHome boomMenuHome;
 
     private PlayerSlideAdapter playerSlideAdapter;
+
+    private NotifyRankAdapter notifyRankAdapter;
 
     @Override
     protected int getContentView() {
@@ -157,14 +172,11 @@ public class HomeActivity extends BaseMvpActivity<HomePresenter> implements IHom
         SeasonManager.SeasonEnum type = SeasonManager.getSeasonType();
         if (type == SeasonManager.SeasonEnum.CLAY) {
             boomMenuHome.init(BoomMenuHome.CLAY, this);
-        }
-        else if (type == SeasonManager.SeasonEnum.GRASS) {
+        } else if (type == SeasonManager.SeasonEnum.GRASS) {
             boomMenuHome.init(BoomMenuHome.GRASS, this);
-        }
-        else if (type == SeasonManager.SeasonEnum.INHARD) {
+        } else if (type == SeasonManager.SeasonEnum.INHARD) {
             boomMenuHome.init(BoomMenuHome.INHARD, this);
-        }
-        else {
+        } else {
             boomMenuHome.init(BoomMenuHome.HARD, this);
         }
     }
@@ -190,6 +202,7 @@ public class HomeActivity extends BaseMvpActivity<HomePresenter> implements IHom
     @Override
     public void initData() {
         presenter.loadHomeDatas();
+        presenter.checkWeekRank();
     }
 
     @Override
@@ -200,6 +213,7 @@ public class HomeActivity extends BaseMvpActivity<HomePresenter> implements IHom
                 ctlToolbar.setTitle(presenter.getUser().getNameEng());
                 initNavView();
                 initRankChart();
+                initRankWeekChart();
             }
         });
     }
@@ -231,6 +245,19 @@ public class HomeActivity extends BaseMvpActivity<HomePresenter> implements IHom
         ft.commit();
     }
 
+    private void initRankWeekChart() {
+        ftRankDetail = RankDetailFragment.newInstance(presenter.getUser().getId());
+        ftRankDetail.setOnChartClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startWeekRankActivity(presenter.getUser().getId());
+            }
+        });
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        ft.replace(R.id.group_chart_week, ftRankDetail, "RankDetailFragment");
+        ft.commit();
+    }
+
     @Override
     public void postShowAllUsers() {
         runOnUiThread(new Runnable() {
@@ -259,7 +286,7 @@ public class HomeActivity extends BaseMvpActivity<HomePresenter> implements IHom
     private void initPlayerBasic() {
         headAdapter = new HomeHeadAdapter(getSupportFragmentManager());
         int index = 0;
-        for (int i = 0; i < presenter.getAllUsers().size(); i ++) {
+        for (int i = 0; i < presenter.getAllUsers().size(); i++) {
             User user = presenter.getAllUsers().get(i);
             HomeHeadFragment fragment = HomeHeadFragment.newInstance(user.getId());
             headAdapter.addFragment(fragment);
@@ -348,8 +375,7 @@ public class HomeActivity extends BaseMvpActivity<HomePresenter> implements IHom
                 }
             });
             rvPlayers.setAdapter(playerSlideAdapter);
-        }
-        else {
+        } else {
             playerSlideAdapter.setList(list);
             playerSlideAdapter.notifyDataSetChanged();
         }
@@ -382,14 +408,11 @@ public class HomeActivity extends BaseMvpActivity<HomePresenter> implements IHom
         SeasonManager.SeasonEnum type = SeasonManager.getSeasonType();
         if (type == SeasonManager.SeasonEnum.CLAY) {
             ivNavImage.setImageResource(R.drawable.nav_header_mon);
-        }
-        else if (type == SeasonManager.SeasonEnum.GRASS) {
+        } else if (type == SeasonManager.SeasonEnum.GRASS) {
             ivNavImage.setImageResource(R.drawable.nav_header_win);
-        }
-        else if (type == SeasonManager.SeasonEnum.INHARD) {
+        } else if (type == SeasonManager.SeasonEnum.INHARD) {
             ivNavImage.setImageResource(R.drawable.nav_header_sydney);
-        }
-        else {
+        } else {
             ivNavImage.setImageResource(R.drawable.nav_header_iw);
         }
     }
@@ -540,7 +563,7 @@ public class HomeActivity extends BaseMvpActivity<HomePresenter> implements IHom
         Intent intent = new Intent().setClass(this, RankManageActivity.class);
         intent.putExtra(RankManageActivity.KEY_USER_ID, presenter.getUser().getId());
         ActivityOptions transitionActivityOptions = ActivityOptions.makeSceneTransitionAnimation(this
-                , Pair.create(findViewById(R.id.group_chart),getString(R.string.anim_home_rank)));
+                , Pair.create(findViewById(R.id.group_chart), getString(R.string.anim_home_rank)));
         startActivityForResult(intent, REQUEST_RANK, transitionActivityOptions.toBundle());
 
     }
@@ -550,7 +573,7 @@ public class HomeActivity extends BaseMvpActivity<HomePresenter> implements IHom
         Intent intent = new Intent().setClass(this, RecordEditorActivity.class);
         intent.putExtra(RecordEditorActivity.KEY_USER_ID, presenter.getUser().getId());
         ActivityOptions transitionActivityOptions = ActivityOptions.makeSceneTransitionAnimation(this
-                , Pair.create(findViewById(R.id.group_add),getString(R.string.anim_home_add)));
+                , Pair.create(findViewById(R.id.group_add), getString(R.string.anim_home_add)));
         startActivityForResult(intent, REQUEST_ADD, transitionActivityOptions.toBundle());
     }
 
@@ -584,7 +607,7 @@ public class HomeActivity extends BaseMvpActivity<HomePresenter> implements IHom
         Intent intent = new Intent().setClass(this, RecordActivity.class);
         intent.putExtra(RecordActivity.KEY_USER_ID, presenter.getUser().getId());
         ActivityOptions transitionActivityOptions = ActivityOptions.makeSceneTransitionAnimation(this
-                , Pair.create(findViewById(R.id.iv_record_bk),getString(R.string.anim_home_date)));
+                , Pair.create(findViewById(R.id.iv_record_bk), getString(R.string.anim_home_date)));
         startActivityForResult(intent, REQUEST_RECORD_LIST, transitionActivityOptions.toBundle());
     }
 
@@ -619,25 +642,25 @@ public class HomeActivity extends BaseMvpActivity<HomePresenter> implements IHom
             if (resultCode == RESULT_OK) {
                 ftChart.refreshRanks();
             }
-        }
-        else if (requestCode == REQUEST_SCORE) {
+        } else if (requestCode == REQUEST_RANK_DETAIL) {
+            if (resultCode == RESULT_OK) {
+                ftRankDetail.refresh();
+            }
+        } else if (requestCode == REQUEST_SCORE) {
             if (resultCode == RESULT_OK) {
                 headAdapter.getItem(viewpagerHead.getCurrentItem()).onRankChanged();
             }
-        }
-        else if (requestCode == REQUEST_ADD) {
+        } else if (requestCode == REQUEST_ADD) {
             if (resultCode == RESULT_OK) {
                 // 添加过新数据，刷新record相关
                 presenter.setRecordChanged();
             }
-        }
-        else if (requestCode == REQUEST_RECORD_LIST) {
+        } else if (requestCode == REQUEST_RECORD_LIST) {
             if (resultCode == RESULT_OK) {
                 // 删除或修改过新数据，刷新record相关
                 presenter.setRecordChanged();
             }
-        }
-        else if (requestCode == REQUEST_RECORD_COMPLEX) {
+        } else if (requestCode == REQUEST_RECORD_COMPLEX) {
             if (resultCode == RESULT_OK) {
                 // 删除或修改过新数据，刷新record相关
                 presenter.setRecordChanged();
@@ -679,5 +702,86 @@ public class HomeActivity extends BaseMvpActivity<HomePresenter> implements IHom
             }
         });
         anim.start();
+    }
+
+    @Override
+    public void notifyRankFound(List<NotifyRankBean> list) {
+        if (list.size() == 0) {
+            groupNotify.setVisibility(View.GONE);
+        }
+        else {
+            groupNotify.setVisibility(View.VISIBLE);
+            if (notifyRankAdapter == null) {
+                LinearLayoutManager manager = new LinearLayoutManager(this);
+                manager.setOrientation(LinearLayoutManager.VERTICAL);
+                rvNotify.setLayoutManager(manager);
+
+                notifyRankAdapter = new NotifyRankAdapter();
+                notifyRankAdapter.setList(list);
+                notifyRankAdapter.setOnItemListener(new NotifyRankAdapter.OnItemListener() {
+                    @Override
+                    public void onClickItem(NotifyRankBean bean, int position) {
+                        startWeekRankActivity(bean.getUser().getId());
+                    }
+                });
+                rvNotify.setAdapter(notifyRankAdapter);
+            }
+            else {
+                notifyRankAdapter.setList(list);
+                notifyRankAdapter.notifyDataSetChanged();
+            }
+
+        }
+    }
+
+    private void startWeekRankActivity(long userId) {
+        Intent intent = new Intent().setClass(this, RankDetailActivity.class);
+        intent.putExtra(RankDetailActivity.KEY_USER_ID, userId);
+        startActivityForResult(intent, REQUEST_RANK_DETAIL);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // 重新检测是否还有未更新的排名
+        if (groupNotify.getVisibility() == View.VISIBLE) {
+            presenter.checkWeekRank();
+        }
+    }
+
+    @OnClick({R.id.tv_skip, R.id.group_notify})
+    public void onViewClicked(View view) {
+        switch (view.getId()) {
+            case R.id.tv_skip:
+                dismissNotify();
+                break;
+            case R.id.group_notify:
+                // 防止事件透传
+                break;
+        }
+    }
+
+    private void dismissNotify() {
+        Animation animation = new TranslateAnimation(0, groupNotify.getWidth(), 0, 0);
+        animation.setDuration(500);
+        animation.setInterpolator(new AccelerateInterpolator());
+        animation.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                groupNotify.setVisibility(View.GONE);
+                groupNotify.setTranslationX(0);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
+        groupNotify.startAnimation(animation);
     }
 }

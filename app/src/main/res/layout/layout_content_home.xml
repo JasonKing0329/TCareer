@@ -154,6 +154,13 @@
             android:transitionName="@string/anim_home_rank"
             android:layout_height="@dimen/rank_chart_height"/>
 
+        <FrameLayout
+            android:id="@+id/group_chart_week"
+            android:layout_marginTop="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:transitionName="@string/anim_home_rank_week"/>
+
         <LinearLayout
             android:id="@+id/group_h2h"
             android:layout_width="match_parent"

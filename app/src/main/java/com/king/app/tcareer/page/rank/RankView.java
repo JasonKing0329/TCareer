@@ -13,7 +13,5 @@ import java.util.List;
  */
 
 public interface RankView extends BaseView {
-    void postShowRanks(List<Rank> list);
-
-    void showWeekRanks(List<RankWeek> ranks);
+    void showRanks(List<Rank> list);
 }

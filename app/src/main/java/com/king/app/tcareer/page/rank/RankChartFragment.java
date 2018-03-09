@@ -112,7 +112,7 @@ public class RankChartFragment extends BaseMvpFragment<RankPresenter> implements
     }
 
     @Override
-    public void postShowRanks(final List<Rank> list) {
+    public void showRanks(final List<Rank> list) {
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -121,18 +121,13 @@ public class RankChartFragment extends BaseMvpFragment<RankPresenter> implements
         });
     }
 
-    @Override
-    public void showWeekRanks(List<RankWeek> ranks) {
-
-    }
-
     /**
      * 发生User变化后presenter持有的dao还保留对上个user的数据库访问
      * 需要重新初始化
      */
     public void onUserChanged(long userId) {
         this.userId = userId;
-        presenter.loadRanks(userId);
+        presenter.loadYearRanks(userId);
     }
 
     /**
@@ -140,7 +135,7 @@ public class RankChartFragment extends BaseMvpFragment<RankPresenter> implements
      *
      */
     public void refreshRanks() {
-        presenter.loadRanks(userId);
+        presenter.loadYearRanks(userId);
     }
 
     private void initChart(List<Rank> rankList) {

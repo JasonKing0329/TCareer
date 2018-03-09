@@ -6,6 +6,8 @@ import com.king.app.tcareer.conf.AppConstants;
 import com.king.app.tcareer.model.CompetitorParser;
 import com.king.app.tcareer.model.MatchModel;
 import com.king.app.tcareer.model.bean.CompetitorBean;
+import com.king.app.tcareer.model.db.entity.RankWeek;
+import com.king.app.tcareer.model.db.entity.RankWeekDao;
 import com.king.app.tcareer.model.db.entity.Record;
 import com.king.app.tcareer.model.db.entity.RecordDao;
 import com.king.app.tcareer.model.db.entity.User;
@@ -15,7 +17,12 @@ import com.king.app.tcareer.page.match.gallery.UserMatchPresenter;
 import com.king.app.tcareer.page.setting.SettingProperty;
 import com.king.app.tcareer.utils.DBExportor;
 
+import org.greenrobot.greendao.DaoException;
+
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,6 +34,7 @@ import io.reactivex.ObservableSource;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 
@@ -295,6 +303,86 @@ public class HomePresenter extends BasePresenter<IHomeView> {
                     public void onError(Throwable e) {
                         e.printStackTrace();
                         view.showMessage("save failed: " + e.getMessage());
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
+    }
+
+    /**
+     * 检查是否更新week rank
+     */
+    public void checkWeekRank() {
+        Observable.create(new ObservableOnSubscribe<List<NotifyRankBean>>() {
+            @Override
+            public void subscribe(ObservableEmitter<List<NotifyRankBean>> e) throws Exception {
+                RankWeekDao rankDao = TApplication.getInstance().getDaoSession().getRankWeekDao();
+                UserDao userDao = TApplication.getInstance().getDaoSession().getUserDao();
+                List<User> users = userDao.queryBuilder().build().list();
+                List<NotifyRankBean> list = new ArrayList<>();
+                for (int i = 0; i < users.size(); i ++) {
+                    RankWeek rankWeek = null;
+                    try {
+                        rankWeek = rankDao.queryBuilder()
+                                .where(RankWeekDao.Properties.UserId.eq(users.get(i).getId()))
+                                .orderDesc(RankWeekDao.Properties.Date)
+                                .limit(1)
+                                .build().unique();
+                    } catch (DaoException de) {}
+
+                    if (rankWeek != null) {
+                        Calendar calendar = Calendar.getInstance();
+                        GregorianCalendar gc = new GregorianCalendar();
+                        gc.setTime(calendar.getTime());
+                        // 必须清零，因为数据库存的是yyyy-MM-dd转化而成的date
+                        gc.set(GregorianCalendar.HOUR, 0);
+                        gc.set(GregorianCalendar.MINUTE, 0);
+                        gc.set(GregorianCalendar.SECOND, 0);
+                        gc.set(GregorianCalendar.MILLISECOND, 0);
+                        // 周日是1，周一是2 ...
+                        int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
+                        // 采用week和day的计算方式可以解决跨年的问题
+                        // 如果今天是星期日，星期一，比较最近一条是否小于上周一
+                        if (dayOfWeek < 3) {
+                            gc.add(GregorianCalendar.WEEK_OF_YEAR, -1);
+                            gc.add(GregorianCalendar.DAY_OF_YEAR, 2 - dayOfWeek);
+                        }
+                        // 如果今天是星期二到星期六，比较最近一条是否小于本周一
+                        else {
+                            gc.add(GregorianCalendar.DAY_OF_YEAR, 2 - dayOfWeek);
+                        }
+                        Date targetMonday = gc.getTime();
+
+                        if (rankWeek.getDate().getTime() < targetMonday.getTime()) {
+                            NotifyRankBean bean = new NotifyRankBean();
+                            bean.setUser(users.get(i));
+                            bean.setLastRank(rankWeek);
+                            list.add(bean);
+                        }
+                    }
+                }
+                e.onNext(list);
+            }
+        })
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(new Observer<List<NotifyRankBean>>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                        addDisposable(d);
+                    }
+
+                    @Override
+                    public void onNext(List<NotifyRankBean> list) {
+                        view.notifyRankFound(list);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        e.printStackTrace();
                     }
 
                     @Override

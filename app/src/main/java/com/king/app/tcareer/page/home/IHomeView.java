@@ -22,4 +22,6 @@ public interface IHomeView extends BaseView {
     void postShowCompetitors(List<CompetitorBean> list);
 
     void showMatches(List<UserMatchBean> list);
+
+    void notifyRankFound(List<NotifyRankBean> list);
 }

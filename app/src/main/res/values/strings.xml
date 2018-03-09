@@ -319,6 +319,7 @@
 
     <!-- transition anim -->
     <string name="anim_home_rank" translatable="false">anim_home_rank</string>
+    <string name="anim_home_rank_week" translatable="false">anim_home_rank_week</string>
     <string name="anim_home_date" translatable="false">anim_home_date</string>
     <string name="anim_home_add" translatable="false">anim_home_add</string>
     <string name="anim_player_page_head" translatable="false">anim_player_head_circle</string>

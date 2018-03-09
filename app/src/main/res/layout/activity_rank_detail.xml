@@ -26,7 +26,24 @@
             android:textSize="20sp"
             android:textColor="@color/white"
             android:textStyle="bold" />
+        <ImageView
+            android:id="@+id/iv_add"
+            android:layout_width="@dimen/view7_actionbar_height"
+            android:layout_height="@dimen/view7_actionbar_height"
+            android:padding="15dp"
+            android:layout_marginLeft="5dp"
+            android:layout_centerVertical="true"
+            android:src="@drawable/ic_add_white_36dp"
+            android:layout_alignParentRight="true"
+            android:scaleType="fitCenter" />
     </RelativeLayout>
+
+    <FrameLayout
+        android:id="@+id/group_ft_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/group_actionbar"
+        android:transitionName="@string/anim_home_rank_week"/>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/rv_ranks"
@@ -36,5 +53,5 @@
         android:layout_marginRight="@dimen/activity_horizontal_margin"
         android:layout_marginBottom="@dimen/activity_vertical_margin"
         android:layout_marginTop="@dimen/margin_10"
-        android:layout_below="@id/group_actionbar"/>
+        android:layout_below="@id/group_ft_container"/>
 </RelativeLayout>

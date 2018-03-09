@@ -64,33 +64,6 @@
 				android:background="?android:attr/selectableItemBackgroundBorderless"
 				android:src="@drawable/ic_add"/>
 
-			<com.github.mikephil.charting.charts.LineChart
-				android:id="@+id/chart_week"
-				android:layout_width="match_parent"
-				android:layout_height="@dimen/rank_chart_height"/>
-
-			<ImageView
-				android:id="@+id/iv_add_week"
-				android:layout_width="55dp"
-				android:layout_height="55dp"
-				android:padding="10dp"
-				android:layout_marginTop="10dp"
-				android:layout_marginBottom="20dp"
-				android:layout_gravity="center_horizontal"
-				android:background="?android:attr/selectableItemBackgroundBorderless"
-				android:src="@drawable/ic_add"/>
-
-			<TextView
-				android:id="@+id/tv_details"
-				android:layout_width="match_parent"
-				android:layout_height="wrap_content"
-				android:paddingTop="15dp"
-				android:paddingBottom="15dp"
-				android:gravity="center"
-				android:background="?android:attr/selectableItemBackground"
-				android:textColor="@color/colorPrimary"
-				android:textSize="20dp"
-				android:text="Details"/>
 		</LinearLayout>
 	</ScrollView>
 </RelativeLayout>

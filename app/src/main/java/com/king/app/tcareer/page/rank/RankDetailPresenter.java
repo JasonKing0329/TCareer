@@ -6,8 +6,13 @@ import com.king.app.tcareer.model.db.entity.RankWeek;
 import com.king.app.tcareer.model.db.entity.RankWeekDao;
 import com.king.app.tcareer.model.db.entity.User;
 
+import org.greenrobot.greendao.query.QueryBuilder;
+
 import java.util.List;
 
+import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.ObservableSource;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -26,23 +31,37 @@ public class RankDetailPresenter extends BasePresenter<RankDetailView> {
 
     }
 
-    public void loadRanks(final long userId) {
+    /**
+     * query rank of week
+     * @param userId
+     * @return
+     */
+    private Observable<List<RankWeek>> queryWeekRank(final long userId, final boolean desc) {
+        return Observable.create(new ObservableOnSubscribe<List<RankWeek>>() {
+            @Override
+            public void subscribe(ObservableEmitter<List<RankWeek>> e) throws Exception {
+                RankWeekDao dao = TApplication.getInstance().getDaoSession().getRankWeekDao();
+                QueryBuilder<RankWeek> builder = dao.queryBuilder()
+                        .where(RankWeekDao.Properties.UserId.eq(userId));
+                if (desc) {
+                    builder.orderDesc(RankWeekDao.Properties.Date);
+                }
+                else {
+                    builder.orderAsc(RankWeekDao.Properties.Date);
+                }
+                List<RankWeek> list = builder.build().list();
+                e.onNext(list);
+            }
+        });
+    }
+
+    public void loadRanks(final long userId, final boolean desc) {
         view.showLoading();
         queryUser(userId)
                 .flatMap(new Function<User, ObservableSource<List<RankWeek>>>() {
                     @Override
                     public ObservableSource<List<RankWeek>> apply(User user) throws Exception {
-                        return new ObservableSource<List<RankWeek>>() {
-                            @Override
-                            public void subscribe(Observer<? super List<RankWeek>> observer) {
-                                RankWeekDao dao = TApplication.getInstance().getDaoSession().getRankWeekDao();
-                                List<RankWeek> list = dao.queryBuilder()
-                                        .where(RankWeekDao.Properties.UserId.eq(userId))
-                                        .orderDesc(RankWeekDao.Properties.Date)
-                                        .build().list();
-                                observer.onNext(list);
-                            }
-                        };
+                        return queryWeekRank(userId, desc);
                     }
                 })
                 .observeOn(AndroidSchedulers.mainThread())
