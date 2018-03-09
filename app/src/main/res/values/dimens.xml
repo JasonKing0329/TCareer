@@ -49,4 +49,5 @@
     <dimen name="record_filter_spinner_width_large">150dp</dimen>
     <dimen name="record_filter_spinner_input_large">150dp</dimen>
     <dimen name="record_filter_spinner_input_short">60dp</dimen>
+    <dimen name="rank_count_top">10dp</dimen>
 </resources>

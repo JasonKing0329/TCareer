@@ -105,7 +105,7 @@ public class RankDetailActivity extends BaseMvpActivity<RankDetailPresenter> imp
         }
     }
 
-    @OnClick({R.id.iv_back, R.id.iv_add})
+    @OnClick({R.id.iv_back, R.id.iv_add, R.id.iv_count})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.iv_back:
@@ -114,7 +114,16 @@ public class RankDetailActivity extends BaseMvpActivity<RankDetailPresenter> imp
             case R.id.iv_add:
                 showScoreCalculator();
                 break;
+            case R.id.iv_count:
+                showRankCount();
+                break;
         }
+    }
+
+    private void showRankCount() {
+        RankCountDialog dialog = new RankCountDialog();
+        dialog.setUserId(presenter.getUser().getId());
+        dialog.show(getSupportFragmentManager(), "RankCountDialog");
     }
 
     private void showScoreCalculator() {

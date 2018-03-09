@@ -19,6 +19,7 @@ import com.king.app.tcareer.utils.DBExportor;
 
 import org.greenrobot.greendao.DaoException;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -34,7 +35,6 @@ import io.reactivex.ObservableSource;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 
@@ -323,6 +323,12 @@ public class HomePresenter extends BasePresenter<IHomeView> {
                 UserDao userDao = TApplication.getInstance().getDaoSession().getUserDao();
                 List<User> users = userDao.queryBuilder().build().list();
                 List<NotifyRankBean> list = new ArrayList<>();
+
+                // 因为数据库存的是yyyy-MM-dd转化而成的date，所以在取今天的时候也要转化一下，否则后面的比较会出问题
+                SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+                String strToday = format.format(new Date());
+                Date today = format.parse(strToday);
+
                 for (int i = 0; i < users.size(); i ++) {
                     RankWeek rankWeek = null;
                     try {
@@ -334,16 +340,10 @@ public class HomePresenter extends BasePresenter<IHomeView> {
                     } catch (DaoException de) {}
 
                     if (rankWeek != null) {
-                        Calendar calendar = Calendar.getInstance();
                         GregorianCalendar gc = new GregorianCalendar();
-                        gc.setTime(calendar.getTime());
-                        // 必须清零，因为数据库存的是yyyy-MM-dd转化而成的date
-                        gc.set(GregorianCalendar.HOUR, 0);
-                        gc.set(GregorianCalendar.MINUTE, 0);
-                        gc.set(GregorianCalendar.SECOND, 0);
-                        gc.set(GregorianCalendar.MILLISECOND, 0);
+                        gc.setTime(today);
                         // 周日是1，周一是2 ...
-                        int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
+                        int dayOfWeek = gc.get(Calendar.DAY_OF_WEEK);
                         // 采用week和day的计算方式可以解决跨年的问题
                         // 如果今天是星期日，星期一，比较最近一条是否小于上周一
                         if (dayOfWeek < 3) {

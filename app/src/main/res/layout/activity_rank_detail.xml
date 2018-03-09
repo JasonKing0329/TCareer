@@ -15,6 +15,7 @@
             android:layout_marginLeft="5dp"
             android:layout_centerVertical="true"
             android:src="@drawable/actionbar_back"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
             android:scaleType="fitCenter" />
         <TextView
             android:layout_width="wrap_content"
@@ -35,6 +36,18 @@
             android:layout_centerVertical="true"
             android:src="@drawable/ic_add_white_36dp"
             android:layout_alignParentRight="true"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:scaleType="fitCenter" />
+        <ImageView
+            android:id="@+id/iv_count"
+            android:layout_width="@dimen/view7_actionbar_height"
+            android:layout_height="@dimen/view7_actionbar_height"
+            android:padding="17dp"
+            android:layout_marginLeft="5dp"
+            android:layout_centerVertical="true"
+            android:src="@drawable/ic_pie_chart_white_36dp"
+            android:layout_toLeftOf="@id/iv_add"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
             android:scaleType="fitCenter" />
     </RelativeLayout>
 

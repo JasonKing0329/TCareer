@@ -56,7 +56,6 @@ public class RankDetailPresenter extends BasePresenter<RankDetailView> {
     }
 
     public void loadRanks(final long userId, final boolean desc) {
-        view.showLoading();
         queryUser(userId)
                 .flatMap(new Function<User, ObservableSource<List<RankWeek>>>() {
                     @Override
@@ -74,14 +73,12 @@ public class RankDetailPresenter extends BasePresenter<RankDetailView> {
 
                     @Override
                     public void onNext(List<RankWeek> list) {
-                        view.dismissLoading();
                         view.showRanks(list);
                     }
 
                     @Override
                     public void onError(Throwable e) {
                         e.printStackTrace();
-                        view.dismissLoading();
                         view.showMessage("Load error: " + e.getMessage());
                     }
 

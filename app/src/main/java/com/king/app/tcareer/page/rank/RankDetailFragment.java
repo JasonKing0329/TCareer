@@ -172,6 +172,9 @@ public class RankDetailFragment extends BaseMvpFragment<RankDetailPresenter> imp
 
         // set data
         chartWeek.setData(data);
+
+        // 作为fragment嵌入到home时，经常在切换user后图标会加载不出来，加上animateY后就可以保证显示出来了
+        chartWeek.animateY(700);
     }
 
     public void refresh() {
