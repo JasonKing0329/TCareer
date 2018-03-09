@@ -109,7 +109,7 @@ public class RankDetailActivity extends BaseMvpActivity<RankDetailPresenter> imp
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.iv_back:
-                finish();
+                onBackPressed();
                 break;
             case R.id.iv_add:
                 showScoreCalculator();

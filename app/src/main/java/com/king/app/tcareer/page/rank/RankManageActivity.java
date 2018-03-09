@@ -12,7 +12,6 @@ import android.widget.TextView;
 import com.king.app.tcareer.R;
 import com.king.app.tcareer.base.BaseMvpActivity;
 import com.king.app.tcareer.model.db.entity.Rank;
-import com.king.app.tcareer.model.db.entity.RankCareer;
 
 import java.util.List;
 
@@ -137,11 +136,6 @@ public class RankManageActivity extends BaseMvpActivity<RankPresenter> implement
                 tagUpdated();
                 refreshRanks();
             }
-
-            @Override
-            public void onSaveCountRank(RankCareer rank) {
-
-            }
         });
         dialog.show(getSupportFragmentManager(), "ScoreEditDialog");
     }
@@ -158,11 +152,6 @@ public class RankManageActivity extends BaseMvpActivity<RankPresenter> implement
                 presenter.saveRankFinal(rank);
                 tagUpdated();
                 refreshRanks();
-            }
-
-            @Override
-            public void onSaveCountRank(RankCareer rank) {
-
             }
         });
         dialog.show(getSupportFragmentManager(), "ScoreEditDialog");

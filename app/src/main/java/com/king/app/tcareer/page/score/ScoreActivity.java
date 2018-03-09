@@ -6,10 +6,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.king.app.tcareer.R;
-import com.king.app.tcareer.base.BaseActivity;
 import com.king.app.tcareer.base.BaseMvpActivity;
 import com.king.app.tcareer.model.db.entity.Rank;
-import com.king.app.tcareer.model.db.entity.RankCareer;
 import com.king.app.tcareer.page.rank.ScoreEditDialog;
 
 import butterknife.BindView;
@@ -58,17 +56,12 @@ public class ScoreActivity extends BaseMvpActivity<ScoreHolderPresenter> impleme
 
     @Override
     protected void initData() {
-        presenter.loadRank(getIntent().getLongExtra(KEY_USER_ID, -1));
+        presenter.loadData(getIntent().getLongExtra(KEY_USER_ID, -1));
     }
 
     @Override
     public void showRanks() {
         show52WeekScores();
-    }
-
-    @Override
-    public RankCareer getRankCareer() {
-        return presenter.getRankCareer();
     }
 
     @OnClick({R.id.score_actionbar_year, R.id.score_actionbar_week, R.id.score_actionbar_edit, R.id.score_actionbar_back, R.id.score_actionbar_date})
@@ -100,17 +93,9 @@ public class ScoreActivity extends BaseMvpActivity<ScoreHolderPresenter> impleme
         editDialog = new ScoreEditDialog();
         editDialog.setMode(ScoreEditDialog.MODE_COUNT_RANK);
         editDialog.setUser(presenter.getUser());
-        editDialog.setRankCareer(getRankCareer());
         editDialog.setOnRankListener(new ScoreEditDialog.OnRankListener() {
             @Override
             public void onSaveYearRank(Rank rank) {
-            }
-
-            @Override
-            public void onSaveCountRank(RankCareer rank) {
-                presenter.updateRankCareer(rank);
-                getFocusFragment().onRankChanged(rank);
-                setResult(RESULT_OK);
             }
         });
         editDialog.show(getSupportFragmentManager(), "ScoreEditDialog");

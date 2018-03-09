@@ -1,7 +1,6 @@
 package com.king.app.tcareer.page.score;
 
 import com.king.app.tcareer.base.IFragmentHolder;
-import com.king.app.tcareer.model.db.entity.RankCareer;
 
 /**
  * 描述:
@@ -10,5 +9,4 @@ import com.king.app.tcareer.model.db.entity.RankCareer;
  */
 public interface IScoreHolder extends IFragmentHolder {
 
-    RankCareer getRankCareer();
 }

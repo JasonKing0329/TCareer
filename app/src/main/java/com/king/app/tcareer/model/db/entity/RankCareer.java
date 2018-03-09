@@ -9,6 +9,7 @@ import org.greenrobot.greendao.annotation.Generated;
  * <p/>作者：景阳
  * <p/>创建时间: 2018/2/5 9:27
  */
+@Deprecated
 @Entity(nameInDb = "rank_career")
 public class RankCareer {
 

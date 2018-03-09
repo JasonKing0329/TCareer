@@ -1,9 +1,7 @@
 package com.king.app.tcareer.page.rank;
 
 import android.support.v4.app.Fragment;
-import android.text.Editable;
 import android.text.TextUtils;
-import android.text.TextWatcher;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
@@ -16,13 +14,10 @@ import com.king.app.tcareer.conf.AppConstants;
 import com.king.app.tcareer.model.db.entity.EarlierAchieve;
 import com.king.app.tcareer.model.db.entity.EarlierAchieveDao;
 import com.king.app.tcareer.model.db.entity.Rank;
-import com.king.app.tcareer.model.db.entity.RankCareer;
 import com.king.app.tcareer.model.db.entity.User;
 import com.king.app.tcareer.utils.ListUtil;
 import com.king.app.tcareer.utils.ScreenUtils;
 import com.king.app.tcareer.view.dialog.DraggableDialogFragment;
-
-import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -52,8 +47,6 @@ public class ScoreEditDialog extends DraggableDialogFragment {
 
     private Rank mRank;
 
-    private RankCareer mRankCareer;
-
     private User mUser;
 
     private OnRankListener onRankListener;
@@ -71,7 +64,6 @@ public class ScoreEditDialog extends DraggableDialogFragment {
         editFragment = new EditFragment();
         editFragment.setMode(mode);
         editFragment.setRank(mRank);
-        editFragment.setRankCareer(mRankCareer);
         editFragment.setUser(mUser);
         editFragment.setOnRankListener(onRankListener);
         return editFragment;
@@ -83,10 +75,6 @@ public class ScoreEditDialog extends DraggableDialogFragment {
 
     public void setRank(Rank mRank) {
         this.mRank = mRank;
-    }
-
-    public void setRankCareer(RankCareer mRankCareer) {
-        this.mRankCareer = mRankCareer;
     }
 
     @Override
@@ -114,16 +102,6 @@ public class ScoreEditDialog extends DraggableDialogFragment {
 
     public static class EditFragment extends ContentFragment {
 
-        @BindView(R.id.score_manage_rank)
-        EditText scoreManageRank;
-        @BindView(R.id.score_manage_rank_highest)
-        EditText scoreManageRankHighest;
-        @BindView(R.id.score_manage_top1_week)
-        EditText scoreManageTop1Week;
-        @BindView(R.id.score_manage_group_top1_week)
-        LinearLayout scoreManageGroupTop1Week;
-        @BindView(R.id.group_rank_count)
-        LinearLayout groupRankCount;
         @BindView(R.id.et_year)
         EditText etYear;
         @BindView(R.id.et_rank)
@@ -146,8 +124,6 @@ public class ScoreEditDialog extends DraggableDialogFragment {
         private int mode;
 
         private Rank mRank;
-
-        private RankCareer mRankCareer;
 
         private User mUser;
 
@@ -177,7 +153,6 @@ public class ScoreEditDialog extends DraggableDialogFragment {
             if (mRank == null) {
                 mRank = new Rank();
             }
-            groupRankCount.setVisibility(View.GONE);
             groupRankYear.setVisibility(View.VISIBLE);
             if (mRank.getYear() != 0) {
                 etYear.setText(String.valueOf(mRank.getYear()));
@@ -188,42 +163,6 @@ public class ScoreEditDialog extends DraggableDialogFragment {
         }
 
         private void showPlayerRank() {
-            scoreManageRankHighest.addTextChangedListener(new TextWatcher() {
-                @Override
-                public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-                }
-
-                @Override
-                public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                    try {
-                        if (Integer.parseInt(charSequence.toString()) == 1) {
-                            scoreManageTop1Week.setText(String.valueOf(mRankCareer.getTop1Week()));
-                            scoreManageGroupTop1Week.setVisibility(View.VISIBLE);
-                        } else {
-                            mRankCareer.setTop1Week(0);
-                            scoreManageGroupTop1Week.setVisibility(View.GONE);
-                        }
-                    } catch (Exception e) {
-                        mRankCareer.setTop1Week(0);
-                        scoreManageGroupTop1Week.setVisibility(View.GONE);
-                    }
-                }
-
-                @Override
-                public void afterTextChanged(Editable editable) {
-
-                }
-            });
-
-            if (mRankCareer == null) {
-                mRankCareer = new RankCareer();
-            } else {
-                scoreManageRank.setText(String.valueOf(mRankCareer.getRankCurrent()));
-                scoreManageRankHighest.setText(String.valueOf(mRankCareer.getRankHighest()));
-                showTop1Week();
-            }
-
             groupEarlier.setVisibility(View.VISIBLE);
             if (!ListUtil.isEmpty(mUser.getEarlierAchieves())) {
                 for (EarlierAchieve achieve:mUser.getEarlierAchieves()) {
@@ -239,21 +178,8 @@ public class ScoreEditDialog extends DraggableDialogFragment {
             }
         }
 
-        private void showTop1Week() {
-            if (mRankCareer.getRankHighest() == 1) {
-                scoreManageGroupTop1Week.setVisibility(View.VISIBLE);
-                scoreManageTop1Week.setText(String.valueOf(mRankCareer.getTop1Week()));
-            } else {
-                scoreManageGroupTop1Week.setVisibility(View.GONE);
-            }
-        }
-
         public void setRank(Rank mRank) {
             this.mRank = mRank;
-        }
-
-        public void setRankCareer(RankCareer rankCareer) {
-            this.mRankCareer = rankCareer;
         }
 
         @Override
@@ -280,18 +206,6 @@ public class ScoreEditDialog extends DraggableDialogFragment {
         }
 
         private boolean savePlayerRank() {
-            String rank = scoreManageRank.getText().toString();
-            if (TextUtils.isEmpty(rank)) {
-                scoreManageRank.setError("rank can't be null");
-                return false;
-            }
-            mRankCareer.setRankCurrent(Integer.parseInt(rank));
-            String highest = scoreManageRankHighest.getText().toString();
-            if (TextUtils.isEmpty(rank)) {
-                scoreManageRankHighest.setError("highest rank can't be null");
-                return false;
-            }
-            mRankCareer.setRankHighest(Integer.parseInt(highest));
             String cWin = etChallengeWin.getText().toString();
             if (TextUtils.isEmpty(cWin)) {
                 etChallengeWin.setError("challenge win can't be null");
@@ -312,17 +226,8 @@ public class ScoreEditDialog extends DraggableDialogFragment {
                 etQualifyLose.setError("qualify lose can't be null");
                 return false;
             }
-            if (scoreManageGroupTop1Week.getVisibility() == View.VISIBLE) {
-                String top1Week = scoreManageTop1Week.getText().toString();
-                if (TextUtils.isEmpty(rank)) {
-                    scoreManageTop1Week.setError("top 1 week can't be null");
-                    return false;
-                }
-                mRankCareer.setTop1Week(Integer.parseInt(top1Week));
-            }
 
             saveEalierAchieve(cWin, cLose, qWin, qLose);
-            onRankListener.onSaveCountRank(mRankCareer);
             return true;
         }
 
@@ -388,7 +293,5 @@ public class ScoreEditDialog extends DraggableDialogFragment {
 
     public interface OnRankListener {
         void onSaveYearRank(Rank rank);
-
-        void onSaveCountRank(RankCareer rank);
     }
 }

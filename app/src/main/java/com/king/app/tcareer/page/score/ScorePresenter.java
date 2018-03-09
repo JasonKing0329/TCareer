@@ -8,11 +8,12 @@ import com.king.app.tcareer.model.db.entity.MatchBeanDao;
 import com.king.app.tcareer.model.db.entity.MatchNameBean;
 import com.king.app.tcareer.model.db.entity.MatchNameBeanDao;
 import com.king.app.tcareer.model.db.entity.Rank;
-import com.king.app.tcareer.model.db.entity.RankCareer;
-import com.king.app.tcareer.model.db.entity.RankCareerDao;
 import com.king.app.tcareer.model.db.entity.RankDao;
+import com.king.app.tcareer.model.db.entity.RankWeek;
+import com.king.app.tcareer.model.db.entity.RankWeekDao;
 import com.king.app.tcareer.model.db.entity.User;
 
+import org.greenrobot.greendao.DaoException;
 import org.greenrobot.greendao.query.QueryBuilder;
 
 import java.util.ArrayList;
@@ -456,11 +457,15 @@ public class ScorePresenter extends BasePresenter<IScorePageView> {
         scorePageData.setCountScoreLastYear(countLastYear);
 
         // load rank
-        RankCareerDao rankCareerDao = TApplication.getInstance().getDaoSession().getRankCareerDao();
-        RankCareer career = rankCareerDao.queryBuilder()
-                .where(RankCareerDao.Properties.UserId.eq(mUser.getId()))
-                .build().unique();
-        scorePageData.setRank(career.getRankCurrent());
+        RankWeekDao weekDao = TApplication.getInstance().getDaoSession().getRankWeekDao();
+        try {
+            RankWeek week = weekDao.queryBuilder()
+                    .where(RankWeekDao.Properties.UserId.eq(mUser.getId()))
+                    .orderDesc(RankWeekDao.Properties.Date)
+                    .limit(1)
+                    .build().unique();
+            scorePageData.setRank(week.getRank());
+        } catch (DaoException e) {}
         return scorePageData;
     }
 

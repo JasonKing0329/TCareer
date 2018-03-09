@@ -734,10 +734,13 @@ public class HomeActivity extends BaseMvpActivity<HomePresenter> implements IHom
         }
     }
 
+    @SuppressLint("RestrictedApi")
     private void startWeekRankActivity(long userId) {
         Intent intent = new Intent().setClass(this, RankDetailActivity.class);
         intent.putExtra(RankDetailActivity.KEY_USER_ID, userId);
-        startActivityForResult(intent, REQUEST_RANK_DETAIL);
+        ActivityOptions transitionActivityOptions = ActivityOptions.makeSceneTransitionAnimation(this
+                , Pair.create(findViewById(R.id.group_chart_week), getString(R.string.anim_home_rank_week)));
+        startActivityForResult(intent, REQUEST_RANK_DETAIL, transitionActivityOptions.toBundle());
     }
 
     @Override
