@@ -184,22 +184,25 @@ public class SearchPresenter extends BasePresenter<SearchView> {
     }
 
     private boolean checkScore(Record record, SearchBean searchBean) {
-        boolean pass = false;
-        List<Score> scoreList = record.getScoreList();
-        for (Score score:scoreList) {
-            pass = score.getUserPoint() == searchBean.getScoreUser() && score.getCompetitorPoint() == searchBean.getScoreCpt();
-            if (pass) {
-                break;
-            }
+        if (searchBean.isScoreOn()) {
+            boolean pass = false;
+            List<Score> scoreList = record.getScoreList();
+            for (Score score:scoreList) {
+                pass = score.getUserPoint() == searchBean.getScoreUser() && score.getCompetitorPoint() == searchBean.getScoreCpt();
+                if (pass) {
+                    break;
+                }
 
-            if (searchBean.isScoreEachOther()) {
-                pass = score.getUserPoint() == searchBean.getScoreCpt() && score.getCompetitorPoint() == searchBean.getScoreUser();
+                if (searchBean.isScoreEachOther()) {
+                    pass = score.getUserPoint() == searchBean.getScoreCpt() && score.getCompetitorPoint() == searchBean.getScoreUser();
+                }
+                if (pass) {
+                    break;
+                }
             }
-            if (pass) {
-                break;
-            }
+            return pass;
         }
-        return pass;
+        return true;
     }
 
 }

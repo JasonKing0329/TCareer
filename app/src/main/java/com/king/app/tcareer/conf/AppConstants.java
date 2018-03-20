@@ -10,6 +10,9 @@ import android.text.TextUtils;
 public class AppConstants {
 
     public static final long USER_ID_KING = 1;
+    public static final long USER_ID_FLAMENCO = 2;
+    public static final long USER_ID_HENRY = 3;
+    public static final long USER_ID_QI = 4;
 
     public static final String SCORE_RETIRE = "W/O";
 

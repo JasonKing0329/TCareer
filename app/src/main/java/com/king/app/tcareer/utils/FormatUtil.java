@@ -1,11 +1,18 @@
 package com.king.app.tcareer.utils;
 
+import java.text.DecimalFormat;
+
 /**
  * 描述:
  * <p/>作者：景阳
  * <p/>创建时间: 2017/8/24 13:19
  */
 public class FormatUtil {
+
+    public static String round2(double num) {
+        DecimalFormat df = new DecimalFormat("#.00");
+        return df.format(num);
+    }
 
     public static String formatNumber(double money) {
         return formatNumber(String.valueOf(money));

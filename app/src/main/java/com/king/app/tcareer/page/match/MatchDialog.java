@@ -100,8 +100,6 @@ public class MatchDialog extends DraggableDialogFragment {
         @BindView(R.id.rv_list)
         RecyclerView rvList;
 
-        Unbinder unbinder;
-
         private MatchItemAdapter itemAdapter;
         private CompositeDisposable compositeDisposable;
 
@@ -116,7 +114,6 @@ public class MatchDialog extends DraggableDialogFragment {
 
         @Override
         protected void onCreate(View view) {
-            unbinder = ButterKnife.bind(this, view);
 
             LinearLayoutManager manager = new LinearLayoutManager(getActivity());
             manager.setOrientation(LinearLayoutManager.VERTICAL);
@@ -138,9 +135,6 @@ public class MatchDialog extends DraggableDialogFragment {
 
         @Override
         public void onDestroyView() {
-            if (unbinder != null) {
-                unbinder.unbind();
-            }
             if (compositeDisposable != null) {
                 compositeDisposable.clear();
             }

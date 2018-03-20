@@ -6,6 +6,8 @@ import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 
@@ -99,6 +101,29 @@ public class RecordComplexActivity extends BaseMvpActivity<ComplexPresenter> imp
         });
         toolbar.setTitle("全部记录");
         ctlToolbar.setTitle("全部记录");
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.record_complex, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        switch (id) {
+            case R.id.menu_action_chart:
+                showCareerCompare();
+                break;
+        }
+        return true;
+    }
+
+    private void showCareerCompare() {
+        CareerCompareDialog dialog = new CareerCompareDialog();
+        dialog.show(getSupportFragmentManager(), "CareerCompareDialog");
     }
 
     private void initBoomButton() {
