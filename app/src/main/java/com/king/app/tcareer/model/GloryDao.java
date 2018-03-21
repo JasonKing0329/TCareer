@@ -200,7 +200,8 @@ public class GloryDao {
 
     public Map<String,Integer[]> getGsWinLose(long userId) {
         Map<String, Integer[]> map = new HashMap<>();
-        String sql = Sqls.getGroupGSWinLose(userId, null);Cursor cursor = getCursor(sql, null);
+        String sql = Sqls.getGroupGSWinLose(userId, null);
+        Cursor cursor = getCursor(sql, null);
         while (cursor.moveToNext()) {
             String key = cursor.getString(1);
             Integer[] count = new Integer[2];

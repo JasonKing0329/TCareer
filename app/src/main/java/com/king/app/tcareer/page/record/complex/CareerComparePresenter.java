@@ -64,8 +64,13 @@ public class CareerComparePresenter extends BasePresenter<CareerCompareView> {
             @Override
             public void subscribe(ObservableEmitter<List<CompareItem>> e) throws Exception {
                 List<CompareItem> list = new ArrayList<>();
+                // 冠军（级别，场地）
                 queryChampions(list);
+                // 重要轮次（级别）
                 queryRounds(list);
+                // 胜率（级别，场地，对阵排名，抢七）
+                queryRate(list);
+                // 其他
                 queryOther(list);
                 e.onNext(list);
             }
@@ -97,13 +102,37 @@ public class CareerComparePresenter extends BasePresenter<CareerCompareView> {
         items.addAll(dao.getImportantSF());
     }
 
+    /**
+     * 胜率
+     * 赛事级别，场地类型，决胜盘，对阵topN，抢七胜率
+     * @param items
+     */
+    private void queryRate(List<CompareItem> items) {
+        CompareItem item = new CompareItem();
+        item.setHead(true);
+        item.setTitle("胜率");
+        items.add(item);
+        items.addAll(dao.getMatchData());
+        items.addAll(dao.getCompetitorData());
+        items.addAll(dao.getTiebreakData());
+        items.addAll(dao.getFinalSet());
+    }
+
+    /**
+     * 领先被逆转，落后逆转，送蛋次数，抢七次数，最长连胜
+     * @param items
+     */
     private void queryOther(List<CompareItem> items) {
         CompareItem item = new CompareItem();
         item.setHead(true);
         item.setTitle("其他");
         items.add(item);
-        items.addAll(dao.getCompetitorData());
-        items.addAll(dao.getTiebreakData());
+        items.add(dao.getReverse());
+        items.add(dao.getBeReversed());
+        items.add(dao.getBagel());
+        items.add(dao.getBeBagel());
+        items.add(dao.getTibreakMatch());
+        items.add(dao.getLongestWin());
     }
 
 }
