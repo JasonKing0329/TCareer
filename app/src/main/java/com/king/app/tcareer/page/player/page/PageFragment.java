@@ -14,6 +14,7 @@ import com.king.app.tcareer.base.IFragmentHolder;
 import com.king.app.tcareer.model.db.entity.Record;
 import com.king.app.tcareer.model.db.entity.User;
 import com.king.app.tcareer.page.match.MatchDialog;
+import com.king.app.tcareer.page.record.page.RecordPageActivity;
 
 import java.util.List;
 
@@ -69,9 +70,9 @@ public class PageFragment extends BaseFragment implements IPageCallback {
         adapter = new PageRecordAdapter(user, list);
         adapter.setOnItemClickListener(new PageRecordAdapter.OnItemClickListener() {
             @Override
-            public void onClickRecord(final Record record) {
-
-                showMatchDialog(record);
+            public void onClickRecord(View v, final Record record) {
+                showRecordPage(v, record);
+//                showMatchDialog(record);
             }
 
             @Override
@@ -86,6 +87,15 @@ public class PageFragment extends BaseFragment implements IPageCallback {
             }
         });
         rvRecords.setAdapter(adapter);
+    }
+
+    private void showRecordPage(View view, Record record) {
+        Intent intent = new Intent();
+        intent.setClass(getActivity(), RecordPageActivity.class);
+        intent.putExtra(RecordPageActivity.KEY_RECORD_ID, record.getId());
+        ActivityOptions transitionActivityOptions = ActivityOptions.makeSceneTransitionAnimation(getActivity()
+                , Pair.create(view.findViewById(R.id.iv_match),getString(R.string.anim_match_page_head)));
+        startActivity(intent, transitionActivityOptions.toBundle());
     }
 
     private void showMatchDialog(Record record) {

@@ -178,7 +178,7 @@ public class PlayerSlideActivity extends BaseMvpActivity<SlidePresenter> impleme
             recordAdapter = new PageRecordAdapter(presenter.getUser(), list);
             recordAdapter.setOnItemClickListener(new PageRecordAdapter.OnItemClickListener() {
                 @Override
-                public void onClickRecord(Record record) {
+                public void onClickRecord(View v, Record record) {
                     Intent intent = new Intent(PlayerSlideActivity.this, MatchPageActivity.class);
                     intent.putExtra(MatchPageActivity.KEY_USER_ID, presenter.getUser().getId());
                     intent.putExtra(MatchPageActivity.KEY_MATCH_NAME_ID, record.getMatchNameId());

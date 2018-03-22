@@ -1,5 +1,6 @@
 package com.king.app.tcareer.page.match.page;
 
+import android.app.ActivityOptions;
 import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.support.design.widget.AppBarLayout;
@@ -7,6 +8,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Pair;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -14,13 +16,10 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.king.app.tcareer.R;
 import com.king.app.tcareer.base.BaseMvpActivity;
-import com.king.app.tcareer.model.CompetitorParser;
 import com.king.app.tcareer.model.GlideOptions;
 import com.king.app.tcareer.model.ImageProvider;
-import com.king.app.tcareer.model.bean.CompetitorBean;
 import com.king.app.tcareer.model.db.entity.Record;
-import com.king.app.tcareer.model.db.entity.User;
-import com.king.app.tcareer.page.player.page.PlayerPageActivity;
+import com.king.app.tcareer.page.record.page.RecordPageActivity;
 import com.king.app.tcareer.view.widget.CircleImageView;
 
 import java.util.List;
@@ -133,17 +132,27 @@ public class MatchPageActivity extends BaseMvpActivity<PagePresenter> implements
         adapter = new PageRecordAdapter(presenter.getUser(), list);
         adapter.setOnItemClickListener(new PageRecordAdapter.OnItemClickListener() {
             @Override
-            public void onClickRecord(Record record) {
-                CompetitorBean competitor = CompetitorParser.getCompetitorFrom(record);
-                Intent intent = new Intent().setClass(MatchPageActivity.this, PlayerPageActivity.class);
-                intent.putExtra(PlayerPageActivity.KEY_USER_ID, presenter.getUser().getId());
-                intent.putExtra(PlayerPageActivity.KEY_COMPETITOR_ID, competitor.getId());
-                if (competitor instanceof User) {
-                    intent.putExtra(PlayerPageActivity.KEY_COMPETITOR_IS_USER, true);
-                }
-                startActivity(intent);
+            public void onClickRecord(View v, Record record) {
+                showRecord(v, record);
+//                CompetitorBean competitor = CompetitorParser.getCompetitorFrom(record);
+//                Intent intent = new Intent().setClass(MatchPageActivity.this, PlayerPageActivity.class);
+//                intent.putExtra(PlayerPageActivity.KEY_USER_ID, presenter.getUser().getId());
+//                intent.putExtra(PlayerPageActivity.KEY_COMPETITOR_ID, competitor.getId());
+//                if (competitor instanceof User) {
+//                    intent.putExtra(PlayerPageActivity.KEY_COMPETITOR_IS_USER, true);
+//                }
+//                startActivity(intent);
             }
         });
         rvRecords.setAdapter(adapter);
+    }
+
+    private void showRecord(View view, Record record) {
+        Intent intent = new Intent();
+        intent.setClass(this, RecordPageActivity.class);
+        intent.putExtra(RecordPageActivity.KEY_RECORD_ID, record.getId());
+        ActivityOptions transitionActivityOptions = ActivityOptions.makeSceneTransitionAnimation(this
+                , Pair.create(view.findViewById(R.id.iv_player),getString(R.string.anim_player_page_head)));
+        startActivity(intent, transitionActivityOptions.toBundle());
     }
 }

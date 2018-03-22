@@ -1,5 +1,6 @@
 package com.king.app.tcareer.page.match;
 
+import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -42,6 +43,8 @@ public class MatchItemAdapter extends RecyclerView.Adapter<MatchItemAdapter.Matc
      * 保存首次从文件夹加载的图片序号
      */
     private Map<String, Integer> imageIndexMap;
+
+    private Record mFocusItem;
 
     public MatchItemAdapter(List<Record> list) {
         this.list = list;
@@ -99,6 +102,12 @@ public class MatchItemAdapter extends RecyclerView.Adapter<MatchItemAdapter.Matc
                 .apply(playerOptions)
                 .into(holder.ivPlayer);
 
+        if (mFocusItem != null && list.get(position).getId() == mFocusItem.getId()) {
+            holder.groupItem.setBackgroundColor(Color.parseColor("#9900a5c4"));
+        }
+        else {
+            holder.groupItem.setBackground(null);
+        }
     }
 
     @Override
@@ -106,8 +115,14 @@ public class MatchItemAdapter extends RecyclerView.Adapter<MatchItemAdapter.Matc
         return list == null ? 0:list.size();
     }
 
+    public void setFocusItem(Record focusItem) {
+        this.mFocusItem = focusItem;
+    }
+
     public static class MatchHolder extends RecyclerView.ViewHolder {
 
+        @BindView(R.id.group_item)
+        ViewGroup groupItem;
         @BindView(R.id.iv_player)
         CircleImageView ivPlayer;
         @BindView(R.id.tv_round)

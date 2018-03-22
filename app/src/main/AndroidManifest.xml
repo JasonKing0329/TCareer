@@ -61,6 +61,11 @@
             android:theme="@style/RecordTheme"
             android:screenOrientation="portrait"/>
 
+        <activity android:name=".page.record.page.RecordPageActivity"
+            android:theme="@style/RecordTheme"
+            android:screenOrientation="portrait"
+            android:launchMode="singleTask"/>
+
         <activity android:name=".page.record.editor.RecordEditorActivity"
             android:theme="@style/SubTheme"
             android:screenOrientation="portrait"/>

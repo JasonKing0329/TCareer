@@ -138,7 +138,7 @@ public class PageRecordAdapter extends RecyclerView.Adapter implements View.OnCl
     @Override
     public void onClick(View v) {
         if (onItemClickListener != null) {
-            onItemClickListener.onClickRecord((Record) v.getTag());
+            onItemClickListener.onClickRecord(v, (Record) v.getTag());
         }
     }
 
@@ -183,7 +183,7 @@ public class PageRecordAdapter extends RecyclerView.Adapter implements View.OnCl
     }
 
     public interface OnItemClickListener {
-        void onClickRecord(Record record);
+        void onClickRecord(View v, Record record);
         void onLongClickRecord(View view, Record record);
     }
 }

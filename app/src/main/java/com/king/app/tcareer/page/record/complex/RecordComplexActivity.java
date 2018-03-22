@@ -1,11 +1,13 @@
 package com.king.app.tcareer.page.record.complex;
 
+import android.app.ActivityOptions;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -14,16 +16,13 @@ import android.widget.ImageView;
 import com.bumptech.glide.Glide;
 import com.king.app.tcareer.R;
 import com.king.app.tcareer.base.BaseMvpActivity;
-import com.king.app.tcareer.model.CompetitorParser;
 import com.king.app.tcareer.model.GlideOptions;
 import com.king.app.tcareer.model.ImageProvider;
-import com.king.app.tcareer.model.bean.CompetitorBean;
 import com.king.app.tcareer.model.db.entity.Record;
-import com.king.app.tcareer.model.db.entity.User;
-import com.king.app.tcareer.page.player.page.PlayerPageActivity;
 import com.king.app.tcareer.page.record.editor.RecordEditorActivity;
 import com.king.app.tcareer.page.record.list.OnItemMenuListener;
 import com.king.app.tcareer.page.record.list.RecordItem;
+import com.king.app.tcareer.page.record.page.RecordPageActivity;
 import com.king.app.tcareer.utils.DebugLog;
 import com.king.app.tcareer.view.dialog.AlertDialogFragment;
 import com.nightonke.boommenu.BoomButtons.ButtonPlaceAlignmentEnum;
@@ -251,14 +250,12 @@ public class RecordComplexActivity extends BaseMvpActivity<ComplexPresenter> imp
     @Override
     public void onItemClicked(View view, RecordItem record) {
         Intent intent = new Intent();
-        intent.setClass(this, PlayerPageActivity.class);
-        intent.putExtra(PlayerPageActivity.KEY_USER_ID, record.getRecord().getUserId());
-        CompetitorBean competitor = CompetitorParser.getCompetitorFrom(record.getRecord());
-        if (competitor instanceof User) {
-            intent.putExtra(PlayerPageActivity.KEY_COMPETITOR_IS_USER, true);
-        }
-        intent.putExtra(PlayerPageActivity.KEY_COMPETITOR_ID, competitor.getId());
-        startActivity(intent);
+        intent.setClass(this, RecordPageActivity.class);
+        intent.putExtra(RecordPageActivity.KEY_RECORD_ID, record.getRecord().getId());
+        ActivityOptions transitionActivityOptions = ActivityOptions.makeSceneTransitionAnimation(this
+                , Pair.create(view.findViewById(R.id.iv_player),getString(R.string.anim_player_page_head))
+                , Pair.create(view.findViewById(R.id.iv_user),getString(R.string.anim_user_page_head)));
+        startActivity(intent, transitionActivityOptions.toBundle());
     }
 
     @Override

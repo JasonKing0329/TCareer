@@ -25,6 +25,7 @@ import com.king.app.tcareer.model.db.entity.User;
 import com.king.app.tcareer.page.match.page.MatchPageActivity;
 import com.king.app.tcareer.page.player.page.PlayerPageActivity;
 import com.king.app.tcareer.page.record.editor.RecordEditorActivity;
+import com.king.app.tcareer.page.record.page.RecordPageActivity;
 import com.king.app.tcareer.page.record.search.SearchDialog;
 import com.king.app.tcareer.utils.DebugLog;
 import com.king.app.tcareer.utils.ListUtil;
@@ -269,13 +270,8 @@ public class RecordActivity extends BaseMvpActivity<RecordPresenter> implements 
     @Override
     public void onItemClicked(View view, RecordItem recordItem) {
         Intent intent = new Intent();
-        intent.setClass(this, PlayerPageActivity.class);
-        intent.putExtra(PlayerPageActivity.KEY_USER_ID, presenter.getUser().getId());
-        CompetitorBean competitor = CompetitorParser.getCompetitorFrom(recordItem.getRecord());
-        if (competitor instanceof User) {
-            intent.putExtra(PlayerPageActivity.KEY_COMPETITOR_IS_USER, true);
-        }
-        intent.putExtra(PlayerPageActivity.KEY_COMPETITOR_ID, competitor.getId());
+        intent.setClass(this, RecordPageActivity.class);
+        intent.putExtra(RecordPageActivity.KEY_RECORD_ID, recordItem.getRecord().getId());
         ActivityOptions transitionActivityOptions = ActivityOptions.makeSceneTransitionAnimation(this
                 , Pair.create(view.findViewById(R.id.iv_player),getString(R.string.anim_player_page_head)));
         startActivity(intent, transitionActivityOptions.toBundle());

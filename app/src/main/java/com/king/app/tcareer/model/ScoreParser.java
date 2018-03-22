@@ -12,10 +12,23 @@ import java.util.List;
  */
 public class ScoreParser {
 
+    /**
+     * 解析比分，形式为 6-3/6-7(5)/3-2(对手退赛)...，user比分在前
+     * @param scoreList
+     * @param retireFlag
+     * @return
+     */
     public static String getScoreText(List<Score> scoreList, int retireFlag) {
         return getScoreText(scoreList, AppConstants.WINNER_USER, retireFlag);
     }
 
+    /**
+     * 解析比分，形式为 6-3/6-7(5)/3-2(对手退赛)...，winnerFlag决定谁的比分在前
+     * @param scoreList
+     * @param winnerFlag
+     * @param retireFlag
+     * @return
+     */
     public static String getScoreText(List<Score> scoreList, int winnerFlag, int retireFlag) {
         StringBuffer buffer = new StringBuffer();
         if (retireFlag == AppConstants.RETIRE_WO) {

@@ -1,10 +1,11 @@
-package com.king.app.tcareer.model;
+package com.king.app.tcareer.model.dao;
 
 import android.database.Cursor;
 
 import com.king.app.tcareer.base.TApplication;
 import com.king.app.tcareer.conf.AppConstants;
 import com.king.app.tcareer.model.bean.KeyValueCountBean;
+import com.king.app.tcareer.model.dao.GloryDao;
 import com.king.app.tcareer.model.db.entity.Record;
 import com.king.app.tcareer.model.db.entity.RecordDao;
 import com.king.app.tcareer.page.record.complex.CompareItem;

@@ -3,7 +3,7 @@ package com.king.app.tcareer.page.glory;
 import com.king.app.tcareer.base.BasePresenter;
 import com.king.app.tcareer.base.TApplication;
 import com.king.app.tcareer.conf.AppConstants;
-import com.king.app.tcareer.model.GloryDao;
+import com.king.app.tcareer.model.dao.GloryDao;
 import com.king.app.tcareer.model.bean.KeyValueCountBean;
 import com.king.app.tcareer.model.bean.MatchResultBean;
 import com.king.app.tcareer.model.db.entity.EarlierAchieve;

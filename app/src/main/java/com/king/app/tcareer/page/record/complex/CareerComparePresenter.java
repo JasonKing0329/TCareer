@@ -1,7 +1,7 @@
 package com.king.app.tcareer.page.record.complex;
 
 import com.king.app.tcareer.base.BasePresenter;
-import com.king.app.tcareer.model.CareerCompareDao;
+import com.king.app.tcareer.model.dao.CareerCompareDao;
 
 import java.util.ArrayList;
 import java.util.List;
