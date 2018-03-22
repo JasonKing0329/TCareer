@@ -2,12 +2,14 @@ package com.king.app.tcareer.page.record.page;
 
 import com.king.app.tcareer.base.BasePresenter;
 import com.king.app.tcareer.base.TApplication;
+import com.king.app.tcareer.conf.AppConstants;
 import com.king.app.tcareer.model.bean.RecordWinFlagBean;
 import com.king.app.tcareer.model.dao.RecordExtendDao;
 import com.king.app.tcareer.model.db.entity.Record;
 import com.king.app.tcareer.model.db.entity.RecordDao;
 import com.king.app.tcareer.model.db.entity.Score;
 
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
 
@@ -145,48 +147,72 @@ public class RecordPagePresenter extends BasePresenter<RecordPageView> {
                 }
                 details.scoreSet = win + "：" + lose;
 
+                boolean isWin = mRecord.getWinnerFlag() == AppConstants.WINNER_USER;
                 // 级别胜绩
                 RecordExtendDao extendDao = new RecordExtendDao();
                 List<RecordWinFlagBean> flagList = extendDao.queryRecordWinnerFlagsByLevel(
                         mRecord.getUserId(), mRecord.getMatch().getMatchBean().getLevel(), false);
                 int careerIndex = 0;
                 for (int i = 0; i < flagList.size(); i ++) {
+                    if (mRecord.getWinnerFlag() == flagList.get(i).getWinnerFlag()) {
+                        careerIndex ++;
+                    }
                     if (flagList.get(i).getRecordId() == mRecord.getId()) {
-                        careerIndex = i + 1;
                         break;
                     }
                 }
-                int yearIndex = 0;
-                flagList = extendDao.queryRecordWinnerFlagsByLevel(
-                        mRecord.getUserId(), mRecord.getMatch().getMatchBean().getLevel(), true);
-                for (int i = 0; i < flagList.size(); i ++) {
-                    if (flagList.get(i).getRecordId() == mRecord.getId()) {
-                        yearIndex = i + 1;
-                        break;
+                StringBuffer buffer = new StringBuffer();
+                buffer.append("生涯第").append(careerIndex)
+                        .append(isWin ? "胜":"败");
+                int year = Integer.parseInt(mRecord.getDateStr().split("-")[0]);
+                if (year == Calendar.getInstance().get(Calendar.YEAR)) {
+                    int yearIndex = 0;
+                    flagList = extendDao.queryRecordWinnerFlagsByLevel(
+                            mRecord.getUserId(), mRecord.getMatch().getMatchBean().getLevel(), true);
+                    for (int i = 0; i < flagList.size(); i ++) {
+                        if (mRecord.getWinnerFlag() == flagList.get(i).getWinnerFlag()) {
+                            yearIndex ++;
+                        }
+                        if (flagList.get(i).getRecordId() == mRecord.getId()) {
+                            break;
+                        }
                     }
+                    buffer.append("，赛季第").append(yearIndex)
+                            .append(isWin ? "胜":"败");
                 }
-                details.levelStr = "生涯第" + careerIndex + "胜，赛季第" + yearIndex + "胜";
+                details.levelStr = buffer.toString();
 
                 // 场地胜绩
                 flagList = extendDao.queryRecordWinnerFlagsByCourt(
                         mRecord.getUserId(), mRecord.getMatch().getMatchBean().getCourt(), false);
                 careerIndex = 0;
                 for (int i = 0; i < flagList.size(); i ++) {
+                    if (mRecord.getWinnerFlag() == flagList.get(i).getWinnerFlag()) {
+                        careerIndex ++;
+                    }
                     if (flagList.get(i).getRecordId() == mRecord.getId()) {
-                        careerIndex = i + 1;
                         break;
                     }
                 }
-                yearIndex = 0;
-                flagList = extendDao.queryRecordWinnerFlagsByCourt(
-                        mRecord.getUserId(), mRecord.getMatch().getMatchBean().getCourt(), true);
-                for (int i = 0; i < flagList.size(); i ++) {
-                    if (flagList.get(i).getRecordId() == mRecord.getId()) {
-                        yearIndex = i + 1;
-                        break;
+                buffer = new StringBuffer();
+                buffer.append("生涯第").append(careerIndex)
+                        .append(isWin ? "胜":"败");
+                if (year == Calendar.getInstance().get(Calendar.YEAR)) {
+                    int yearIndex = 0;
+                    flagList = extendDao.queryRecordWinnerFlagsByCourt(
+                            mRecord.getUserId(), mRecord.getMatch().getMatchBean().getCourt(), true);
+                    for (int i = 0; i < flagList.size(); i ++) {
+                        if (mRecord.getWinnerFlag() == flagList.get(i).getWinnerFlag()) {
+                            yearIndex ++;
+                        }
+                        if (flagList.get(i).getRecordId() == mRecord.getId()) {
+                            break;
+                        }
                     }
+                    buffer.append("，赛季第").append(yearIndex)
+                            .append(isWin ? "胜":"败");
                 }
-                details.courtStr = "生涯第" + careerIndex + "胜，赛季第" + yearIndex + "胜";
+                details.courtStr = buffer.toString();
 
                 e.onNext(details);
             }

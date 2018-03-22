@@ -151,8 +151,10 @@ public class MatchPageActivity extends BaseMvpActivity<PagePresenter> implements
         Intent intent = new Intent();
         intent.setClass(this, RecordPageActivity.class);
         intent.putExtra(RecordPageActivity.KEY_RECORD_ID, record.getId());
-        ActivityOptions transitionActivityOptions = ActivityOptions.makeSceneTransitionAnimation(this
-                , Pair.create(view.findViewById(R.id.iv_player),getString(R.string.anim_player_page_head)));
-        startActivity(intent, transitionActivityOptions.toBundle());
+        // 不知为何用这个CircularImageView会报IllegalStatementException
+//        ActivityOptions transitionActivityOptions = ActivityOptions.makeSceneTransitionAnimation(this
+//                , Pair.create(view.findViewById(R.id.iv_player),getString(R.string.anim_player_page_head)));
+//        startActivity(intent, transitionActivityOptions.toBundle());
+        startActivity(intent);
     }
 }
