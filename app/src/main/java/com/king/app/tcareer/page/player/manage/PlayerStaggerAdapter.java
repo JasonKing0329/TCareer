@@ -65,6 +65,8 @@ public class PlayerStaggerAdapter extends PlayerManageBaseAdapter {
         }
         holder.tvCountry.setText("(" + bean.getCountry() + ")");
 
+        holder.tvH2h.setText(bean.getLose() + "-" + bean.getWin());
+
         holder.groupCard.setTag(position);
         holder.groupCard.setOnClickListener(this);
 
@@ -97,6 +99,8 @@ public class PlayerStaggerAdapter extends PlayerManageBaseAdapter {
         TextView tvNameEng;
         @BindView(R.id.tv_birthday)
         TextView tvBirthday;
+        @BindView(R.id.tv_h2h)
+        TextView tvH2h;
         @BindView(R.id.group_card)
         CardView groupCard;
         @BindView(R.id.cb_check)

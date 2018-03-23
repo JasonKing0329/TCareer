@@ -30,6 +30,7 @@ public class SettingProperty {
     public static final int VALUE_SORT_PLAYER_COUNTRY = 2;
     public static final int VALUE_SORT_PLAYER_AGE = 3;
     public static final int VALUE_SORT_PLAYER_CONSTELLATION = 4;
+    public static final int VALUE_SORT_PLAYER_RECORD = 5;
 
     private static final String getString(String key) {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(TApplication.getInstance());

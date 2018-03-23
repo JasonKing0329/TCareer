@@ -405,6 +405,9 @@ public class PlayerManageActivity extends BaseMvpActivity<PlayerManagePresenter>
                         case R.id.menu_sort_constellation:
                             presenter.sortPlayer(SettingProperty.VALUE_SORT_PLAYER_CONSTELLATION);
                             break;
+                        case R.id.menu_sort_record:
+                            presenter.sortPlayer(SettingProperty.VALUE_SORT_PLAYER_RECORD);
+                            break;
                     }
                     return false;
                 }

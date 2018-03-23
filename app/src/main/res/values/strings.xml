@@ -140,6 +140,7 @@
     <string name="menu_sort_country">By country</string>
     <string name="menu_sort_age">By age</string>
     <string name="menu_sort_constellation">By constellation</string>
+    <string name="menu_sort_record">By records</string>
     <!-- **************************************************************** -->
     <string name="record_listview_allrecords">All records</string>
     <string name="dlg_loading_msg">loading...</string>

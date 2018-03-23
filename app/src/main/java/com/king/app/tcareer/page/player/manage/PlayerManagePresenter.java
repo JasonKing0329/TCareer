@@ -4,7 +4,10 @@ import android.text.TextUtils;
 
 import com.king.app.tcareer.base.BasePresenter;
 import com.king.app.tcareer.base.TApplication;
+import com.king.app.tcareer.conf.AppConstants;
 import com.king.app.tcareer.model.PlayerComparator;
+import com.king.app.tcareer.model.bean.H2hBean;
+import com.king.app.tcareer.model.dao.H2HDao;
 import com.king.app.tcareer.model.db.entity.PlayerBean;
 import com.king.app.tcareer.model.db.entity.PlayerBeanDao;
 import com.king.app.tcareer.model.db.entity.User;
@@ -106,6 +109,7 @@ public class PlayerManagePresenter extends BasePresenter<PlayerManageView> {
                 UserDao dao = TApplication.getInstance().getDaoSession().getUserDao();
                 List<User> users = dao.queryBuilder().build().list();
 
+                H2HDao h2hDao = new H2HDao();
                 List<PlayerViewBean> list = new ArrayList<>();
                 for (User user:users) {
                     PlayerViewBean viewBean = new PlayerViewBean();
@@ -115,6 +119,15 @@ public class PlayerManagePresenter extends BasePresenter<PlayerManageView> {
                     viewBean.setName(user.getNameChn());
                     viewBean.setNameEng(user.getNameEng());
                     viewBean.setNamePinyin(user.getNamePinyin());
+
+                    H2hBean h2hK = h2hDao.getH2h(AppConstants.USER_ID_KING, user.getId(), true);
+                    H2hBean h2hF = h2hDao.getH2h(AppConstants.USER_ID_FLAMENCO, user.getId(), true);
+                    H2hBean h2hH = h2hDao.getH2h(AppConstants.USER_ID_HENRY, user.getId(), true);
+                    H2hBean h2hQ = h2hDao.getH2h(AppConstants.USER_ID_QI, user.getId(), true);
+
+                    viewBean.setWin(h2hK.getWin() + h2hF.getWin() + h2hH.getWin() + h2hQ.getWin());
+                    viewBean.setLose(h2hK.getLose() + h2hF.getLose() + h2hH.getLose() + h2hQ.getLose());
+
                     list.add(viewBean);
                 }
                 e.onNext(list);
@@ -129,6 +142,7 @@ public class PlayerManagePresenter extends BasePresenter<PlayerManageView> {
                 PlayerBeanDao dao = TApplication.getInstance().getDaoSession().getPlayerBeanDao();
                 List<PlayerBean> players = dao.queryBuilder().build().list();
 
+                H2HDao h2hDao = new H2HDao();
                 List<PlayerViewBean> list = new ArrayList<>();
                 for (PlayerBean player:players) {
                     PlayerViewBean viewBean = new PlayerViewBean();
@@ -138,6 +152,14 @@ public class PlayerManagePresenter extends BasePresenter<PlayerManageView> {
                     viewBean.setName(player.getNameChn());
                     viewBean.setNameEng(player.getNameEng());
                     viewBean.setNamePinyin(player.getNamePinyin());
+
+                    H2hBean h2hK = h2hDao.getH2h(AppConstants.USER_ID_KING, player.getId(), false);
+                    H2hBean h2hF = h2hDao.getH2h(AppConstants.USER_ID_FLAMENCO, player.getId(), false);
+                    H2hBean h2hH = h2hDao.getH2h(AppConstants.USER_ID_HENRY, player.getId(), false);
+                    H2hBean h2hQ = h2hDao.getH2h(AppConstants.USER_ID_QI, player.getId(), false);
+                    viewBean.setWin(h2hK.getWin() + h2hF.getWin() + h2hH.getWin() + h2hQ.getWin());
+                    viewBean.setLose(h2hK.getLose() + h2hF.getLose() + h2hH.getLose() + h2hQ.getLose());
+
                     list.add(viewBean);
                 }
                 e.onNext(list);
@@ -181,6 +203,7 @@ public class PlayerManagePresenter extends BasePresenter<PlayerManageView> {
 
     public void sortPlayer(final int sortType) {
         view.showLoading();
+        updateSortType(sortType);
         sortPlayerRx(playerList)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
@@ -192,7 +215,6 @@ public class PlayerManagePresenter extends BasePresenter<PlayerManageView> {
 
                     @Override
                     public void onNext(List<PlayerViewBean> list) {
-                        updateSortType(sortType);
                         SettingProperty.setPlayerSortMode(sortType);
                         view.dismissLoading();
                         view.sortFinished(list);

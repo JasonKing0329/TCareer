@@ -34,7 +34,7 @@ public class PlayerItemAdapter extends PlayerManageBaseAdapter {
         PlayerViewBean bean = list.get(position);
         holder.tvIndex.setText(String.valueOf(position + 1));
         holder.tvName.setText(bean.getName());
-        holder.tvNameEng.setText(bean.getNameEng());
+        holder.tvNameEng.setText(bean.getNameEng() + "  " + bean.getCountry());
         // 当前排序是按星座排序，显示星座名称
         if (isSortByConstellation()) {
             holder.tvBirthday.setText(getConstellation(position));
@@ -42,7 +42,7 @@ public class PlayerItemAdapter extends PlayerManageBaseAdapter {
         else {
             holder.tvBirthday.setText(bean.getBirthday());
         }
-        holder.tvCountry.setText(bean.getCountry());
+        holder.tvCountry.setText(bean.getLose() + "-" + bean.getWin());
 
         holder.group.setTag(position);
         holder.group.setOnClickListener(this);

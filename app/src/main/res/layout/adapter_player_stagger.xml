@@ -57,6 +57,14 @@
                 android:layout_centerHorizontal="true"
                 android:layout_below="@id/tv_name_eng"
                 android:layout_marginTop="3dp"/>
+            <TextView
+                android:id="@+id/tv_h2h"
+                style="@style/MatchManageItemSub"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_below="@id/tv_birthday"
+                android:layout_marginTop="3dp"/>
             <CheckBox
                 android:id="@+id/cb_check"
                 android:layout_width="wrap_content"

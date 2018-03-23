@@ -20,6 +20,10 @@ public class PlayerViewBean<T> {
 
     private String country;
 
+    private int win;
+
+    private int lose;
+
     public T getData() {
         return data;
     }
@@ -66,5 +70,21 @@ public class PlayerViewBean<T> {
 
     public void setCountry(String country) {
         this.country = country;
+    }
+
+    public int getWin() {
+        return win;
+    }
+
+    public void setWin(int win) {
+        this.win = win;
+    }
+
+    public int getLose() {
+        return lose;
+    }
+
+    public void setLose(int lose) {
+        this.lose = lose;
     }
 }
