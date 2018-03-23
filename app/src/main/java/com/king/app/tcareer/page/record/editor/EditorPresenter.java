@@ -274,11 +274,19 @@ public class EditorPresenter extends BasePresenter<IEditorView> {
     }
 
     public void initMatchPage() {
-        AutoFillMatchBean autoFill = SettingProperty.getAutoFillMatch();
-        if (autoFill != null) {
-            long matchId = autoFill.getMatchId();
-            queryMatch(matchId);
-            view.showMatchAutoFill(autoFill);
+        // 修改
+        if (mMatchNameBean != null) {
+            int year = Integer.parseInt(mRecord.getDateStr().split("-")[0]);
+            view.showMatchFill(year, mRecord.getRound());
+        }
+        // 新增
+        else {
+            AutoFillMatchBean autoFill = SettingProperty.getAutoFillMatch();
+            if (autoFill != null) {
+                long matchId = autoFill.getMatchId();
+                queryMatch(matchId);
+                view.showMatchAutoFill(autoFill);
+            }
         }
         view.showMatchInfor(mRecord.getId() == null ? null:mRecord, mMatchNameBean, mCompetitor, mScoreList);
     }

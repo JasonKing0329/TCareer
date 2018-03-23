@@ -1,5 +1,6 @@
 package com.king.app.tcareer.page.record.complex;
 
+import android.annotation.SuppressLint;
 import android.app.ActivityOptions;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -46,6 +47,7 @@ public class RecordComplexActivity extends BaseMvpActivity<ComplexPresenter> imp
         , OnBMClickListener, OnItemMenuListener {
 
     private final int REQUEST_UPDATE = 100;
+    private final int REQUEST_RECORD_PAGE = 101;
 
     @BindView(R.id.iv_record_head)
     ImageView ivRecordHead;
@@ -247,6 +249,7 @@ public class RecordComplexActivity extends BaseMvpActivity<ComplexPresenter> imp
 
     }
 
+    @SuppressLint("RestrictedApi")
     @Override
     public void onItemClicked(View view, RecordItem record) {
         Intent intent = new Intent();
@@ -255,7 +258,7 @@ public class RecordComplexActivity extends BaseMvpActivity<ComplexPresenter> imp
         ActivityOptions transitionActivityOptions = ActivityOptions.makeSceneTransitionAnimation(this
                 , Pair.create(view.findViewById(R.id.iv_player),getString(R.string.anim_player_page_head))
                 , Pair.create(view.findViewById(R.id.iv_user),getString(R.string.anim_user_page_head)));
-        startActivity(intent, transitionActivityOptions.toBundle());
+        startActivityForResult(intent, REQUEST_RECORD_PAGE, transitionActivityOptions.toBundle());
     }
 
     @Override
@@ -263,6 +266,7 @@ public class RecordComplexActivity extends BaseMvpActivity<ComplexPresenter> imp
         super.onActivityResult(requestCode, resultCode, data);
         switch (requestCode) {
             case REQUEST_UPDATE:
+            case REQUEST_RECORD_PAGE:
                 DebugLog.e("update " + mUpdatePosition);
                 recordAdapter.notifyItemChanged(mUpdatePosition);
                 // notify home

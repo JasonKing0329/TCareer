@@ -30,5 +30,7 @@ public interface IEditorView extends BaseView {
     void showMatchAutoFill(AutoFillMatchBean autoFill);
 
     void showMatchInfor(Record record, MatchNameBean mMatchNameBean, CompetitorBean mCompetitor, List<Score> mScoreList);
+
+    void showMatchFill(int year, String round);
 }
 

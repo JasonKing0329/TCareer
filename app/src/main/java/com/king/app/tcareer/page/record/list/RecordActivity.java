@@ -1,5 +1,6 @@
 package com.king.app.tcareer.page.record.list;
 
+import android.annotation.SuppressLint;
 import android.app.ActivityOptions;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -54,6 +55,7 @@ public class RecordActivity extends BaseMvpActivity<RecordPresenter> implements 
     public static final String KEY_USER_ID = "key_user_id";
 
     private final int REQUEST_UPDATE = 100;
+    private final int REQUEST_RECORD_PAGE = 101;
 
     @BindView(R.id.rv_record)
     RecyclerView rvRecord;
@@ -267,6 +269,7 @@ public class RecordActivity extends BaseMvpActivity<RecordPresenter> implements 
 //        dlg.show();
     }
 
+    @SuppressLint("RestrictedApi")
     @Override
     public void onItemClicked(View view, RecordItem recordItem) {
         Intent intent = new Intent();
@@ -274,7 +277,7 @@ public class RecordActivity extends BaseMvpActivity<RecordPresenter> implements 
         intent.putExtra(RecordPageActivity.KEY_RECORD_ID, recordItem.getRecord().getId());
         ActivityOptions transitionActivityOptions = ActivityOptions.makeSceneTransitionAnimation(this
                 , Pair.create(view.findViewById(R.id.iv_player),getString(R.string.anim_player_page_head)));
-        startActivity(intent, transitionActivityOptions.toBundle());
+        startActivityForResult(intent, REQUEST_RECORD_PAGE, transitionActivityOptions.toBundle());
     }
 
     @Override
@@ -282,10 +285,13 @@ public class RecordActivity extends BaseMvpActivity<RecordPresenter> implements 
         super.onActivityResult(requestCode, resultCode, data);
         switch (requestCode) {
             case REQUEST_UPDATE:
-                DebugLog.e("update " + mUpdatePosition);
-                recordAdapter.notifyItemChanged(mUpdatePosition);
-                // notify home
-                setResult(RESULT_OK);
+            case REQUEST_RECORD_PAGE:
+                if (resultCode == RESULT_OK) {
+                    DebugLog.e("update " + mUpdatePosition);
+                    recordAdapter.notifyItemChanged(mUpdatePosition);
+                    // notify home
+                    setResult(RESULT_OK);
+                }
                 break;
         }
     }

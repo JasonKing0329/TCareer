@@ -104,6 +104,13 @@ public class MatchEditPage implements View.OnClickListener {
         holder.getPresenter().initMatchPage();
     }
 
+    public void showMatchFill(int year, String round) {
+        cur_year = getYearIndex(year);
+        sp_year.setSelection(cur_year);
+        cur_round = getRoundIndex(round);
+        sp_round.setSelection(cur_round);
+    }
+
     public void showMatchAutoFill(AutoFillMatchBean autoFill) {
         cur_year = autoFill.getIndexYear();
         sp_year.setSelection(cur_year);
@@ -144,6 +151,15 @@ public class MatchEditPage implements View.OnClickListener {
         mStrScore = "";
         mStrWinner = "";
         groupWinner.setVisibility(View.INVISIBLE);
+    }
+
+    private int getYearIndex(int year) {
+        for (int i = 0; i < arr_year.length; i++) {
+            if (arr_year[i].equals(String.valueOf(year))) {
+                return i;
+            }
+        }
+        return 0;
     }
 
     private int getRoundIndex(String round) {

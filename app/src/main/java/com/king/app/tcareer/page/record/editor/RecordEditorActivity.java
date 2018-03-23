@@ -151,6 +151,11 @@ public class RecordEditorActivity extends BaseMvpActivity<EditorPresenter> imple
         matchEditPage.showMatchInfor(record, mMatchNameBean, mCompetitor, mScoreList);
     }
 
+    @Override
+    public void showMatchFill(int year, String round) {
+        matchEditPage.showMatchFill(year, round);
+    }
+
     @OnClick({R.id.tv_next_page, R.id.tv_done, R.id.tv_continue, R.id.tv_previous_page})
     public void onViewClicked(View view) {
         switch (view.getId()) {
@@ -202,6 +207,7 @@ public class RecordEditorActivity extends BaseMvpActivity<EditorPresenter> imple
 
     @Override
     public void updateSuccess() {
+        setResult(RESULT_OK);
         finish();
     }
 

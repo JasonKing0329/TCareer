@@ -5,6 +5,8 @@ import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -23,6 +25,7 @@ import com.king.app.tcareer.model.db.entity.User;
 import com.king.app.tcareer.page.match.MatchItemAdapter;
 import com.king.app.tcareer.page.match.page.MatchPageActivity;
 import com.king.app.tcareer.page.player.page.PlayerPageActivity;
+import com.king.app.tcareer.page.record.editor.RecordEditorActivity;
 import com.king.app.tcareer.view.widget.CircleImageView;
 import com.youth.banner.Banner;
 
@@ -39,6 +42,8 @@ import butterknife.OnClick;
 public class RecordPageActivity extends BaseMvpActivity<RecordPagePresenter> implements RecordPageView {
 
     public static final String KEY_RECORD_ID = "record_id";
+
+    private final int REQUEST_EDIT = 121;
 
     @BindView(R.id.iv_match)
     ImageView ivMatch;
@@ -116,6 +121,32 @@ public class RecordPageActivity extends BaseMvpActivity<RecordPagePresenter> imp
         super.onNewIntent(intent);
         setIntent(intent);
         initData();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.record_page, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        switch (id) {
+            case R.id.menu_action_edit:
+                editRecord();
+                break;
+        }
+        return true;
+    }
+
+    private void editRecord() {
+        Intent intent = new Intent();
+        intent.setClass(this, RecordEditorActivity.class);
+        intent.putExtra(RecordEditorActivity.KEY_USER_ID, presenter.getUser().getId());
+        intent.putExtra(RecordEditorActivity.KEY_RECORD_ID, presenter.getRecord().getId());
+        startActivityForResult(intent, REQUEST_EDIT);
     }
 
     @Override
@@ -225,5 +256,18 @@ public class RecordPageActivity extends BaseMvpActivity<RecordPagePresenter> imp
         }
         intent.putExtra(PlayerPageActivity.KEY_COMPETITOR_ID, competitor.getId());
         startActivity(intent);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch (requestCode) {
+            case REQUEST_EDIT:
+                if (resultCode == RESULT_OK) {
+                    setResult(RESULT_OK);
+                    initData();
+                }
+                break;
+        }
     }
 }
