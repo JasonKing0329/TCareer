@@ -79,6 +79,8 @@ public class RecordPageActivity extends BaseMvpActivity<RecordPagePresenter> imp
     TextView tvCourtDetail;
     @BindView(R.id.tv_date)
     TextView tvDate;
+    @BindView(R.id.tv_h2h)
+    TextView tvH2h;
     @BindView(R.id.rv_records)
     RecyclerView rvRecords;
 
@@ -220,10 +222,11 @@ public class RecordPageActivity extends BaseMvpActivity<RecordPagePresenter> imp
     }
 
     @Override
-    public void showDetails(String scoreSet, String levelStr, String courtStr) {
+    public void showDetails(String scoreSet, String levelStr, String courtStr, String h2h) {
         tvScoreSet.setText(scoreSet);
         tvLevelDetail.setText(levelStr);
         tvCourtDetail.setText(courtStr);
+        tvH2h.setText(h2h);
     }
 
     @OnClick({R.id.tv_h2h, R.id.tv_match_page})

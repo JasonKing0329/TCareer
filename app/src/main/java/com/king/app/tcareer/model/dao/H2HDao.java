@@ -137,16 +137,20 @@ public class H2HDao {
         return Observable.create(new ObservableOnSubscribe<H2hBean>() {
             @Override
             public void subscribe(ObservableEmitter<H2hBean> e) throws Exception {
-                H2hBean bean = new H2hBean();
-                Cursor cursor = TApplication.getInstance().getDaoSession().getDatabase()
-                        .rawQuery(Sqls.getH2h(userId, playerId, competitorIsUser), new String[]{});
-                if (cursor.moveToNext()) {
-                    bean = parseH2hBean(cursor);
-                }
-                cursor.close();
-                e.onNext(bean);
+                e.onNext(getH2h(userId, playerId, competitorIsUser));
             }
         });
+    }
+
+    public H2hBean getH2h(long userId, long playerId, boolean competitorIsUser) {
+        H2hBean bean = new H2hBean();
+        Cursor cursor = TApplication.getInstance().getDaoSession().getDatabase()
+                .rawQuery(Sqls.getH2h(userId, playerId, competitorIsUser), new String[]{});
+        if (cursor.moveToNext()) {
+            bean = parseH2hBean(cursor);
+        }
+        cursor.close();
+        return bean;
     }
 
     /**

@@ -3,7 +3,9 @@ package com.king.app.tcareer.page.record.page;
 import com.king.app.tcareer.base.BasePresenter;
 import com.king.app.tcareer.base.TApplication;
 import com.king.app.tcareer.conf.AppConstants;
+import com.king.app.tcareer.model.bean.H2hBean;
 import com.king.app.tcareer.model.bean.RecordWinFlagBean;
+import com.king.app.tcareer.model.dao.H2HDao;
 import com.king.app.tcareer.model.dao.RecordExtendDao;
 import com.king.app.tcareer.model.db.entity.Record;
 import com.king.app.tcareer.model.db.entity.RecordDao;
@@ -71,7 +73,7 @@ public class RecordPagePresenter extends BasePresenter<RecordPageView> {
                     @Override
                     public void onNext(Details details) {
                         view.dismissLoading();
-                        view.showDetails(details.scoreSet, details.levelStr, details.courtStr);
+                        view.showDetails(details.scoreSet, details.levelStr, details.courtStr, details.h2h);
                     }
 
                     @Override
@@ -126,6 +128,7 @@ public class RecordPagePresenter extends BasePresenter<RecordPageView> {
         String scoreSet;
         String levelStr;
         String courtStr;
+        String h2h;
     }
 
     private Observable<Details> queryDetails() {
@@ -213,6 +216,10 @@ public class RecordPagePresenter extends BasePresenter<RecordPageView> {
                             .append(isWin ? "胜":"败");
                 }
                 details.courtStr = buffer.toString();
+
+                H2HDao dao = new H2HDao();
+                H2hBean bean = dao.getH2h(mRecord.getUserId(), mRecord.getPlayerId(), mRecord.getPlayerFlag() == AppConstants.COMPETITOR_VIRTUAL);
+                details.h2h = "H2H(" + bean.getWin() + " - " + bean.getLose() + ")";
 
                 e.onNext(details);
             }

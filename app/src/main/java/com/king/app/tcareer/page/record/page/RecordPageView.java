@@ -15,5 +15,5 @@ public interface RecordPageView extends BaseView {
 
     void postShowMatchRecords(List<Record> records);
 
-    void showDetails(String scoreSet, String levelStr, String courtStr);
+    void showDetails(String scoreSet, String levelStr, String courtStr, String h2h);
 }

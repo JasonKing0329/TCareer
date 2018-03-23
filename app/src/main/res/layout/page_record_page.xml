@@ -16,21 +16,21 @@
             android:layout_marginLeft="16dp"
             android:transitionName="@string/anim_user_page_head"
             android:src="@drawable/default_img"/>
+        <TextView
+            android:id="@+id/tv_score_set"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textSize="46dp"
+            android:textColor="@color/actionbar_bk_blue"/>
         <com.king.app.tcareer.view.widget.CircleImageView
             android:id="@+id/iv_player"
             android:layout_width="100dp"
             android:layout_height="100dp"
             android:src="@drawable/default_img"
             android:transitionName="@string/anim_player_page_head"
-            android:layout_marginLeft="10dp"/>
-        <TextView
-            android:id="@+id/tv_score_set"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="20dp"
-            android:gravity="center"
-            android:textSize="50dp"
-            android:textColor="@color/actionbar_bk_blue"/>
+            android:layout_marginRight="16dp"/>
     </LinearLayout>
     <LinearLayout
         android:layout_width="match_parent"
@@ -45,17 +45,10 @@
             android:gravity="center"
             android:textSize="12dp"/>
         <TextView
-            android:id="@+id/tv_rs_player"
-            android:layout_width="100dp"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
-            android:gravity="center"
-            android:textSize="12dp"/>
-        <TextView
             android:id="@+id/tv_h2h"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
+            android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="20dp"
             android:paddingTop="10dp"
             android:paddingBottom="10dp"
             android:gravity="center"
@@ -64,6 +57,13 @@
             android:textSize="16dp"
             android:textStyle="bold"
             android:textColor="@color/colorAccent"/>
+        <TextView
+            android:id="@+id/tv_rs_player"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="16dp"
+            android:gravity="center"
+            android:textSize="12dp"/>
     </LinearLayout>
     <LinearLayout
         android:layout_width="match_parent"
