@@ -112,6 +112,11 @@ public class RankChartFragment extends BaseMvpFragment<RankPresenter> implements
     }
 
     @Override
+    public void postShowUser(String nameEng) {
+
+    }
+
+    @Override
     public void showRanks(final List<Rank> list) {
         getActivity().runOnUiThread(new Runnable() {
             @Override

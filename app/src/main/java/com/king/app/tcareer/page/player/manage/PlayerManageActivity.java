@@ -1,20 +1,22 @@
 package com.king.app.tcareer.page.player.manage;
 
 import android.content.Intent;
-import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
-import android.widget.ImageView;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 
+import com.king.app.jactionbar.JActionbar;
+import com.king.app.jactionbar.OnBackListener;
+import com.king.app.jactionbar.OnConfirmListener;
+import com.king.app.jactionbar.OnMenuItemListener;
+import com.king.app.jactionbar.PopupMenuProvider;
 import com.king.app.tcareer.R;
 import com.king.app.tcareer.base.BaseMvpActivity;
 import com.king.app.tcareer.model.db.entity.PlayerBean;
@@ -42,6 +44,8 @@ public class PlayerManageActivity extends BaseMvpActivity<PlayerManagePresenter>
     public static final String RESPONSE_PLAYER_ID = "resp_player_id";
     public static final String RESPONSE_PLAYER_IS_USER = "resp_player_is_user";
 
+    @BindView(R.id.actionbar)
+    JActionbar actionbar;
     @BindView(R.id.rv_stagger)
     RecyclerView rvStagger;
     @BindView(R.id.rv_grid)
@@ -53,20 +57,13 @@ public class PlayerManageActivity extends BaseMvpActivity<PlayerManagePresenter>
     @BindView(R.id.tv_index_popup)
     TextView tvIndexPopup;
 
-    private ImageView ivSort;
-    private ImageView ivChart;
-    private ViewGroup groupNormal;
-    private ViewGroup groupConfirm;
     private PopupMenu popSort;
 
-    // 选择模式
-    private boolean isSelectMode;
-    // 编辑模式
-    private boolean isEditMode;
-    // 删除模式
-    private boolean isDeleteMode;
-
     private boolean isCardMode;
+
+    private boolean isSelectMode;
+
+    private boolean isEditMode;
 
     private PlayerItemAdapter playerItemAdapter;
     private PlayerStaggerAdapter playerStaggerAdapter;
@@ -95,7 +92,6 @@ public class PlayerManageActivity extends BaseMvpActivity<PlayerManagePresenter>
             rvList.setVisibility(View.VISIBLE);
             rvStagger.setVisibility(View.GONE);
         }
-        ((TextView) findViewById(R.id.view7_actionbar_title)).setText(getString(R.string.player_manage_title));
 
         sidebar.setVisibility(View.VISIBLE);
         sidebar.setOnTouchingLetterChangedListener(letterListener);
@@ -105,26 +101,123 @@ public class PlayerManageActivity extends BaseMvpActivity<PlayerManagePresenter>
     }
 
     private void initActionbar() {
-        findViewById(R.id.view7_actionbar_menu).setVisibility(View.GONE);
-        ImageView backView = findViewById(R.id.view7_actionbar_back);
-        backView.setVisibility(View.VISIBLE);
-        backView.setOnClickListener(actionbarListener);
-        groupConfirm = findViewById(R.id.view7_actionbar_action_confirm);
-        groupNormal = findViewById(R.id.view7_actionbar_action_normal);
-        ivSort = findViewById(R.id.view7_actionbar_sort);
-        ivChart = findViewById(R.id.view7_actionbar_chart);
-        groupNormal.setVisibility(View.VISIBLE);
-        findViewById(R.id.view7_actionbar_edit_group).setVisibility(View.VISIBLE);
+        actionbar.setTitle(getString(R.string.player_manage_title));
+        if (isSelectMode) {
+            actionbar.inflateMenu(R.menu.player_manage_select);
+        }
+        else {
+            actionbar.inflateMenu(R.menu.player_manage);
+        }
+        actionbar.setOnBackListener(new OnBackListener() {
+            @Override
+            public void onBack() {
+                onBackPressed();
+            }
+        });
+        actionbar.setOnMenuItemListener(new OnMenuItemListener() {
+            @Override
+            public void onMenuItemSelected(int menuId) {
+                switch (menuId) {
+                    case R.id.menu_manage_count:
+                        showChartDialog();
+                        break;
+                    case R.id.menu_manage_add:
+                        openEditDialog(null);
+                        break;
+                    case R.id.menu_manage_delete:
+                        actionbar.showConfirmStatus(menuId);
+                        if (playerItemAdapter != null) {
+                            playerItemAdapter.setSelectMode(true);
+                            playerItemAdapter.notifyDataSetChanged();
+                        }
+                        if (playerStaggerAdapter != null) {
+                            playerStaggerAdapter.setSelectMode(true);
+                            playerStaggerAdapter.notifyDataSetChanged();
+                        }
+                        break;
+                    case R.id.menu_manage_edit:
+                        isEditMode = true;
+                        actionbar.showConfirmStatus(menuId);
+                        break;
+                    case R.id.menu_manage_view:
+                        if (isWaterfall()) {
+                            isCardMode = false;
+                            rvStagger.startAnimation(getDisappearAnim(rvStagger));
+                            rvList.startAnimation(getAppearAnim(rvList));
+                            SettingProperty.setPlayerManageCardMode(false);
+                        }
+                        else {
+                            isCardMode = true;
+                            rvList.startAnimation(getDisappearAnim(rvList));
+                            rvStagger.startAnimation(getAppearAnim(rvStagger));
+                            SettingProperty.setPlayerManageCardMode(true);
+                        }
+                        refreshList();
+                        break;
+                }
+            }
+        });
+        actionbar.setOnConfirmListener(new OnConfirmListener() {
+            @Override
+            public boolean disableInstantDismissConfirm() {
+                return false;
+            }
 
-        findViewById(R.id.view7_actionbar_add).setOnClickListener(actionbarListener);
-        findViewById(R.id.view7_actionbar_edit).setOnClickListener(actionbarListener);
-        findViewById(R.id.view7_actionbar_delete).setOnClickListener(actionbarListener);
-        findViewById(R.id.view7_actionbar_done).setOnClickListener(actionbarListener);
-        findViewById(R.id.view7_actionbar_close).setOnClickListener(actionbarListener);
-        findViewById(R.id.view7_actionbar_mode).setOnClickListener(actionbarListener);
-        ivSort.setOnClickListener(actionbarListener);
-        ivChart.setOnClickListener(actionbarListener);
-        ivChart.setVisibility(View.VISIBLE);
+            @Override
+            public boolean disableInstantDismissCancel() {
+                return false;
+            }
+
+            @Override
+            public boolean onConfirm(int actionId) {
+                switch (actionId) {
+                    case R.id.menu_manage_delete:
+                        deletePlayerItems();
+                        if (playerItemAdapter != null) {
+                            playerItemAdapter.setSelectMode(false);
+                            playerItemAdapter.notifyDataSetChanged();
+                        }
+                        if (playerStaggerAdapter != null) {
+                            playerStaggerAdapter.setSelectMode(false);
+                            playerStaggerAdapter.notifyDataSetChanged();
+                        }
+                        break;
+                }
+                isEditMode = false;
+                return true;
+            }
+
+            @Override
+            public boolean onCancel(int actionId) {
+                switch (actionId) {
+                    case R.id.menu_manage_delete:
+                        if (playerItemAdapter != null) {
+                            playerItemAdapter.setSelectMode(false);
+                            playerItemAdapter.notifyDataSetChanged();
+                        }
+                        if (playerStaggerAdapter != null) {
+                            playerStaggerAdapter.setSelectMode(false);
+                            playerStaggerAdapter.notifyDataSetChanged();
+                        }
+                        break;
+                }
+                isEditMode = false;
+                return true;
+            }
+        });
+        actionbar.registerPopupMenu(R.id.menu_manage_sort);
+        actionbar.setPopupMenuProvider(new PopupMenuProvider() {
+            @Override
+            public PopupMenu getPopupMenu(int iconMenuId, View anchorView) {
+                PopupMenu popupMenu = null;
+                switch (iconMenuId) {
+                    case R.id.menu_manage_sort:
+                        popupMenu = getSortPopup(anchorView);
+                        break;
+                }
+                return popupMenu;
+            }
+        });
     }
 
     private void initVerticalList() {
@@ -240,69 +333,6 @@ public class PlayerManageActivity extends BaseMvpActivity<PlayerManagePresenter>
         }
     };
 
-    private View.OnClickListener actionbarListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View view) {
-            switch (view.getId()) {
-                case R.id.view7_actionbar_back:
-                    finish();
-                    break;
-                case R.id.view7_actionbar_mode:
-                    if (isWaterfall()) {
-                        isCardMode = false;
-                        rvStagger.startAnimation(getDisappearAnim(rvStagger));
-                        rvList.startAnimation(getAppearAnim(rvList));
-                        SettingProperty.setPlayerManageCardMode(false);
-                    }
-                    else {
-                        isCardMode = true;
-                        rvList.startAnimation(getDisappearAnim(rvList));
-                        rvStagger.startAnimation(getAppearAnim(rvStagger));
-                        SettingProperty.setPlayerManageCardMode(true);
-                    }
-                    refreshList();
-                    break;
-                case R.id.view7_actionbar_sort:
-                    showSortPopup();
-                    break;
-                case R.id.view7_actionbar_chart:
-                    showChartDialog();
-                    break;
-                case R.id.view7_actionbar_add:
-                    openEditDialog(null);
-                    break;
-                case R.id.view7_actionbar_edit:
-                    isEditMode = true;
-                    updateActionbarStatus(true);
-                    break;
-                case R.id.view7_actionbar_delete:
-                    isDeleteMode = true;
-                    updateActionbarStatus(true);
-                    if (playerItemAdapter != null) {
-                        playerItemAdapter.setSelectMode(true);
-                        playerItemAdapter.notifyDataSetChanged();
-                    }
-                    if (playerStaggerAdapter != null) {
-                        playerStaggerAdapter.setSelectMode(true);
-                        playerStaggerAdapter.notifyDataSetChanged();
-                    }
-                    break;
-                case R.id.view7_actionbar_done:
-                    if (isEditMode) {
-
-                    }
-                    else if (isDeleteMode) {
-                        deletePlayerItems();
-                    }
-                    updateActionbarStatus(false);
-                    break;
-                case R.id.view7_actionbar_close:
-                    updateActionbarStatus(false);
-                    break;
-            }
-        }
-    };
-
     private PlayerManageBaseAdapter getAdapter() {
         if (isWaterfall()) {
             return playerStaggerAdapter;
@@ -359,32 +389,9 @@ public class PlayerManageActivity extends BaseMvpActivity<PlayerManagePresenter>
         dialog.show(getSupportFragmentManager(), "PlayerEditDialog");
     }
 
-    public void updateActionbarStatus(boolean editMode) {
-        if (editMode) {
-            groupConfirm.setVisibility(View.VISIBLE);
-            groupNormal.setVisibility(View.GONE);
-        }
-        else {
-            groupConfirm.setVisibility(View.GONE);
-            groupNormal.setVisibility(View.VISIBLE);
-            if (isDeleteMode) {
-                if (playerItemAdapter != null) {
-                    playerItemAdapter.setSelectMode(false);
-                    playerItemAdapter.notifyDataSetChanged();
-                }
-                if (playerStaggerAdapter != null) {
-                    playerStaggerAdapter.setSelectMode(false);
-                    playerStaggerAdapter.notifyDataSetChanged();
-                }
-            }
-            isEditMode = false;
-            isDeleteMode = false;
-        }
-    }
-
-    private void showSortPopup() {
+    private PopupMenu getSortPopup(View anchor) {
         if (popSort == null) {
-            popSort = new PopupMenu(this, ivSort);
+            popSort = new PopupMenu(this, anchor);
             popSort.getMenuInflater().inflate(R.menu.sort_player, popSort.getMenu());
             popSort.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                 @Override
@@ -413,7 +420,7 @@ public class PlayerManageActivity extends BaseMvpActivity<PlayerManagePresenter>
                 }
             });
         }
-        popSort.show();
+        return popSort;
     }
 
     @Override
@@ -430,8 +437,7 @@ public class PlayerManageActivity extends BaseMvpActivity<PlayerManagePresenter>
 
     @Override
     public void onBackPressed() {
-        if (isEditMode || isDeleteMode) {
-            updateActionbarStatus(false);
+        if (actionbar != null && actionbar.onBackPressed()) {
             return;
         }
         super.onBackPressed();

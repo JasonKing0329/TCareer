@@ -7,8 +7,8 @@ android {
         applicationId "com.king.app.tcareer"
         minSdkVersion 21
         targetSdkVersion 26
-        versionCode 43
-        versionName "2.4.4"
+        versionCode 44
+        versionName "2.4.5"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     signingConfigs {
@@ -46,38 +46,47 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
+
     /*butterknife*/
     implementation 'com.jakewharton:butterknife:8.5.1'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.5.1'
+
     /*gson*/
     implementation "com.google.code.gson:gson:${GSON_VERSION}"
+
     /*rxjava  rxbinding  sqlbrite*/
     implementation "io.reactivex.rxjava2:rxjava:${RXJAVA_VERSION}"
     implementation "io.reactivex.rxjava2:rxandroid:${RXANDROID_VERSION}"
+
     /*retrofit2*/
     implementation "com.squareup.retrofit2:retrofit:${RETROFIT_VERSION}"
     implementation "com.squareup.retrofit2:converter-gson:${RETROFIT_VERSION}"
     implementation "com.squareup.retrofit2:adapter-rxjava2:${RETROFIT_VERSION}"
     implementation "com.squareup.okhttp3:logging-interceptor:${OKHTTP_VERSION}"
+
     /*okhttp*/
     implementation "com.squareup.okhttp3:okhttp:${OKHTTP_VERSION}"
     implementation "com.squareup.okio:okio:${OKIO_VERSION}"
+
     /*logger*/
     implementation "com.orhanobut:logger:${LOGGER_VERSION}"
+
     /*rx permission*/
     implementation "com.tbruyelle.rxpermissions2:rxpermissions:${RXPERMISSION_VERSION}"
+
     /*green dao*/
     implementation 'org.greenrobot:greendao:3.2.2'
     implementation project(':libtool')
+
     /*glide*/
     implementation 'com.github.bumptech.glide:glide:4.0.0'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.0.0'
 
     /*轮播视图*/
     compile 'com.youth.banner:banner:1.4.10'
-
     implementation project(':MPChartLib')
     implementation project(':shapimageview')
     implementation project(':boommenu')
     implementation project(':expandablerecycleradapter')
+    implementation project(':jactionbar')
 }

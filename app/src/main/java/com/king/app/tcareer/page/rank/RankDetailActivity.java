@@ -5,6 +5,9 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
+import com.king.app.jactionbar.JActionbar;
+import com.king.app.jactionbar.OnBackListener;
+import com.king.app.jactionbar.OnMenuItemListener;
 import com.king.app.tcareer.R;
 import com.king.app.tcareer.base.BaseMvpActivity;
 import com.king.app.tcareer.model.db.entity.RankWeek;
@@ -24,6 +27,8 @@ public class RankDetailActivity extends BaseMvpActivity<RankDetailPresenter> imp
 
     public static final String KEY_USER_ID = "user_id";
 
+    @BindView(R.id.actionbar)
+    JActionbar actionbar;
     @BindView(R.id.rv_ranks)
     RecyclerView rvRanks;
 
@@ -40,6 +45,26 @@ public class RankDetailActivity extends BaseMvpActivity<RankDetailPresenter> imp
     protected void initView() {
         LinearLayoutManager manager = new LinearLayoutManager(this);
         rvRanks.setLayoutManager(manager);
+
+        actionbar.setOnBackListener(new OnBackListener() {
+            @Override
+            public void onBack() {
+                onBackPressed();
+            }
+        });
+        actionbar.setOnMenuItemListener(new OnMenuItemListener() {
+            @Override
+            public void onMenuItemSelected(int menuId) {
+                switch (menuId) {
+                    case R.id.menu_rank_add:
+                        showScoreCalculator();
+                        break;
+                    case R.id.menu_rank_count:
+                        showRankCount();
+                        break;
+                }
+            }
+        });
     }
 
     @Override
@@ -59,6 +84,16 @@ public class RankDetailActivity extends BaseMvpActivity<RankDetailPresenter> imp
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.group_ft_container, ftDetail, "RankDetailFragment")
                 .commit();
+    }
+
+    @Override
+    public void postShowUser(final String nameEng) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                actionbar.setTitle(nameEng);
+            }
+        });
     }
 
     @Override
@@ -102,21 +137,6 @@ public class RankDetailActivity extends BaseMvpActivity<RankDetailPresenter> imp
         } else {
             detailAdapter.setList(list);
             detailAdapter.notifyDataSetChanged();
-        }
-    }
-
-    @OnClick({R.id.iv_back, R.id.iv_add, R.id.iv_count})
-    public void onViewClicked(View view) {
-        switch (view.getId()) {
-            case R.id.iv_back:
-                onBackPressed();
-                break;
-            case R.id.iv_add:
-                showScoreCalculator();
-                break;
-            case R.id.iv_count:
-                showRankCount();
-                break;
         }
     }
 

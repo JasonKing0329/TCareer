@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/menu_rank_count"
+        android:title="Rank count"
+        android:icon="@drawable/ic_pie_chart_white_24dp"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/menu_rank_add"
+        android:title="Add"
+        android:icon="@drawable/ic_add_white_36dp"
+        app:showAsAction="ifRoom" />
+</menu>

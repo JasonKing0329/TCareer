@@ -5,16 +5,19 @@ import android.content.Intent;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
-import android.widget.ImageView;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 
+import com.king.app.jactionbar.JActionbar;
+import com.king.app.jactionbar.OnBackListener;
+import com.king.app.jactionbar.OnConfirmListener;
+import com.king.app.jactionbar.OnMenuItemListener;
+import com.king.app.jactionbar.PopupMenuProvider;
 import com.king.app.tcareer.R;
 import com.king.app.tcareer.base.BaseMvpActivity;
 import com.king.app.tcareer.model.db.entity.MatchNameBean;
@@ -38,6 +41,8 @@ public class MatchManageActivity extends BaseMvpActivity<MatchManagePresenter> i
 
     public static final String RESPONSE_MATCH_NAME_ID = "resp_match_name_id";
 
+    @BindView(R.id.actionbar)
+    JActionbar actionbar;
     @BindView(R.id.rv_stagger)
     RecyclerView rvStagger;
     @BindView(R.id.rv_grid)
@@ -49,17 +54,12 @@ public class MatchManageActivity extends BaseMvpActivity<MatchManagePresenter> i
     @BindView(R.id.tv_index_popup)
     TextView tvIndexPopup;
 
-    private ImageView ivSort;
-    private ViewGroup groupNormal;
-    private ViewGroup groupConfirm;
     private PopupMenu popSort;
 
     // 选择模式
     private boolean isSelectMode;
     // 编辑模式
     private boolean isEditMode;
-    // 删除模式
-    private boolean isDeleteMode;
     // 只添加新name选择模式
     private boolean isOnlyAddName;
 
@@ -107,24 +107,136 @@ public class MatchManageActivity extends BaseMvpActivity<MatchManagePresenter> i
     }
 
     private void initActionbar() {
-        ImageView backView = findViewById(R.id.view7_actionbar_back);
-        backView.setVisibility(View.VISIBLE);
-        backView.setOnClickListener(actionbarListener);
-        groupConfirm = findViewById(R.id.view7_actionbar_action_confirm);
-        groupNormal = findViewById(R.id.view7_actionbar_action_normal);
-        ivSort = findViewById(R.id.view7_actionbar_sort);
-        groupNormal.setVisibility(View.VISIBLE);
-        findViewById(R.id.view7_actionbar_edit_group).setVisibility(View.VISIBLE);
+        actionbar.setTitle(getString(R.string.match_manage_title));
+        if (isSelectMode) {
+            actionbar.inflateMenu(R.menu.match_manage_select);
+        }
+        else {
+            actionbar.inflateMenu(R.menu.match_manage);
+        }
+        actionbar.setOnBackListener(new OnBackListener() {
+            @Override
+            public void onBack() {
+                onBackPressed();
+            }
+        });
+        actionbar.setOnMenuItemListener(new OnMenuItemListener() {
+            @Override
+            public void onMenuItemSelected(int menuId) {
+                switch (menuId) {
+                    case R.id.menu_manage_add:
+                        showYesNoMessage("Only add match name from existed matches?"
+                                , new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        isOnlyAddName = true;
+                                        isEditMode = true;
+                                        actionbar.showConfirmStatus(R.id.menu_manage_add);
+                                    }
+                                }
+                                , new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        openMatchEditDialog(null);
+                                    }
+                                });
+                        break;
+                    case R.id.menu_manage_delete:
+                        actionbar.showConfirmStatus(menuId);
+                        if (matchItemAdapter != null) {
+                            matchItemAdapter.setSelectMode(true);
+                            matchItemAdapter.notifyDataSetChanged();
+                        }
+                        if (matchGridAdapter != null) {
+                            matchGridAdapter.setSelectMode(true);
+                            matchGridAdapter.notifyDataSetChanged();
+                        }
+                        break;
+                    case R.id.menu_manage_edit:
+                        isEditMode = true;
+                        actionbar.showConfirmStatus(menuId);
+                        break;
+                    case R.id.menu_manage_view:
+                        if (isGridMode) {
+                            isGridMode = false;
+                            rvGrid.startAnimation(getDisappearAnim(rvGrid));
+                            rvList.startAnimation(getAppearAnim(rvList));
+                            SettingProperty.setMatchManageGridMode(false);
+                        }
+                        else {
+                            isGridMode = true;
+                            rvList.startAnimation(getDisappearAnim(rvList));
+                            rvGrid.startAnimation(getAppearAnim(rvGrid));
+                            SettingProperty.setMatchManageGridMode(true);
+                        }
+                        refreshList();
+                        break;
+                }
+            }
+        });
+        actionbar.setOnConfirmListener(new OnConfirmListener() {
+            @Override
+            public boolean disableInstantDismissConfirm() {
+                return false;
+            }
 
-        ((TextView) findViewById(R.id.view7_actionbar_title)).setText(getString(R.string.match_manage_title));
+            @Override
+            public boolean disableInstantDismissCancel() {
+                return false;
+            }
 
-        findViewById(R.id.view7_actionbar_add).setOnClickListener(actionbarListener);
-        findViewById(R.id.view7_actionbar_edit).setOnClickListener(actionbarListener);
-        findViewById(R.id.view7_actionbar_delete).setOnClickListener(actionbarListener);
-        findViewById(R.id.view7_actionbar_done).setOnClickListener(actionbarListener);
-        findViewById(R.id.view7_actionbar_close).setOnClickListener(actionbarListener);
-        findViewById(R.id.view7_actionbar_mode).setOnClickListener(actionbarListener);
-        ivSort.setOnClickListener(actionbarListener);
+            @Override
+            public boolean onConfirm(int actionId) {
+                switch (actionId) {
+                    case R.id.menu_manage_delete:
+                        deleteMatchItems();
+                        if (matchItemAdapter != null) {
+                            matchItemAdapter.setSelectMode(false);
+                            matchItemAdapter.notifyDataSetChanged();
+                        }
+                        if (matchGridAdapter != null) {
+                            matchGridAdapter.setSelectMode(false);
+                            matchGridAdapter.notifyDataSetChanged();
+                        }
+                        break;
+                }
+                isEditMode = false;
+                isOnlyAddName = false;
+                return true;
+            }
+
+            @Override
+            public boolean onCancel(int actionId) {
+                switch (actionId) {
+                    case R.id.menu_manage_delete:
+                        if (matchItemAdapter != null) {
+                            matchItemAdapter.setSelectMode(false);
+                            matchItemAdapter.notifyDataSetChanged();
+                        }
+                        if (matchGridAdapter != null) {
+                            matchGridAdapter.setSelectMode(false);
+                            matchGridAdapter.notifyDataSetChanged();
+                        }
+                        break;
+                }
+                isEditMode = false;
+                isOnlyAddName = false;
+                return true;
+            }
+        });
+        actionbar.registerPopupMenu(R.id.menu_manage_sort);
+        actionbar.setPopupMenuProvider(new PopupMenuProvider() {
+            @Override
+            public PopupMenu getPopupMenu(int iconMenuId, View anchorView) {
+                PopupMenu popupMenu = null;
+                switch (iconMenuId) {
+                    case R.id.menu_manage_sort:
+                        popupMenu = getSortPopup(anchorView);
+                        break;
+                }
+                return popupMenu;
+            }
+        });
     }
 
     @Override
@@ -176,7 +288,9 @@ public class MatchManageActivity extends BaseMvpActivity<MatchManagePresenter> i
                 openMatchEditDialog(bean);
                 // 只添加新名称，打开对话框后恢复到正常模式
                 if (isOnlyAddName) {
-                    updateActionbarStatus(false);
+                    isOnlyAddName = false;
+                    isEditMode = false;
+                    actionbar.cancelConfirmStatus();
                 }
             }
             else {
@@ -194,104 +308,6 @@ public class MatchManageActivity extends BaseMvpActivity<MatchManagePresenter> i
             }
         }
     };
-
-    View.OnClickListener actionbarListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View view) {
-            switch (view.getId()) {
-                case R.id.view7_actionbar_back:
-                    finish();
-                    break;
-                case R.id.view7_actionbar_sort:
-                    showSortPopup();
-                    break;
-                case R.id.view7_actionbar_add:
-                    showYesNoMessage("Only add match name from existed matches?"
-                            , new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialogInterface, int i) {
-                                    isOnlyAddName = true;
-                                    isEditMode = true;
-                                    updateActionbarStatus(true);
-                                }
-                            }
-                            , new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialogInterface, int i) {
-                                    openMatchEditDialog(null);
-                                }
-                            });
-                    break;
-                case R.id.view7_actionbar_edit:
-                    isEditMode = true;
-                    updateActionbarStatus(true);
-                    break;
-                case R.id.view7_actionbar_delete:
-                    isDeleteMode = true;
-                    updateActionbarStatus(true);
-                    if (matchItemAdapter != null) {
-                        matchItemAdapter.setSelectMode(true);
-                        matchItemAdapter.notifyDataSetChanged();
-                    }
-                    if (matchGridAdapter != null) {
-                        matchGridAdapter.setSelectMode(true);
-                        matchGridAdapter.notifyDataSetChanged();
-                    }
-                    break;
-                case R.id.view7_actionbar_done:
-                    if (isEditMode) {
-
-                    }
-                    else if (isDeleteMode) {
-                        deleteMatchItems();
-                    }
-                    updateActionbarStatus(false);
-                    break;
-                case R.id.view7_actionbar_close:
-                    updateActionbarStatus(false);
-                    break;
-                case R.id.view7_actionbar_mode:
-                    if (isGridMode) {
-                        isGridMode = false;
-                        rvGrid.startAnimation(getDisappearAnim(rvGrid));
-                        rvList.startAnimation(getAppearAnim(rvList));
-                        SettingProperty.setMatchManageGridMode(false);
-                    }
-                    else {
-                        isGridMode = true;
-                        rvList.startAnimation(getDisappearAnim(rvList));
-                        rvGrid.startAnimation(getAppearAnim(rvGrid));
-                        SettingProperty.setMatchManageGridMode(true);
-                    }
-                    refreshList();
-                    break;
-            }
-        }
-    };
-
-    public void updateActionbarStatus(boolean editMode) {
-        if (editMode) {
-            groupConfirm.setVisibility(View.VISIBLE);
-            groupNormal.setVisibility(View.GONE);
-        }
-        else {
-            groupConfirm.setVisibility(View.GONE);
-            groupNormal.setVisibility(View.VISIBLE);
-            if (isDeleteMode) {
-                if (matchItemAdapter != null) {
-                    matchItemAdapter.setSelectMode(false);
-                    matchItemAdapter.notifyDataSetChanged();
-                }
-                if (matchGridAdapter != null) {
-                    matchGridAdapter.setSelectMode(false);
-                    matchGridAdapter.notifyDataSetChanged();
-                }
-            }
-            isEditMode = false;
-            isDeleteMode = false;
-            isOnlyAddName = false;
-        }
-    }
 
     private void openMatchEditDialog(MatchNameBean bean) {
         MatchEditDialog dialog = new MatchEditDialog();
@@ -333,9 +349,9 @@ public class MatchManageActivity extends BaseMvpActivity<MatchManagePresenter> i
         refreshList();
     }
 
-    private void showSortPopup() {
+    private PopupMenu getSortPopup(View anchor) {
         if (popSort == null) {
-            popSort = new PopupMenu(this, ivSort);
+            popSort = new PopupMenu(this, anchor);
             popSort.getMenuInflater().inflate(R.menu.sort_match, popSort.getMenu());
             popSort.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                 @Override
@@ -355,7 +371,7 @@ public class MatchManageActivity extends BaseMvpActivity<MatchManagePresenter> i
                 }
             });
         }
-        popSort.show();
+        return popSort;
     }
 
     @Override
@@ -372,8 +388,7 @@ public class MatchManageActivity extends BaseMvpActivity<MatchManagePresenter> i
 
     @Override
     public void onBackPressed() {
-        if (isEditMode || isDeleteMode) {
-            updateActionbarStatus(false);
+        if (actionbar != null && actionbar.onBackPressed()) {
             return;
         }
         super.onBackPressed();

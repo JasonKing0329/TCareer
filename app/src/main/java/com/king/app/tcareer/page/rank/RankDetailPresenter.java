@@ -60,6 +60,7 @@ public class RankDetailPresenter extends BasePresenter<RankDetailView> {
                 .flatMap(new Function<User, ObservableSource<List<RankWeek>>>() {
                     @Override
                     public ObservableSource<List<RankWeek>> apply(User user) throws Exception {
+                        view.postShowUser(user.getNameEng());
                         return queryWeekRank(userId, desc);
                     }
                 })

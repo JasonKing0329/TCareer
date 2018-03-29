@@ -50,4 +50,6 @@
     <dimen name="record_filter_spinner_input_large">150dp</dimen>
     <dimen name="record_filter_spinner_input_short">60dp</dimen>
     <dimen name="rank_count_top">10dp</dimen>
+    <dimen name="actionbar_icon_size">40dp</dimen>
+    <dimen name="actionbar_icon_padding">8dp</dimen>
 </resources>

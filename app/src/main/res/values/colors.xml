@@ -132,4 +132,5 @@
     <color name="normal_court_grass">#50a625</color>
     <color name="normal_court_inhard">#3453d1</color>
 
+    <color name="ripple_actionbar_icon">#33111111</color>
 </resources>

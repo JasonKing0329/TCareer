@@ -106,6 +106,11 @@ public class RankDetailFragment extends BaseMvpFragment<RankDetailPresenter> imp
     }
 
     @Override
+    public void postShowUser(String nameEng) {
+
+    }
+
+    @Override
     public void showRanks(List<RankWeek> ranks) {
 
         if (ListUtil.isEmpty(ranks)) {

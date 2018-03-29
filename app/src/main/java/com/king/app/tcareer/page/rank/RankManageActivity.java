@@ -9,6 +9,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.king.app.jactionbar.JActionbar;
+import com.king.app.jactionbar.OnBackListener;
 import com.king.app.tcareer.R;
 import com.king.app.tcareer.base.BaseMvpActivity;
 import com.king.app.tcareer.model.db.entity.Rank;
@@ -29,8 +31,8 @@ public class RankManageActivity extends BaseMvpActivity<RankPresenter> implement
 
     private static final int REQUEST_DETAIL = 100;
 
-    @BindView(R.id.tv_title)
-    TextView tvTitle;
+    @BindView(R.id.actionbar)
+    JActionbar actionbar;
     @BindView(R.id.group_chart_container)
     ViewGroup groupChartContainer;
     @BindView(R.id.rank_manage_list)
@@ -49,11 +51,17 @@ public class RankManageActivity extends BaseMvpActivity<RankPresenter> implement
 
     @Override
     protected void initView() {
-        tvTitle.setText("Rank");
         LinearLayoutManager manager = new LinearLayoutManager(this);
         manager.setOrientation(LinearLayoutManager.VERTICAL);
         rvRankList.setLayoutManager(manager);
         rvRankList.setItemAnimator(new DefaultItemAnimator());
+
+        actionbar.setOnBackListener(new OnBackListener() {
+            @Override
+            public void onBack() {
+                onBackPressed();
+            }
+        });
     }
 
     @Override
@@ -65,6 +73,16 @@ public class RankManageActivity extends BaseMvpActivity<RankPresenter> implement
     public void initData() {
         userId = getIntent().getLongExtra(KEY_USER_ID, -1);
         presenter.loadYearRanks(userId);
+    }
+
+    @Override
+    public void postShowUser(final String nameEng) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                actionbar.setTitle(nameEng);
+            }
+        });
     }
 
     @Override
@@ -111,13 +129,9 @@ public class RankManageActivity extends BaseMvpActivity<RankPresenter> implement
         setResult(RESULT_OK);
     }
 
-    @OnClick({R.id.iv_back, R.id.iv_add})
+    @OnClick({R.id.iv_add})
     public void onClick(View view) {
         switch (view.getId()) {
-            case R.id.iv_back:
-                // 加入了转场动画，必须用onBackPressed，finish无效果
-                onBackPressed();
-                break;
             case R.id.iv_add:
                 addRank();
                 break;

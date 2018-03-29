@@ -35,6 +35,7 @@ public class RankPresenter extends BasePresenter<RankView> {
                 .flatMap(new Function<User, ObservableSource<List<Rank>>>() {
                     @Override
                     public ObservableSource<List<Rank>> apply(User user) throws Exception {
+                        view.postShowUser(user.getNameEng());
                         return queryYearRank(userId);
                     }
                 })
