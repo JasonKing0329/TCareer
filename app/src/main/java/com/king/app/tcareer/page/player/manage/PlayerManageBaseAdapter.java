@@ -2,6 +2,7 @@ package com.king.app.tcareer.page.player.manage;
 
 import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.util.SparseBooleanArray;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,6 +35,10 @@ import java.util.Map;
 public abstract class PlayerManageBaseAdapter extends RecyclerView.Adapter implements View.OnClickListener {
 
     protected List<PlayerViewBean> list;
+    private List<PlayerViewBean> originList;
+
+    private String mKeyword;
+
     protected boolean selectMode;
     protected SparseBooleanArray mCheckMap;
     private OnPlayerItemClickListener onPlayerItemClickListener;
@@ -51,9 +56,9 @@ public abstract class PlayerManageBaseAdapter extends RecyclerView.Adapter imple
     private FragmentManager fragmentManager;
 
     public PlayerManageBaseAdapter(List<PlayerViewBean> list) {
-        this.list = list;
         mCheckMap = new SparseBooleanArray();
         playerImageIndexMap = new HashMap<>();
+        setList(list);
     }
 
     public void setSelectMode(boolean selectMode) {
@@ -63,8 +68,12 @@ public abstract class PlayerManageBaseAdapter extends RecyclerView.Adapter imple
         }
     }
 
-    public void setList(List<PlayerViewBean> list) {
-        this.list = list;
+    public void setList(List<PlayerViewBean> data) {
+        originList = data;
+        list = new ArrayList<>();
+        for (PlayerViewBean t:originList) {
+            list.add(t);
+        }
     }
 
     public void setOnPlayerItemClickListener(OnPlayerItemClickListener onPlayerItemClickListener) {
@@ -265,6 +274,38 @@ public abstract class PlayerManageBaseAdapter extends RecyclerView.Adapter imple
             return fragmentManager;
         }
     };
+
+    public void filter(String text) {
+        if (!text.equals(mKeyword)) {
+            list.clear();
+            mKeyword = text;
+            for (int i = 0; i < originList.size(); i ++) {
+                if (TextUtils.isEmpty(text)) {
+                    list.add(originList.get(i));
+                }
+                else {
+                    if (isMatchForKeyword(originList.get(i), text)) {
+                        list.add(originList.get(i));
+                    }
+                }
+            }
+            notifyDataSetChanged();
+        }
+    }
+
+    private boolean isMatchForKeyword(PlayerViewBean playerViewBean, String text) {
+        // 中文、英文、拼音模糊匹配
+        if (playerViewBean.getName().toLowerCase().contains(text.toLowerCase())) {
+            return true;
+        }
+        if (playerViewBean.getNameEng() != null && playerViewBean.getNameEng().toLowerCase().contains(text.toLowerCase())) {
+            return true;
+        }
+        if (playerViewBean.getNamePinyin() != null && playerViewBean.getNamePinyin().toLowerCase().contains(text.toLowerCase())) {
+            return true;
+        }
+        return false;
+    }
 
     public interface OnPlayerItemClickListener {
         void onPlayerItemClick(PlayerViewBean bean);

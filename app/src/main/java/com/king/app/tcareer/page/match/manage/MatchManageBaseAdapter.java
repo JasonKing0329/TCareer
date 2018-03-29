@@ -2,6 +2,7 @@ package com.king.app.tcareer.page.match.manage;
 
 import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.util.SparseBooleanArray;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +19,7 @@ import com.king.app.tcareer.model.http.Command;
 import com.king.app.tcareer.model.http.bean.ImageUrlBean;
 import com.king.app.tcareer.page.imagemanager.DataController;
 import com.king.app.tcareer.page.imagemanager.ImageManager;
+import com.king.app.tcareer.page.player.manage.PlayerViewBean;
 import com.king.app.tcareer.utils.DebugLog;
 
 import java.util.ArrayList;
@@ -33,6 +35,9 @@ import java.util.Map;
 public abstract class MatchManageBaseAdapter extends RecyclerView.Adapter implements View.OnClickListener {
 
     protected List<MatchNameBean> list;
+    private List<MatchNameBean> originList;
+
+    private String mKeyword;
     protected boolean selectMode;
     protected SparseBooleanArray mCheckMap;
     protected OnMatchItemClickListener onMatchItemClickListener;
@@ -50,9 +55,9 @@ public abstract class MatchManageBaseAdapter extends RecyclerView.Adapter implem
     private FragmentManager fragmentManager;
 
     public MatchManageBaseAdapter(List<MatchNameBean> list) {
-        this.list = list;
         mCheckMap = new SparseBooleanArray();
         imageIndexMap = new HashMap<>();
+        setList(list);
     }
 
     public void setSelectMode(boolean selectMode) {
@@ -66,8 +71,12 @@ public abstract class MatchManageBaseAdapter extends RecyclerView.Adapter implem
         this.onMatchItemClickListener = onMatchItemClickListener;
     }
 
-    public void setList(List<MatchNameBean> list) {
-        this.list = list;
+    public void setList(List<MatchNameBean> data) {
+        originList = data;
+        list = new ArrayList<>();
+        for (MatchNameBean t:originList) {
+            list.add(t);
+        }
     }
 
     @Override
@@ -192,4 +201,37 @@ public abstract class MatchManageBaseAdapter extends RecyclerView.Adapter implem
             }
         }
     }
+
+    public void filter(String text) {
+        if (!text.equals(mKeyword)) {
+            list.clear();
+            mKeyword = text;
+            for (int i = 0; i < originList.size(); i ++) {
+                if (TextUtils.isEmpty(text)) {
+                    list.add(originList.get(i));
+                }
+                else {
+                    if (isMatchForKeyword(originList.get(i), text)) {
+                        list.add(originList.get(i));
+                    }
+                }
+            }
+            notifyDataSetChanged();
+        }
+    }
+
+    private boolean isMatchForKeyword(MatchNameBean bean, String text) {
+        // 支持name，国家，城市
+        if (bean.getName().toLowerCase().contains(text.toLowerCase())) {
+            return true;
+        }
+        if (bean.getMatchBean().getCountry().contains(text.toLowerCase())) {
+            return true;
+        }
+        if (bean.getMatchBean().getCity().contains(text.toLowerCase())) {
+            return true;
+        }
+        return false;
+    }
+
 }

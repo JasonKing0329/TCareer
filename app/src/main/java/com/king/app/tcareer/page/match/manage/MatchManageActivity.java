@@ -17,6 +17,7 @@ import com.king.app.jactionbar.JActionbar;
 import com.king.app.jactionbar.OnBackListener;
 import com.king.app.jactionbar.OnConfirmListener;
 import com.king.app.jactionbar.OnMenuItemListener;
+import com.king.app.jactionbar.OnSearchListener;
 import com.king.app.jactionbar.PopupMenuProvider;
 import com.king.app.tcareer.R;
 import com.king.app.tcareer.base.BaseMvpActivity;
@@ -235,6 +236,18 @@ public class MatchManageActivity extends BaseMvpActivity<MatchManagePresenter> i
                         break;
                 }
                 return popupMenu;
+            }
+        });
+        actionbar.setOnSearchListener(new OnSearchListener() {
+            @Override
+            public void onSearchWordsChanged(String words) {
+
+                if (matchGridAdapter != null) {
+                    matchGridAdapter.filter(words);
+                }
+                if (matchItemAdapter != null) {
+                    matchItemAdapter.filter(words);
+                }
             }
         });
     }
