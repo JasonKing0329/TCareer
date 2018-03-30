@@ -7,8 +7,8 @@ android {
         applicationId "com.king.app.tcareer"
         minSdkVersion 21
         targetSdkVersion 26
-        versionCode 45
-        versionName "2.4.6"
+        versionCode 46
+        versionName "2.4.7"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     signingConfigs {
@@ -83,10 +83,10 @@ dependencies {
     annotationProcessor 'com.github.bumptech.glide:compiler:4.0.0'
 
     /*轮播视图*/
-    compile 'com.youth.banner:banner:1.4.10'
+    implementation 'com.youth.banner:banner:1.4.10'
+    implementation 'com.king.lib:jactionbar:1.0.1'
     implementation project(':MPChartLib')
     implementation project(':shapimageview')
     implementation project(':boommenu')
     implementation project(':expandablerecycleradapter')
-    implementation project(':jactionbar')
 }
