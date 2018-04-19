@@ -26,6 +26,7 @@ import com.king.app.tcareer.model.palette.PaletteCallback;
 import com.king.app.tcareer.model.palette.PaletteRequestListener;
 import com.king.app.tcareer.model.palette.PaletteResponse;
 import com.king.app.tcareer.model.palette.ViewColorBound;
+import com.king.app.tcareer.utils.DebugLog;
 import com.king.app.tcareer.utils.ScreenUtils;
 
 import java.util.ArrayList;
@@ -174,7 +175,7 @@ public class PlayerPageActivity extends BaseMvpActivity<PagePresenter> implement
     @Override
     public void showCompetitor(String nameEng, String bgPath) {
         collapsingToolbar.setTitle(nameEng);
-
+        DebugLog.e(bgPath);
         Glide.with(this)
                 .asBitmap()
                 .load(bgPath)

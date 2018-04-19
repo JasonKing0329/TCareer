@@ -7,9 +7,13 @@ android {
         applicationId "com.king.app.tcareer"
         minSdkVersion 21
         targetSdkVersion 26
-        versionCode 49
-        versionName "2.5.2"
+        versionCode 50
+        versionName "2.5.3"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+        sourceSets.main {
+            jniLibs.srcDirs = ['libs']
+        }
     }
     signingConfigs {
         releaseConfig {
@@ -85,7 +89,11 @@ dependencies {
 
     /*轮播视图*/
     implementation 'com.youth.banner:banner:1.4.10'
+
     implementation 'com.king.lib:jactionbar:1.0.1'
+
+    implementation 'com.guo.android_extend:android-extend:1.0.1'
+
     implementation project(':MPChartLib')
     implementation project(':shapimageview')
     implementation project(':boommenu')

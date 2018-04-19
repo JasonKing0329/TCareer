@@ -1,10 +1,7 @@
 package com.king.app.tcareer.page.player.page;
 
-import android.graphics.Bitmap;
-import android.graphics.PointF;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
-import android.media.FaceDetector;
 import android.support.design.widget.TabLayout;
 import android.support.v7.graphics.Palette;
 import android.text.TextUtils;
@@ -26,10 +23,11 @@ import com.king.app.tcareer.model.db.entity.Record;
 import com.king.app.tcareer.model.db.entity.RecordDao;
 import com.king.app.tcareer.model.db.entity.User;
 import com.king.app.tcareer.model.db.entity.UserDao;
+import com.king.app.tcareer.model.face.FaceData;
+import com.king.app.tcareer.model.face.FaceModelFactory;
 import com.king.app.tcareer.model.palette.PaletteResponse;
 import com.king.app.tcareer.model.palette.ViewColorBound;
 import com.king.app.tcareer.utils.ConstellationUtil;
-import com.king.app.tcareer.utils.DebugLog;
 import com.king.app.tcareer.utils.ListUtil;
 import com.king.app.tcareer.utils.ScreenUtils;
 
@@ -419,9 +417,9 @@ public class PagePresenter extends BasePresenter<IPageView> {
         // 修改信息标签的位置（根据人脸位置，统一显示在左侧或右侧）
         boolean isRight = true;
         int rule = RelativeLayout.ALIGN_PARENT_RIGHT;
-        if (data.faceData != null && data.faceData.point != null) {
+        if (data.faceData != null && data.faceData.centerPoint != null) {
             // 人脸在右侧，则text在左侧
-            if (data.faceData.point.x > ScreenUtils.getScreenWidth() / 2) {
+            if (data.faceData.centerPoint.x > ScreenUtils.getScreenWidth() / 2) {
                 rule = RelativeLayout.ALIGN_PARENT_LEFT;
                 isRight = false;
             }
@@ -522,10 +520,6 @@ public class PagePresenter extends BasePresenter<IPageView> {
         ColorPack pack;
     }
 
-    private class FaceData {
-        PointF point;
-    }
-
     private class ColorPack {
         List<Integer> rgbs = new ArrayList<>();
         List<Integer> bodyColors = new ArrayList<>();
@@ -539,68 +533,7 @@ public class PagePresenter extends BasePresenter<IPageView> {
      * @return
      */
     private Observable<FaceData> getFaceData(final PaletteResponse response) {
-        return Observable.create(new ObservableOnSubscribe<FaceData>() {
-            @Override
-            public void subscribe(ObservableEmitter<FaceData> e) throws Exception {
-                FaceData data = new FaceData();
-                Bitmap bitmap = getFaceBitmap(response.resource);
-                FaceDetector detector = new FaceDetector(bitmap.getWidth(), bitmap.getHeight(), 1);
-                FaceDetector.Face[] faces = new FaceDetector.Face[1];
-                int num = detector.findFaces(bitmap, faces);
-                DebugLog.e("findFaces " + num);
-                if (faces.length > 0 && faces[0] != null) {
-                    FaceDetector.Face face = faces[0];
-                    data.point = new PointF();
-                    face.getMidPoint(data.point);
-                    DebugLog.e("x=" + data.point.x + ", y=" + data.point.y);
-                }
-                bitmap.recycle();
-                e.onNext(data);
-            }
-        });
-    }
-
-    /**
-     * Android官方提供的人脸识别api在android.media.FaceDetector，核心的api是
-     * FaceDetector.findFaces()
-     * 主要的坑有两个：
-     * （1）只能处理RGB_565格式的Bitmap，需要做转换。
-     * （2）只能处理width为偶数的Bitmap，这里的解法是如果是奇数，则放弃最右侧的一列像素。
-     * @param sourceBitmap
-     * @return
-     */
-    public Bitmap getFaceBitmap(Bitmap sourceBitmap) {
-        // default algorithm of face detecting of Android can only handle
-        // RGB_565 bitmap, so copy it by RGB_565 here.
-        Bitmap cacheBitmap = sourceBitmap.copy(Bitmap.Config.RGB_565, false);
-
-        DebugLog.e(
-                "genFaceBitmap() : source bitmap width - "
-                        + cacheBitmap.getWidth() + " , height - "
-                        + cacheBitmap.getHeight());
-
-        int cacheWidth = cacheBitmap.getWidth();
-        int cacheHeight = cacheBitmap.getHeight();
-
-        // default algorithm of face detecting of Android can only handle the
-        // bitmap that width is even, so we give up the 1 pixel from right if
-        // not even.
-        if (cacheWidth % 2 != 0) {
-            if (0 == cacheWidth - 1) {
-                return null;
-            }
-            final Bitmap localCacheBitmap = Bitmap.createBitmap(cacheBitmap, 0,
-                    0, cacheWidth - 1, cacheHeight);
-            cacheBitmap.recycle();
-            cacheBitmap = localCacheBitmap;
-            --cacheWidth;
-
-            DebugLog.e(
-                    "genFaceBitmap() : source bitmap width - "
-                            + cacheBitmap.getWidth() + " , height - "
-                            + cacheBitmap.getHeight());
-        }
-        return cacheBitmap;
+        return FaceModelFactory.create().createFaceData(response.resource);
     }
 
     /**
