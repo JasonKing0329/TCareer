@@ -24,6 +24,7 @@ import com.king.app.tcareer.model.db.entity.RecordDao;
 import com.king.app.tcareer.model.db.entity.User;
 import com.king.app.tcareer.model.db.entity.UserDao;
 import com.king.app.tcareer.model.face.FaceData;
+import com.king.app.tcareer.model.face.FaceModel;
 import com.king.app.tcareer.model.face.FaceModelFactory;
 import com.king.app.tcareer.model.palette.PaletteResponse;
 import com.king.app.tcareer.model.palette.ViewColorBound;
@@ -67,9 +68,11 @@ public class PagePresenter extends BasePresenter<IPageView> {
 
     private PageData mPageData;
 
+    private FaceModel faceModel;
+
     @Override
     protected void onCreate() {
-
+        faceModel = FaceModelFactory.create();
     }
 
     public void loadPlayerAndUser(final long playerId, final long userId, final boolean playerIsUser) {
@@ -533,7 +536,7 @@ public class PagePresenter extends BasePresenter<IPageView> {
      * @return
      */
     private Observable<FaceData> getFaceData(final PaletteResponse response) {
-        return FaceModelFactory.create().createFaceData(response.resource);
+        return faceModel.createFaceData(response.resource);
     }
 
     /**
@@ -569,5 +572,13 @@ public class PagePresenter extends BasePresenter<IPageView> {
                 e.onNext(pack);
             }
         });
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (faceModel != null) {
+            faceModel.destroy();
+        }
     }
 }

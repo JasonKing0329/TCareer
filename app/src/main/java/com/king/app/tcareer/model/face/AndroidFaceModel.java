@@ -48,6 +48,11 @@ public class AndroidFaceModel implements FaceModel {
         return null;
     }
 
+    @Override
+    public void destroy() {
+
+    }
+
     /**
      * Android官方提供的人脸识别api在android.media.FaceDetector，核心的api是
      * FaceDetector.findFaces()

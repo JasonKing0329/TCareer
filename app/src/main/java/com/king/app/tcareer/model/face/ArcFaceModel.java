@@ -23,6 +23,13 @@ import io.reactivex.ObservableOnSubscribe;
  * <p/>创建时间: 2018/4/19 15:51
  */
 public class ArcFaceModel implements FaceModel {
+
+    private AFD_FSDKEngine engine;
+
+    public ArcFaceModel() {
+        engine = new AFD_FSDKEngine();
+    }
+
     @Override
     public Observable<FaceData> createFaceData(final Bitmap resource) {
         return Observable.create(new ObservableOnSubscribe<FaceData>() {
@@ -36,7 +43,6 @@ public class ArcFaceModel implements FaceModel {
                 boolean convertResult = convert.convert(resource, bitdata);
                 DebugLog.e("convert " + convertResult);
                 convert.destroy();
-                AFD_FSDKEngine engine = new AFD_FSDKEngine();
                 AFD_FSDKVersion version = new AFD_FSDKVersion();
                 List<AFD_FSDKFace> result = new ArrayList<>();
                 AFD_FSDKError err = engine.AFD_FSDK_InitialFaceEngine(FaceDB.appid, FaceDB.fd_key, AFD_FSDKEngine.AFD_OPF_0_HIGHER_EXT, 16, 1);
@@ -66,5 +72,13 @@ public class ArcFaceModel implements FaceModel {
     @Override
     public Observable<FaceData> createFaceData(String filePath) {
         return null;
+    }
+
+    @Override
+    public void destroy() {
+        if (engine != null) {
+            AFD_FSDKError err = engine.AFD_FSDK_UninitialFaceEngine();
+            DebugLog.e("AFD_FSDK_UninitialFaceEngine =" + err.getCode());
+        }
     }
 }
