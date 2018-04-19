@@ -1,7 +1,5 @@
 package com.king.app.tcareer.model.palette;
 
-import android.view.View;
-
 import java.util.List;
 
 /**
@@ -11,7 +9,7 @@ import java.util.List;
  */
 public interface PaletteCallback {
 
-    List<View> getTargetViews();
+    List<ViewColorBound> getTargetViews();
 
     void noPaletteResponseLoaded(int position);
 

@@ -2,6 +2,7 @@ package com.king.app.tcareer.page.player.page;
 
 import android.content.Context;
 import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.design.widget.TabLayout;
 import android.support.v7.widget.Toolbar;
 import android.widget.TextView;
 
@@ -33,6 +34,8 @@ public interface IPageView extends BaseView {
     CollapsingToolbarLayout getCollapsingToolbar();
 
     Toolbar getToolbar();
+
+    TabLayout getTabLayout();
 
     void showCompetitor(String nameEng, String detailPlayerPath);
 

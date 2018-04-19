@@ -52,4 +52,5 @@
     <dimen name="rank_count_top">10dp</dimen>
     <dimen name="actionbar_icon_size">40dp</dimen>
     <dimen name="actionbar_icon_padding">8dp</dimen>
+    <dimen name="player_page_head_height">300dp</dimen>
 </resources>

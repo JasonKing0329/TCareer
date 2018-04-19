@@ -1,6 +1,5 @@
 package com.king.app.tcareer.model.palette;
 
-import android.graphics.Rect;
 import android.view.View;
 
 /**
@@ -8,11 +7,10 @@ import android.view.View;
  * <p/>作者：景阳
  * <p/>创建时间: 2018/4/12 16:15
  */
-public class ViewColorBound {
+public class RectColorBound {
 
     public View view;
 
     public int color;
 
-    public Rect rect;
 }

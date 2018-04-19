@@ -16,6 +16,7 @@
 package com.king.app.tcareer.page.player.page;
 
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.support.annotation.StringRes;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
@@ -74,6 +75,29 @@ public class TabCustomView extends LinearLayout {
     public void setContentCategory(String category) {
         contentCategory = category;
         contentCategoryText.setText(contentCategory);
+    }
+
+    public void setTextColor(int defaultColor, int selectedColor) {
+        ColorStateList list = createColorStateList(defaultColor, selectedColor);
+        countText.setTextColor(list);
+        contentCategoryText.setTextColor(list);
+    }
+
+    private static ColorStateList createColorStateList(int defaultColor, int selectedColor) {
+        final int[][] states = new int[2][];
+        final int[] colors = new int[2];
+        int i = 0;
+
+        states[i] = SELECTED_STATE_SET;
+        colors[i] = selectedColor;
+        i++;
+
+        // Default enabled state
+        states[i] = EMPTY_STATE_SET;
+        colors[i] = defaultColor;
+        i++;
+
+        return new ColorStateList(states, colors);
     }
 
 }

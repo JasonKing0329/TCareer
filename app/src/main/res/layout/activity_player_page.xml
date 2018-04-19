@@ -7,6 +7,7 @@
 
     <!-- 加android:stateListAnimator="@null"解决Can't call void android.view.View.setElevation(float) on null object引起的闪退 -->
     <android.support.design.widget.AppBarLayout
+        android:id="@+id/appbar_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:stateListAnimator="@null"
@@ -28,7 +29,7 @@
                 <ImageView
                     android:id="@+id/iv_player_bg"
                     android:layout_width="360dp"
-                    android:layout_height="300dp" />
+                    android:layout_height="@dimen/player_page_head_height" />
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

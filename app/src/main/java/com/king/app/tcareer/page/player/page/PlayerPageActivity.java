@@ -3,6 +3,7 @@ package com.king.app.tcareer.page.player.page;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
@@ -24,8 +25,10 @@ import com.king.app.tcareer.model.db.entity.User;
 import com.king.app.tcareer.model.palette.PaletteCallback;
 import com.king.app.tcareer.model.palette.PaletteRequestListener;
 import com.king.app.tcareer.model.palette.PaletteResponse;
+import com.king.app.tcareer.model.palette.ViewColorBound;
 import com.king.app.tcareer.utils.ScreenUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -60,6 +63,8 @@ public class PlayerPageActivity extends BaseMvpActivity<PagePresenter> implement
     ViewPager viewpager;
     @BindView(R.id.collapsing_toolbar)
     CollapsingToolbarLayout collapsingToolbar;
+    @BindView(R.id.appbar_layout)
+    AppBarLayout appBarLayout;
 
     private PageAdapter pageAdapter;
 
@@ -117,6 +122,46 @@ public class PlayerPageActivity extends BaseMvpActivity<PagePresenter> implement
             }
         });
         collapsingToolbar.setExpandedTitleColor(getResources().getColor(R.color.transparent));
+
+        collapsingToolbar.post(new Runnable() {
+            @Override
+            public void run() {
+                // getScrimVisibleHeightTrigger里面用到了getHeight，要在控件布局完成后才有数值
+                int trigger = collapsingToolbar.getScrimVisibleHeightTrigger();
+                int total = getResources().getDimensionPixelSize(R.dimen.player_page_head_height);
+                appBarLayout.addOnOffsetChangedListener(new AppBarListener(total, trigger) {
+                    @Override
+                    protected void onCollapseStateChanged(boolean isCollapsing) {
+                        presenter.handleCollapseScrimChanged(isCollapsing);
+                    }
+                });
+            }
+        });
+    }
+
+    public static abstract class AppBarListener implements AppBarLayout.OnOffsetChangedListener {
+
+        private int collapseHeight;
+        private int scrimTrigger;
+
+        private boolean isCollapsing;
+
+        public AppBarListener(int collapseHeight, int scrimTrigger) {
+            this.collapseHeight = collapseHeight;
+            this.scrimTrigger = scrimTrigger;
+        }
+
+        @Override
+        public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
+            int offset = collapseHeight + verticalOffset;
+            boolean collapsing = (offset <= scrimTrigger);
+            if (collapsing != isCollapsing) {
+                isCollapsing = collapsing;
+                onCollapseStateChanged(isCollapsing);
+            }
+        }
+
+        protected abstract void onCollapseStateChanged(boolean isCollapsing);
     }
 
     private void initPlayerAndUser() {
@@ -136,8 +181,13 @@ public class PlayerPageActivity extends BaseMvpActivity<PagePresenter> implement
                 .apply(GlideOptions.getEditorPlayerOptions())
                 .listener(new PaletteRequestListener(0, new PaletteCallback() {
                     @Override
-                    public List<View> getTargetViews() {
-                        return null;
+                    public List<ViewColorBound> getTargetViews() {
+                        List<ViewColorBound> list = new ArrayList<>();
+                        ViewColorBound bound = new ViewColorBound();
+                        bound.view = toolbar;
+                        bound.rect = toolbar.getNavigationIcon().getBounds();
+                        list.add(bound);
+                        return list;
                     }
 
                     @Override
@@ -194,6 +244,11 @@ public class PlayerPageActivity extends BaseMvpActivity<PagePresenter> implement
     @Override
     public Context getContext() {
         return this;
+    }
+
+    @Override
+    public TabLayout getTabLayout() {
+        return tabLayout;
     }
 
     @Override

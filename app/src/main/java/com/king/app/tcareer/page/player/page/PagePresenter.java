@@ -3,7 +3,9 @@ package com.king.app.tcareer.page.player.page;
 import android.graphics.Bitmap;
 import android.graphics.PointF;
 import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.media.FaceDetector;
+import android.support.design.widget.TabLayout;
 import android.support.v7.graphics.Palette;
 import android.text.TextUtils;
 import android.view.Gravity;
@@ -25,6 +27,7 @@ import com.king.app.tcareer.model.db.entity.RecordDao;
 import com.king.app.tcareer.model.db.entity.User;
 import com.king.app.tcareer.model.db.entity.UserDao;
 import com.king.app.tcareer.model.palette.PaletteResponse;
+import com.king.app.tcareer.model.palette.ViewColorBound;
 import com.king.app.tcareer.utils.ConstellationUtil;
 import com.king.app.tcareer.utils.DebugLog;
 import com.king.app.tcareer.utils.ListUtil;
@@ -63,6 +66,8 @@ public class PagePresenter extends BasePresenter<IPageView> {
     private CompetitorBean mCompetitor;
 
     private List<Record> recordList;
+
+    private PageData mPageData;
 
     @Override
     protected void onCreate() {
@@ -347,6 +352,7 @@ public class PagePresenter extends BasePresenter<IPageView> {
 
                     @Override
                     public void onNext(PageData data) {
+                        mPageData = data;
                         dispatchData(data);
                     }
 
@@ -367,9 +373,20 @@ public class PagePresenter extends BasePresenter<IPageView> {
         // 修改titlebar的主色调（背景，文字颜色，图标颜色）
         view.getCollapsingToolbar().setContentScrimColor(data.mainSwatch.getRgb());
         view.getCollapsingToolbar().setCollapsedTitleTextColor(data.mainSwatch.getTitleTextColor());
-        // PorterDuff.Mode作用参考https://www.jianshu.com/p/d11892bbe055
-        // 这里用SRC_IN，第一个参数是source，表示source与原图像叠加后相交的部分运用source的颜色，如果是SRC_TOP则是叠加的情况，SRC则是source color充满整个view区域
-        view.getToolbar().getNavigationIcon().setColorFilter(data.mainSwatch.getTitleTextColor(), PorterDuff.Mode.SRC_IN);
+        // toolbar上的图标需要根据展开/折叠状态确定颜色，初始是展开状态
+        handleCollapseScrimChanged(false);
+
+        // 修改tab layout的相关颜色
+        view.getTabLayout().setBackgroundColor(data.mainSwatch.getRgb());
+        view.getTabLayout().setSelectedTabIndicatorColor(data.mainSwatch.getTitleTextColor());
+        // 使用了自定义布局，要单独设置
+//        view.getTabLayout().setTabTextColors(data.mainSwatch.getBodyTextColor(), data.mainSwatch.getTitleTextColor());
+        for (int i = 0; i < view.getTabLayout().getTabCount(); i ++) {
+            TabLayout.Tab tab = view.getTabLayout().getTabAt(i);
+            TabCustomView view = (TabCustomView) tab.getCustomView();
+            view.setTextColor(data.mainSwatch.getBodyTextColor(), data.mainSwatch.getTitleTextColor());
+        }
+        view.getTabLayout().invalidate();
 
         // 修改信息标签的颜色（eng name, chn name, place, birthday）
         ColorPack colorPack = data.pack;
@@ -389,6 +406,14 @@ public class PagePresenter extends BasePresenter<IPageView> {
         for (int i = 0; i < textViews.length; i ++) {
             textViews[i].setBackgroundColor(colorPack.rgbs.get(i));
             textViews[i].setTextColor(colorPack.bodyColors.get(i));
+            // country标签，更改drawable颜色
+            if (textViews[i] == view.getCountryTextView()) {
+                Drawable drawable = view.getContext().getResources().getDrawable(R.drawable.ic_edit_location_white_24dp);
+                drawable.setBounds(0, 0, ScreenUtils.dp2px(20), ScreenUtils.dp2px(20));
+                // 替换原图颜色
+                drawable.setColorFilter(colorPack.bodyColors.get(i), PorterDuff.Mode.SRC_IN);
+                textViews[i].setCompoundDrawables(drawable, null, null, null);
+            }
         }
 
         // 修改信息标签的位置（根据人脸位置，统一显示在左侧或右侧）
@@ -460,6 +485,37 @@ public class PagePresenter extends BasePresenter<IPageView> {
         return swatch;
     }
 
+    /**
+     * 处理appBar滑动过程scrim的出现和消失引起的图标颜色变化
+     * @param isCollapsing
+     */
+    public void handleCollapseScrimChanged(boolean isCollapsing) {
+        // 折叠状态运用main swatch的getTitleTextColor
+        if (isCollapsing) {
+            // PorterDuff.Mode作用参考https://www.jianshu.com/p/d11892bbe055
+            // 这里用SRC_IN，第一个参数是source，表示source与原图像叠加后相交的部分运用source的颜色，如果是SRC_TOP则是叠加的情况，SRC则是source color充满整个view区域
+            view.getToolbar().getNavigationIcon().setColorFilter(mPageData.mainSwatch.getTitleTextColor(), PorterDuff.Mode.SRC_IN);
+        }
+        // 展开状态运用图片区域颜色分析法得到的颜色
+        else {
+            ViewColorBound bound = findViewColorBound(mPageData.pack.colorBounds, view.getToolbar());
+            if (bound != null) {
+                view.getToolbar().getNavigationIcon().setColorFilter(bound.color, PorterDuff.Mode.SRC_IN);
+            }
+        }
+    }
+
+    private ViewColorBound findViewColorBound(List<ViewColorBound> colorBounds, View view) {
+        if (!ListUtil.isEmpty(colorBounds)) {
+            for (ViewColorBound bound:colorBounds) {
+                if (bound.view == view) {
+                    return bound;
+                }
+            }
+        }
+        return null;
+    }
+
     private class PageData {
         Palette.Swatch mainSwatch;
         FaceData faceData;
@@ -473,11 +529,12 @@ public class PagePresenter extends BasePresenter<IPageView> {
     private class ColorPack {
         List<Integer> rgbs = new ArrayList<>();
         List<Integer> bodyColors = new ArrayList<>();
+        List<ViewColorBound> colorBounds;
     }
 
     /**
      * 检测人脸位置（中心点）
-     * 原生FaceDetector，不是特别理想
+     * 原生FaceDetector，不是特别理想，侧面几乎不能识别出来
      * @param response
      * @return
      */
@@ -557,6 +614,7 @@ public class PagePresenter extends BasePresenter<IPageView> {
             @Override
             public void subscribe(ObservableEmitter<ColorPack> e) throws Exception {
                 ColorPack pack = new ColorPack();
+                pack.colorBounds = response.viewColorBounds;
                 int nTags = colorNumber;
                 if (response != null && response.palette != null && !ListUtil.isEmpty(response.palette.getSwatches())) {
                     List<Palette.Swatch> swatches = response.palette.getSwatches();

@@ -7,6 +7,7 @@ import android.graphics.ColorMatrix;
 import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.view.View;
@@ -195,22 +196,22 @@ public class ColorUtils {
     }
 
     /**
-     * 获取targetView所在bitmap区域的平均色值
+     * 获取bitmap指定区域的平均色值
      * @param bitmap
-     * @param targetView
+     * @param rect
      * @return
      */
-    public static int averageImageColor(Bitmap bitmap, View targetView) {
-        int pos[] = new int[2];
-        targetView.getLocationOnScreen(pos);
-        int[] pixels = new int[targetView.getWidth() * targetView.getHeight()];
-        int offsetX = pos[0];
-        int offsetY = pos[1];
+    public static int averageImageColor(Bitmap bitmap, Rect rect) {
+        int regionWidth = rect.right - rect.left;
+        int regionHeight = rect.bottom - rect.top;
+        int[] pixels = new int[regionWidth * regionHeight];
+        int offsetX = rect.left;
+        int offsetY = rect.top;
         long red = 0;
         long green = 0;
         long blue = 0;
-        for (int i = 0; i < targetView.getWidth(); i ++) {
-            for (int j = 0; j < targetView.getHeight(); j ++) {
+        for (int i = 0; i < regionWidth; i ++) {
+            for (int j = 0; j < regionHeight; j ++) {
                 int color = bitmap.getPixel(offsetX + i , offsetY + j);
                 red += Color.red(color);
                 green += Color.red(color);
@@ -221,5 +222,17 @@ public class ColorUtils {
         green = green / pixels.length;
         blue = blue / pixels.length;
         return (int) ((0xFF << 24) | (red << 16) | (green << 8) | blue);
+    }
+    /**
+     * 获取targetView所在bitmap区域的平均色值
+     * @param bitmap
+     * @param targetView
+     * @return
+     */
+    public static int averageImageColor(Bitmap bitmap, View targetView) {
+        int pos[] = new int[2];
+        targetView.getLocationOnScreen(pos);
+        Rect rect = new Rect(pos[0], pos[1], pos[0] + targetView.getWidth(), pos[1] + targetView.getHeight());
+        return averageImageColor(bitmap, rect);
     }
 }

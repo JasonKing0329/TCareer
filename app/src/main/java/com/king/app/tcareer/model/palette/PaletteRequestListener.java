@@ -103,17 +103,21 @@ public class PaletteRequestListener implements RequestListener<Bitmap> {
     }
 
     private Observable<List<ViewColorBound>> createViewColorBound(final Bitmap resource) {
-        List<View> list = callback.getTargetViews();
+        List<ViewColorBound> list = callback.getTargetViews();
         if (list == null) {
             list = new ArrayList<>();
         }
         return Observable.fromIterable(list)
-                        .map(new Function<View, ViewColorBound>() {
+                        .map(new Function<ViewColorBound, ViewColorBound>() {
                             @Override
-                            public ViewColorBound apply(View view) throws Exception {
-                                int color = ColorUtils.averageImageColor(resource, view);
-                                ViewColorBound bound = new ViewColorBound();
-                                bound.view = view;
+                            public ViewColorBound apply(ViewColorBound bound) throws Exception {
+                                int color;
+                                if (bound.rect == null) {
+                                    color = ColorUtils.averageImageColor(resource, bound.view);
+                                }
+                                else {
+                                    color = ColorUtils.averageImageColor(resource, bound.rect);
+                                }
                                 bound.color = ColorUtils.generateForgroundColorForBg(color);
                                 return bound;
                             }
