@@ -240,4 +240,10 @@ public class AppConstants {
 
     };
 
+    public static final String[] USER_COUNTRY = new String[] {
+            "China",
+            "France",
+            "America"
+    };
+
 }

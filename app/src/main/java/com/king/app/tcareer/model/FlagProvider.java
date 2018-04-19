@@ -1,6 +1,7 @@
 package com.king.app.tcareer.model;
 
 import com.king.app.tcareer.R;
+import com.king.app.tcareer.conf.AppConstants;
 
 /**
  * @desc
@@ -11,10 +12,10 @@ import com.king.app.tcareer.R;
 public class FlagProvider {
 
     public static int getFlagRes(String country) {
-        if (country.equals("法国")) {
+        if (country.equals(AppConstants.USER_COUNTRY[1])) {
             return R.drawable.flag_france;
         }
-        else if (country.equals("美国")) {
+        else if (country.equals(AppConstants.USER_COUNTRY[2])) {
             return R.drawable.flag_usa;
         }
         else {

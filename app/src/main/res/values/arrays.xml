@@ -119,12 +119,6 @@
 	    <item>Henry</item>
 	    <item>Tian Qi</item>
     </string-array>
-	<string-array name="multiuser_country" translatable="false">
-		<item>China</item>
-		<item>France</item>
-		<item>America</item>
-		<item>China</item>
-	</string-array>
 	<string-array name="multiuser_birthday" translatable="false">
 		<item>1991.03.29</item>
 		<item>1997.05.04</item>
