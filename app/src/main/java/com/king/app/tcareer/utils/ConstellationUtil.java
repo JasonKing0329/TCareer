@@ -1,5 +1,9 @@
 package com.king.app.tcareer.utils;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+
 /**
  * 描述:
  * <p/>作者：景阳
@@ -17,6 +21,7 @@ public class ConstellationUtil {
 
     /**
      * 获取星座的序号，下标从0开始
+     *
      * @param date 符合“yyyy-MM-dd”
      * @return
      */
@@ -32,6 +37,7 @@ public class ConstellationUtil {
 
     /**
      * 获取星座的中文名
+     *
      * @param date 符合“yyyy-MM-dd”
      * @return
      */
@@ -47,6 +53,7 @@ public class ConstellationUtil {
 
     /**
      * 获取星座的英文名
+     *
      * @param date 符合“yyyy-MM-dd”
      * @return
      */
@@ -104,11 +111,12 @@ public class ConstellationUtil {
 
     /**
      * 获取星座序号对应的中文名称
+     *
      * @param astroIndex
      * @return
      */
     public static String getConstellationChnByIndex(int astroIndex) {
-        for (int i = 0; i < starIndex.length; i ++) {
+        for (int i = 0; i < starIndex.length; i++) {
             if (astroIndex == starIndex[i]) {
                 return starArr[i];
             }
@@ -118,5 +126,51 @@ public class ConstellationUtil {
 
     public static class ConstellationParseException extends Exception {
 
+    }
+
+    /**
+     *
+     * @param dateString match yyyy-MM-dd
+     * @return
+     * @throws Exception
+     */
+    public static int getAge(String dateString) throws Exception {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        Date date = sdf.parse(dateString);
+        return getAge(date);
+    }
+
+    /**
+     *
+     * @param birthDay
+     * @return
+     * @throws Exception
+     */
+    public static int getAge(Date birthDay) throws Exception {
+        Calendar cal = Calendar.getInstance();
+
+        if (cal.before(birthDay)) {
+            throw new IllegalArgumentException(
+                    "The birthDay is before Now.It's unbelievable!");
+        }
+        int yearNow = cal.get(Calendar.YEAR);
+        int monthNow = cal.get(Calendar.MONTH);
+        int dayOfMonthNow = cal.get(Calendar.DAY_OF_MONTH);
+        cal.setTime(birthDay);
+
+        int yearBirth = cal.get(Calendar.YEAR);
+        int monthBirth = cal.get(Calendar.MONTH);
+        int dayOfMonthBirth = cal.get(Calendar.DAY_OF_MONTH);
+
+        int age = yearNow - yearBirth;
+
+        if (monthNow <= monthBirth) {
+            if (monthNow == monthBirth) {
+                if (dayOfMonthNow < dayOfMonthBirth) age--;
+            } else {
+                age--;
+            }
+        }
+        return age;
     }
 }

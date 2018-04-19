@@ -1,13 +1,19 @@
 package com.king.app.tcareer.page.player.page;
 
+import android.content.Context;
 import android.content.Intent;
-import android.graphics.PorterDuff;
-import android.graphics.drawable.Drawable;
+import android.os.Handler;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.view.View;
+import android.view.animation.AccelerateDecelerateInterpolator;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.AnimationSet;
+import android.view.animation.TranslateAnimation;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -15,7 +21,10 @@ import com.king.app.tcareer.R;
 import com.king.app.tcareer.base.BaseMvpActivity;
 import com.king.app.tcareer.model.GlideOptions;
 import com.king.app.tcareer.model.db.entity.User;
-import com.king.app.tcareer.view.widget.CircleImageView;
+import com.king.app.tcareer.model.palette.PaletteCallback;
+import com.king.app.tcareer.model.palette.PaletteRequestListener;
+import com.king.app.tcareer.model.palette.PaletteResponse;
+import com.king.app.tcareer.utils.ScreenUtils;
 
 import java.util.List;
 
@@ -35,12 +44,16 @@ public class PlayerPageActivity extends BaseMvpActivity<PagePresenter> implement
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
-    @BindView(R.id.iv_player)
-    CircleImageView ivPlayer;
-    @BindView(R.id.tv_info)
-    TextView tvInfo;
+    @BindView(R.id.iv_player_bg)
+    ImageView ivPlayerBg;
+    @BindView(R.id.tv_birthday)
+    TextView tvBirthday;
     @BindView(R.id.tv_country)
     TextView tvCountry;
+    @BindView(R.id.tv_name_chn)
+    TextView tvNameChn;
+    @BindView(R.id.tv_name_eng)
+    TextView tvNameEng;
     @BindView(R.id.tabLayout)
     TabLayout tabLayout;
     @BindView(R.id.viewpager)
@@ -92,22 +105,18 @@ public class PlayerPageActivity extends BaseMvpActivity<PagePresenter> implement
     }
 
     private void initViews() {
-        Drawable[] drawables = tvCountry.getCompoundDrawables();
-        if (drawables[0] != null) {
-            drawables[0].setColorFilter(getResources().getColor(R.color.icon_grey), PorterDuff.Mode.SRC_IN);
-        }
         // 不用公共的icon，这样会使其他界面引用该资源颜色也被下面的代码修改
 //        toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);
         toolbar.setNavigationIcon(R.drawable.ic_arrow_back_filterrable);
-        toolbar.getNavigationIcon().setColorFilter(
-                getResources().getColor(R.color.grey), PorterDuff.Mode.SRC_ATOP);
+//        toolbar.getNavigationIcon().setColorFilter(
+//                getResources().getColor(R.color.grey), PorterDuff.Mode.SRC_ATOP);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 finish();
             }
         });
-
+        collapsingToolbar.setExpandedTitleColor(getResources().getColor(R.color.transparent));
     }
 
     private void initPlayerAndUser() {
@@ -118,16 +127,30 @@ public class PlayerPageActivity extends BaseMvpActivity<PagePresenter> implement
     }
 
     @Override
-    public void showPlayerInfo(String engName, String info, String imagePath, String country) {
-        collapsingToolbar.setTitle(engName);
-        collapsingToolbar.setCollapsedTitleTextColor(getResources().getColor(R.color.grey));
-        tvInfo.setText(info);
-        Glide.with(this)
-                .load(imagePath)
-                .apply(GlideOptions.getDefaultPlayerOptions())
-                .into(ivPlayer);
-        tvCountry.setText(country);
+    public void showCompetitor(String nameEng, String bgPath) {
+        collapsingToolbar.setTitle(nameEng);
 
+        Glide.with(this)
+                .asBitmap()
+                .load(bgPath)
+                .apply(GlideOptions.getEditorPlayerOptions())
+                .listener(new PaletteRequestListener(0, new PaletteCallback() {
+                    @Override
+                    public List<View> getTargetViews() {
+                        return null;
+                    }
+
+                    @Override
+                    public void noPaletteResponseLoaded(int position) {
+
+                    }
+
+                    @Override
+                    public void onPaletteResponse(int position, PaletteResponse response) {
+                        presenter.handlePalette(response);
+                    }
+                }))
+                .into(ivPlayerBg);
         initFragments();
     }
 
@@ -138,6 +161,39 @@ public class PlayerPageActivity extends BaseMvpActivity<PagePresenter> implement
 
     private void initFragments() {
         presenter.loadRecords();
+    }
+
+    public CollapsingToolbarLayout getCollapsingToolbar() {
+        return collapsingToolbar;
+    }
+
+    public Toolbar getToolbar() {
+        return toolbar;
+    }
+
+    @Override
+    public TextView getChnNameTextView() {
+        return tvNameChn;
+    }
+
+    @Override
+    public TextView getEngNameTextView() {
+        return tvNameEng;
+    }
+
+    @Override
+    public TextView getCountryTextView() {
+        return tvCountry;
+    }
+
+    @Override
+    public TextView getBirthdayTextView() {
+        return tvBirthday;
+    }
+
+    @Override
+    public Context getContext() {
+        return this;
     }
 
     @Override
@@ -163,5 +219,57 @@ public class PlayerPageActivity extends BaseMvpActivity<PagePresenter> implement
     @Override
     public PagePresenter getPresenter() {
         return presenter;
+    }
+
+    @Override
+    public void animTags(boolean isRight) {
+        int time = 0;
+        appearTag(tvNameEng, isRight, time);
+        time += 100;
+        if (!TextUtils.isEmpty(tvNameChn.getText().toString())) {
+            appearTag(tvNameChn, isRight, time);
+            time += 100;
+        }
+        appearTag(tvCountry, isRight, time);
+        time += 100;
+        appearTag(tvBirthday, isRight, time);
+    }
+
+    /**
+     * 根据目标位置，从屏幕左侧或右侧alpha+translation渐入
+     * @param view
+     * @param isRight
+     * @param delay
+     */
+    private void appearTag(final View view, boolean isRight, int delay) {
+        final AnimationSet set = new AnimationSet(true);
+        set.setInterpolator(new AccelerateDecelerateInterpolator());
+        set.setDuration(500);
+        AlphaAnimation alpha = new AlphaAnimation(0, 1);
+        set.addAnimation(alpha);
+        TranslateAnimation translate;
+        if (isRight) {
+            int locations[] = new int[2];
+            view.getLocationOnScreen(locations);
+            translate = new TranslateAnimation(-ScreenUtils.getScreenWidth(), 0, 0, 0);
+        }
+        else {
+            translate = new TranslateAnimation(ScreenUtils.getScreenWidth(), 0, 0, 0);
+        }
+        set.addAnimation(translate);
+
+        if (delay > 0) {
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    view.setVisibility(View.VISIBLE);
+                    view.startAnimation(set);
+                }
+            }, delay);
+        }
+        else {
+            view.setVisibility(View.VISIBLE);
+            view.startAnimation(set);
+        }
     }
 }

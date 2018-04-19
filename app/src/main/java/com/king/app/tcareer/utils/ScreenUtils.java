@@ -9,6 +9,8 @@ import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.WindowManager;
 
+import com.king.app.tcareer.base.TApplication;
+
 /**
  * 获得屏幕相关的辅助类
  * 
@@ -23,6 +25,13 @@ public class ScreenUtils
 		throw new UnsupportedOperationException("cannot be instantiated");
 	}
 
+	public static int getScreenWidth() {
+		return getScreenWidth(TApplication.getInstance());
+	}
+
+	public static int getScreenHeight() {
+		return getScreenHeight(TApplication.getInstance());
+	}
 	/**
 	 * 获得屏幕高度
 	 * 
