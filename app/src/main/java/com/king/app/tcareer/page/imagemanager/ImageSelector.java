@@ -10,6 +10,7 @@ import android.widget.LinearLayout;
 import com.king.app.tcareer.R;
 import com.king.app.tcareer.base.IFragmentHolder;
 import com.king.app.tcareer.model.http.bean.ImageUrlBean;
+import com.king.app.tcareer.utils.ScreenUtils;
 import com.king.app.tcareer.view.dialog.DraggableDialogFragment;
 
 import java.util.List;
@@ -49,6 +50,11 @@ public abstract class ImageSelector extends DraggableDialogFragment implements I
     protected abstract View customToolbar();
 
     @Override
+    protected int getMaxHeight() {
+        return ScreenUtils.getScreenHeight(getActivity()) * 4 / 5;
+    }
+
+    @Override
     protected Fragment getContentViewFragment() {
         return new SelectorFragment();
     }
@@ -79,7 +85,7 @@ public abstract class ImageSelector extends DraggableDialogFragment implements I
             rvSelector.setLayoutManager(layoutManager);
 
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT, getContext().getResources().getDimensionPixelSize(R.dimen.dlg_loadfrom_list_height)
+                    LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT
             );
             view.setLayoutParams(params);
 

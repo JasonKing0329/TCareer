@@ -1,15 +1,18 @@
 package com.king.app.tcareer.page.player.page;
 
+import android.animation.Animator;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.View;
+import android.view.ViewAnimationUtils;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.AnimationSet;
@@ -22,10 +25,12 @@ import com.king.app.tcareer.R;
 import com.king.app.tcareer.base.BaseMvpActivity;
 import com.king.app.tcareer.model.GlideOptions;
 import com.king.app.tcareer.model.db.entity.User;
+import com.king.app.tcareer.model.http.Command;
 import com.king.app.tcareer.model.palette.PaletteCallback;
 import com.king.app.tcareer.model.palette.PaletteRequestListener;
 import com.king.app.tcareer.model.palette.PaletteResponse;
 import com.king.app.tcareer.model.palette.ViewColorBound;
+import com.king.app.tcareer.page.imagemanager.ImageManager;
 import com.king.app.tcareer.utils.DebugLog;
 import com.king.app.tcareer.utils.ScreenUtils;
 
@@ -33,6 +38,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
+import butterknife.OnClick;
 
 /**
  * 描述: collapse toolbar + viewpager style
@@ -69,6 +75,8 @@ public class PlayerPageActivity extends BaseMvpActivity<PagePresenter> implement
     AppBarLayout appBarLayout;
 
     private PageAdapter pageAdapter;
+
+    private boolean disableReloadFragments;
 
     @Override
     protected int getContentView() {
@@ -141,6 +149,46 @@ public class PlayerPageActivity extends BaseMvpActivity<PagePresenter> implement
         return new PageCourtPresenter();
     }
 
+    @OnClick({R.id.iv_player_bg})
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.iv_player_bg:
+                showImageManager();
+                break;
+        }
+    }
+
+    private void showImageManager() {
+        ImageManager imageManager = new ImageManager(this);
+        imageManager.setOnActionListener(new ImageManager.OnActionListener() {
+            @Override
+            public void onRefresh(int position) {
+                disableReloadFragments = true;
+                initPlayerAndUser();
+            }
+
+            @Override
+            public void onManageFinished() {
+                disableReloadFragments = true;
+                initPlayerAndUser();
+            }
+
+            @Override
+            public void onDownloadFinished() {
+                disableReloadFragments = true;
+                initPlayerAndUser();
+            }
+
+            @Override
+            public FragmentManager getFragmentManager() {
+                return getSupportFragmentManager();
+            }
+        });
+        imageManager.setDataProvider(presenter.getImageProvider());
+        imageManager.showOptions(presenter.getCompetitor().getNameEng(), 0
+                , Command.TYPE_IMG_PLAYER, presenter.getCompetitor().getNameChn());
+    }
+
     public static abstract class AppBarListener implements AppBarLayout.OnOffsetChangedListener {
 
         private int collapseHeight;
@@ -203,7 +251,17 @@ public class PlayerPageActivity extends BaseMvpActivity<PagePresenter> implement
                     }
                 }))
                 .into(ivPlayerBg);
-        initFragments();
+
+        ivPlayerBg.post(new Runnable() {
+            @Override
+            public void run() {
+                startRevealView(500);
+            }
+        });
+
+        if (!disableReloadFragments) {
+            initFragments();
+        }
     }
 
     @Override
@@ -256,7 +314,7 @@ public class PlayerPageActivity extends BaseMvpActivity<PagePresenter> implement
     @Override
     public void onTabLoaded(List<TabBean> list) {
         pageAdapter = new PageAdapter(getSupportFragmentManager());
-        for (TabBean bean:list) {
+        for (TabBean bean : list) {
             TabLayout.Tab shotsTab = tabLayout.newTab();
             TabCustomView shotsTabCustomView = new TabCustomView(this);
             shotsTab.setCustomView(shotsTabCustomView);
@@ -294,6 +352,7 @@ public class PlayerPageActivity extends BaseMvpActivity<PagePresenter> implement
 
     /**
      * 根据目标位置，从屏幕左侧或右侧alpha+translation渐入
+     *
      * @param view
      * @param isRight
      * @param delay
@@ -309,8 +368,7 @@ public class PlayerPageActivity extends BaseMvpActivity<PagePresenter> implement
             int locations[] = new int[2];
             view.getLocationOnScreen(locations);
             translate = new TranslateAnimation(-ScreenUtils.getScreenWidth(), 0, 0, 0);
-        }
-        else {
+        } else {
             translate = new TranslateAnimation(ScreenUtils.getScreenWidth(), 0, 0, 0);
         }
         set.addAnimation(translate);
@@ -323,10 +381,40 @@ public class PlayerPageActivity extends BaseMvpActivity<PagePresenter> implement
                     view.startAnimation(set);
                 }
             }, delay);
-        }
-        else {
+        } else {
             view.setVisibility(View.VISIBLE);
             view.startAnimation(set);
         }
     }
+
+    private void startRevealView(int animTime) {
+        // centerX和centerY实是相对于view的
+        Animator anim = ViewAnimationUtils.createCircularReveal(ivPlayerBg, ivPlayerBg.getWidth() / 2
+                , 0, 0, (float) ivPlayerBg.getHeight());
+        anim.setDuration(animTime);
+        anim.setInterpolator(new AccelerateDecelerateInterpolator());
+        anim.addListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animation) {
+
+            }
+        });
+        anim.start();
+    }
+
 }

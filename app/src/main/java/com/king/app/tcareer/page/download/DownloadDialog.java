@@ -15,6 +15,7 @@ import android.widget.TextView;
 import com.king.app.tcareer.R;
 import com.king.app.tcareer.base.IFragmentHolder;
 import com.king.app.tcareer.model.http.progress.ProgressListener;
+import com.king.app.tcareer.utils.ScreenUtils;
 import com.king.app.tcareer.view.dialog.DraggableDialogFragment;
 
 import java.util.ArrayList;
@@ -45,6 +46,11 @@ public class DownloadDialog extends DraggableDialogFragment implements IDownload
         requestCloseAction();
         setTitle("Download");
         return null;
+    }
+
+    @Override
+    protected int getMaxHeight() {
+        return ScreenUtils.getScreenHeight(getActivity()) * 4 / 5;
     }
 
     @Override

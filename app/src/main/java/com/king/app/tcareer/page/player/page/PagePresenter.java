@@ -24,8 +24,11 @@ import com.king.app.tcareer.model.db.entity.UserDao;
 import com.king.app.tcareer.model.face.FaceData;
 import com.king.app.tcareer.model.face.FaceModel;
 import com.king.app.tcareer.model.face.FaceModelFactory;
+import com.king.app.tcareer.model.http.bean.ImageUrlBean;
 import com.king.app.tcareer.model.palette.PaletteResponse;
 import com.king.app.tcareer.model.palette.ViewColorBound;
+import com.king.app.tcareer.page.imagemanager.DataController;
+import com.king.app.tcareer.page.imagemanager.ImageManager;
 import com.king.app.tcareer.utils.ConstellationUtil;
 import com.king.app.tcareer.utils.ListUtil;
 import com.king.app.tcareer.utils.ScreenUtils;
@@ -99,6 +102,10 @@ public abstract class PagePresenter extends BasePresenter<IPageView> {
 
                     }
                 });
+    }
+
+    public CompetitorBean getCompetitor() {
+        return mCompetitor;
     }
 
     protected Observable<CompetitorBean> queryCompetitor(final long playerId, final boolean playerIsUser) {
@@ -431,6 +438,17 @@ public abstract class PagePresenter extends BasePresenter<IPageView> {
 
     public User getUser(String tabId) {
         return mUser;
+    }
+
+    public ImageManager.DataProvider getImageProvider() {
+        return new ImageManager.DataProvider() {
+
+            @Override
+            public ImageUrlBean createImageUrlBean(DataController dataController) {
+                ImageUrlBean bean = dataController.getPlayerImageUrlBean(mCompetitor.getNameChn());
+                return bean;
+            }
+        };
     }
 
     private class PageData {
