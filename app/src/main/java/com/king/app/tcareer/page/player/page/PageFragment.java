@@ -13,7 +13,6 @@ import com.king.app.tcareer.base.BaseFragment;
 import com.king.app.tcareer.base.IFragmentHolder;
 import com.king.app.tcareer.model.db.entity.Record;
 import com.king.app.tcareer.model.db.entity.User;
-import com.king.app.tcareer.page.match.MatchDialog;
 import com.king.app.tcareer.page.record.page.RecordPageActivity;
 
 import java.util.List;
@@ -27,7 +26,7 @@ import butterknife.BindView;
  */
 public class PageFragment extends BaseFragment implements IPageCallback {
 
-    private static final String KEY_TAB_NAME = "tab_name";
+    private static final String KEY_TAB_ID_STR = "tab_id_str";
 
     @BindView(R.id.rv_records)
     RecyclerView rvRecords;
@@ -36,9 +35,9 @@ public class PageFragment extends BaseFragment implements IPageCallback {
 
     private IPageHolder holder;
 
-    public static PageFragment newInstance(String tabName) {
+    public static PageFragment newInstance(String id) {
         Bundle args = new Bundle();
-        args.putString(KEY_TAB_NAME, tabName);
+        args.putString(KEY_TAB_ID_STR, id);
         PageFragment fragment = new PageFragment();
         fragment.setArguments(args);
         return fragment;
@@ -60,13 +59,14 @@ public class PageFragment extends BaseFragment implements IPageCallback {
         manager.setOrientation(LinearLayoutManager.VERTICAL);
         rvRecords.setLayoutManager(manager);
 
-        String tabName = getArguments().getString(KEY_TAB_NAME);
-        holder.getPresenter().createRecords(tabName, this);
+        String tabId = getArguments().getString(KEY_TAB_ID_STR);
+        holder.getPresenter().createRecords(tabId, this);
     }
 
     @Override
     public void onDataLoaded(List<Object> list) {
-        User user = holder.getUser();
+        String tabId = getArguments().getString(KEY_TAB_ID_STR);
+        User user = holder.getUser(tabId);
         adapter = new PageRecordAdapter(user, list);
         adapter.setOnItemClickListener(new PageRecordAdapter.OnItemClickListener() {
             @Override
@@ -96,12 +96,5 @@ public class PageFragment extends BaseFragment implements IPageCallback {
         ActivityOptions transitionActivityOptions = ActivityOptions.makeSceneTransitionAnimation(getActivity()
                 , Pair.create(view.findViewById(R.id.iv_match),getString(R.string.anim_match_page_head)));
         startActivity(intent, transitionActivityOptions.toBundle());
-    }
-
-    private void showMatchDialog(Record record) {
-        MatchDialog matchDialog = new MatchDialog();
-        matchDialog.setMatch(record.getMatchNameId(), record.getMatch().getName(), record.getDateStr());
-        matchDialog.setUser(holder.getUser());
-        matchDialog.show(getChildFragmentManager(), "MatchDialog");
     }
 }

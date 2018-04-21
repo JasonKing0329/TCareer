@@ -5,12 +5,14 @@ package com.king.app.tcareer.page.player.page;
  * <p/>作者：景阳
  * <p/>创建时间: 2017/11/20 16:18
  */
-public class TabBean {
-    int win;
-    int lose;
+public abstract class TabBean {
+    public int win;
+    public int lose;
     /**
      * total = win + lose + W/O
      */
-    int total;
-    String name;
+    public int total;
+    public String id;
+
+    public abstract String getTitle();
 }

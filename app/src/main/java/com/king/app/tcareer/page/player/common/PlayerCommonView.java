@@ -9,7 +9,7 @@ import com.king.app.tcareer.page.player.manage.PlayerViewBean;
  * @auth 景阳
  * @time 2018/1/31 0031 11:02
  */
-
+@Deprecated
 public interface PlayerCommonView extends BaseView {
     void showPlayer(PlayerViewBean playerBean);
 

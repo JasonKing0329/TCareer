@@ -27,7 +27,7 @@ import butterknife.OnClick;
  * @auth 景阳
  * @time 2018/1/31 0031 11:03
  */
-
+@Deprecated
 public class PlayerCommonActivity extends BaseMvpActivity<PlayerCommonPresenter> implements PlayerCommonView {
 
     public static final String KEY_PLAYER = "player_id";

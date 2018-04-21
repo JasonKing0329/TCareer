@@ -28,7 +28,7 @@ import io.reactivex.schedulers.Schedulers;
  * @auth 景阳
  * @time 2018/1/31 0031 11:02
  */
-
+@Deprecated
 public class PlayerCommonPresenter extends BasePresenter<PlayerCommonView> {
 
     private PlayerViewBean mPlayerViewBean;

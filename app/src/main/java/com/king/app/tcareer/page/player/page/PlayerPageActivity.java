@@ -36,6 +36,7 @@ import butterknife.BindView;
 
 /**
  * 描述: collapse toolbar + viewpager style
+ * player主页，相对于单个user，tab以court区分
  * <p/>作者：景阳
  * <p/>创建时间: 2017/11/20 14:11
  */
@@ -80,11 +81,6 @@ public class PlayerPageActivity extends BaseMvpActivity<PagePresenter> implement
     }
 
     @Override
-    protected PagePresenter createPresenter() {
-        return new PagePresenter();
-    }
-
-    @Override
     protected void initData() {
         init();
     }
@@ -106,7 +102,7 @@ public class PlayerPageActivity extends BaseMvpActivity<PagePresenter> implement
     }
 
     @Override
-    public User getUser() {
+    public User getUser(String tabId) {
         return presenter.getUser();
     }
 
@@ -140,6 +136,11 @@ public class PlayerPageActivity extends BaseMvpActivity<PagePresenter> implement
         });
     }
 
+    @Override
+    protected PagePresenter createPresenter() {
+        return new PageCourtPresenter();
+    }
+
     public static abstract class AppBarListener implements AppBarLayout.OnOffsetChangedListener {
 
         private int collapseHeight;
@@ -165,7 +166,7 @@ public class PlayerPageActivity extends BaseMvpActivity<PagePresenter> implement
         protected abstract void onCollapseStateChanged(boolean isCollapsing);
     }
 
-    private void initPlayerAndUser() {
+    protected void initPlayerAndUser() {
         long playerId = getIntent().getLongExtra(KEY_COMPETITOR_ID, -1);
         boolean playerIsUser = getIntent().getBooleanExtra(KEY_COMPETITOR_IS_USER, false);
         long userId = getIntent().getLongExtra(KEY_USER_ID, -1);
@@ -211,7 +212,7 @@ public class PlayerPageActivity extends BaseMvpActivity<PagePresenter> implement
     }
 
     private void initFragments() {
-        presenter.loadRecords();
+        presenter.loadTabs();
     }
 
     public CollapsingToolbarLayout getCollapsingToolbar() {
@@ -260,10 +261,10 @@ public class PlayerPageActivity extends BaseMvpActivity<PagePresenter> implement
             TabCustomView shotsTabCustomView = new TabCustomView(this);
             shotsTab.setCustomView(shotsTabCustomView);
             shotsTabCustomView.setCount(bean.win + "-" + bean.lose);
-            shotsTabCustomView.setContentCategory(bean.name);
+            shotsTabCustomView.setContentCategory(bean.getTitle());
             tabLayout.addTab(shotsTab);
 
-            PageFragment fragment = PageFragment.newInstance(bean.name);
+            PageFragment fragment = PageFragment.newInstance(bean.id);
             pageAdapter.addFragment(fragment);
         }
         viewpager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));

@@ -17,10 +17,8 @@ import com.king.app.tcareer.base.TApplication;
 import com.king.app.tcareer.conf.AppConstants;
 import com.king.app.tcareer.model.ImageProvider;
 import com.king.app.tcareer.model.bean.CompetitorBean;
-import com.king.app.tcareer.model.db.entity.MatchBean;
 import com.king.app.tcareer.model.db.entity.PlayerBeanDao;
 import com.king.app.tcareer.model.db.entity.Record;
-import com.king.app.tcareer.model.db.entity.RecordDao;
 import com.king.app.tcareer.model.db.entity.User;
 import com.king.app.tcareer.model.db.entity.UserDao;
 import com.king.app.tcareer.model.face.FaceData;
@@ -31,8 +29,6 @@ import com.king.app.tcareer.model.palette.ViewColorBound;
 import com.king.app.tcareer.utils.ConstellationUtil;
 import com.king.app.tcareer.utils.ListUtil;
 import com.king.app.tcareer.utils.ScreenUtils;
-
-import org.greenrobot.greendao.query.WhereCondition;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -58,13 +54,9 @@ import io.reactivex.schedulers.Schedulers;
  * <p/>作者：景阳
  * <p/>创建时间: 2017/11/20 15:48
  */
-public class PagePresenter extends BasePresenter<IPageView> {
+public abstract class PagePresenter extends BasePresenter<IPageView> {
 
-    private final String TAB_ALL = "全部";
-
-    private CompetitorBean mCompetitor;
-
-    private List<Record> recordList;
+    protected CompetitorBean mCompetitor;
 
     private PageData mPageData;
 
@@ -77,26 +69,10 @@ public class PagePresenter extends BasePresenter<IPageView> {
 
     public void loadPlayerAndUser(final long playerId, final long userId, final boolean playerIsUser) {
         queryUser(userId)
-                .flatMap(new Function<User, ObservableSource<?>>() {
+                .flatMap(new Function<User, ObservableSource<CompetitorBean>>() {
                     @Override
-                    public ObservableSource<?> apply(User user) throws Exception {
-                        return new ObservableSource<Object>() {
-                            @Override
-                            public void subscribe(Observer<? super Object> observer) {
-                                if (playerIsUser) {
-                                    UserDao userDao = TApplication.getInstance().getDaoSession().getUserDao();
-                                    mCompetitor = userDao.queryBuilder()
-                                            .where(UserDao.Properties.Id.eq(playerId))
-                                            .build().unique();
-                                } else {
-                                    PlayerBeanDao playerBeanDao = TApplication.getInstance().getDaoSession().getPlayerBeanDao();
-                                    mCompetitor = playerBeanDao.queryBuilder()
-                                            .where(PlayerBeanDao.Properties.Id.eq(playerId))
-                                            .build().unique();
-                                }
-                                observer.onNext(new Object());
-                            }
-                        };
+                    public ObservableSource<CompetitorBean> apply(User user) throws Exception {
+                        return queryCompetitor(playerId, playerIsUser);
                     }
                 })
                 .observeOn(AndroidSchedulers.mainThread())
@@ -125,7 +101,27 @@ public class PagePresenter extends BasePresenter<IPageView> {
                 });
     }
 
-    private void loadPlayerInfor() {
+    protected Observable<CompetitorBean> queryCompetitor(final long playerId, final boolean playerIsUser) {
+        return Observable.create(new ObservableOnSubscribe<CompetitorBean>() {
+            @Override
+            public void subscribe(ObservableEmitter<CompetitorBean> e) throws Exception {
+                if (playerIsUser) {
+                    UserDao userDao = TApplication.getInstance().getDaoSession().getUserDao();
+                    mCompetitor = userDao.queryBuilder()
+                            .where(UserDao.Properties.Id.eq(playerId))
+                            .build().unique();
+                } else {
+                    PlayerBeanDao playerBeanDao = TApplication.getInstance().getDaoSession().getPlayerBeanDao();
+                    mCompetitor = playerBeanDao.queryBuilder()
+                            .where(PlayerBeanDao.Properties.Id.eq(playerId))
+                            .build().unique();
+                }
+                e.onNext(mCompetitor);
+            }
+        });
+    }
+
+    protected void loadPlayerInfor() {
 
         // 先全部隐藏，等到调色板相关参数都加载完再动画渐入
         view.getEngNameTextView().setVisibility(View.GONE);
@@ -136,105 +132,14 @@ public class PagePresenter extends BasePresenter<IPageView> {
         view.showCompetitor(mCompetitor.getNameEng(), ImageProvider.getDetailPlayerPath(mCompetitor.getNameChn()));
     }
 
-    public void loadRecords() {
+    public void loadTabs() {
         Observable.create(new ObservableOnSubscribe<List<TabBean>>() {
             @Override
             public void subscribe(ObservableEmitter<List<TabBean>> e) throws Exception {
 
-                RecordDao dao = TApplication.getInstance().getDaoSession().getRecordDao();
-                WhereCondition competitorCond[] = new WhereCondition[2];
-                if (mCompetitor instanceof User) {
-                    competitorCond[0] = RecordDao.Properties.PlayerId.eq(mCompetitor.getId());
-                    competitorCond[1] = RecordDao.Properties.PlayerFlag.eq(AppConstants.COMPETITOR_VIRTUAL);
-                } else {
-                    competitorCond[0] = RecordDao.Properties.PlayerId.eq(mCompetitor.getId());
-                    competitorCond[1] = RecordDao.Properties.PlayerFlag.eq(AppConstants.COMPETITOR_NORMAL);
-                }
-                recordList = dao.queryBuilder()
-                        .where(RecordDao.Properties.UserId.eq(mUser.getId())
-                                , competitorCond)
-                        .build().list();
+                List<TabBean> list = createTabs();
 
-                // 查出来的是时间升序，按时间降序排列
-                Collections.reverse(recordList);
-
-                List<TabBean> tabList = new ArrayList<>();
-
-                for (int i = 0; i < AppConstants.RECORD_MATCH_COURTS.length; i++) {
-                    TabBean tab = new TabBean();
-                    tab.name = AppConstants.RECORD_MATCH_COURTS[i];
-                    tabList.add(tab);
-                }
-
-                for (int i = 0; i < recordList.size(); i++) {
-                    Record record = recordList.get(i);
-                    MatchBean matchBean = record.getMatch().getMatchBean();
-                    // count h2h by court
-                    if (matchBean.getCourt().equals(AppConstants.RECORD_MATCH_COURTS[0])) {
-                        tabList.get(0).total++;
-                        //如果是赛前退赛不算作h2h
-                        if (record.getRetireFlag() == AppConstants.RETIRE_WO) {
-                            continue;
-                        } else {
-                            if (record.getWinnerFlag() == AppConstants.WINNER_COMPETITOR) {
-                                tabList.get(0).lose++;
-                            } else {
-                                tabList.get(0).win++;
-                            }
-                        }
-                    } else if (matchBean.getCourt().equals(AppConstants.RECORD_MATCH_COURTS[1])) {
-                        tabList.get(1).total++;
-                        //如果是赛前退赛不算作h2h
-                        if (record.getRetireFlag() == AppConstants.RETIRE_WO) {
-                            continue;
-                        } else {
-                            if (record.getWinnerFlag() == AppConstants.WINNER_COMPETITOR) {
-                                tabList.get(1).lose++;
-                            } else {
-                                tabList.get(1).win++;
-                            }
-                        }
-                    } else if (matchBean.getCourt().equals(AppConstants.RECORD_MATCH_COURTS[3])) {
-                        tabList.get(3).total++;
-                        //如果是赛前退赛不算作h2h
-                        if (record.getRetireFlag() == AppConstants.RETIRE_WO) {
-                            continue;
-                        } else {
-                            if (record.getWinnerFlag() == AppConstants.WINNER_COMPETITOR) {
-                                tabList.get(3).lose++;
-                            } else {
-                                tabList.get(3).win++;
-                            }
-                        }
-                    } else if (matchBean.getCourt().equals(AppConstants.RECORD_MATCH_COURTS[2])) {
-                        tabList.get(2).total++;
-                        //如果是赛前退赛不算作h2h
-                        if (record.getRetireFlag() == AppConstants.RETIRE_WO) {
-                            continue;
-                        } else {
-                            if (record.getWinnerFlag() == AppConstants.WINNER_COMPETITOR) {
-                                tabList.get(2).lose++;
-                            } else {
-                                tabList.get(2).win++;
-                            }
-                        }
-                    }
-                }
-
-                TabBean tabAll = new TabBean();
-                tabAll.name = TAB_ALL;
-                // 如果没有记录就不显示这个tab
-                for (int i = tabList.size() - 1; i >= 0; i--) {
-                    tabAll.win += tabList.get(i).win;
-                    tabAll.lose += tabList.get(i).lose;
-                    tabAll.total += tabList.get(i).total;
-                    if (tabList.get(i).total == 0) {
-                        tabList.remove(i);
-                    }
-                }
-                tabList.add(0, tabAll);
-
-                e.onNext(tabList);
+                e.onNext(list);
             }
         }).observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
@@ -252,15 +157,18 @@ public class PagePresenter extends BasePresenter<IPageView> {
                 });
     }
 
-    public void createRecords(final String tabName, final IPageCallback callback) {
+    protected abstract List<TabBean> createTabs();
+
+    public void createRecords(final String tabId, final IPageCallback callback) {
         Observable.create(new ObservableOnSubscribe<List<Object>>() {
             @Override
             public void subscribe(ObservableEmitter<List<Object>> e) throws Exception {
                 List<Object> list = new ArrayList<>();
                 Map<Integer, List<Record>> map = new HashMap<>();
+                List<Record> recordList = createTabRecords(tabId);
                 for (int i = 0; i < recordList.size(); i++) {
                     Record record = recordList.get(i);
-                    if (tabName.equals(TAB_ALL) || tabName.equals(record.getMatch().getMatchBean().getCourt())) {
+                    if (filterRecord(record)) {
                         String strYear = record.getDateStr().split("-")[0];
                         int year = Integer.parseInt(strYear);
                         List<Record> child = map.get(year);
@@ -305,7 +213,11 @@ public class PagePresenter extends BasePresenter<IPageView> {
                 });
     }
 
-    private PageTitleBean countTitle(int year, List<Record> records) {
+    protected abstract List<Record> createTabRecords(String tabId);
+
+    protected abstract boolean filterRecord(Record record);
+
+    protected PageTitleBean countTitle(int year, List<Record> records) {
         PageTitleBean bean = new PageTitleBean();
         int win = 0, lose = 0;
         for (int i = 0; i < records.size(); i++) {
@@ -515,6 +427,10 @@ public class PagePresenter extends BasePresenter<IPageView> {
             }
         }
         return null;
+    }
+
+    public User getUser(String tabId) {
+        return mUser;
     }
 
     private class PageData {

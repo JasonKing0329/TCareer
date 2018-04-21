@@ -11,5 +11,5 @@ import com.king.app.tcareer.model.db.entity.User;
 public interface IPageHolder extends IFragmentHolder {
     PagePresenter getPresenter();
 
-    User getUser();
+    User getUser(String tabId);
 }
