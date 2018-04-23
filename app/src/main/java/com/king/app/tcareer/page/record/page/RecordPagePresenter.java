@@ -1,5 +1,10 @@
 package com.king.app.tcareer.page.record.page;
 
+import android.graphics.PorterDuff;
+import android.support.v7.graphics.Palette;
+import android.support.v7.widget.Toolbar;
+import android.view.View;
+
 import com.king.app.tcareer.base.BasePresenter;
 import com.king.app.tcareer.base.TApplication;
 import com.king.app.tcareer.conf.AppConstants;
@@ -10,6 +15,9 @@ import com.king.app.tcareer.model.dao.RecordExtendDao;
 import com.king.app.tcareer.model.db.entity.Record;
 import com.king.app.tcareer.model.db.entity.RecordDao;
 import com.king.app.tcareer.model.db.entity.Score;
+import com.king.app.tcareer.model.palette.PaletteResponse;
+import com.king.app.tcareer.model.palette.ViewColorBound;
+import com.king.app.tcareer.utils.ListUtil;
 
 import java.util.Calendar;
 import java.util.Collections;
@@ -33,6 +41,10 @@ import io.reactivex.schedulers.Schedulers;
 public class RecordPagePresenter extends BasePresenter<RecordPageView> {
 
     private Record mRecord;
+
+    private Palette.Swatch mSwatch;
+
+    private PaletteResponse mPaletteResponse;
 
     @Override
     protected void onCreate() {
@@ -224,6 +236,78 @@ public class RecordPagePresenter extends BasePresenter<RecordPageView> {
                 e.onNext(details);
             }
         });
+    }
+
+    /**
+     * 根据背景图片为各个UI空间设置合适的颜色
+     * @param response
+     */
+    public void handlePalette(final PaletteResponse response) {
+        mPaletteResponse = response;
+        if (response != null && response.palette != null) {
+            mSwatch = getTitlebarSwatch(response.palette);
+            dispatchTitleBar(mSwatch);
+        }
+    }
+
+    private void dispatchTitleBar(Palette.Swatch swatch) {
+        // 修改titlebar的主色调（背景，文字颜色，图标颜色）
+        view.getCollapsingToolbar().setContentScrimColor(swatch.getRgb());
+        view.getCollapsingToolbar().setCollapsedTitleTextColor(swatch.getTitleTextColor());
+        // toolbar上的图标需要根据展开/折叠状态确定颜色，初始是展开状态
+        handleCollapseScrimChanged(false);
+    }
+
+    /**
+     * 处理appBar滑动过程scrim的出现和消失引起的图标颜色变化
+     * @param isCollapsing
+     */
+    public void handleCollapseScrimChanged(boolean isCollapsing) {
+        // 折叠状态运用main swatch的getTitleTextColor
+        if (isCollapsing) {
+            // PorterDuff.Mode作用参考https://www.jianshu.com/p/d11892bbe055
+            // 这里用SRC_IN，第一个参数是source，表示source与原图像叠加后相交的部分运用source的颜色，如果是SRC_TOP则是叠加的情况，SRC则是source color充满整个view区域
+            view.getToolbar().getNavigationIcon().setColorFilter(mSwatch.getTitleTextColor(), PorterDuff.Mode.SRC_IN);
+            // 替换原图颜色
+            view.getEditMenuItem().getIcon().setColorFilter(mSwatch.getTitleTextColor(), PorterDuff.Mode.SRC_IN);
+        }
+        // 展开状态运用图片区域颜色分析法得到的颜色
+        else {
+            if (!ListUtil.isEmpty(mPaletteResponse.viewColorBounds)) {
+                for (ViewColorBound bound:mPaletteResponse.viewColorBounds) {
+                    if (bound.view == view.getToolbar()) {
+                        view.getToolbar().getNavigationIcon().setColorFilter(bound.color, PorterDuff.Mode.SRC_IN);
+                    }
+                    else if (bound.view == view.getEditMenuItem().getActionView()) {
+                        // 替换原图颜色
+                        view.getEditMenuItem().getIcon().setColorFilter(bound.color, PorterDuff.Mode.SRC_IN);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * title bar运用的颜色
+     * vibrant优先，其次muted，再其次任意
+     * @param palette
+     * @return
+     */
+    public Palette.Swatch getTitlebarSwatch(Palette palette) {
+        if (palette == null) {
+            return null;
+        }
+        Palette.Swatch swatch = palette.getVibrantSwatch();
+        if (swatch == null) {
+            swatch = palette.getMutedSwatch();
+            if (swatch == null) {
+                List<Palette.Swatch> swatches = palette.getSwatches();
+                if (!ListUtil.isEmpty(swatches)) {
+                    swatch = swatches.get(0);
+                }
+            }
+        }
+        return swatch;
     }
 
 }

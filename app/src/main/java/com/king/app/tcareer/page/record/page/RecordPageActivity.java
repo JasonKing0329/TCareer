@@ -1,6 +1,7 @@
 package com.king.app.tcareer.page.record.page;
 
 import android.content.Intent;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -22,13 +23,19 @@ import com.king.app.tcareer.model.bean.CompetitorBean;
 import com.king.app.tcareer.model.db.entity.MatchBean;
 import com.king.app.tcareer.model.db.entity.Record;
 import com.king.app.tcareer.model.db.entity.User;
+import com.king.app.tcareer.model.palette.PaletteCallback;
+import com.king.app.tcareer.model.palette.PaletteRequestListener;
+import com.king.app.tcareer.model.palette.PaletteResponse;
+import com.king.app.tcareer.model.palette.ViewColorBound;
 import com.king.app.tcareer.page.match.MatchItemAdapter;
 import com.king.app.tcareer.page.match.page.MatchPageActivity;
 import com.king.app.tcareer.page.player.page.PlayerPageActivity;
 import com.king.app.tcareer.page.record.editor.RecordEditorActivity;
+import com.king.app.tcareer.utils.DebugLog;
 import com.king.app.tcareer.view.widget.CircleImageView;
 import com.youth.banner.Banner;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -45,6 +52,8 @@ public class RecordPageActivity extends BaseMvpActivity<RecordPagePresenter> imp
 
     private final int REQUEST_EDIT = 121;
 
+    @BindView(R.id.appbar_layout)
+    AppBarLayout appBarLayout;
     @BindView(R.id.iv_match)
     ImageView ivMatch;
     @BindView(R.id.lmbanner)
@@ -86,6 +95,8 @@ public class RecordPageActivity extends BaseMvpActivity<RecordPagePresenter> imp
 
     private MatchItemAdapter itemAdapter;
 
+    private MenuItem mMenuEdit;
+
     @Override
     protected int getContentView() {
         return R.layout.activity_record_page;
@@ -105,6 +116,46 @@ public class RecordPageActivity extends BaseMvpActivity<RecordPagePresenter> imp
         LinearLayoutManager manager = new LinearLayoutManager(this);
         manager.setOrientation(LinearLayoutManager.VERTICAL);
         rvRecords.setLayoutManager(manager);
+
+        ctlToolbar.post(new Runnable() {
+            @Override
+            public void run() {
+                // getScrimVisibleHeightTrigger里面用到了getHeight，要在控件布局完成后才有数值
+                int trigger = ctlToolbar.getScrimVisibleHeightTrigger();
+                int total = getResources().getDimensionPixelSize(R.dimen.record_page_head_height);
+                appBarLayout.addOnOffsetChangedListener(new AppBarListener(total, trigger) {
+                    @Override
+                    protected void onCollapseStateChanged(boolean isCollapsing) {
+                        presenter.handleCollapseScrimChanged(isCollapsing);
+                    }
+                });
+            }
+        });
+    }
+
+    public static abstract class AppBarListener implements AppBarLayout.OnOffsetChangedListener {
+
+        private int collapseHeight;
+        private int scrimTrigger;
+
+        private boolean isCollapsing;
+
+        public AppBarListener(int collapseHeight, int scrimTrigger) {
+            this.collapseHeight = collapseHeight;
+            this.scrimTrigger = scrimTrigger;
+        }
+
+        @Override
+        public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
+            int offset = collapseHeight + verticalOffset;
+            boolean collapsing = (offset <= scrimTrigger);
+            if (collapsing != isCollapsing) {
+                isCollapsing = collapsing;
+                onCollapseStateChanged(isCollapsing);
+            }
+        }
+
+        protected abstract void onCollapseStateChanged(boolean isCollapsing);
     }
 
     @Override
@@ -129,6 +180,7 @@ public class RecordPageActivity extends BaseMvpActivity<RecordPagePresenter> imp
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.record_page, menu);
+        mMenuEdit = menu.findItem(R.id.menu_action_edit);
         return true;
     }
 
@@ -149,6 +201,21 @@ public class RecordPageActivity extends BaseMvpActivity<RecordPagePresenter> imp
         intent.putExtra(RecordEditorActivity.KEY_USER_ID, presenter.getUser().getId());
         intent.putExtra(RecordEditorActivity.KEY_RECORD_ID, presenter.getRecord().getId());
         startActivityForResult(intent, REQUEST_EDIT);
+    }
+
+    @Override
+    public Toolbar getToolbar() {
+        return toolbar;
+    }
+
+    @Override
+    public CollapsingToolbarLayout getCollapsingToolbar() {
+        return ctlToolbar;
+    }
+
+    @Override
+    public MenuItem getEditMenuItem() {
+        return mMenuEdit;
     }
 
     @Override
@@ -184,7 +251,35 @@ public class RecordPageActivity extends BaseMvpActivity<RecordPagePresenter> imp
         tvRound.setText(record.getRound());
         tvScore.setText(ScoreParser.getScoreText(record.getScoreList(), record.getRetireFlag()));
         Glide.with(this)
+                .asBitmap()
                 .load(ImageProvider.getMatchHeadPath(name, match.getCourt()))
+                .listener(new PaletteRequestListener(0, new PaletteCallback() {
+                    @Override
+                    public List<ViewColorBound> getTargetViews() {
+                        List<ViewColorBound> list = new ArrayList<>();
+                        ViewColorBound bound = new ViewColorBound();
+                        bound.view = toolbar;
+                        bound.rect = toolbar.getNavigationIcon().getBounds();
+                        list.add(bound);
+
+                        bound = new ViewColorBound();
+                        bound.view = mMenuEdit.getActionView();
+                        bound.object = mMenuEdit;
+                        bound.rect = mMenuEdit.getIcon().getBounds();
+                        list.add(bound);
+                        return list;
+                    }
+
+                    @Override
+                    public void noPaletteResponseLoaded(int position) {
+
+                    }
+
+                    @Override
+                    public void onPaletteResponse(int position, PaletteResponse response) {
+                        presenter.handlePalette(response);
+                    }
+                }))
                 .apply(GlideOptions.getDefaultMatchOptions())
                 .into(ivMatch);
 

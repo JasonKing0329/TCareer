@@ -15,4 +15,6 @@ public class ViewColorBound {
     public int color;
 
     public Rect rect;
+
+    public Object object;
 }

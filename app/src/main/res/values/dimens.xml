@@ -53,4 +53,5 @@
     <dimen name="actionbar_icon_size">40dp</dimen>
     <dimen name="actionbar_icon_padding">8dp</dimen>
     <dimen name="player_page_head_height">300dp</dimen>
+    <dimen name="record_page_head_height">204dp</dimen>
 </resources>

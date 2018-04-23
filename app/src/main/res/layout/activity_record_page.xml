@@ -8,6 +8,7 @@
     tools:context=".page.record.page.RecordPageActivity">
 
     <android.support.design.widget.AppBarLayout
+        android:id="@+id/appbar_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:elevation="0dp"
@@ -20,11 +21,11 @@
             android:layout_height="wrap_content"
             app:contentScrim="?attr/colorPrimary"
             app:scrimVisibleHeightTrigger="@dimen/home_scrim_visible_height"
-            app:layout_scrollFlags="scroll|exitUntilCollapsed">
+            app:layout_scrollFlags="scroll|exitUntilCollapsed|enterAlwaysCollapsed|snap">
 
             <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="204dp"
+                android:layout_height="@dimen/record_page_head_height"
                 android:transitionName="@string/anim_home_date">
                 <ImageView
                     android:id="@+id/iv_match"
