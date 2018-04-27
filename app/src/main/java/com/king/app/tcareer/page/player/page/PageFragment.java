@@ -2,17 +2,19 @@ package com.king.app.tcareer.page.player.page;
 
 import android.app.ActivityOptions;
 import android.content.Intent;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
+import android.support.v7.graphics.Palette;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Pair;
 import android.view.View;
+import android.widget.TextView;
 
 import com.king.app.tcareer.R;
-import com.king.app.tcareer.base.BaseFragment;
+import com.king.app.tcareer.base.BaseMvpFragment;
 import com.king.app.tcareer.base.IFragmentHolder;
 import com.king.app.tcareer.model.db.entity.Record;
-import com.king.app.tcareer.model.db.entity.User;
 import com.king.app.tcareer.page.record.page.RecordPageActivity;
 
 import java.util.List;
@@ -24,20 +26,29 @@ import butterknife.BindView;
  * <p/>作者：景阳
  * <p/>创建时间: 2017/11/20 16:05
  */
-public class PageFragment extends BaseFragment implements IPageCallback {
+public class PageFragment extends BaseMvpFragment<SubPagePresenter> implements SubPageView {
 
-    private static final String KEY_TAB_ID_STR = "tab_id_str";
+    protected static final String KEY_USER_ID = "user_id";
+    protected static final String KEY_COURT = "court";
 
     @BindView(R.id.rv_records)
     RecyclerView rvRecords;
+    @BindView(R.id.tv_year)
+    TextView tvYear;
 
-    private PageRecordAdapter adapter;
+    private PageRecordAdapter cardAdapter;
+    private FullRecordAdapter fullAdapter;
 
     private IPageHolder holder;
 
-    public static PageFragment newInstance(String id) {
+    private int mFirstPosition;
+
+    private boolean initialYearTitle;
+
+    public static PageFragment newInstance(long userId, String court) {
         Bundle args = new Bundle();
-        args.putString(KEY_TAB_ID_STR, id);
+        args.putLong(KEY_USER_ID, userId);
+        args.putString(KEY_COURT, court);
         PageFragment fragment = new PageFragment();
         fragment.setArguments(args);
         return fragment;
@@ -58,35 +69,79 @@ public class PageFragment extends BaseFragment implements IPageCallback {
         LinearLayoutManager manager = new LinearLayoutManager(getActivity());
         manager.setOrientation(LinearLayoutManager.VERTICAL);
         rvRecords.setLayoutManager(manager);
-
-        String tabId = getArguments().getString(KEY_TAB_ID_STR);
-        holder.getPresenter().createRecords(tabId, this);
     }
 
     @Override
-    public void onDataLoaded(List<Object> list) {
-        String tabId = getArguments().getString(KEY_TAB_ID_STR);
-        User user = holder.getUser(tabId);
-        adapter = new PageRecordAdapter(user, list);
-        adapter.setOnItemClickListener(new PageRecordAdapter.OnItemClickListener() {
-            @Override
-            public void onClickRecord(View v, final Record record) {
-                showRecordPage(v, record);
-//                showMatchDialog(record);
-            }
+    protected SubPagePresenter createPresenter() {
+        return new SubPagePresenter();
+    }
 
-            @Override
-            public void onLongClickRecord(View view, Record record) {
-//                Intent intent = new Intent();
-//                intent.setClass(getActivity(), MatchPageActivity.class);
-//                intent.putExtra(MatchPageActivity.KEY_MATCH_NAME, record.getMatch());
-//                intent.putExtra(MatchPageActivity.KEY_USER_ID, getArguments().getString(KEY_USER_ID));
-//                ActivityOptions transitionActivityOptions = ActivityOptions.makeSceneTransitionAnimation(getActivity()
-//                        , Pair.create(view.findViewById(R.id.iv_match),getString(R.string.anim_match_page_head)));
-//                startActivity(intent, transitionActivityOptions.toBundle());
-            }
-        });
-        rvRecords.setAdapter(adapter);
+    @Override
+    protected void onCreateData() {
+        presenter.setCompetitor(holder.getCompetitor());
+
+        long userId = getArguments().getLong(KEY_USER_ID);
+        String court = getArguments().getString(KEY_COURT);
+        presenter.createRecords(userId, court);
+    }
+
+    private void refreshYear(int first) {
+        mFirstPosition = first;
+        Palette.Swatch swatch = fullAdapter.getSwatch(first);
+        if (swatch != null) {
+            GradientDrawable drawable = (GradientDrawable) tvYear.getBackground();
+            drawable.setColor(swatch.getRgb());
+            tvYear.setTextColor(swatch.getBodyTextColor());
+        }
+        tvYear.setText(presenter.getYearTitle(fullAdapter.getYear(first)));
+    }
+
+    @Override
+    public void onDataLoaded(List<Object> list, int viewType) {
+        if (viewType == SubPagePresenter.TYPE_PURE) {
+            tvYear.setVisibility(View.VISIBLE);
+            rvRecords.addOnScrollListener(new RecyclerView.OnScrollListener() {
+                @Override
+                public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                    super.onScrolled(recyclerView, dx, dy);
+                    int first = ((LinearLayoutManager) rvRecords.getLayoutManager()).findFirstVisibleItemPosition();
+                    if (first != mFirstPosition) {
+                        refreshYear(first);
+                    }
+                }
+            });
+
+            fullAdapter = new FullRecordAdapter(presenter.getUser());
+            fullAdapter.setList(list);
+            fullAdapter.setOnItemListener(new FullRecordAdapter.OnItemListener() {
+                @Override
+                public void onClickRecord(View v, Record record) {
+                    showRecordPage(v, record);
+                }
+
+                @Override
+                public void onSwatchLoaded(int position, Palette.Swatch swatch) {
+                    // 进入界面初始化yearTitle，后续会随着recyclerView的滚动而变化
+                    if (!initialYearTitle) {
+                        initialYearTitle = true;
+                        refreshYear(position);
+                    }
+                }
+            });
+            rvRecords.setAdapter(fullAdapter);
+        }
+        else {
+            tvYear.setVisibility(View.GONE);
+            cardAdapter = new PageRecordAdapter(presenter.getUser());
+            cardAdapter.setList(list);
+            cardAdapter.setOnItemClickListener(new PageRecordAdapter.OnItemClickListener() {
+                @Override
+                public void onClickRecord(View v, final Record record) {
+                    showRecordPage(v, record);
+                }
+            });
+            rvRecords.setAdapter(cardAdapter);
+        }
     }
 
     private void showRecordPage(View view, Record record) {

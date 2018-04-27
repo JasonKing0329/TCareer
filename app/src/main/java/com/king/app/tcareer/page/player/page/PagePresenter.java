@@ -14,11 +14,9 @@ import android.widget.TextView;
 import com.king.app.tcareer.R;
 import com.king.app.tcareer.base.BasePresenter;
 import com.king.app.tcareer.base.TApplication;
-import com.king.app.tcareer.conf.AppConstants;
 import com.king.app.tcareer.model.ImageProvider;
 import com.king.app.tcareer.model.bean.CompetitorBean;
 import com.king.app.tcareer.model.db.entity.PlayerBeanDao;
-import com.king.app.tcareer.model.db.entity.Record;
 import com.king.app.tcareer.model.db.entity.User;
 import com.king.app.tcareer.model.db.entity.UserDao;
 import com.king.app.tcareer.model.face.FaceData;
@@ -29,16 +27,13 @@ import com.king.app.tcareer.model.palette.PaletteResponse;
 import com.king.app.tcareer.model.palette.ViewColorBound;
 import com.king.app.tcareer.page.imagemanager.DataController;
 import com.king.app.tcareer.page.imagemanager.ImageManager;
+import com.king.app.tcareer.page.setting.SettingProperty;
 import com.king.app.tcareer.utils.ConstellationUtil;
 import com.king.app.tcareer.utils.ListUtil;
 import com.king.app.tcareer.utils.ScreenUtils;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
@@ -57,7 +52,7 @@ import io.reactivex.schedulers.Schedulers;
  * <p/>作者：景阳
  * <p/>创建时间: 2017/11/20 15:48
  */
-public abstract class PagePresenter extends BasePresenter<IPageView> {
+public class PagePresenter extends BasePresenter<IPageView> {
 
     protected CompetitorBean mCompetitor;
 
@@ -65,19 +60,40 @@ public abstract class PagePresenter extends BasePresenter<IPageView> {
 
     private FaceModel faceModel;
 
+    private int mTabType;
+
+    private final int TAB_USER = 0;
+    private final int TAB_COURT = 1;
+
+    private SubPageModel subPageModel;
+
     @Override
     protected void onCreate() {
         faceModel = FaceModelFactory.create();
     }
 
-    public void loadPlayerAndUser(final long playerId, final long userId, final boolean playerIsUser) {
-        queryUser(userId)
-                .flatMap(new Function<User, ObservableSource<CompetitorBean>>() {
-                    @Override
-                    public ObservableSource<CompetitorBean> apply(User user) throws Exception {
-                        return queryCompetitor(playerId, playerIsUser);
-                    }
-                })
+    public void preparePage(long userId, final long playerId, final boolean playerIsUser, int tabType) {
+        mTabType = tabType;
+        if (mTabType == TAB_COURT) {
+            subPageModel = new CourtPageModel();
+        }
+        else {
+            subPageModel = new UserPageModel();
+        }
+        Observable<CompetitorBean> observable;
+        if (userId == -1) {
+            observable = queryCompetitor(playerId, playerIsUser);
+        }
+        else {
+            observable = queryUser(userId)
+                    .flatMap(new Function<User, ObservableSource<CompetitorBean>>() {
+                        @Override
+                        public ObservableSource<CompetitorBean> apply(User user) throws Exception {
+                            return queryCompetitor(playerId, playerIsUser);
+                        }
+                    });
+        }
+        observable
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe(new Observer<Object>() {
@@ -143,9 +159,7 @@ public abstract class PagePresenter extends BasePresenter<IPageView> {
         Observable.create(new ObservableOnSubscribe<List<TabBean>>() {
             @Override
             public void subscribe(ObservableEmitter<List<TabBean>> e) throws Exception {
-
-                List<TabBean> list = createTabs();
-
+                List<TabBean> list = subPageModel.createTabs(mUser, mCompetitor);
                 e.onNext(list);
             }
         }).observeOn(AndroidSchedulers.mainThread())
@@ -162,88 +176,6 @@ public abstract class PagePresenter extends BasePresenter<IPageView> {
                         view.showError("loadRecords error: " + throwable.getMessage());
                     }
                 });
-    }
-
-    protected abstract List<TabBean> createTabs();
-
-    public void createRecords(final String tabId, final IPageCallback callback) {
-        Observable.create(new ObservableOnSubscribe<List<Object>>() {
-            @Override
-            public void subscribe(ObservableEmitter<List<Object>> e) throws Exception {
-                List<Object> list = new ArrayList<>();
-                Map<Integer, List<Record>> map = new HashMap<>();
-                List<Record> recordList = createTabRecords(tabId);
-                for (int i = 0; i < recordList.size(); i++) {
-                    Record record = recordList.get(i);
-                    if (filterRecord(record)) {
-                        String strYear = record.getDateStr().split("-")[0];
-                        int year = Integer.parseInt(strYear);
-                        List<Record> child = map.get(year);
-                        if (child == null) {
-                            child = new ArrayList<>();
-                            map.put(year, child);
-                        }
-                        child.add(record);
-                    }
-                }
-
-                // 按year降序
-                Iterator<Integer> it = map.keySet().iterator();
-                List<Integer> yearList = new ArrayList<>();
-                while (it.hasNext()) {
-                    yearList.add(it.next());
-                }
-                Collections.sort(yearList);
-                Collections.reverse(yearList);
-
-                for (Integer year : yearList) {
-                    List<Record> records = map.get(year);
-                    PageTitleBean title = countTitle(year, records);
-                    list.add(title);
-                    list.addAll(records);
-                }
-
-                e.onNext(list);
-            }
-        }).observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.io())
-                .subscribe(new Consumer<List<Object>>() {
-                    @Override
-                    public void accept(List<Object> list) throws Exception {
-                        callback.onDataLoaded(list);
-                    }
-                }, new Consumer<Throwable>() {
-                    @Override
-                    public void accept(Throwable throwable) throws Exception {
-                        throwable.printStackTrace();
-                    }
-                });
-    }
-
-    protected abstract List<Record> createTabRecords(String tabId);
-
-    protected abstract boolean filterRecord(Record record);
-
-    protected PageTitleBean countTitle(int year, List<Record> records) {
-        PageTitleBean bean = new PageTitleBean();
-        int win = 0, lose = 0;
-        for (int i = 0; i < records.size(); i++) {
-            Record record = records.get(i);
-            //如果是赛前退赛不算作h2h
-            if (record.getRetireFlag() == AppConstants.RETIRE_WO) {
-                continue;
-            } else {
-                if (record.getWinnerFlag() == AppConstants.WINNER_COMPETITOR) {
-                    lose++;
-                } else {
-                    win++;
-                }
-            }
-        }
-        bean.setYear(year);
-        bean.setWin(win);
-        bean.setLose(lose);
-        return bean;
     }
 
     /**
@@ -415,12 +347,14 @@ public abstract class PagePresenter extends BasePresenter<IPageView> {
             // PorterDuff.Mode作用参考https://www.jianshu.com/p/d11892bbe055
             // 这里用SRC_IN，第一个参数是source，表示source与原图像叠加后相交的部分运用source的颜色，如果是SRC_TOP则是叠加的情况，SRC则是source color充满整个view区域
             view.getToolbar().getNavigationIcon().setColorFilter(mPageData.mainSwatch.getTitleTextColor(), PorterDuff.Mode.SRC_IN);
+            view.getToolbar().getOverflowIcon().setColorFilter(mPageData.mainSwatch.getTitleTextColor(), PorterDuff.Mode.SRC_IN);
         }
         // 展开状态运用图片区域颜色分析法得到的颜色
         else {
             ViewColorBound bound = findViewColorBound(mPageData.pack.colorBounds, view.getToolbar());
             if (bound != null) {
                 view.getToolbar().getNavigationIcon().setColorFilter(bound.color, PorterDuff.Mode.SRC_IN);
+                view.getToolbar().getOverflowIcon().setColorFilter(bound.color, PorterDuff.Mode.SRC_IN);
             }
         }
     }
@@ -449,6 +383,29 @@ public abstract class PagePresenter extends BasePresenter<IPageView> {
                 return bean;
             }
         };
+    }
+
+    public String getTargetViewTypeString() {
+        int viewType = SettingProperty.getPlayerPageViewType();
+        String text;
+        if (viewType == SubPagePresenter.TYPE_PURE) {
+            text = "卡片布局";
+        }
+        else {
+            text = "平铺布局";
+        }
+        return text;
+    }
+
+    public void changeSubViewType() {
+        int viewType = SettingProperty.getPlayerPageViewType();
+        if (viewType == SubPagePresenter.TYPE_PURE) {
+            viewType = SubPagePresenter.TYPE_CARD;
+        }
+        else {
+            viewType = SubPagePresenter.TYPE_PURE;
+        }
+        SettingProperty.setPlayerPageViewType(viewType);
     }
 
     private class PageData {

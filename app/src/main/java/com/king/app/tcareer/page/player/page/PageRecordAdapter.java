@@ -32,7 +32,7 @@ import butterknife.ButterKnife;
  * <p/>作者：景阳
  * <p/>创建时间: 2017/11/21 9:34
  */
-public class PageRecordAdapter extends RecyclerView.Adapter implements View.OnClickListener, View.OnLongClickListener {
+public class PageRecordAdapter extends RecyclerView.Adapter implements View.OnClickListener {
 
     private final int TYPE_TITLE = 1;
     private final int TYPE_RECORD = 0;
@@ -50,9 +50,8 @@ public class PageRecordAdapter extends RecyclerView.Adapter implements View.OnCl
      */
     private Map<String, Integer> imageIndexMap;
 
-    public PageRecordAdapter(User user, List<Object> list) {
+    public PageRecordAdapter(User user) {
         this.user = user;
-        this.list = list;
         requestOptions = GlideOptions.getDefaultMatchOptions();
         imageIndexMap = new HashMap<>();
     }
@@ -123,7 +122,6 @@ public class PageRecordAdapter extends RecyclerView.Adapter implements View.OnCl
 
         holder.groupCard.setTag(record);
         holder.groupCard.setOnClickListener(this);
-        holder.groupCard.setOnLongClickListener(this);
     }
 
     @Override
@@ -140,14 +138,6 @@ public class PageRecordAdapter extends RecyclerView.Adapter implements View.OnCl
         if (onItemClickListener != null) {
             onItemClickListener.onClickRecord(v, (Record) v.getTag());
         }
-    }
-
-    @Override
-    public boolean onLongClick(View v) {
-        if (onItemClickListener != null) {
-            onItemClickListener.onLongClickRecord(v, (Record) v.getTag());
-        }
-        return true;
     }
 
     public static class TitleHolder extends RecyclerView.ViewHolder {
@@ -184,6 +174,5 @@ public class PageRecordAdapter extends RecyclerView.Adapter implements View.OnCl
 
     public interface OnItemClickListener {
         void onClickRecord(View v, Record record);
-        void onLongClickRecord(View view, Record record);
     }
 }

@@ -2,6 +2,7 @@ package com.king.app.tcareer.page.player.page;
 
 import com.king.app.tcareer.base.TApplication;
 import com.king.app.tcareer.conf.AppConstants;
+import com.king.app.tcareer.model.bean.CompetitorBean;
 import com.king.app.tcareer.model.db.entity.MatchBean;
 import com.king.app.tcareer.model.db.entity.Record;
 import com.king.app.tcareer.model.db.entity.RecordDao;
@@ -14,32 +15,27 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * @desc
- * @auth 景阳
- * @time 2018/4/21 0021 17:58
+ * Desc:
+ *
+ * @author：Jing Yang
+ * @date: 2018/4/27 14:03
  */
-
-public class PageCourtPresenter extends PagePresenter {
-
-    private final String TAB_ALL = "全部";
-
-    private List<Record> recordList;
-
-    private String mTabId;
+public class CourtPageModel implements SubPageModel {
+    public static final String TAB_ALL = "全部";
 
     @Override
-    protected List<TabBean> createTabs() {
+    public List<TabBean> createTabs(User user, CompetitorBean competitor) {
         RecordDao dao = TApplication.getInstance().getDaoSession().getRecordDao();
         WhereCondition competitorCond[] = new WhereCondition[2];
-        if (mCompetitor instanceof User) {
-            competitorCond[0] = RecordDao.Properties.PlayerId.eq(mCompetitor.getId());
+        if (competitor instanceof User) {
+            competitorCond[0] = RecordDao.Properties.PlayerId.eq(competitor.getId());
             competitorCond[1] = RecordDao.Properties.PlayerFlag.eq(AppConstants.COMPETITOR_VIRTUAL);
         } else {
-            competitorCond[0] = RecordDao.Properties.PlayerId.eq(mCompetitor.getId());
+            competitorCond[0] = RecordDao.Properties.PlayerId.eq(competitor.getId());
             competitorCond[1] = RecordDao.Properties.PlayerFlag.eq(AppConstants.COMPETITOR_NORMAL);
         }
-        recordList = dao.queryBuilder()
-                .where(RecordDao.Properties.UserId.eq(mUser.getId())
+        List<Record> recordList = dao.queryBuilder()
+                .where(RecordDao.Properties.UserId.eq(user.getId())
                         , competitorCond)
                 .build().list();
 
@@ -53,10 +49,10 @@ public class PageCourtPresenter extends PagePresenter {
 
                 @Override
                 public String getTitle() {
-                    return id;
+                    return court;
                 }
             };
-            tab.id = AppConstants.RECORD_MATCH_COURTS[i];
+            tab.court = AppConstants.RECORD_MATCH_COURTS[i];
             tabList.add(tab);
         }
 
@@ -118,11 +114,11 @@ public class PageCourtPresenter extends PagePresenter {
         TabBean tabAll = new TabBean() {
             @Override
             public String getTitle() {
-                return id;
+                return court;
             }
         };
 
-        tabAll.id = TAB_ALL;
+        tabAll.court = TAB_ALL;
         // 如果没有记录就不显示这个tab
         for (int i = tabList.size() - 1; i >= 0; i--) {
             tabAll.win += tabList.get(i).win;
@@ -134,16 +130,5 @@ public class PageCourtPresenter extends PagePresenter {
         }
         tabList.add(0, tabAll);
         return tabList;
-    }
-
-    @Override
-    protected List<Record> createTabRecords(String tabId) {
-        mTabId = tabId;
-        return recordList;
-    }
-
-    @Override
-    protected boolean filterRecord(Record record) {
-        return mTabId.equals(TAB_ALL) || mTabId.equals(record.getMatch().getMatchBean().getCourt());
     }
 }

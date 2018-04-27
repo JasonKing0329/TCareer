@@ -1,4 +1,4 @@
-package com.king.app.tcareer.page.player.common;
+package com.king.app.tcareer.page.player.page;
 
 import com.king.app.tcareer.model.db.entity.User;
 import com.king.app.tcareer.page.player.page.TabBean;

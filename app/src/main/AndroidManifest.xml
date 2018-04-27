@@ -91,10 +91,6 @@
             android:theme="@style/NoActionBarTheme"
             android:screenOrientation="portrait"/>
 
-        <activity android:name=".page.player.common.PlayerUserPageActivity"
-            android:theme="@style/NoActionBarTheme"
-            android:screenOrientation="portrait"/>
-
         <activity android:name=".page.player.page.PlayerPageActivity"
             android:theme="@style/HomeTheme"
             android:screenOrientation="portrait"/>

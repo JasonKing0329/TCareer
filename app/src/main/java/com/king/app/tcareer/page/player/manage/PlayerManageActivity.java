@@ -22,7 +22,7 @@ import com.king.app.tcareer.R;
 import com.king.app.tcareer.base.BaseMvpActivity;
 import com.king.app.tcareer.model.db.entity.PlayerBean;
 import com.king.app.tcareer.model.db.entity.User;
-import com.king.app.tcareer.page.player.common.PlayerUserPageActivity;
+import com.king.app.tcareer.page.player.page.PlayerPageActivity;
 import com.king.app.tcareer.page.setting.SettingProperty;
 import com.king.app.tcareer.utils.ScreenUtils;
 import com.king.app.tcareer.view.widget.SideBar;
@@ -331,14 +331,15 @@ public class PlayerManageActivity extends BaseMvpActivity<PlayerManagePresenter>
                     finish();
                 }
                 else {
-                    Intent intent = new Intent().setClass(PlayerManageActivity.this, PlayerUserPageActivity.class);
+                    Intent intent = new Intent().setClass(PlayerManageActivity.this, PlayerPageActivity.class);
                     if (bean.getData() instanceof User) {
-                        intent.putExtra(PlayerUserPageActivity.KEY_COMPETITOR_IS_USER, true);
-                        intent.putExtra(PlayerUserPageActivity.KEY_COMPETITOR_ID, ((User) bean.getData()).getId());
+                        intent.putExtra(PlayerPageActivity.KEY_COMPETITOR_IS_USER, true);
+                        intent.putExtra(PlayerPageActivity.KEY_COMPETITOR_ID, ((User) bean.getData()).getId());
                     }
                     else {
-                        intent.putExtra(PlayerUserPageActivity.KEY_COMPETITOR_ID, ((PlayerBean) bean.getData()).getId());
+                        intent.putExtra(PlayerPageActivity.KEY_COMPETITOR_ID, ((PlayerBean) bean.getData()).getId());
                     }
+                    intent.putExtra(PlayerPageActivity.KEY_SUB_PAGE_TYPE, PlayerPageActivity.SUB_BY_USER);
                     startActivity(intent);
                 }
             }

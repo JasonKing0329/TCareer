@@ -12,7 +12,9 @@ public abstract class TabBean {
      * total = win + lose + W/O
      */
     public int total;
-    public String id;
+
+    public String court;
+    public long userId = -1;
 
     public abstract String getTitle();
 }

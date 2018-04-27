@@ -45,6 +45,10 @@ public abstract class BaseRecyclerAdapter<VH extends RecyclerView.ViewHolder, T>
         return list == null ? 0:list.size();
     }
 
+    public T getItem(int position) {
+        return list.get(position);
+    }
+
     public interface OnItemClickListener<T> {
         void onClickItem(int position, T data);
     }

@@ -3,6 +3,7 @@ package com.king.app.tcareer.page.player.page;
 import android.animation.Animator;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Rect;
 import android.os.Handler;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
@@ -11,6 +12,8 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewAnimationUtils;
 import android.view.animation.AccelerateDecelerateInterpolator;
@@ -24,6 +27,7 @@ import com.bumptech.glide.Glide;
 import com.king.app.tcareer.R;
 import com.king.app.tcareer.base.BaseMvpActivity;
 import com.king.app.tcareer.model.GlideOptions;
+import com.king.app.tcareer.model.bean.CompetitorBean;
 import com.king.app.tcareer.model.db.entity.User;
 import com.king.app.tcareer.model.http.Command;
 import com.king.app.tcareer.model.palette.PaletteCallback;
@@ -52,6 +56,9 @@ public class PlayerPageActivity extends BaseMvpActivity<PagePresenter> implement
     public static final String KEY_COMPETITOR_ID = "key_competitor_id";
     public static final String KEY_COMPETITOR_IS_USER = "key_competitor_is_user";
 
+    public static final String KEY_SUB_PAGE_TYPE = "key_sub_type";
+    public static final int SUB_BY_COURT = 1;
+    public static final int SUB_BY_USER = 0;
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
@@ -109,15 +116,12 @@ public class PlayerPageActivity extends BaseMvpActivity<PagePresenter> implement
         initPlayerAndUser();
     }
 
-    @Override
-    public User getUser(String tabId) {
-        return presenter.getUser();
-    }
-
     private void initViews() {
+        setSupportActionBar(toolbar);
         // 不用公共的icon，这样会使其他界面引用该资源颜色也被下面的代码修改
 //        toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);
         toolbar.setNavigationIcon(R.drawable.ic_arrow_back_filterrable);
+        toolbar.setOverflowIcon(getResources().getDrawable(R.drawable.ic_more_vert_white_24dp));
 //        toolbar.getNavigationIcon().setColorFilter(
 //                getResources().getColor(R.color.grey), PorterDuff.Mode.SRC_ATOP);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
@@ -146,7 +150,34 @@ public class PlayerPageActivity extends BaseMvpActivity<PagePresenter> implement
 
     @Override
     protected PagePresenter createPresenter() {
-        return new PageCourtPresenter();
+        return new PagePresenter();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.player_page, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        String text = presenter.getTargetViewTypeString();
+        menu.findItem(R.id.menu_view_type).setTitle(text);
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        switch (id) {
+            case R.id.menu_view_type:
+                presenter.changeSubViewType();
+                initPlayerAndUser();
+                break;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     @OnClick({R.id.iv_player_bg})
@@ -217,8 +248,9 @@ public class PlayerPageActivity extends BaseMvpActivity<PagePresenter> implement
     protected void initPlayerAndUser() {
         long playerId = getIntent().getLongExtra(KEY_COMPETITOR_ID, -1);
         boolean playerIsUser = getIntent().getBooleanExtra(KEY_COMPETITOR_IS_USER, false);
-        long userId = getIntent().getLongExtra(KEY_USER_ID, -1);
-        presenter.loadPlayerAndUser(playerId, userId, playerIsUser);
+        long bindUserId = getIntent().getLongExtra(KEY_USER_ID, -1);
+        int subType = getIntent().getIntExtra(KEY_SUB_PAGE_TYPE, SUB_BY_COURT);
+        presenter.preparePage(bindUserId, playerId, playerIsUser, subType);
     }
 
     @Override
@@ -237,6 +269,17 @@ public class PlayerPageActivity extends BaseMvpActivity<PagePresenter> implement
                         bound.view = toolbar;
                         bound.rect = toolbar.getNavigationIcon().getBounds();
                         list.add(bound);
+
+                        // 菜单图标用与返回键一样的颜色
+//                        Rect rect = toolbar.getOverflowIcon().getBounds();
+//                        int width = rect.right - rect.left;
+//                        int left = ScreenUtils.getScreenWidth() - rect.right;
+//                        rect.left = left;
+//                        rect.right = left + width;
+//                        bound = new ViewColorBound();
+//                        bound.view = toolbar;
+//                        bound.rect = rect;
+//                        list.add(bound);
                         return list;
                     }
 
@@ -313,6 +356,7 @@ public class PlayerPageActivity extends BaseMvpActivity<PagePresenter> implement
 
     @Override
     public void onTabLoaded(List<TabBean> list) {
+        tabLayout.removeAllTabs();
         pageAdapter = new PageAdapter(getSupportFragmentManager());
         for (TabBean bean : list) {
             TabLayout.Tab shotsTab = tabLayout.newTab();
@@ -322,7 +366,11 @@ public class PlayerPageActivity extends BaseMvpActivity<PagePresenter> implement
             shotsTabCustomView.setContentCategory(bean.getTitle());
             tabLayout.addTab(shotsTab);
 
-            PageFragment fragment = PageFragment.newInstance(bean.id);
+            // 非page user模式，取当前user
+            if (bean.userId == -1) {
+                bean.userId = presenter.getUser().getId();
+            }
+            PageFragment fragment = PageFragment.newInstance(bean.userId, bean.court);
             pageAdapter.addFragment(fragment);
         }
         viewpager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
@@ -332,8 +380,8 @@ public class PlayerPageActivity extends BaseMvpActivity<PagePresenter> implement
     }
 
     @Override
-    public PagePresenter getPresenter() {
-        return presenter;
+    public CompetitorBean getCompetitor() {
+        return presenter.getCompetitor();
     }
 
     @Override

@@ -2,12 +2,21 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
-    android:paddingLeft="3dp"
-    android:paddingRight="3dp" >
+    android:background="@color/white" >
     <android.support.v7.widget.RecyclerView
         android:id="@+id/rv_records"
 	    android:layout_width="match_parent"
 	    android:layout_height="match_parent" />
-
+	<TextView
+		android:id="@+id/tv_year"
+		android:layout_width="@dimen/record_year_size"
+		android:layout_height="@dimen/record_year_size"
+		android:background="@drawable/shape_oval_hard"
+		android:gravity="center"
+		android:elevation="5dp"
+		android:textColor="@color/white"
+		android:textSize="@dimen/record_year_text"
+		android:layout_alignParentRight="true"
+		android:layout_marginRight="@dimen/record_year_right"
+		android:layout_marginTop="@dimen/record_year_right"/>
 </RelativeLayout>

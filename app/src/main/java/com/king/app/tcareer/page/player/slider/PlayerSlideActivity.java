@@ -175,7 +175,8 @@ public class PlayerSlideActivity extends BaseMvpActivity<SlidePresenter> impleme
     @Override
     public void onRecordLoaded(List<Object> list) {
         if (recordAdapter == null) {
-            recordAdapter = new PageRecordAdapter(presenter.getUser(), list);
+            recordAdapter = new PageRecordAdapter(presenter.getUser());
+            recordAdapter.setList(list);
             recordAdapter.setOnItemClickListener(new PageRecordAdapter.OnItemClickListener() {
                 @Override
                 public void onClickRecord(View v, Record record) {
@@ -183,11 +184,6 @@ public class PlayerSlideActivity extends BaseMvpActivity<SlidePresenter> impleme
                     intent.putExtra(MatchPageActivity.KEY_USER_ID, presenter.getUser().getId());
                     intent.putExtra(MatchPageActivity.KEY_MATCH_NAME_ID, record.getMatchNameId());
                     startActivity(intent);
-                }
-
-                @Override
-                public void onLongClickRecord(View view, Record record) {
-
                 }
             });
             rvRecords.setAdapter(recordAdapter);

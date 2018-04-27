@@ -1,6 +1,7 @@
 package com.king.app.tcareer.page.player.page;
 
 import com.king.app.tcareer.base.IFragmentHolder;
+import com.king.app.tcareer.model.bean.CompetitorBean;
 import com.king.app.tcareer.model.db.entity.User;
 
 /**
@@ -9,7 +10,5 @@ import com.king.app.tcareer.model.db.entity.User;
  * <p/>创建时间: 2017/11/20 17:27
  */
 public interface IPageHolder extends IFragmentHolder {
-    PagePresenter getPresenter();
-
-    User getUser(String tabId);
+    CompetitorBean getCompetitor();
 }

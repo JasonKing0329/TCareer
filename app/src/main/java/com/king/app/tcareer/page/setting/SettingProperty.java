@@ -215,4 +215,19 @@ public class SettingProperty {
         setInt("key_glory_runnerup_group_mode", mode);
     }
 
+    /**
+     * card or pure type of player page
+     */
+    public static int getPlayerPageViewType() {
+        return getInt("key_player_page_view_type", 0);
+    }
+
+    /**
+     * card or pure type of player page
+     * @param mode
+     */
+    public static void setPlayerPageViewType(int mode) {
+        setInt("key_player_page_view_type", mode);
+    }
+
 }

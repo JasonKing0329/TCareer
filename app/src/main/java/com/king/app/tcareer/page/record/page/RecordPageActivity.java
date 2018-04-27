@@ -262,11 +262,14 @@ public class RecordPageActivity extends BaseMvpActivity<RecordPagePresenter> imp
                         bound.rect = toolbar.getNavigationIcon().getBounds();
                         list.add(bound);
 
-                        bound = new ViewColorBound();
-                        bound.view = mMenuEdit.getActionView();
-                        bound.object = mMenuEdit;
-                        bound.rect = mMenuEdit.getIcon().getBounds();
-                        list.add(bound);
+                        // FIXME 执行速度快于执行到 onCreateOptionsMenu的速度会出现空指针
+                        if (mMenuEdit != null) {
+                            bound = new ViewColorBound();
+                            bound.view = mMenuEdit.getActionView();
+                            bound.object = mMenuEdit;
+                            bound.rect = mMenuEdit.getIcon().getBounds();
+                            list.add(bound);
+                        }
                         return list;
                     }
 
