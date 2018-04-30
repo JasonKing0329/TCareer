@@ -1,7 +1,5 @@
 package com.king.app.tcareer.page.player.page;
 
-import android.graphics.Color;
-import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.support.annotation.Nullable;
 import android.support.v7.graphics.Palette;
@@ -77,7 +75,7 @@ public class FullRecordAdapter extends BaseRecyclerAdapter<FullRecordAdapter.Rec
         holder.tvMonth.setText(month + "月");
         String winner = record.getWinnerFlag() == AppConstants.WINNER_USER ?
                 user.getNameShort() : CompetitorParser.getCompetitorFrom(record).getNameChn();
-        holder.tvScore.setText(winner + "  " + ScoreParser.getScoreText(record.getScoreList(), record.getWinnerFlag()));
+        holder.tvScore.setText(winner + "  " + ScoreParser.getScoreText(record.getScoreList(), record.getRetireFlag()));
 
         String url = ImageProvider.getMatchHeadPath(record.getMatch().getName(), record.getMatch().getMatchBean().getCourt());
         Glide.with(holder.ivMatch.getContext())

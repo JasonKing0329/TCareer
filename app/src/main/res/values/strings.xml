@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">TCareer</string>
+    <string name="app_name" translatable="false">TCareer</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
     <string name="login">Identity Confirm</string>
@@ -295,14 +295,13 @@
     <string name="match_manage_title">Manage match</string>
     <string name="player_manage_title">Manage player</string>
     <!-- *************************** score ********************************* -->
-    <string name="score_action_year">Year</string>
-    <string name="score_action_week">52 weeks</string>
-    <string name="title_activity_home">HomeActivity</string>
+    <string name="score_action_year" translatable="false">Year</string>
+    <string name="score_action_week" translatable="false">52 weeks</string>
+    <string name="title_activity_home" translatable="false">HomeActivity</string>
 
-    <string name="navigation_drawer_open">Open navigation drawer</string>
-    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="navigation_drawer_open" translatable="false">Open navigation drawer</string>
+    <string name="navigation_drawer_close" translatable="false">Close navigation drawer</string>
 
-    <string name="action_settings">Settings</string>
     <!-- *************************** home ********************************* -->
     <string name="home_go_top">Go top</string>
     <!-- *************************** h2h list ********************************* -->
@@ -311,7 +310,7 @@
     <string name="sort_title">Sort</string>
     <string name="filter_type">Filter type</string>
     <string name="filter_title">Filter</string>
-    <string name="title_activity_ksettings">Settings</string>
+    <string name="title_activity_ksettings" translatable="false">Settings</string>
 
     <!-- Example General settings -->
     <string name="pref_header_general">General</string>
@@ -331,4 +330,12 @@
     <string name="anim_pullzoom_player_name" translatable="false">anim_pullzoom_player_name</string>
     <string name="anim_pullzoom_player_country" translatable="false">anim_pullzoom_player_country</string>
 
+    <!-- ***************************color picker********************************* -->
+    <string name="colorpicker_text_error">Error value</string>
+    <string name="colorpicker_title">Color picker</string>
+    <string name="colorpicker_more">More</string>
+    <string name="colorpicker_editself">Edit color picker</string>
+    <string name="colorpicker_restore">Apply default style</string>
+    <string name="colorpicker_warning_giveup">Give up?</string>
+    <string name="colorpicker_warning_applydefault">Current style will be replaced with default style, continue?</string>
 </resources>

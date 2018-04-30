@@ -5,7 +5,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Build;
+import android.support.v4.content.FileProvider;
 
+import com.king.app.tcareer.BuildConfig;
 import com.king.app.tcareer.conf.AppConfig;
 import com.king.app.tcareer.model.http.AppHttpClient;
 import com.king.app.tcareer.model.http.Command;
@@ -86,9 +89,16 @@ public class UpdatePresenter {
      * 安装应用
      */
     public void installApp(Activity activity, String path) {
-        Uri uri = Uri.fromFile(new File(path));
         Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.setDataAndType(uri, "application/vnd.android.package-archive");
+        //判断是否是AndroidN以及更高的版本
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            Uri contentUri = FileProvider.getUriForFile(activity, BuildConfig.APPLICATION_ID + ".fileProvider", new File(path));
+            intent.setDataAndType(contentUri, "application/vnd.android.package-archive");
+        } else {
+            intent.setDataAndType(Uri.fromFile(new File(path)), "application/vnd.android.package-archive");
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        }
         activity.startActivity(intent);
     }
 
