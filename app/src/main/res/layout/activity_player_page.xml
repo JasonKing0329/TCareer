@@ -33,35 +33,25 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="110dp"
+                    android:layout_marginTop="150dp"
                     android:layout_alignParentRight="true"
                     android:orientation="vertical">
                     <TextView
-                        android:id="@+id/tv_name_eng"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:singleLine="true"
-                        android:ellipsize="marquee"
-                        android:textSize="20dp"
-                        android:padding="10dp"/>
-                    <TextView
-                        android:id="@+id/tv_name_chn"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:padding="10dp"/>
-                    <TextView
                         android:id="@+id/tv_country"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:drawableLeft="@drawable/ic_edit_location_white_24dp"
-                        android:gravity="center_vertical"
-                        android:padding="10dp"
-                        android:paddingRight="20dp"/>
+                        style="@style/TvPlayerTag"
+                        android:drawableLeft="@drawable/ic_edit_location_white_24dp"/>
                     <TextView
                         android:id="@+id/tv_birthday"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:padding="10dp"/>
+                        style="@style/TvPlayerTag"/>
+                    <TextView
+                        android:id="@+id/tv_name_chn"
+                        style="@style/TvPlayerTag" />
+                    <TextView
+                        android:id="@+id/tv_name_eng"
+                        style="@style/TvPlayerTag"
+                        android:singleLine="true"
+                        android:ellipsize="marquee"
+                        android:textSize="18dp"/>
                 </LinearLayout>
 
             </RelativeLayout>

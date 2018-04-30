@@ -73,9 +73,15 @@ public class FullRecordAdapter extends BaseRecyclerAdapter<FullRecordAdapter.Rec
         holder.tvRound.setText(record.getRound());
         int month = Integer.parseInt(record.getDateStr().split("-")[1]);
         holder.tvMonth.setText(month + "月");
-        String winner = record.getWinnerFlag() == AppConstants.WINNER_USER ?
-                user.getNameShort() : CompetitorParser.getCompetitorFrom(record).getNameChn();
-        holder.tvScore.setText(winner + "  " + ScoreParser.getScoreText(record.getScoreList(), record.getRetireFlag()));
+        String winner;
+        if (record.getWinnerFlag() == AppConstants.WINNER_USER) {
+            winner = user.getNameShort();
+        }
+        else {
+            winner = "● " + CompetitorParser.getCompetitorFrom(record).getNameChn();
+        }
+        holder.tvScore.setText(winner + "  " + ScoreParser.getScoreText(record.getScoreList()
+                , record.getWinnerFlag(), record.getRetireFlag()));
 
         String url = ImageProvider.getMatchHeadPath(record.getMatch().getName(), record.getMatch().getMatchBean().getCourt());
         Glide.with(holder.ivMatch.getContext())

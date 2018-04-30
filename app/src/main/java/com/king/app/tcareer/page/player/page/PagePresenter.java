@@ -2,6 +2,7 @@ package com.king.app.tcareer.page.player.page;
 
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
 import android.support.design.widget.TabLayout;
 import android.support.v7.graphics.Palette;
 import android.text.TextUtils;
@@ -255,18 +256,6 @@ public class PagePresenter extends BasePresenter<IPageView> {
                     view.getEngNameTextView(), view.getCountryTextView(), view.getBirthdayTextView()
             };
         }
-        for (int i = 0; i < textViews.length; i ++) {
-            textViews[i].setBackgroundColor(colorPack.rgbs.get(i));
-            textViews[i].setTextColor(colorPack.bodyColors.get(i));
-            // country标签，更改drawable颜色
-            if (textViews[i] == view.getCountryTextView()) {
-                Drawable drawable = view.getContext().getResources().getDrawable(R.drawable.ic_edit_location_white_24dp);
-                drawable.setBounds(0, 0, ScreenUtils.dp2px(20), ScreenUtils.dp2px(20));
-                // 替换原图颜色
-                drawable.setColorFilter(colorPack.bodyColors.get(i), PorterDuff.Mode.SRC_IN);
-                textViews[i].setCompoundDrawables(drawable, null, null, null);
-            }
-        }
 
         // 修改信息标签的位置（根据人脸位置，统一显示在左侧或右侧）
         boolean isRight = true;
@@ -285,6 +274,28 @@ public class PagePresenter extends BasePresenter<IPageView> {
         rParams.removeRule(RelativeLayout.ALIGN_PARENT_RIGHT);
         rParams.addRule(rule);
         layout.setLayoutParams(rParams);
+
+        for (int i = 0; i < textViews.length; i ++) {
+            textViews[i].setTextColor(colorPack.bodyColors.get(i));
+            GradientDrawable bg;
+            if (isRight) {
+                bg = (GradientDrawable) textViews[i].getResources().getDrawable(R.drawable.shape_tag_left);
+            }
+            else {
+                bg = (GradientDrawable) textViews[i].getResources().getDrawable(R.drawable.shape_tag_right);
+            }
+            bg.setColor(colorPack.rgbs.get(i));
+            textViews[i].setBackground(bg);
+
+            // country标签，更改drawable颜色
+            if (textViews[i] == view.getCountryTextView()) {
+                Drawable drawable = view.getContext().getResources().getDrawable(R.drawable.ic_edit_location_white_24dp);
+                drawable.setBounds(0, 0, ScreenUtils.dp2px(20), ScreenUtils.dp2px(20));
+                // 替换原图颜色
+                drawable.setColorFilter(colorPack.bodyColors.get(i), PorterDuff.Mode.SRC_IN);
+                textViews[i].setCompoundDrawables(drawable, null, null, null);
+            }
+        }
 
         // 信息赋值并动画渐入
         String constel = null;
