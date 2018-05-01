@@ -194,7 +194,7 @@ public class ScoreCalculator extends DraggableDialogFragment {
             }
 
             DatePickerDialog startDlg = new DatePickerDialog(getContext(),
-                    startListener, nYearStart, nMonthStart - 1, nDayStart);
+                    startListener, nYearStart, nMonthStart, nDayStart);
             startDlg.show();
         }
 

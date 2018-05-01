@@ -57,54 +57,20 @@ public class LevelPageModel implements SubPageModel {
         for (int i = 0; i < recordList.size(); i++) {
             Record record = recordList.get(i);
             MatchBean matchBean = record.getMatch().getMatchBean();
-            // count h2h by level
-            if (matchBean.getLevel().equals(AppConstants.RECORD_MATCH_LEVELS[0])) {
-                tabList.get(0).total++;
-                //如果是赛前退赛不算作h2h
-                if (record.getRetireFlag() == AppConstants.RETIRE_WO) {
-                    continue;
-                } else {
-                    if (record.getWinnerFlag() == AppConstants.WINNER_COMPETITOR) {
-                        tabList.get(0).lose++;
+            for (TabBean bean:tabList) {
+                if (matchBean.getLevel().equals(bean.level)) {
+                    bean.total++;
+                    //如果是赛前退赛不算作h2h
+                    if (record.getRetireFlag() == AppConstants.RETIRE_WO) {
+                        continue;
                     } else {
-                        tabList.get(0).win++;
+                        if (record.getWinnerFlag() == AppConstants.WINNER_COMPETITOR) {
+                            bean.lose++;
+                        } else {
+                            bean.win++;
+                        }
                     }
-                }
-            } else if (matchBean.getLevel().equals(AppConstants.RECORD_MATCH_LEVELS[1])) {
-                tabList.get(1).total++;
-                //如果是赛前退赛不算作h2h
-                if (record.getRetireFlag() == AppConstants.RETIRE_WO) {
                     continue;
-                } else {
-                    if (record.getWinnerFlag() == AppConstants.WINNER_COMPETITOR) {
-                        tabList.get(1).lose++;
-                    } else {
-                        tabList.get(1).win++;
-                    }
-                }
-            } else if (matchBean.getLevel().equals(AppConstants.RECORD_MATCH_LEVELS[3])) {
-                tabList.get(3).total++;
-                //如果是赛前退赛不算作h2h
-                if (record.getRetireFlag() == AppConstants.RETIRE_WO) {
-                    continue;
-                } else {
-                    if (record.getWinnerFlag() == AppConstants.WINNER_COMPETITOR) {
-                        tabList.get(3).lose++;
-                    } else {
-                        tabList.get(3).win++;
-                    }
-                }
-            } else if (matchBean.getLevel().equals(AppConstants.RECORD_MATCH_LEVELS[2])) {
-                tabList.get(2).total++;
-                //如果是赛前退赛不算作h2h
-                if (record.getRetireFlag() == AppConstants.RETIRE_WO) {
-                    continue;
-                } else {
-                    if (record.getWinnerFlag() == AppConstants.WINNER_COMPETITOR) {
-                        tabList.get(2).lose++;
-                    } else {
-                        tabList.get(2).win++;
-                    }
                 }
             }
         }
