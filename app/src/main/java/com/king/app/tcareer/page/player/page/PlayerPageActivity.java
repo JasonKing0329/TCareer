@@ -2,8 +2,8 @@ package com.king.app.tcareer.page.player.page;
 
 import android.animation.Animator;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Rect;
 import android.os.Handler;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
@@ -28,7 +28,6 @@ import com.king.app.tcareer.R;
 import com.king.app.tcareer.base.BaseMvpActivity;
 import com.king.app.tcareer.model.GlideOptions;
 import com.king.app.tcareer.model.bean.CompetitorBean;
-import com.king.app.tcareer.model.db.entity.User;
 import com.king.app.tcareer.model.http.Command;
 import com.king.app.tcareer.model.palette.PaletteCallback;
 import com.king.app.tcareer.model.palette.PaletteRequestListener;
@@ -37,6 +36,7 @@ import com.king.app.tcareer.model.palette.ViewColorBound;
 import com.king.app.tcareer.page.imagemanager.ImageManager;
 import com.king.app.tcareer.utils.DebugLog;
 import com.king.app.tcareer.utils.ScreenUtils;
+import com.king.app.tcareer.view.dialog.AlertDialogFragment;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,10 +55,6 @@ public class PlayerPageActivity extends BaseMvpActivity<PagePresenter> implement
     public static final String KEY_USER_ID = "key_user_id";
     public static final String KEY_COMPETITOR_ID = "key_competitor_id";
     public static final String KEY_COMPETITOR_IS_USER = "key_competitor_is_user";
-
-    public static final String KEY_SUB_PAGE_TYPE = "key_sub_type";
-    public static final int SUB_BY_COURT = 1;
-    public static final int SUB_BY_USER = 0;
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
@@ -164,6 +160,10 @@ public class PlayerPageActivity extends BaseMvpActivity<PagePresenter> implement
     public boolean onPrepareOptionsMenu(Menu menu) {
         String text = presenter.getTargetViewTypeString();
         menu.findItem(R.id.menu_view_type).setTitle(text);
+
+        if (presenter.getUser() == null) {
+            menu.findItem(R.id.menu_tab_type).setVisible(false);
+        }
         return super.onPrepareOptionsMenu(menu);
     }
 
@@ -174,6 +174,34 @@ public class PlayerPageActivity extends BaseMvpActivity<PagePresenter> implement
             case R.id.menu_view_type:
                 presenter.changeSubViewType();
                 initPlayerAndUser();
+                break;
+            case R.id.menu_tab_type:
+                String[] array = getResources().getStringArray(R.array.player_tab_type);
+                new AlertDialogFragment()
+                        .setItems(array, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                boolean isTypeChanged = false;
+                                switch (i) {
+                                    case 0:
+                                        isTypeChanged = presenter.updateTabType(PagePresenter.TAB_USER);
+                                        break;
+                                    case 1:
+                                        isTypeChanged = presenter.updateTabType(PagePresenter.TAB_COURT);
+                                        break;
+                                    case 2:
+                                        isTypeChanged = presenter.updateTabType(PagePresenter.TAB_LEVEL);
+                                        break;
+                                    case 3:
+                                        isTypeChanged = presenter.updateTabType(PagePresenter.TAB_YEAR);
+                                        break;
+                                }
+                                if (isTypeChanged) {
+                                    initPlayerAndUser();
+                                }
+                            }
+                        })
+                        .show(getSupportFragmentManager(), "AlertDialogFragment");
                 break;
         }
 
@@ -249,8 +277,8 @@ public class PlayerPageActivity extends BaseMvpActivity<PagePresenter> implement
         long playerId = getIntent().getLongExtra(KEY_COMPETITOR_ID, -1);
         boolean playerIsUser = getIntent().getBooleanExtra(KEY_COMPETITOR_IS_USER, false);
         long bindUserId = getIntent().getLongExtra(KEY_USER_ID, -1);
-        int subType = getIntent().getIntExtra(KEY_SUB_PAGE_TYPE, SUB_BY_COURT);
-        presenter.preparePage(bindUserId, playerId, playerIsUser, subType);
+        appBarLayout.setExpanded(true, true);
+        presenter.preparePage(bindUserId, playerId, playerIsUser);
     }
 
     @Override
@@ -357,6 +385,12 @@ public class PlayerPageActivity extends BaseMvpActivity<PagePresenter> implement
     @Override
     public void onTabLoaded(List<TabBean> list) {
         tabLayout.removeAllTabs();
+        if (list.size() > 5) {
+            tabLayout.setTabMode(TabLayout.MODE_SCROLLABLE);
+        }
+        else {
+            tabLayout.setTabMode(TabLayout.MODE_FIXED);
+        }
         pageAdapter = new PageAdapter(getSupportFragmentManager());
         for (TabBean bean : list) {
             TabLayout.Tab shotsTab = tabLayout.newTab();
@@ -370,7 +404,7 @@ public class PlayerPageActivity extends BaseMvpActivity<PagePresenter> implement
             if (bean.userId == -1) {
                 bean.userId = presenter.getUser().getId();
             }
-            PageFragment fragment = PageFragment.newInstance(bean.userId, bean.court);
+            PageFragment fragment = PageFragment.newInstance(bean.userId, bean.court, bean.level, bean.year);
             pageAdapter.addFragment(fragment);
         }
         viewpager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));

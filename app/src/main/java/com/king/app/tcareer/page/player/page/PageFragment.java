@@ -16,6 +16,7 @@ import com.king.app.tcareer.base.BaseMvpFragment;
 import com.king.app.tcareer.base.IFragmentHolder;
 import com.king.app.tcareer.model.db.entity.Record;
 import com.king.app.tcareer.page.record.page.RecordPageActivity;
+import com.king.app.tcareer.utils.DebugLog;
 
 import java.util.List;
 
@@ -28,8 +29,10 @@ import butterknife.BindView;
  */
 public class PageFragment extends BaseMvpFragment<SubPagePresenter> implements SubPageView {
 
-    protected static final String KEY_USER_ID = "user_id";
-    protected static final String KEY_COURT = "court";
+    protected static final String KEY_USER_ID = "key_user_id";
+    protected static final String KEY_COURT = "key_court";
+    protected static final String KEY_LEVEL = "key_level";
+    protected static final String KEY_YEAR = "key_year";
 
     @BindView(R.id.rv_records)
     RecyclerView rvRecords;
@@ -45,11 +48,14 @@ public class PageFragment extends BaseMvpFragment<SubPagePresenter> implements S
 
     private boolean initialYearTitle;
 
-    public static PageFragment newInstance(long userId, String court) {
+    public static PageFragment newInstance(long userId, String court, String level, String year) {
+        DebugLog.e("newInstance userId=" + userId + ", court=" + court + ", level=" + level + ", year=" + year);
+        PageFragment fragment = new PageFragment();
         Bundle args = new Bundle();
         args.putLong(KEY_USER_ID, userId);
         args.putString(KEY_COURT, court);
-        PageFragment fragment = new PageFragment();
+        args.putString(KEY_LEVEL, level);
+        args.putString(KEY_YEAR, year);
         fragment.setArguments(args);
         return fragment;
     }
@@ -82,7 +88,10 @@ public class PageFragment extends BaseMvpFragment<SubPagePresenter> implements S
 
         long userId = getArguments().getLong(KEY_USER_ID);
         String court = getArguments().getString(KEY_COURT);
-        presenter.createRecords(userId, court);
+        String level = getArguments().getString(KEY_LEVEL);
+        String year = getArguments().getString(KEY_YEAR);
+        DebugLog.e("userId=" + userId + ", court=" + court + ", level=" + level + ", year=" + year);
+        presenter.createRecords(userId, court, level, year);
     }
 
     private void refreshYear(int first) {

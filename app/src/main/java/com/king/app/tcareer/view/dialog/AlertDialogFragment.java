@@ -32,6 +32,9 @@ public class AlertDialogFragment extends DialogFragment {
 
     private DialogInterface.OnDismissListener dismissListener;
 
+    private CharSequence[] items;
+    private DialogInterface.OnClickListener itemListener;
+
     public AlertDialogFragment setTitle(String title) {
         this.title = title;
         return this;
@@ -77,6 +80,12 @@ public class AlertDialogFragment extends DialogFragment {
         return this;
     }
 
+    public AlertDialogFragment setItems(CharSequence[] items, DialogInterface.OnClickListener itemListener) {
+        this.items = items;
+        this.itemListener = itemListener;
+        return this;
+    }
+
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -91,6 +100,9 @@ public class AlertDialogFragment extends DialogFragment {
         }
         if (neutralText != null) {
             builder.setNeutralButton(neutralText, neutralListener);
+        }
+        if (items != null) {
+            builder.setItems(items, itemListener);
         }
         builder.setOnDismissListener(dismissListener);
         return builder.create();

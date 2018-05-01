@@ -13,5 +13,7 @@ import java.util.List;
  */
 public interface SubPageModel {
 
+    String TAB_ALL = "全部";
+
     List<TabBean> createTabs(User user, CompetitorBean competitor);
 }

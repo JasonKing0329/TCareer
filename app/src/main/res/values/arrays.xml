@@ -182,4 +182,11 @@
 		<item>ASC</item>
 		<item>DESC</item>
 	</array>
+
+	<array name="player_tab_type">
+		<item>User</item>
+		<item>Court</item>
+		<item>Level</item>
+		<item>Year</item>
+	</array>
 </resources>

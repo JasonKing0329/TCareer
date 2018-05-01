@@ -3,4 +3,7 @@
     <item
         android:id="@+id/menu_view_type"
         android:title="卡片布局"/>
+    <item
+        android:id="@+id/menu_tab_type"
+        android:title="Tab类型"/>
 </menu>

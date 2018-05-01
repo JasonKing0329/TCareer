@@ -14,6 +14,8 @@ public abstract class TabBean {
     public int total;
 
     public String court;
+    public String level;
+    public String year;
     public long userId = -1;
 
     public abstract String getTitle();

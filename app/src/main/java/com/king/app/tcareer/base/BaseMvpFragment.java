@@ -21,8 +21,13 @@ public abstract class BaseMvpFragment<T extends BasePresenter> extends BaseFragm
         View view = super.onCreateView(inflater, container, savedInstanceState);
         presenter = createPresenter();
         presenter.onAttach(this);
-        onCreateData();
         return view;
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        onCreateData();
     }
 
     protected abstract T createPresenter();

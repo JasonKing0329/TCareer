@@ -339,7 +339,6 @@ public class PlayerManageActivity extends BaseMvpActivity<PlayerManagePresenter>
                     else {
                         intent.putExtra(PlayerPageActivity.KEY_COMPETITOR_ID, ((PlayerBean) bean.getData()).getId());
                     }
-                    intent.putExtra(PlayerPageActivity.KEY_SUB_PAGE_TYPE, PlayerPageActivity.SUB_BY_USER);
                     startActivity(intent);
                 }
             }

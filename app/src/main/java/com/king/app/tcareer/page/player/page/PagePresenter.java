@@ -55,6 +55,11 @@ import io.reactivex.schedulers.Schedulers;
  */
 public class PagePresenter extends BasePresenter<IPageView> {
 
+    public static final int TAB_USER = 0;
+    public static final int TAB_COURT = 1;
+    public static final int TAB_LEVEL = 2;
+    public static final int TAB_YEAR = 3;
+
     protected CompetitorBean mCompetitor;
 
     private PageData mPageData;
@@ -63,23 +68,30 @@ public class PagePresenter extends BasePresenter<IPageView> {
 
     private int mTabType;
 
-    private final int TAB_USER = 0;
-    private final int TAB_COURT = 1;
-
     private SubPageModel subPageModel;
 
     @Override
     protected void onCreate() {
         faceModel = FaceModelFactory.create();
+        mTabType = SettingProperty.getPlayerTabType();
     }
 
-    public void preparePage(long userId, final long playerId, final boolean playerIsUser, int tabType) {
-        mTabType = tabType;
-        if (mTabType == TAB_COURT) {
-            subPageModel = new CourtPageModel();
+    public void preparePage(long userId, final long playerId, final boolean playerIsUser) {
+        if (userId == -1 || mTabType == TAB_USER) {
+            subPageModel = new UserPageModel();
         }
         else {
-            subPageModel = new UserPageModel();
+            switch (mTabType) {
+                case TAB_COURT:
+                    subPageModel = new CourtPageModel();
+                    break;
+                case TAB_LEVEL:
+                    subPageModel = new LevelPageModel();
+                    break;
+                case TAB_YEAR:
+                    subPageModel = new YearPageModel();
+                    break;
+            }
         }
         Observable<CompetitorBean> observable;
         if (userId == -1) {
@@ -119,6 +131,15 @@ public class PagePresenter extends BasePresenter<IPageView> {
 
                     }
                 });
+    }
+
+    public boolean updateTabType(int mTabType) {
+        if (mTabType != this.mTabType) {
+            this.mTabType = mTabType;
+            SettingProperty.setPlayerTabType(mTabType);
+            return true;
+        }
+        return false;
     }
 
     public CompetitorBean getCompetitor() {

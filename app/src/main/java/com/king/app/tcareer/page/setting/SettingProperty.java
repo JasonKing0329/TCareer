@@ -230,4 +230,20 @@ public class SettingProperty {
         setInt("key_player_page_view_type", mode);
     }
 
+
+    /**
+     * tab type of player page
+     */
+    public static int getPlayerTabType() {
+        return getInt("key_player_tab_type", 0);
+    }
+
+    /**
+     * tab type of player page
+     * @param mode
+     */
+    public static void setPlayerTabType(int mode) {
+        setInt("key_player_tab_type", mode);
+    }
+
 }

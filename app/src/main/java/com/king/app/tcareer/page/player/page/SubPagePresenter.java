@@ -61,11 +61,11 @@ public class SubPagePresenter extends BasePresenter<SubPageView> {
         return mViewType;
     }
 
-    public void createRecords(long userId, String court) {
-        createRecords(userId, court, mViewType);
+    public void createRecords(long userId, String court, String level, String year) {
+        createRecords(userId, court, mViewType, level, year);
     }
 
-    private Observable<List<Record>> queryRecords(final long userId, final String court) {
+    private Observable<List<Record>> queryRecords(final long userId, final String court, final String level, final String year) {
         return Observable.create(new ObservableOnSubscribe<List<Record>>() {
             @Override
             public void subscribe(ObservableEmitter<List<Record>> e) throws Exception {
@@ -81,18 +81,28 @@ public class SubPagePresenter extends BasePresenter<SubPageView> {
                 if (userId != -1) {
                     builder.where(RecordDao.Properties.UserId.eq(userId));
                 }
+                if (!TextUtils.isEmpty(year) && !year.equals(SubPageModel.TAB_ALL)) {
+                    builder.where(RecordDao.Properties.DateStr.like(year + "%"));
+                }
                 List<Record> list = builder.build().list();
-                List<Record> results;
-                if (!TextUtils.isEmpty(court) && !court.equals(CourtPageModel.TAB_ALL)) {
-                    results = new ArrayList<>();
-                    for (Record record : list) {
-                        if (record.getMatch().getMatchBean().getCourt().equals(court)) {
-                            results.add(record);
+                List<Record> results = new ArrayList<>();
+                for (Record record : list) {
+                    boolean isPast = true;
+                    // filter court
+                    if (!TextUtils.isEmpty(court) && !court.equals(SubPageModel.TAB_ALL)) {
+                        if (!record.getMatch().getMatchBean().getCourt().equals(court)) {
+                            isPast = false;
                         }
                     }
-                }
-                else {
-                    results = list;
+                    // filter level
+                    if (!TextUtils.isEmpty(level) && !level.equals(SubPageModel.TAB_ALL)) {
+                        if (!record.getMatch().getMatchBean().getLevel().equals(level)) {
+                            isPast = false;
+                        }
+                    }
+                    if (isPast) {
+                        results.add(record);
+                    }
                 }
 
                 Collections.reverse(results);
@@ -135,12 +145,12 @@ public class SubPagePresenter extends BasePresenter<SubPageView> {
         };
     }
 
-    private void createRecords(final long userId, final String court, final int type) {
+    private void createRecords(final long userId, final String court, final int type, final String level, final String year) {
         queryUser(userId)
                 .flatMap(new Function<User, ObservableSource<List<Record>>>() {
                     @Override
                     public ObservableSource<List<Record>> apply(User user) throws Exception {
-                        return queryRecords(userId, court);
+                        return queryRecords(userId, court, level, year);
                     }
                 })
                 .flatMap(new Function<List<Record>, ObservableSource<List<Object>>>() {
@@ -172,26 +182,6 @@ public class SubPagePresenter extends BasePresenter<SubPageView> {
     public String getYearTitle(int year) {
         FullRecordBean bean = yearMap.get(year);
         return bean.year + "\n" + bean.yearWin + "-" + bean.yearLose;
-    }
-
-    /**
-     * 平铺式布局
-     * 每一个都是record的扩展，每年的第一个才会有年份信息
-     * @param userId
-     * @param court
-     */
-    public void createPureRecords(long userId, String court) {
-        createRecords(userId, court, TYPE_PURE);
-    }
-
-    /**
-     * 卡片式布局list
-     * 区分title与record
-     * @param userId
-     * @param court
-     */
-    public void createCardRecords(final long userId, final String court) {
-        createRecords(userId, court, TYPE_CARD);
     }
 
     protected PageTitleBean countTitle(int year, List<Record> records) {
