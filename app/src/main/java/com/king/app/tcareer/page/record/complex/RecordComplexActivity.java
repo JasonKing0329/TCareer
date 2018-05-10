@@ -239,16 +239,6 @@ public class RecordComplexActivity extends BaseMvpActivity<ComplexPresenter> imp
         recordAdapter.removedItem(viewPosition);
     }
 
-    @Override
-    public void onAllDetail(RecordItem record) {
-
-    }
-
-    @Override
-    public void onListDetail(RecordItem record) {
-
-    }
-
     @SuppressLint("RestrictedApi")
     @Override
     public void onItemClicked(View view, RecordItem record) {

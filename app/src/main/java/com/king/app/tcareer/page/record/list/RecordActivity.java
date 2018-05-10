@@ -17,14 +17,10 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.king.app.tcareer.R;
 import com.king.app.tcareer.base.BaseMvpActivity;
-import com.king.app.tcareer.model.CompetitorParser;
 import com.king.app.tcareer.model.GlideOptions;
 import com.king.app.tcareer.model.ImageProvider;
-import com.king.app.tcareer.model.bean.CompetitorBean;
 import com.king.app.tcareer.model.db.entity.Record;
-import com.king.app.tcareer.model.db.entity.User;
 import com.king.app.tcareer.page.match.page.MatchPageActivity;
-import com.king.app.tcareer.page.player.page.PlayerPageActivity;
 import com.king.app.tcareer.page.record.editor.RecordEditorActivity;
 import com.king.app.tcareer.page.record.page.RecordPageActivity;
 import com.king.app.tcareer.page.record.search.SearchDialog;
@@ -251,22 +247,6 @@ public class RecordActivity extends BaseMvpActivity<RecordPresenter> implements 
         // delete from list
         // 通过调试发现，itemPosition是在整个recycler view里的position，框架对根据position做的3级显示，整个position都是顺序排列的
         recordAdapter.removedItem(viewPosition);
-    }
-
-    @Override
-    public void onAllDetail(RecordItem record) {
-//        Intent intent = new Intent();
-//        intent.setClass(this, DetailGallery.class);
-//        Bundle bundle = new Bundle();
-//        bundle.putSerializable("record", record.getRecord());
-//        intent.putExtras(bundle);
-//        startActivity(intent);
-    }
-
-    @Override
-    public void onListDetail(RecordItem record) {
-//        DetailsDialog dlg = new DetailsDialog(this, record.getRecord(), new H2HDAOList(recordPageData.getRecordList(), record.getRecord().getCompetitor()));
-//        dlg.show();
     }
 
     @SuppressLint("RestrictedApi")

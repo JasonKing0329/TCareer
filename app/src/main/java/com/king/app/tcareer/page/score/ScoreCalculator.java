@@ -208,11 +208,11 @@ public class ScoreCalculator extends DraggableDialogFragment {
 
         private void updateDate(int year, int monthOfYear, int dayOfMonth) {
             nYearStart = year;
-            nMonthStart = monthOfYear + 1;//日期控件的月份是从0开始编号的
+            nMonthStart = monthOfYear;//日期控件的月份是从0开始编号的
             nDayStart = dayOfMonth;
             StringBuffer buffer = new StringBuffer();
             buffer.append(nYearStart).append("-");
-            buffer.append(nMonthStart < 10 ? "0" + nMonthStart : nMonthStart).append("-");
+            buffer.append(nMonthStart < 10 ? "0" + (nMonthStart + 1) : (nMonthStart + 1)).append("-");
             buffer.append(nDayStart < 10 ? "0" + nDayStart : nDayStart);
             mDate = buffer.toString();
             btnStart.setText(mDate);

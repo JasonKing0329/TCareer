@@ -82,16 +82,6 @@ public class RecordItemAdapter extends AbstractExpandableAdapterItem implements 
                 .normalImageRes(R.drawable.ic_delete_white_24dp)
                 .imagePadding(new Rect(padding, padding, padding, padding))
                 .listener(this));
-        bmbMenu.addBuilder(new HamButton.Builder().normalTextRes(R.string.record_longclick_detail)
-            .subNormalTextRes(R.string.record_longclick_detail_sub_all)
-                .normalImageRes(R.drawable.ic_assignment_ind_white_24dp)
-                .imagePadding(new Rect(padding, padding, padding, padding))
-                .listener(this));
-        bmbMenu.addBuilder(new HamButton.Builder().normalTextRes(R.string.record_longclick_detail)
-                .subNormalTextRes(R.string.record_longclick_detail_sub_this)
-                .normalImageRes(R.drawable.ic_assignment_white_24dp)
-                .imagePadding(new Rect(padding, padding, padding, padding))
-                .listener(this));
     }
 
     @Override
@@ -163,12 +153,6 @@ public class RecordItemAdapter extends AbstractExpandableAdapterItem implements 
                 break;
             case 1:
                 onItemMenuListener.onDeleteRecord(curRecordItem);
-                break;
-            case 2:
-                onItemMenuListener.onAllDetail(curRecordItem);
-                break;
-            case 3:
-                onItemMenuListener.onListDetail(curRecordItem);
                 break;
         }
     }

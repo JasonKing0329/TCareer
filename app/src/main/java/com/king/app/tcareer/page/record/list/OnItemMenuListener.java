@@ -9,8 +9,6 @@ import android.view.View;
 public interface OnItemMenuListener {
     void onUpdateRecord(RecordItem record);
     void onDeleteRecord(RecordItem record);
-    void onAllDetail(RecordItem record);
-    void onListDetail(RecordItem record);
 
     void onItemClicked(View view, RecordItem curRecordItem);
 }
