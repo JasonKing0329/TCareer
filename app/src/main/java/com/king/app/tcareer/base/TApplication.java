@@ -9,7 +9,10 @@ import com.king.app.tcareer.conf.AppConfig;
 import com.king.app.tcareer.model.db.entity.DaoMaster;
 import com.king.app.tcareer.model.db.entity.DaoSession;
 import com.king.app.tcareer.model.db.entity.EarlierAchieveDao;
+import com.king.app.tcareer.model.db.entity.PlayerAtpBeanDao;
+import com.king.app.tcareer.model.db.entity.PlayerBeanDao;
 import com.king.app.tcareer.model.db.entity.RankWeekDao;
+import com.king.app.tcareer.model.db.entity.UserDao;
 import com.king.app.tcareer.utils.DebugLog;
 
 import org.greenrobot.greendao.database.Database;
@@ -90,11 +93,16 @@ public class TApplication extends Application {
 		@Override
 		public void onUpgrade(Database db, int oldVersion, int newVersion) {
 			DebugLog.e(" oldVersion=" + oldVersion + ", newVersion=" + newVersion);
-			if (newVersion == 2) {
-				EarlierAchieveDao.createTable(db, true);
-			}
-			if (newVersion == 3) {
-				RankWeekDao.createTable(db, true);
+			switch (oldVersion) {
+				case 1:
+					EarlierAchieveDao.createTable(db, true);
+				case 2:
+					RankWeekDao.createTable(db, true);
+				case 3:
+					PlayerAtpBeanDao.createTable(db, true);
+					db.execSQL("ALTER TABLE " + UserDao.TABLENAME + " ADD COLUMN " + UserDao.Properties.AtpId.columnName + " TEXT;");
+					db.execSQL("ALTER TABLE " + PlayerBeanDao.TABLENAME + " ADD COLUMN " + PlayerBeanDao.Properties.AtpId.columnName + " TEXT;");
+					break;
 			}
 		}
 	}

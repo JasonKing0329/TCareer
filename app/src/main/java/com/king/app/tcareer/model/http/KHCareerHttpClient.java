@@ -1,5 +1,6 @@
 package com.king.app.tcareer.model.http;
 
+import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
 
 /**
@@ -11,6 +12,11 @@ public class KHCareerHttpClient extends BaseHttpClient {
 
     private KHCareerHttpClient() {
         super();
+    }
+
+    @Override
+    protected void extendBuilder(OkHttpClient.Builder builder) {
+
     }
 
     @Override

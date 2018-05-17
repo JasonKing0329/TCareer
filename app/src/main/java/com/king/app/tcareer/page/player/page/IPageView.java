@@ -3,10 +3,14 @@ package com.king.app.tcareer.page.player.page;
 import android.content.Context;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.TabLayout;
+import android.support.v4.view.ViewPager;
 import android.support.v7.widget.Toolbar;
+import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.king.app.tcareer.base.BaseView;
+import com.king.app.tcareer.model.db.entity.PlayerAtpBean;
 
 import java.util.List;
 
@@ -40,4 +44,16 @@ public interface IPageView extends BaseView {
     void showCompetitor(String nameEng, String detailPlayerPath);
 
     void animTags(boolean isRight);
+
+    void showAtpInfo(PlayerAtpBean atpBean);
+
+    ViewGroup getGroupAtp();
+
+    TextView getTvAtpTime();
+
+    LinearLayout getGroupAtpCover();
+
+    ViewPager getViewpager();
+
+    void onUpdateAtpCompleted();
 }

@@ -30,6 +30,85 @@
                     android:id="@+id/iv_player_bg"
                     android:layout_width="360dp"
                     android:layout_height="@dimen/player_page_head_height" />
+
+                <RelativeLayout
+                    android:id="@+id/group_atp"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/player_page_update_time_height"
+                    android:visibility="gone"
+                    android:layout_below="@id/iv_player_bg"
+                    android:paddingLeft="@dimen/activity_horizontal_margin"
+                    android:paddingRight="@dimen/activity_horizontal_margin">
+                    <TextView
+                        android:id="@+id/tv_atp_time"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:layout_centerVertical="true"
+                        android:textColor="#dedede"
+                        android:text="上次更新时间： 2018-05-16 14:23:00"/>
+                </RelativeLayout>
+
+                <LinearLayout
+                    android:id="@+id/group_atp_cover"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/player_page_head_height"
+                    android:orientation="vertical"
+                    android:gravity="center_vertical"
+                    android:background="@drawable/shape_atp_cover_ltr"
+                    android:paddingLeft="@dimen/activity_horizontal_margin"
+                    android:paddingRight="@dimen/activity_horizontal_margin"
+                    android:paddingTop="40dp"
+                    android:paddingBottom="@dimen/margin_10">
+                    <TextView
+                        android:id="@+id/tv_turned_pro"
+                        style="@style/TvAtpCoverValue"
+                        android:text="Turned Pro    2005" />
+                    <TextView
+                        style="@style/TvAtpCoverTitle"
+                        android:text="Residence" />
+                    <TextView
+                        android:id="@+id/tv_residence"
+                        style="@style/TvAtpCoverValue"
+                        android:text="California, America" />
+                    <TextView
+                        style="@style/TvAtpCoverTitle"
+                        android:text="Plays"/>
+                    <TextView
+                        android:id="@+id/tv_plays"
+                        style="@style/TvAtpCoverValue"
+                        android:text="Right-hand forehand, 2-hand backhand" />
+                    <TextView
+                        style="@style/TvAtpCoverTitle"
+                        android:text="Coach"/>
+                    <TextView
+                        android:id="@+id/tv_coach"
+                        style="@style/TvAtpCoverValue"
+                        android:text="Jonas Comberbench" />
+                    <TextView
+                        style="@style/TvAtpCoverTitle"
+                        android:text="Titles(singles/doubles)" />
+                    <TextView
+                        android:id="@+id/tv_titles_year"
+                        style="@style/TvAtpCoverValue"
+                        android:text="2018(5/0)" />
+                    <TextView
+                        android:id="@+id/tv_titles_career"
+                        style="@style/TvAtpCoverValue"
+                        android:text="Career(66/14)" />
+                    <TextView
+                        style="@style/TvAtpCoverTitle"
+                        android:text="Win-Lose and Prize" />
+                    <TextView
+                        android:id="@+id/tv_win_lose_prize_year"
+                        style="@style/TvAtpCoverValue"
+                        android:text="2018  22-10  $1,163,254" />
+                    <TextView
+                        android:id="@+id/tv_win_lose_prize_career"
+                        style="@style/TvAtpCoverValue"
+                        android:text="Career  543-225  $116,163,254" />
+                </LinearLayout>
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

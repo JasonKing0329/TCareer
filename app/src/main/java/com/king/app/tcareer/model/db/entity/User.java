@@ -5,11 +5,11 @@ import com.king.app.tcareer.model.bean.CompetitorBean;
 import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.annotation.Id;
-import org.greenrobot.greendao.annotation.JoinProperty;
 import org.greenrobot.greendao.annotation.ToMany;
 
 import java.util.List;
 import org.greenrobot.greendao.DaoException;
+import org.greenrobot.greendao.annotation.ToOne;
 
 /**
  * 描述:
@@ -32,6 +32,10 @@ public class User implements CompetitorBean {
     private int height;
     private double weight;
 
+    private String atpId;
+
+    @ToOne(joinProperty = "atpId")
+    private PlayerAtpBean atpBean;
     @ToMany(referencedJoinProperty = "userId")
     private List<EarlierAchieve> earlierAchieves;
 
@@ -43,10 +47,12 @@ public class User implements CompetitorBean {
     @Generated(hash = 1507654846)
     private transient UserDao myDao;
 
-    @Generated(hash = 598643048)
-    public User(Long id, String nameEng, String nameChn, String namePinyin,
-            String country, String city, String birthday, String nameShort,
-            int height, double weight) {
+    @Generated(hash = 2088910886)
+    private transient String atpBean__resolvedKey;
+
+    @Generated(hash = 1399991603)
+    public User(Long id, String nameEng, String nameChn, String namePinyin, String country, String city,
+            String birthday, String nameShort, int height, double weight, String atpId) {
         this.id = id;
         this.nameEng = nameEng;
         this.nameChn = nameChn;
@@ -57,6 +63,7 @@ public class User implements CompetitorBean {
         this.nameShort = nameShort;
         this.height = height;
         this.weight = weight;
+        this.atpId = atpId;
     }
     @Generated(hash = 586692638)
     public User() {
@@ -180,6 +187,39 @@ public class User implements CompetitorBean {
             throw new DaoException("Entity is detached from DAO context");
         }
         myDao.update(this);
+    }
+    public String getAtpId() {
+        return this.atpId;
+    }
+    public void setAtpId(String atpId) {
+        this.atpId = atpId;
+    }
+    /** To-one relationship, resolved on first access. */
+    @Generated(hash = 1790333486)
+    public PlayerAtpBean getAtpBean() {
+        String __key = this.atpId;
+        if (atpBean__resolvedKey == null || atpBean__resolvedKey != __key) {
+            final DaoSession daoSession = this.daoSession;
+            if (daoSession == null) {
+                throw new DaoException("Entity is detached from DAO context");
+            }
+            PlayerAtpBeanDao targetDao = daoSession.getPlayerAtpBeanDao();
+            PlayerAtpBean atpBeanNew = targetDao.load(__key);
+            synchronized (this) {
+                atpBean = atpBeanNew;
+                atpBean__resolvedKey = __key;
+            }
+        }
+        return atpBean;
+    }
+    /** called by internal mechanisms, do not call yourself. */
+    @Generated(hash = 869304510)
+    public void setAtpBean(PlayerAtpBean atpBean) {
+        synchronized (this) {
+            this.atpBean = atpBean;
+            atpId = atpBean == null ? null : atpBean.getId();
+            atpBean__resolvedKey = atpId;
+        }
     }
     /** called by internal mechanisms, do not call yourself. */
     @Generated(hash = 2059241980)

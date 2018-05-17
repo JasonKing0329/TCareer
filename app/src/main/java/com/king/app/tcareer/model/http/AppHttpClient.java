@@ -1,5 +1,6 @@
 package com.king.app.tcareer.model.http;
 
+import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
 
 /**
@@ -16,6 +17,11 @@ public class AppHttpClient extends BaseHttpClient {
     @Override
     protected void createService(Retrofit retrofit) {
         appService = retrofit.create(AppService.class);
+    }
+
+    @Override
+    protected void extendBuilder(OkHttpClient.Builder builder) {
+
     }
 
     //在访问HttpMethods时创建单例

@@ -4,6 +4,7 @@ import android.text.TextUtils;
 
 import com.king.app.tcareer.base.BasePresenter;
 import com.king.app.tcareer.base.TApplication;
+import com.king.app.tcareer.conf.AppConfig;
 import com.king.app.tcareer.conf.AppConstants;
 import com.king.app.tcareer.model.PlayerComparator;
 import com.king.app.tcareer.model.bean.H2hBean;
@@ -12,8 +13,14 @@ import com.king.app.tcareer.model.db.entity.PlayerBean;
 import com.king.app.tcareer.model.db.entity.PlayerBeanDao;
 import com.king.app.tcareer.model.db.entity.User;
 import com.king.app.tcareer.model.db.entity.UserDao;
+import com.king.app.tcareer.model.html.PlayerParser;
+import com.king.app.tcareer.model.html.RankParser;
+import com.king.app.tcareer.model.http.AtpWorldTourClient;
+import com.king.app.tcareer.model.http.AtpWorldTourParams;
 import com.king.app.tcareer.page.setting.SettingProperty;
+import com.king.app.tcareer.utils.FileUtil;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -30,6 +37,7 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.BiFunction;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
+import okhttp3.ResponseBody;
 
 /**
  * @desc
@@ -293,5 +301,75 @@ public class PlayerManagePresenter extends BasePresenter<PlayerManageView> {
 
     public int getLetterPosition(String letter) {
         return playerIndexMap.get(letter.charAt(0));
+    }
+
+    /**
+     * 获取排名数据
+     */
+    public void fetchData() {
+        view.showLoading();
+        getSourceFile()
+                .flatMap(new Function<File, ObservableSource<Boolean>>() {
+                    @Override
+                    public ObservableSource<Boolean> apply(File file) throws Exception {
+                        return new RankParser().parse(file);
+                    }
+                })
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(new Observer<Boolean>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                        addDisposable(d);
+                    }
+
+                    @Override
+                    public void onNext(Boolean result) {
+                        view.dismissLoading();
+                        view.showMessage("下载完成");
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        e.printStackTrace();
+                        view.dismissLoading();
+                        view.showMessage("下载失败" + e.getMessage());
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
+    }
+
+    public Observable<File> getSourceFile() {
+        boolean isForce = false;
+        if (!isForce && new File(AppConfig.FILE_HTML_RANK).exists()) {
+            return Observable.create(new ObservableOnSubscribe<File>() {
+                @Override
+                public void subscribe(ObservableEmitter<File> e) throws Exception {
+                    e.onNext(new File(AppConfig.FILE_HTML_RANK));
+                }
+            });
+        }
+        else {
+            return AtpWorldTourClient.getInstance().getService().getRankList(AtpWorldTourParams.URL_RANK)
+                    .flatMap(new Function<ResponseBody, ObservableSource<File>>() {
+                        @Override
+                        public ObservableSource<File> apply(ResponseBody responseBody) throws Exception {
+                            return saveFile(responseBody, AppConfig.FILE_HTML_RANK);
+                        }
+                    });
+        }
+    }
+
+    public static Observable<File> saveFile(final ResponseBody responseBody, final String path) {
+        return Observable.create(new ObservableOnSubscribe<File>() {
+            @Override
+            public void subscribe(ObservableEmitter<File> e) throws Exception {
+                e.onNext(FileUtil.saveFile(responseBody.byteStream(), path));
+            }
+        });
     }
 }

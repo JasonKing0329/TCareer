@@ -280,6 +280,7 @@
     <string name="cptdlg_item_download">Download from server</string>
     <string name="cptdlg_item_refresh">Refresh image</string>
     <string name="cptdlg_item_manage">Manage images</string>
+    <string name="menu_update_atp">Update data from AtpWorldTour</string>
 
     <!-- *************************** http ********************************* -->
     <string name="app_update_found">Found new application version %s, click ok to update.</string>

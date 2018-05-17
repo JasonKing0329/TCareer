@@ -16,11 +16,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewAnimationUtils;
+import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.AnimationSet;
 import android.view.animation.TranslateAnimation;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -28,6 +30,7 @@ import com.king.app.tcareer.R;
 import com.king.app.tcareer.base.BaseMvpActivity;
 import com.king.app.tcareer.model.GlideOptions;
 import com.king.app.tcareer.model.bean.CompetitorBean;
+import com.king.app.tcareer.model.db.entity.PlayerAtpBean;
 import com.king.app.tcareer.model.http.Command;
 import com.king.app.tcareer.model.palette.PaletteCallback;
 import com.king.app.tcareer.model.palette.PaletteRequestListener;
@@ -38,7 +41,10 @@ import com.king.app.tcareer.utils.DebugLog;
 import com.king.app.tcareer.utils.ScreenUtils;
 import com.king.app.tcareer.view.dialog.AlertDialogFragment;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import butterknife.BindView;
@@ -68,6 +74,10 @@ public class PlayerPageActivity extends BaseMvpActivity<PagePresenter> implement
     TextView tvNameChn;
     @BindView(R.id.tv_name_eng)
     TextView tvNameEng;
+    @BindView(R.id.tv_atp_time)
+    TextView tvAtpTime;
+    @BindView(R.id.group_atp)
+    ViewGroup groupAtp;
     @BindView(R.id.tabLayout)
     TabLayout tabLayout;
     @BindView(R.id.viewpager)
@@ -76,6 +86,24 @@ public class PlayerPageActivity extends BaseMvpActivity<PagePresenter> implement
     CollapsingToolbarLayout collapsingToolbar;
     @BindView(R.id.appbar_layout)
     AppBarLayout appBarLayout;
+    @BindView(R.id.tv_residence)
+    TextView tvResidence;
+    @BindView(R.id.tv_plays)
+    TextView tvPlays;
+    @BindView(R.id.tv_coach)
+    TextView tvCoach;
+    @BindView(R.id.tv_titles_year)
+    TextView tvTitlesYear;
+    @BindView(R.id.tv_titles_career)
+    TextView tvTitlesCareer;
+    @BindView(R.id.tv_win_lose_prize_year)
+    TextView tvWinLosePrizeYear;
+    @BindView(R.id.tv_win_lose_prize_career)
+    TextView tvWinLosePrizeCareer;
+    @BindView(R.id.tv_turned_pro)
+    TextView tvTurnedPro;
+    @BindView(R.id.group_atp_cover)
+    LinearLayout groupAtpCover;
 
     private PageAdapter pageAdapter;
 
@@ -142,7 +170,29 @@ public class PlayerPageActivity extends BaseMvpActivity<PagePresenter> implement
                 });
             }
         });
+
+        groupAtp.setVisibility(View.GONE);
+        groupAtpCover.setVisibility(View.GONE);
+
+        tvNameEng.setOnClickListener(tagListener);
+        tvNameChn.setOnClickListener(tagListener);
+        tvCountry.setOnClickListener(tagListener);
+        tvBirthday.setOnClickListener(tagListener);
     }
+
+    private View.OnClickListener tagListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            if (presenter.getCompetitor().getAtpBean() != null) {
+                if (groupAtp.getVisibility() == View.VISIBLE) {
+                    presenter.dismissAtpInfo();
+                }
+                else {
+                    presenter.playAtpInfo();
+                }
+            }
+        }
+    };
 
     @Override
     protected PagePresenter createPresenter() {
@@ -202,6 +252,9 @@ public class PlayerPageActivity extends BaseMvpActivity<PagePresenter> implement
                             }
                         })
                         .show(getSupportFragmentManager(), "AlertDialogFragment");
+                break;
+            case R.id.menu_update_atp:
+                presenter.updateAtpData(presenter.getCompetitor().getAtpId());
                 break;
         }
 
@@ -333,6 +386,37 @@ public class PlayerPageActivity extends BaseMvpActivity<PagePresenter> implement
         if (!disableReloadFragments) {
             initFragments();
         }
+
+    }
+
+    @Override
+    public void showAtpInfo(PlayerAtpBean atp) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        tvAtpTime.setText("上次更新时间： " + sdf.format(new Date(atp.getLastUpdateDate())));
+        tvTurnedPro.setText("Turned Pro    " + atp.getTurnedPro());
+        tvCoach.setText(atp.getCoach());
+        if (TextUtils.isEmpty(atp.getResidenceCity())) {
+            tvResidence.setText(atp.getResidenceCountry());
+        }
+        else {
+            tvResidence.setText(atp.getResidenceCity() + ", " + atp.getResidenceCountry());
+        }
+        tvPlays.setText(atp.getPlays());
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(new Date());
+        int year = calendar.get(Calendar.YEAR);
+        calendar.setTime(new Date(atp.getLastUpdateDate()));
+        int updateYear = calendar.get(Calendar.YEAR);
+        if (year == updateYear) {
+            tvTitlesYear.setText(year + " (" + atp.getYearSingles() + "/" + atp.getYearDoubles() + ")");
+            tvWinLosePrizeYear.setText(year + "  " + atp.getYearWin() + "-" + atp.getYearLose() + "  " + atp.getYearPrize());
+        }
+        else {
+            tvTitlesYear.setText(year + " Unknown");
+            tvWinLosePrizeYear.setText(year + " Unknown");
+        }
+        tvTitlesCareer.setText("Career (" + atp.getCareerSingles() + "/" + atp.getCareerDoubles() + ")");
+        tvWinLosePrizeCareer.setText("Career  " + atp.getCareerWin() + "-" + atp.getCareerLose() + "  " + atp.getCareerPrize());
     }
 
     @Override
@@ -373,6 +457,21 @@ public class PlayerPageActivity extends BaseMvpActivity<PagePresenter> implement
     }
 
     @Override
+    public ViewGroup getGroupAtp() {
+        return groupAtp;
+    }
+
+    @Override
+    public TextView getTvAtpTime() {
+        return tvAtpTime;
+    }
+
+    @Override
+    public LinearLayout getGroupAtpCover() {
+        return groupAtpCover;
+    }
+
+    @Override
     public Context getContext() {
         return this;
     }
@@ -383,12 +482,16 @@ public class PlayerPageActivity extends BaseMvpActivity<PagePresenter> implement
     }
 
     @Override
+    public ViewPager getViewpager() {
+        return viewpager;
+    }
+
+    @Override
     public void onTabLoaded(List<TabBean> list) {
         tabLayout.removeAllTabs();
         if (list.size() > 5) {
             tabLayout.setTabMode(TabLayout.MODE_SCROLLABLE);
-        }
-        else {
+        } else {
             tabLayout.setTabMode(TabLayout.MODE_FIXED);
         }
         pageAdapter = new PageAdapter(getSupportFragmentManager());
@@ -499,4 +602,9 @@ public class PlayerPageActivity extends BaseMvpActivity<PagePresenter> implement
         anim.start();
     }
 
+    @Override
+    public void onUpdateAtpCompleted() {
+        disableReloadFragments = true;
+        initPlayerAndUser();
+    }
 }

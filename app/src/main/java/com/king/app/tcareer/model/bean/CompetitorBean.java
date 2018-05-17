@@ -1,5 +1,7 @@
 package com.king.app.tcareer.model.bean;
 
+import com.king.app.tcareer.model.db.entity.PlayerAtpBean;
+
 /**
  * 描述:
  * <p/>作者：景阳
@@ -20,4 +22,8 @@ public interface CompetitorBean {
     String getCity();
 
     String getBirthday();
+
+    String getAtpId();
+
+    PlayerAtpBean getAtpBean();
 }

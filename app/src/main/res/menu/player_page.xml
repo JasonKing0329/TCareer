@@ -6,4 +6,7 @@
     <item
         android:id="@+id/menu_tab_type"
         android:title="Tab类型"/>
+    <item
+        android:id="@+id/menu_update_atp"
+        android:title="@string/menu_update_atp"/>
 </menu>

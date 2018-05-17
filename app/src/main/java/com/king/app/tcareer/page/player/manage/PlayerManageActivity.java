@@ -155,6 +155,9 @@ public class PlayerManageActivity extends BaseMvpActivity<PlayerManagePresenter>
                         }
                         refreshList();
                         break;
+                    case R.id.menu_manage_fetch:
+                        presenter.fetchData();
+                        break;
                 }
             }
         });

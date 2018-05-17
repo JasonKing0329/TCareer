@@ -31,4 +31,9 @@
         android:title="Constellations"
         android:icon="@drawable/ic_pie_chart_white_24dp"
         app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/menu_manage_fetch"
+        android:title="Fetch data"
+        android:icon="@drawable/ic_pie_chart_white_24dp"
+        app:showAsAction="ifRoom" />
 </menu>

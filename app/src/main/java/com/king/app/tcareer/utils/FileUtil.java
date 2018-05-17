@@ -21,6 +21,7 @@ public class FileUtil {
 
     /**
      * 从assets目录复制的方法
+     *
      * @param dbFile
      */
     public static void copyDbFromAssets(String dbFile) {
@@ -44,7 +45,7 @@ public class FileUtil {
                 OutputStream fileOut = new FileOutputStream(dbPath + "/" + dbFile);
                 byte[] buffer = new byte[1024];
                 int length;
-                while ((length = assetsIn.read(buffer))>0){
+                while ((length = assetsIn.read(buffer)) > 0) {
                     fileOut.write(buffer, 0, length);
                 }
 
@@ -70,7 +71,7 @@ public class FileUtil {
         File targetFolder = new File(dbPath);
         if (targetFolder.exists()) {
             File[] files = targetFolder.listFiles();
-            for (File f:files) {
+            for (File f : files) {
                 f.delete();
             }
         }
@@ -80,7 +81,7 @@ public class FileUtil {
             OutputStream fileOut = new FileOutputStream(file);
             byte[] buffer = new byte[1024];
             int length;
-            while ((length = in.read(buffer))>0){
+            while ((length = in.read(buffer)) > 0) {
                 fileOut.write(buffer, 0, length);
             }
 
@@ -92,5 +93,43 @@ public class FileUtil {
             return false;
         }
         return true;
+    }
+
+    public static File saveFile(InputStream inputStream, String path) {
+        File file = new File(path);
+
+        OutputStream outputStream = null;
+
+        try {
+            byte[] fileReader = new byte[4096];
+            outputStream = new FileOutputStream(file);
+            while (true) {
+                int read = inputStream.read(fileReader);
+                if (read == -1) {
+                    break;
+                }
+                outputStream.write(fileReader, 0, read);
+            }
+            outputStream.flush();
+            return file;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        } finally {
+            if (inputStream != null) {
+                try {
+                    inputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (outputStream != null) {
+                try {
+                    outputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 }

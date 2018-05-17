@@ -1,5 +1,7 @@
 package com.king.app.tcareer.page.player.page;
 
+import android.animation.Animator;
+import android.animation.ObjectAnimator;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
@@ -8,6 +10,8 @@ import android.support.v7.graphics.Palette;
 import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.ScaleAnimation;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -28,8 +32,10 @@ import com.king.app.tcareer.model.palette.PaletteResponse;
 import com.king.app.tcareer.model.palette.ViewColorBound;
 import com.king.app.tcareer.page.imagemanager.DataController;
 import com.king.app.tcareer.page.imagemanager.ImageManager;
+import com.king.app.tcareer.page.player.atp.PlayerAtpPresenter;
 import com.king.app.tcareer.page.setting.SettingProperty;
 import com.king.app.tcareer.utils.ConstellationUtil;
+import com.king.app.tcareer.utils.FormatUtil;
 import com.king.app.tcareer.utils.ListUtil;
 import com.king.app.tcareer.utils.ScreenUtils;
 
@@ -53,7 +59,7 @@ import io.reactivex.schedulers.Schedulers;
  * <p/>作者：景阳
  * <p/>创建时间: 2017/11/20 15:48
  */
-public class PagePresenter extends BasePresenter<IPageView> {
+public class PagePresenter extends PlayerAtpPresenter<IPageView> {
 
     public static final int TAB_USER = 0;
     public static final int TAB_COURT = 1;
@@ -69,6 +75,8 @@ public class PagePresenter extends BasePresenter<IPageView> {
     private int mTabType;
 
     private SubPageModel subPageModel;
+
+    private boolean isFaceInRight;
 
     @Override
     protected void onCreate() {
@@ -175,6 +183,10 @@ public class PagePresenter extends BasePresenter<IPageView> {
         view.getCountryTextView().setVisibility(View.GONE);
 
         view.showCompetitor(mCompetitor.getNameEng(), ImageProvider.getDetailPlayerPath(mCompetitor.getNameChn()));
+
+        if (mCompetitor.getAtpBean() != null) {
+            view.showAtpInfo(mCompetitor.getAtpBean());
+        }
     }
 
     public void loadTabs() {
@@ -250,6 +262,10 @@ public class PagePresenter extends BasePresenter<IPageView> {
         // toolbar上的图标需要根据展开/折叠状态确定颜色，初始是展开状态
         handleCollapseScrimChanged(false);
 
+        // 上次更新时间
+        view.getGroupAtp().setBackgroundColor(data.mainSwatch.getRgb());
+        view.getTvAtpTime().setTextColor(data.mainSwatch.getTitleTextColor());
+
         // 修改tab layout的相关颜色
         view.getTabLayout().setBackgroundColor(data.mainSwatch.getRgb());
         view.getTabLayout().setSelectedTabIndicatorColor(data.mainSwatch.getTitleTextColor());
@@ -265,12 +281,25 @@ public class PagePresenter extends BasePresenter<IPageView> {
         // 修改信息标签的颜色（eng name, chn name, place, birthday）
         ColorPack colorPack = data.pack;
         TextView[] textViews;
+
         // 中文名和英文名相同就不显示中文名
-        if (!TextUtils.isEmpty(mCompetitor.getNameChn()) && !mCompetitor.getNameChn().equals(mCompetitor.getNameEng())) {
+        boolean hasValuedChnName = !TextUtils.isEmpty(mCompetitor.getNameChn()) && !mCompetitor.getNameChn().equals(mCompetitor.getNameEng());
+        // 如果有atp数据并且获取过身高体重就显示身高体重
+        boolean hasAtpParams = mCompetitor.getAtpBean() != null && mCompetitor.getAtpBean().getCm() != 0;
+        if (hasValuedChnName || hasAtpParams) {
             textViews = new TextView[] {
                     view.getEngNameTextView(), view.getChnNameTextView(), view.getCountryTextView(), view.getBirthdayTextView()
             };
-            view.getChnNameTextView().setText(mCompetitor.getNameChn());
+            String name = hasValuedChnName ? mCompetitor.getNameChn():"";
+            if (hasAtpParams) {
+                if (hasValuedChnName) {
+                    name = name + "，";
+                }
+
+                name = name + FormatUtil.formatNumber(mCompetitor.getAtpBean().getCm()) + "cm，"
+                        + FormatUtil.formatNumber(mCompetitor.getAtpBean().getKg()) + "kg";
+            }
+            view.getChnNameTextView().setText(name);
         }
         else {
             textViews = new TextView[] {
@@ -279,27 +308,37 @@ public class PagePresenter extends BasePresenter<IPageView> {
         }
 
         // 修改信息标签的位置（根据人脸位置，统一显示在左侧或右侧）
-        boolean isRight = true;
+        isFaceInRight = true;
         int rule = RelativeLayout.ALIGN_PARENT_RIGHT;
         if (data.faceData != null && data.faceData.centerPoint != null) {
             // 人脸在右侧，则text在左侧
             if (data.faceData.centerPoint.x > ScreenUtils.getScreenWidth() / 2) {
                 rule = RelativeLayout.ALIGN_PARENT_LEFT;
-                isRight = false;
+                isFaceInRight = false;
             }
         }
         LinearLayout layout = (LinearLayout) textViews[0].getParent();
-        layout.setGravity(isRight ? Gravity.RIGHT:Gravity.LEFT);
+        layout.setGravity(isFaceInRight ? Gravity.RIGHT:Gravity.LEFT);
         RelativeLayout.LayoutParams rParams = (RelativeLayout.LayoutParams) layout.getLayoutParams();
         rParams.removeRule(RelativeLayout.ALIGN_PARENT_LEFT);
         rParams.removeRule(RelativeLayout.ALIGN_PARENT_RIGHT);
         rParams.addRule(rule);
         layout.setLayoutParams(rParams);
+        // 主要tag标签在哪侧，次要atp标签就在另一侧
+        if (isFaceInRight) {
+            view.getGroupAtpCover().setGravity(Gravity.LEFT);
+            view.getGroupAtpCover().setBackgroundResource(R.drawable.shape_atp_cover_ltr);
+        }
+        else {
+            view.getGroupAtpCover().setGravity(Gravity.RIGHT);
+            view.getGroupAtpCover().setBackgroundResource(R.drawable.shape_atp_cover_rtl);
+        }
 
+        // 修改主要tag标签的颜色
         for (int i = 0; i < textViews.length; i ++) {
             textViews[i].setTextColor(colorPack.bodyColors.get(i));
             GradientDrawable bg;
-            if (isRight) {
+            if (isFaceInRight) {
                 bg = (GradientDrawable) textViews[i].getResources().getDrawable(R.drawable.shape_tag_left);
             }
             else {
@@ -340,10 +379,25 @@ public class PagePresenter extends BasePresenter<IPageView> {
             buffer.append(", ").append(constel);
         }
         view.getEngNameTextView().setText(mCompetitor.getNameEng());
-        view.getCountryTextView().setText(mCompetitor.getCountry());
+        if (mCompetitor.getAtpBean() == null) {
+            view.getCountryTextView().setText(mCompetitor.getCountry());
+        }
+        else {
+            if (TextUtils.isEmpty(mCompetitor.getAtpBean().getBirthCity())) {
+                if (TextUtils.isEmpty(mCompetitor.getAtpBean().getBirthCountry())) {
+                    view.getCountryTextView().setText(mCompetitor.getCountry());
+                }
+                else {
+                    view.getCountryTextView().setText(mCompetitor.getAtpBean().getBirthCountry());
+                }
+            }
+            else {
+                view.getCountryTextView().setText(mCompetitor.getAtpBean().getBirthCity() + ", " + mCompetitor.getAtpBean().getBirthCountry());
+            }
+        }
         view.getBirthdayTextView().setText(buffer.toString());
 
-        view.animTags(isRight);
+        view.animTags(isFaceInRight);
     }
 
     /**
@@ -503,5 +557,133 @@ public class PagePresenter extends BasePresenter<IPageView> {
         if (faceModel != null) {
             faceModel.destroy();
         }
+    }
+
+    /**
+     * groupAtp之下的布局平移向下推出，展现groupAtp
+     * groupAtpCover水平方向scale展现
+     */
+    public void playAtpInfo() {
+        // 只进行groupAtp的动画会有空白出现在过程中，因此需要在groupAtp下面的布局做文章
+        // 因此动画采取groupAtp之下的tabLayout与viewPager整体平移的联动策略实现效果理想的动画
+        view.getGroupAtp().setVisibility(View.VISIBLE);
+        int offset = view.getContext().getResources().getDimensionPixelSize(R.dimen.player_page_update_time_height);
+        ObjectAnimator.ofFloat(view.getTabLayout(), "translationY", -offset, 0)
+                .setDuration(500)
+                .start();
+        ObjectAnimator.ofFloat(view.getViewpager(), "translationY", -offset, 0)
+                .setDuration(500)
+                .start();
+
+        // groupAtpCover的动画直接根据位置进行scale缩放即刻，不跟其他view进行联动
+        view.getGroupAtpCover().setVisibility(View.VISIBLE);
+        ScaleAnimation scale;
+        if (isFaceInRight) {
+            // 从左至右放大
+            scale = new ScaleAnimation(0, 1, 1, 1);
+        }
+        else {
+            // 从右至左放大
+            // 这里不能是相对于自身，否则也是从左往右缩放
+            scale = new ScaleAnimation(0, 1, 1, 1,
+                    Animation.RELATIVE_TO_PARENT, 1.0f, Animation.RELATIVE_TO_PARENT, 0);
+        }
+        scale.setDuration(500);
+        view.getGroupAtpCover().startAnimation(scale);
+    }
+
+    /**
+     * groupAtp之下的布局平移向上推出，遮盖groupAtp
+     * groupAtpCover水平方向scale合拢
+     */
+    public void dismissAtpInfo() {
+        int offset = view.getGroupAtp().getHeight();
+        ObjectAnimator tabAnim = ObjectAnimator.ofFloat(view.getTabLayout(), "translationY", 0, -offset)
+                .setDuration(500);
+        tabAnim.addListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                view.getGroupAtp().setVisibility(View.GONE);
+                // 属性动画影响了tabLayout和viewpager的最终translation，因此groupAtp设置为GONE后需要复原
+                view.getTabLayout().setTranslationY(0);
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animation) {
+
+            }
+        });
+        tabAnim.start();
+        ObjectAnimator vpAnim = ObjectAnimator.ofFloat(view.getViewpager(), "translationY", 0, -offset)
+                .setDuration(500);
+        vpAnim.addListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                // 属性动画影响了tabLayout和viewpager的最终translation，因此groupAtp设置为GONE后，动画也结束了，需要复原
+                view.getViewpager().setTranslationY(0);
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animation) {
+
+            }
+        });
+        vpAnim.start();
+
+        ScaleAnimation scale;
+        if (isFaceInRight) {
+            // 从右至左缩小
+            scale = new ScaleAnimation(1, 0, 1, 1);
+        }
+        else {
+            // 从左至右缩小
+            // 这里不能是相对于自身，否则也是从右至左缩小
+            scale = new ScaleAnimation(1, 0, 1, 1,
+                    Animation.RELATIVE_TO_PARENT, 1.0f, Animation.RELATIVE_TO_PARENT, 0);
+        }
+        scale.setDuration(500);
+        scale.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                view.getGroupAtpCover().setVisibility(View.GONE);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
+        view.getGroupAtpCover().startAnimation(scale);
+    }
+
+    @Override
+    protected void onUpdateAtpCompleted() {
+        super.onUpdateAtpCompleted();
+        view.onUpdateAtpCompleted();
     }
 }

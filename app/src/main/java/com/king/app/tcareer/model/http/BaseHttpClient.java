@@ -36,6 +36,8 @@ public abstract class BaseHttpClient implements BaseUrlSubscriber {
         // 设置log打印器
         builder.addInterceptor(loggingInterceptor);
 
+        extendBuilder(builder);
+
         retrofit = new Retrofit.Builder()
                 .baseUrl(baseUrl)
                 .addConverterFactory(GsonConverterFactory.create())
@@ -45,6 +47,8 @@ public abstract class BaseHttpClient implements BaseUrlSubscriber {
 
         createService(retrofit);
     }
+
+    protected abstract void extendBuilder(OkHttpClient.Builder builder);
 
     protected abstract void createService(Retrofit retrofit);
 
