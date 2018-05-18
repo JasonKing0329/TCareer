@@ -104,4 +104,23 @@
             android:layout_height="wrap_content"
             android:gravity="left" />
     </LinearLayout>
+
+    <TextView
+        android:id="@+id/tv_atp_id"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:gravity="center"
+        android:paddingTop="15dp"
+        android:paddingBottom="15dp"
+        android:text="Atp id:  null"
+        android:background="?android:attr/selectableItemBackground"/>
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <TextView
+            android:id="@+id/tv_atp_conclude"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+    </ScrollView>
 </LinearLayout>

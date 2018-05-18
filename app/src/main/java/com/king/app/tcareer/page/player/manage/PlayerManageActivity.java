@@ -384,6 +384,7 @@ public class PlayerManageActivity extends BaseMvpActivity<PlayerManagePresenter>
             else {
                 dialog.setPlayerBean((PlayerBean) playerBean.getData());
             }
+            dialog.setCustomTitle(playerBean.getName());
         }
         dialog.setOnPlayerEditListener(new PlayerEditDialog.OnPlayerEditListener() {
             @Override

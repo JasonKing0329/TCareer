@@ -1,15 +1,22 @@
 package com.king.app.tcareer.page.player.manage;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import com.king.app.tcareer.R;
 import com.king.app.tcareer.base.IFragmentHolder;
+import com.king.app.tcareer.base.TApplication;
+import com.king.app.tcareer.model.db.entity.PlayerAtpBean;
+import com.king.app.tcareer.model.db.entity.PlayerAtpBeanDao;
 import com.king.app.tcareer.model.db.entity.PlayerBean;
 import com.king.app.tcareer.model.db.entity.User;
+import com.king.app.tcareer.page.player.atp.AtpManageActivity;
 import com.king.app.tcareer.utils.PinyinUtil;
 import com.king.app.tcareer.view.dialog.DraggableDialogFragment;
 
@@ -28,12 +35,18 @@ public class PlayerEditDialog extends DraggableDialogFragment {
     private PlayerBean playerBean;
     private User user;
     private OnPlayerEditListener onPlayerEditListener;
+    private String customTitle;
 
     @Override
     protected View getToolbarView(ViewGroup groupToolbar) {
         requestOkAction();
         requestCloseAction();
-        setTitle("New player");
+        if (customTitle == null) {
+            setTitle("New player");
+        }
+        else {
+            setTitle(customTitle);
+        }
         return null;
     }
 
@@ -63,7 +76,13 @@ public class PlayerEditDialog extends DraggableDialogFragment {
         this.onPlayerEditListener = onPlayerEditListener;
     }
 
+    public void setCustomTitle(String customTitle) {
+        this.customTitle = customTitle;
+    }
+
     public static class EditFragment extends ContentFragment {
+
+        private final int REQUEST_SELECT_ATP = 101;
 
         @BindView(R.id.et_name)
         EditText etName;
@@ -75,12 +94,18 @@ public class PlayerEditDialog extends DraggableDialogFragment {
         EditText etCity;
         @BindView(R.id.et_birthday)
         EditText etBirthday;
+        @BindView(R.id.tv_atp_id)
+        TextView tvAtpId;
+        @BindView(R.id.tv_atp_conclude)
+        TextView tvAtpConclude;
 
         private EditPresenter presenter;
         
         private PlayerBean playerBean;
         private User user;
         private OnPlayerEditListener onPlayerEditListener;
+
+        private String atpId;
 
         @Override
         protected int getContentLayoutRes() {
@@ -105,7 +130,45 @@ public class PlayerEditDialog extends DraggableDialogFragment {
                 etCountry.setText(playerBean.getCountry());
                 etCity.setText(playerBean.getCity());
                 etBirthday.setText(playerBean.getBirthday());
+                if (playerBean.getAtpBean() != null) {
+                    atpId = playerBean.getAtpId();
+                    updateByAtpBean(playerBean.getAtpBean());
+                }
             }
+            tvAtpId.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    startActivityForResult(new Intent().setClass(getContext(), AtpManageActivity.class)
+                        , REQUEST_SELECT_ATP);
+                }
+            });
+        }
+
+        private void updateByAtpBean(PlayerAtpBean atpBean) {
+            tvAtpId.setText("Atp id: " + atpBean.getId());
+            etNameEng.setText(atpBean.getName());
+            StringBuffer buffer = new StringBuffer();
+            buffer.append(atpBean.getOverViewUrl());
+            if (!TextUtils.isEmpty(atpBean.getBirthCountry())) {
+                etCountry.setText(atpBean.getBirthCountry());
+
+                if (!TextUtils.isEmpty(atpBean.getBirthCity())) {
+                    etCity.setText(atpBean.getBirthCity());
+                }
+
+                buffer.append("\n").append("Residence: ");
+                if (!TextUtils.isEmpty(atpBean.getResidenceCity())) {
+                    buffer.append(atpBean.getResidenceCity()).append(", ");
+                }
+                buffer.append(atpBean.getResidenceCountry()).append("\n");
+                buffer.append("Plays: ").append(atpBean.getPlays()).append("\n");
+                buffer.append("Turned Pro: ").append(atpBean.getTurnedPro()).append("\n");
+                buffer.append("Coach: ").append(atpBean.getCoach()).append("\n");
+                buffer.append("Career highest rank: ").append(atpBean.getCareerHighSingle()).append(", ").append(atpBean.getCareerHighSingleDate()).append("\n");
+                buffer.append("Year: ").append(atpBean.getYearWin()).append("-").append(atpBean.getYearLose()).append(", ").append(atpBean.getYearPrize()).append("\n");
+                buffer.append("Career: ").append(atpBean.getCareerWin()).append("-").append(atpBean.getCareerLose()).append(", ").append(atpBean.getCareerPrize()).append("\n");
+            }
+            tvAtpConclude.setText(buffer.toString());
         }
 
         @Override
@@ -145,6 +208,7 @@ public class PlayerEditDialog extends DraggableDialogFragment {
                     user.setNameChn(name);
                     user.setNameEng(engName);
                     user.setNamePinyin(PinyinUtil.getPinyin(name));
+                    user.setAtpId(atpId);
                     presenter.updateUser(user);
                     if (onPlayerEditListener != null) {
                         onPlayerEditListener.onUserUpdated(user);
@@ -157,6 +221,7 @@ public class PlayerEditDialog extends DraggableDialogFragment {
                     playerBean.setNameChn(name);
                     playerBean.setNameEng(engName);
                     playerBean.setNamePinyin(PinyinUtil.getPinyin(name));
+                    playerBean.setAtpId(atpId);
                     presenter.updatePlayer(playerBean);
                     if (onPlayerEditListener != null) {
                         onPlayerEditListener.onPlayerUpdated(playerBean);
@@ -172,6 +237,7 @@ public class PlayerEditDialog extends DraggableDialogFragment {
                 bean.setNameChn(name);
                 bean.setNameEng(engName);
                 bean.setNamePinyin(PinyinUtil.getPinyin(name));
+                bean.setAtpId(atpId);
                 presenter.insertPlayer(bean);
                 if (onPlayerEditListener != null) {
                     onPlayerEditListener.onPlayerAdded();
@@ -182,6 +248,22 @@ public class PlayerEditDialog extends DraggableDialogFragment {
 
         public void setOnPlayerEditListener(OnPlayerEditListener onPlayerEditListener) {
             this.onPlayerEditListener = onPlayerEditListener;
+        }
+
+        @Override
+        public void onActivityResult(int requestCode, int resultCode, Intent data) {
+            super.onActivityResult(requestCode, resultCode, data);
+
+            if (requestCode == REQUEST_SELECT_ATP) {
+                if (resultCode == Activity.RESULT_OK) {
+                    atpId = data.getStringExtra(AtpManageActivity.RESP_ATP_ID);
+                    PlayerAtpBean bean = TApplication.getInstance().getDaoSession().getPlayerAtpBeanDao()
+                            .queryBuilder()
+                            .where(PlayerAtpBeanDao.Properties.Id.eq(atpId))
+                            .build().unique();
+                    updateByAtpBean(bean);
+                }
+            }
         }
     }
 

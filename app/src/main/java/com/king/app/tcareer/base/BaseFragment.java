@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.king.app.tcareer.R;
+import com.king.app.tcareer.view.dialog.AlertDialogFragment;
 import com.king.app.tcareer.view.dialog.ProgressDialogFragment;
 
 import butterknife.ButterKnife;
@@ -89,6 +90,18 @@ public abstract class BaseFragment extends Fragment {
                 .setMessage(msg)
                 .setPositiveButton(getString(R.string.ok), listener)
                 .show();
+    }
+
+
+    public void showConfirmCancelMessage(String msg, DialogInterface.OnClickListener listener) {
+        new AlertDialogFragment()
+                .setTitle(null)
+                .setMessage(msg)
+                .setPositiveText(getString(R.string.yes))
+                .setPositiveListener(listener)
+                .setNegativeText(getString(R.string.cancel))
+                .setNegativeListener(listener)
+                .show(getChildFragmentManager(), "AlertDialogFragment");
     }
 
 }

@@ -21,10 +21,12 @@ public class EditPresenter {
     public void updateUser(User user) {
         UserDao dao = TApplication.getInstance().getDaoSession().getUserDao();
         dao.update(user);
+        dao.detach(user);
     }
 
     public void updatePlayer(PlayerBean bean) {
         PlayerBeanDao dao = TApplication.getInstance().getDaoSession().getPlayerBeanDao();
         dao.update(bean);
+        dao.detach(bean);
     }
 }
