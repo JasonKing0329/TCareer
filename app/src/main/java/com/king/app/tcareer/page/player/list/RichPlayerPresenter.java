@@ -78,7 +78,7 @@ public class RichPlayerPresenter extends PlayerAtpPresenter<RichPlayerView> {
                         }
 
                         view.dismissLoading();
-                        view.showPlayers(list);
+                        view.showPlayers(mList);
                         createIndex();
                     }
 

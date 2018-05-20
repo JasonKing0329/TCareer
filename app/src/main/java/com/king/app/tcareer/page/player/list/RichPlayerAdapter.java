@@ -153,7 +153,8 @@ public class RichPlayerAdapter extends BaseRecyclerAdapter<RichPlayerAdapter.Pla
             holder.tvResidence.setText("Residence:  " + getPlaceFromAtp(atpBean.getResidenceCity(), atpBean.getResidenceCountry()));
             holder.tvPlays.setText("Plays:  " + atpBean.getPlays());
             holder.tvHigh.setText("生涯最高排名 【" + atpBean.getCareerHighSingle() + "】 " + atpBean.getCareerHighSingleDate());
-            holder.tvCareer.setText("职业生涯  " + atpBean.getCareerWin() + "胜" + atpBean.getCareerLose() + "负  总奖金" + atpBean.getCareerPrize());
+            holder.tvCareer.setText("职业生涯  " + atpBean.getCareerSingles() + "冠  "
+                    + atpBean.getCareerWin() + "胜" + atpBean.getCareerLose() + "负  总奖金" + atpBean.getCareerPrize());
             holder.tvCoach.setText("Coach:  " + atpBean.getCoach());
             holder.tvCoach.setVisibility(TextUtils.isEmpty(atpBean.getCoach()) ? View.GONE:View.VISIBLE);
         }

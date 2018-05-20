@@ -31,6 +31,13 @@ public class SettingProperty {
     public static final int VALUE_SORT_PLAYER_AGE = 3;
     public static final int VALUE_SORT_PLAYER_CONSTELLATION = 4;
     public static final int VALUE_SORT_PLAYER_RECORD = 5;
+    public static final int VALUE_SORT_PLAYER_HEIGHT = 6;
+    public static final int VALUE_SORT_PLAYER_WEIGHT = 7;
+    public static final int VALUE_SORT_PLAYER_CAREER_HIGH = 8;
+    public static final int VALUE_SORT_PLAYER_CAREER_TITLES = 9;
+    public static final int VALUE_SORT_PLAYER_CAREER_WIN = 10;
+    public static final int VALUE_SORT_PLAYER_CAREER_TURNEDPRO = 11;
+    public static final int VALUE_SORT_PLAYER_CAREER_LAST_UPDATE = 12;
 
     private static final String getString(String key) {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(TApplication.getInstance());

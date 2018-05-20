@@ -198,6 +198,27 @@ public class PlayerManageActivity extends BaseMvpActivity<PlayerManagePresenter>
                     case R.id.menu_sort_record:
                         ftRich.sortPlayer(SettingProperty.VALUE_SORT_PLAYER_RECORD);
                         break;
+                    case R.id.menu_sort_height:
+                        ftRich.sortPlayer(SettingProperty.VALUE_SORT_PLAYER_HEIGHT);
+                        break;
+                    case R.id.menu_sort_weight:
+                        ftRich.sortPlayer(SettingProperty.VALUE_SORT_PLAYER_WEIGHT);
+                        break;
+                    case R.id.menu_sort_career_high:
+                        ftRich.sortPlayer(SettingProperty.VALUE_SORT_PLAYER_CAREER_HIGH);
+                        break;
+                    case R.id.menu_sort_career_titles:
+                        ftRich.sortPlayer(SettingProperty.VALUE_SORT_PLAYER_CAREER_TITLES);
+                        break;
+                    case R.id.menu_sort_career_win:
+                        ftRich.sortPlayer(SettingProperty.VALUE_SORT_PLAYER_CAREER_WIN);
+                        break;
+                    case R.id.menu_sort_turned_pro:
+                        ftRich.sortPlayer(SettingProperty.VALUE_SORT_PLAYER_CAREER_TURNEDPRO);
+                        break;
+                    case R.id.menu_sort_last_update:
+                        ftRich.sortPlayer(SettingProperty.VALUE_SORT_PLAYER_CAREER_LAST_UPDATE);
+                        break;
                 }
                 return false;
             });
