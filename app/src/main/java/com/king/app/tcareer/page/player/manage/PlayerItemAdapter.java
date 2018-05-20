@@ -17,6 +17,7 @@ import java.util.List;
  * <p/>作者：景阳
  * <p/>创建时间: 2017/2/20 13:27
  */
+@Deprecated
 public class PlayerItemAdapter extends PlayerManageBaseAdapter {
 
     public PlayerItemAdapter(List<PlayerViewBean> list) {

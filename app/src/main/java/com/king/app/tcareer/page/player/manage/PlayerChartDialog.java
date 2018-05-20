@@ -20,7 +20,7 @@ import com.github.mikephil.charting.interfaces.datasets.IBarDataSet;
 import com.github.mikephil.charting.utils.ViewPortHandler;
 import com.king.app.tcareer.R;
 import com.king.app.tcareer.base.IFragmentHolder;
-import com.king.app.tcareer.model.db.entity.PlayerBean;
+import com.king.app.tcareer.page.player.list.RichPlayerBean;
 import com.king.app.tcareer.utils.ConstellationUtil;
 import com.king.app.tcareer.view.dialog.DraggableDialogFragment;
 
@@ -38,7 +38,7 @@ import butterknife.ButterKnife;
 
 public class PlayerChartDialog extends DraggableDialogFragment {
 
-    private List<PlayerViewBean> playerList;
+    private List<RichPlayerBean> playerList;
 
     private ChartFragment chartFragment;
 
@@ -56,7 +56,7 @@ public class PlayerChartDialog extends DraggableDialogFragment {
         return chartFragment;
     }
 
-    public void setPlayerList(List<PlayerViewBean> playerList) {
+    public void setPlayerList(List<RichPlayerBean> playerList) {
         this.playerList = playerList;
     }
 
@@ -65,7 +65,7 @@ public class PlayerChartDialog extends DraggableDialogFragment {
         @BindView(R.id.chart_constellation)
         HorizontalBarChart mChart;
 
-        private List<PlayerViewBean> playerList;
+        private List<RichPlayerBean> playerList;
         /**
          * 长度为13,0为白羊座
          */
@@ -99,7 +99,7 @@ public class PlayerChartDialog extends DraggableDialogFragment {
 
         }
 
-        public void setPlayerList(List<PlayerViewBean> playerList) {
+        public void setPlayerList(List<RichPlayerBean> playerList) {
             this.playerList = playerList;
         }
 
@@ -185,9 +185,9 @@ public class PlayerChartDialog extends DraggableDialogFragment {
         private void setData() {
 
             // 统计星座对应数量
-            for (PlayerViewBean bean : playerList) {
+            for (RichPlayerBean bean : playerList) {
                 try {
-                    int index = ConstellationUtil.getConstellationIndex(bean.getBirthday());
+                    int index = ConstellationUtil.getConstellationIndex(bean.getCompetitorBean().getBirthday());
                     arrConstel[index]++;
                 } catch (ConstellationUtil.ConstellationParseException e) {
                     e.printStackTrace();

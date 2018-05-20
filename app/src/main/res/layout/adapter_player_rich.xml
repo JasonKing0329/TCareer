@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:cardCornerRadius="10dp"
+    app:cardElevation="3dp">
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?android:attr/selectableItemBackground">
+
+        <ImageView
+            android:id="@+id/iv_player"
+            android:layout_width="146dp"
+            android:layout_height="90dp"
+            android:scaleType="centerCrop"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/view7_folder_cover_player" />
+
+        <TextView
+            android:id="@+id/tv_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="4dp"
+            android:text="Philipe Koholscriber"
+            android:textColor="#3c3c3c"
+            android:textSize="16dp"
+            app:layout_constraintStart_toEndOf="@+id/iv_player"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tv_place"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="2dp"
+            android:gravity="center_vertical"
+            android:drawableLeft="@drawable/ic_location_on_999999_24dp"
+            android:text="California, America"
+            android:textColor="#999999"
+            android:textSize="12dp"
+            app:layout_constraintStart_toEndOf="@+id/iv_player"
+            app:layout_constraintTop_toBottomOf="@+id/tv_name" />
+
+        <TextView
+            android:id="@+id/tv_birthday"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="29, 1988-05-22, 天秤座"
+            android:textColor="#666666"
+            android:textSize="12dp"
+            app:layout_constraintStart_toEndOf="@+id/iv_player"
+            app:layout_constraintTop_toBottomOf="@+id/tv_place" />
+
+        <TextView
+            android:id="@+id/tv_body"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="科赫尔斯奇雷伯, 185cm, 79kg"
+            android:textColor="#666666"
+            android:textSize="12dp"
+            app:layout_constraintStart_toEndOf="@+id/iv_player"
+            app:layout_constraintTop_toBottomOf="@+id/tv_birthday" />
+
+        <ImageView
+            android:id="@+id/iv_refresh"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/ic_refresh_black_24dp" />
+
+        <TextView
+            android:id="@+id/tv_h2h"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_marginTop="4dp"
+            android:text="15-29"
+            android:textColor="@color/colorAccent"
+            android:textSize="13dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/iv_refresh" />
+
+        <ImageView
+            android:id="@+id/iv_more"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="3dp"
+            android:paddingTop="5dp"
+            android:paddingLeft="5dp"
+            android:paddingRight="5dp"
+            android:paddingBottom="2dp"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            app:layout_constraintBottom_toTopOf="@+id/group_expand"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:srcCompat="@drawable/ic_keyboard_arrow_down_666_24dp" />
+
+        <CheckBox
+            android:id="@+id/cb_check"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:clickable="false"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <LinearLayout
+            android:id="@+id/group_expand"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/margin_10"
+            android:orientation="vertical"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/iv_player">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                <TextView
+                    android:id="@+id/tv_turned_pro"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="2dp"
+                    android:gravity="center_vertical"
+                    android:text="Turned Pro  2008"
+                    android:textColor="#999999"
+                    android:textSize="12dp"/>
+                <TextView
+                    android:id="@+id/tv_time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="2dp"
+                    android:gravity="center_vertical"
+                    android:layout_alignParentRight="true"
+                    android:text="2018-05-06 14:30:00"
+                    android:textColor="@color/colorPrimary"
+                    android:textSize="12dp" />
+            </LinearLayout>
+            <TextView
+                android:id="@+id/tv_residence"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="2dp"
+                android:gravity="center_vertical"
+                android:text="Residence:  California, America"
+                android:textColor="#999999"
+                android:textSize="12dp" />
+            <TextView
+                android:id="@+id/tv_plays"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="2dp"
+                android:gravity="center_vertical"
+                android:text="Plays:  left forehand, 2-handed backhand"
+                android:textColor="#999999"
+                android:textSize="12dp"
+                android:layout_below="@id/tv_residence"/>
+            <TextView
+                android:id="@+id/tv_high"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="2dp"
+                android:gravity="center_vertical"
+                android:text="生涯最高排名 【114】 2013-11-04"
+                android:textColor="@color/colorAccent"
+                android:textSize="12dp"
+                android:layout_below="@id/tv_plays"/>
+            <TextView
+                android:id="@+id/tv_career"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="2dp"
+                android:gravity="center_vertical"
+                android:text="职业生涯  226胜-218负  总奖金$116,404,358"
+                android:textColor="@color/colorAccent"
+                android:textSize="12dp"
+                android:layout_below="@id/tv_high"/>
+            <TextView
+                android:id="@+id/tv_coach"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="2dp"
+                android:gravity="center_vertical"
+                android:text="Coach:  Alexander Merslinkoff"
+                android:textColor="#999999"
+                android:textSize="12dp"
+                android:layout_below="@id/tv_career"/>
+        </LinearLayout>
+
+    </android.support.constraint.ConstraintLayout>
+
+</android.support.v7.widget.CardView>

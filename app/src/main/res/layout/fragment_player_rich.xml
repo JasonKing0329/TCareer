@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/main_bg">
+    <com.king.app.tcareer.view.widget.SideBar
+        android:id="@+id/sidebar"
+        android:layout_width="22dp"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        app:sideBackground="@color/white"
+        app:indexTextSize="14dp"
+        app:indexColor="@color/colorPrimary"
+        app:indexColorFocus="@color/colorAccent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+
+    <TextView
+        android:id="@+id/tv_index_popup"
+        android:layout_width="@dimen/swipecard_indexbar_popup_size"
+        android:layout_height="@dimen/swipecard_indexbar_popup_size"
+        android:background="@drawable/shape_swipecard_sidebar_popup_bk"
+        android:gravity="center"
+        android:textColor="@color/white"
+        android:textSize="@dimen/swipecard_indexbar_popup_text_size"
+        android:visibility="gone"
+        android:elevation="@dimen/margin_10"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/rv_list"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginEnd="3dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/sidebar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:listitem="@layout/adapter_player_rich"/>
+</android.support.constraint.ConstraintLayout>

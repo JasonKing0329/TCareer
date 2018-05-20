@@ -32,6 +32,7 @@ import java.util.Map;
  * <p/>作者：景阳
  * <p/>创建时间: 2017/8/17 16:14
  */
+@Deprecated
 public abstract class PlayerManageBaseAdapter extends RecyclerView.Adapter implements View.OnClickListener {
 
     protected List<PlayerViewBean> list;

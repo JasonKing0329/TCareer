@@ -12,6 +12,7 @@ import android.widget.TextView;
 import com.king.app.tcareer.R;
 import com.king.app.tcareer.base.IFragmentHolder;
 import com.king.app.tcareer.base.TApplication;
+import com.king.app.tcareer.model.bean.CompetitorBean;
 import com.king.app.tcareer.model.db.entity.PlayerAtpBean;
 import com.king.app.tcareer.model.db.entity.PlayerAtpBeanDao;
 import com.king.app.tcareer.model.db.entity.PlayerBean;
@@ -32,8 +33,7 @@ import butterknife.ButterKnife;
 public class PlayerEditDialog extends DraggableDialogFragment {
 
     private EditFragment editFragment;
-    private PlayerBean playerBean;
-    private User user;
+    private CompetitorBean competitorBean;
     private OnPlayerEditListener onPlayerEditListener;
     private String customTitle;
 
@@ -53,18 +53,13 @@ public class PlayerEditDialog extends DraggableDialogFragment {
     @Override
     protected Fragment getContentViewFragment() {
         editFragment = new EditFragment();
-        editFragment.setPlayerBean(playerBean);
-        editFragment.setUser(user);
+        editFragment.setCompetitorBean(competitorBean);
         editFragment.setOnPlayerEditListener(onPlayerEditListener);
         return editFragment;
     }
-    
-    public void setPlayerBean(PlayerBean bean) {
-        this.playerBean = bean;
-    }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setCompetitorBean(CompetitorBean competitorBean) {
+        this.competitorBean = competitorBean;
     }
 
     @Override
@@ -100,9 +95,8 @@ public class PlayerEditDialog extends DraggableDialogFragment {
         TextView tvAtpConclude;
 
         private EditPresenter presenter;
-        
-        private PlayerBean playerBean;
-        private User user;
+
+        private CompetitorBean competitorBean;
         private OnPlayerEditListener onPlayerEditListener;
 
         private String atpId;
@@ -112,36 +106,28 @@ public class PlayerEditDialog extends DraggableDialogFragment {
             return R.layout.dialog_player_manage;
         }
 
+        public void setCompetitorBean(CompetitorBean competitorBean) {
+            this.competitorBean = competitorBean;
+        }
+
         @Override
         protected void onCreate(View view) {
             ButterKnife.bind(this, view);
 
             presenter = new EditPresenter();
-            if (user != null) {
-                etName.setText(user.getNameChn());
-                etNameEng.setText(user.getNameEng());
-                etCountry.setText(user.getCountry());
-                etCity.setText(user.getCity());
-                etBirthday.setText(user.getBirthday());
-            }
-            else if (playerBean != null) {
-                etName.setText(playerBean.getNameChn());
-                etNameEng.setText(playerBean.getNameEng());
-                etCountry.setText(playerBean.getCountry());
-                etCity.setText(playerBean.getCity());
-                etBirthday.setText(playerBean.getBirthday());
-                if (playerBean.getAtpBean() != null) {
-                    atpId = playerBean.getAtpId();
-                    updateByAtpBean(playerBean.getAtpBean());
+            if (competitorBean != null) {
+                etName.setText(competitorBean.getNameChn());
+                etNameEng.setText(competitorBean.getNameEng());
+                etCountry.setText(competitorBean.getCountry());
+                etCity.setText(competitorBean.getCity());
+                etBirthday.setText(competitorBean.getBirthday());
+                if (competitorBean.getAtpBean() != null) {
+                    atpId = competitorBean.getAtpId();
+                    updateByAtpBean(competitorBean.getAtpBean());
                 }
             }
-            tvAtpId.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    startActivityForResult(new Intent().setClass(getContext(), AtpManageActivity.class)
-                        , REQUEST_SELECT_ATP);
-                }
-            });
+            tvAtpId.setOnClickListener(v -> startActivityForResult(new Intent().setClass(getContext(), AtpManageActivity.class)
+                , REQUEST_SELECT_ATP));
         }
 
         private void updateByAtpBean(PlayerAtpBean atpBean) {
@@ -176,14 +162,6 @@ public class PlayerEditDialog extends DraggableDialogFragment {
 
         }
 
-        public void setPlayerBean(PlayerBean playerBean) {
-            this.playerBean = playerBean;
-        }
-
-        public void setUser(User user) {
-            this.user = user;
-        }
-
         public boolean onSave() {
             String name = etName.getText().toString();
             if (TextUtils.isEmpty(name)) {
@@ -200,8 +178,9 @@ public class PlayerEditDialog extends DraggableDialogFragment {
             String birthday = etBirthday.getText().toString();
             String engName = etNameEng.getText().toString();
             // 修改
-            if (user != null || playerBean != null) {
-                if (user != null) {
+            if (competitorBean != null) {
+                if (competitorBean instanceof User) {
+                    User user = (User) competitorBean;
                     user.setBirthday(birthday);
                     user.setCountry(country);
                     user.setCity(city);
@@ -210,11 +189,9 @@ public class PlayerEditDialog extends DraggableDialogFragment {
                     user.setNamePinyin(PinyinUtil.getPinyin(name));
                     user.setAtpId(atpId);
                     presenter.updateUser(user);
-                    if (onPlayerEditListener != null) {
-                        onPlayerEditListener.onUserUpdated(user);
-                    }
                 }
                 else {
+                    PlayerBean playerBean = (PlayerBean) competitorBean;
                     playerBean.setBirthday(birthday);
                     playerBean.setCountry(country);
                     playerBean.setCity(city);
@@ -223,9 +200,6 @@ public class PlayerEditDialog extends DraggableDialogFragment {
                     playerBean.setNamePinyin(PinyinUtil.getPinyin(name));
                     playerBean.setAtpId(atpId);
                     presenter.updatePlayer(playerBean);
-                    if (onPlayerEditListener != null) {
-                        onPlayerEditListener.onPlayerUpdated(playerBean);
-                    }
                 }
             }
             // 添加
@@ -239,9 +213,9 @@ public class PlayerEditDialog extends DraggableDialogFragment {
                 bean.setNamePinyin(PinyinUtil.getPinyin(name));
                 bean.setAtpId(atpId);
                 presenter.insertPlayer(bean);
-                if (onPlayerEditListener != null) {
-                    onPlayerEditListener.onPlayerAdded();
-                }
+            }
+            if (onPlayerEditListener != null) {
+                onPlayerEditListener.onPlayerUpdated(competitorBean);
             }
             return true;
         }
@@ -268,8 +242,6 @@ public class PlayerEditDialog extends DraggableDialogFragment {
     }
 
     public interface OnPlayerEditListener {
-        void onPlayerAdded();
-        void onPlayerUpdated(PlayerBean bean);
-        void onUserUpdated(User user);
+        void onPlayerUpdated(CompetitorBean bean);
     }
 }

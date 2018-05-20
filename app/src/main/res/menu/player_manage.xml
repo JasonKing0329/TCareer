@@ -2,14 +2,14 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/menu_manage_view"
-        android:title="Change view mode"
-        android:icon="@drawable/ic_photo_library_white_36dp"
-        app:showAsAction="ifRoom" />
-    <item
         android:id="@+id/menu_manage_sort"
         android:title="Sort"
         android:icon="@drawable/ic_sort_white_24dp"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/menu_manage_filter"
+        android:title="Sort"
+        android:icon="@drawable/ic_filter_list_white_24dp"
         app:showAsAction="ifRoom" />
     <item
         android:id="@+id/menu_manage_add"
@@ -32,8 +32,11 @@
         android:icon="@drawable/ic_pie_chart_white_24dp"
         app:showAsAction="ifRoom" />
     <item
+        android:id="@+id/menu_manage_expand"
+        android:title="Toggle expand status"
+        app:showAsAction="ifRoom" />
+    <item
         android:id="@+id/menu_manage_fetch"
         android:title="Fetch data"
-        android:icon="@drawable/ic_pie_chart_white_24dp"
         app:showAsAction="ifRoom" />
 </menu>

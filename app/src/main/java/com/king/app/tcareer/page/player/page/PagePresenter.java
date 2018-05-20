@@ -17,7 +17,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.king.app.tcareer.R;
-import com.king.app.tcareer.base.BasePresenter;
 import com.king.app.tcareer.base.TApplication;
 import com.king.app.tcareer.model.ImageProvider;
 import com.king.app.tcareer.model.bean.CompetitorBean;
@@ -378,6 +377,7 @@ public class PagePresenter extends PlayerAtpPresenter<IPageView> {
         if (!TextUtils.isEmpty(constel)) {
             buffer.append(", ").append(constel);
         }
+        view.getBirthdayTextView().setText(buffer.toString());
         view.getEngNameTextView().setText(mCompetitor.getNameEng());
         if (mCompetitor.getAtpBean() == null) {
             view.getCountryTextView().setText(mCompetitor.getCountry());
@@ -395,7 +395,6 @@ public class PagePresenter extends PlayerAtpPresenter<IPageView> {
                 view.getCountryTextView().setText(mCompetitor.getAtpBean().getBirthCity() + ", " + mCompetitor.getAtpBean().getBirthCountry());
             }
         }
-        view.getBirthdayTextView().setText(buffer.toString());
 
         view.animTags(isFaceInRight);
     }

@@ -23,6 +23,7 @@ import butterknife.ButterKnife;
  * <p/>作者：景阳
  * <p/>创建时间: 2017/8/17 14:54
  */
+@Deprecated
 public class PlayerStaggerAdapter extends PlayerManageBaseAdapter {
 
     private int spanWidth;

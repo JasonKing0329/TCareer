@@ -4,7 +4,7 @@ import android.text.TextUtils;
 
 import com.king.app.tcareer.model.db.entity.PlayerBean;
 import com.king.app.tcareer.model.db.entity.User;
-import com.king.app.tcareer.page.player.manage.PlayerViewBean;
+import com.king.app.tcareer.page.player.list.RichPlayerBean;
 import com.king.app.tcareer.page.setting.SettingProperty;
 import com.king.app.tcareer.utils.ConstellationUtil;
 import com.king.app.tcareer.utils.PinyinUtil;
@@ -19,7 +19,7 @@ import java.util.Map;
  * @time 2018/1/31 0031 17:07
  */
 
-public class PlayerComparator implements Comparator<PlayerViewBean> {
+public class PlayerComparator implements Comparator<RichPlayerBean> {
 
     private int sortMode;
     private Map<String, String> countryPinyinMap;
@@ -32,17 +32,17 @@ public class PlayerComparator implements Comparator<PlayerViewBean> {
     }
 
     @Override
-    public int compare(PlayerViewBean lpb, PlayerViewBean rpb) {
+    public int compare(RichPlayerBean lpb, RichPlayerBean rpb) {
         // 只排序PlayerBean
-        if (lpb.getData() instanceof User) {
+        if (lpb.getCompetitorBean() instanceof User) {
             return -1;
         }
-        else if (rpb.getData() instanceof User) {
+        else if (rpb.getCompetitorBean() instanceof User) {
             return 1;
         }
 
-        PlayerBean lhs = (PlayerBean) lpb.getData();
-        PlayerBean rhs = (PlayerBean) rpb.getData();
+        PlayerBean lhs = (PlayerBean) lpb.getCompetitorBean();
+        PlayerBean rhs = (PlayerBean) rpb.getCompetitorBean();
         if (sortMode == SettingProperty.VALUE_SORT_PLAYER_AGE) {
             return compareByAge(lhs, rhs);
         }
@@ -73,7 +73,7 @@ public class PlayerComparator implements Comparator<PlayerViewBean> {
      * @param rpb
      * @return
      */
-    private int compareByRecords(PlayerViewBean lpb, PlayerViewBean rpb) {
+    private int compareByRecords(RichPlayerBean lpb, RichPlayerBean rpb) {
         int resultL = lpb.getWin() + lpb.getLose();
         int resultR = rpb.getWin() + rpb.getLose();
         if (resultL > resultR) {
@@ -84,7 +84,7 @@ public class PlayerComparator implements Comparator<PlayerViewBean> {
         }
         else {
             // 如相等再按姓名排
-            return compareByNamePinyin((PlayerBean) lpb.getData(), (PlayerBean) rpb.getData());
+            return compareByNamePinyin((PlayerBean) lpb.getCompetitorBean(), (PlayerBean) rpb.getCompetitorBean());
         }
     }
 
@@ -92,10 +92,12 @@ public class PlayerComparator implements Comparator<PlayerViewBean> {
         String pinyinL = countryPinyinMap.get(lhs.getCountry());
         if (pinyinL == null) {
             pinyinL = PinyinUtil.getPinyin(lhs.getCountry());
+            countryPinyinMap.put(lhs.getCountry(), pinyinL);
         }
         String pinyinR = countryPinyinMap.get(rhs.getCountry());
         if (pinyinR == null) {
             pinyinR = PinyinUtil.getPinyin(rhs.getCountry());
+            countryPinyinMap.put(rhs.getCountry(), pinyinR);
         }
         return pinyinL.compareTo(pinyinR);
     }
