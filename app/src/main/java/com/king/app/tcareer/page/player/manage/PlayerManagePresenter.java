@@ -33,7 +33,8 @@ public class PlayerManagePresenter extends BasePresenter<PlayerManageView> {
      */
     public void fetchData() {
         view.showLoading();
-        getSourceFile()
+        AtpWorldTourClient.getInstance().getService().getRankList(AtpWorldTourParams.URL_RANK)
+                .flatMap(responseBody -> saveFile(responseBody, AppConfig.FILE_HTML_RANK))
                 .flatMap(file -> new RankParser().parse(file))
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
@@ -61,17 +62,6 @@ public class PlayerManagePresenter extends BasePresenter<PlayerManageView> {
 
                     }
                 });
-    }
-
-    public Observable<File> getSourceFile() {
-        boolean isForce = false;
-        if (!isForce && new File(AppConfig.FILE_HTML_RANK).exists()) {
-            return Observable.create(e -> e.onNext(new File(AppConfig.FILE_HTML_RANK)));
-        }
-        else {
-            return AtpWorldTourClient.getInstance().getService().getRankList(AtpWorldTourParams.URL_RANK)
-                    .flatMap(responseBody -> saveFile(responseBody, AppConfig.FILE_HTML_RANK));
-        }
     }
 
     public static Observable<File> saveFile(final ResponseBody responseBody, final String path) {
