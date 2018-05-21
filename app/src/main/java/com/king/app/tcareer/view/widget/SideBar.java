@@ -13,6 +13,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.king.app.tcareer.R;
+import com.king.app.tcareer.utils.DebugLog;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -80,6 +81,7 @@ public class SideBar extends View {
 		}
 		int width = getWidth();
 		int singleHeight = height / (indexList.size() + 1);//留出一定的padding
+		DebugLog.e("width=" + width + ", height=" + height + ", singleHeight=" + singleHeight);
 
 		for (int i = 0; i < indexList.size(); i++) {
 			paint.setColor(textColor);

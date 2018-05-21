@@ -147,13 +147,6 @@ public class AtpManageActivity extends BaseMvpActivity<AtpManagePresenter> imple
             }
         });
         sideBar.setTextView(tvIndexPopup);
-
-        sideBar.post(new Runnable() {
-            @Override
-            public void run() {
-                sideBar.invalidate();
-            }
-        });
     }
 
     private void editPlayer(String atpId) {

@@ -49,6 +49,13 @@
                     android:layout_height="wrap_content"
                     style="@style/MatchManageItem"/>
                 <TextView
+                    android:id="@+id/tv_atp_id"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="@dimen/margin_10"
+                    android:textSize="12dp"
+                    android:textColor="@color/colorAccent"/>
+                <TextView
                     android:id="@+id/manage_item_birthday"
                     android:layout_width="wrap_content"
                     android:minWidth="50dp"

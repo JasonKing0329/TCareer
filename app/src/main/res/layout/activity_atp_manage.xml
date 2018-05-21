@@ -30,6 +30,7 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintStart_toEndOf="@+id/rv_items"
         app:layout_constraintTop_toBottomOf="@+id/actionbar"
+        android:visibility="gone"
         app:sideBackground="@color/transparent"
         app:indexTextSize="12dp"
         app:indexColor="@color/colorPrimary"

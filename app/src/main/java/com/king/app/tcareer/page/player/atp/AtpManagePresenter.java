@@ -11,13 +11,9 @@ import java.util.List;
 import java.util.Map;
 
 import io.reactivex.Observable;
-import io.reactivex.ObservableEmitter;
-import io.reactivex.ObservableOnSubscribe;
-import io.reactivex.ObservableSource;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 
 /**
@@ -39,12 +35,9 @@ public class AtpManagePresenter extends PlayerAtpPresenter<AtpManageView> {
     public void loadData() {
         view.getSideBar().clear();
         loadAtpPlayers()
-                .flatMap(new Function<List<PlayerAtpBean>, ObservableSource<String>>() {
-                    @Override
-                    public ObservableSource<String> apply(List<PlayerAtpBean> list) throws Exception {
-                        view.postShowPlayers(list);
-                        return createIndex(list);
-                    }
+                .flatMap(list -> {
+                    view.postShowPlayers(list);
+                    return createIndex(list);
                 })
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
@@ -56,6 +49,7 @@ public class AtpManagePresenter extends PlayerAtpPresenter<AtpManageView> {
 
                     @Override
                     public void onNext(String index) {
+                        view.getSideBar().setVisibility(View.VISIBLE);
                         view.getSideBar().addIndex(index);
                     }
 
@@ -66,54 +60,48 @@ public class AtpManagePresenter extends PlayerAtpPresenter<AtpManageView> {
 
                     @Override
                     public void onComplete() {
-                        view.getSideBar().requestLayout();
                         view.getSideBar().setVisibility(View.VISIBLE);
                     }
                 });
     }
 
     private Observable<List<PlayerAtpBean>> loadAtpPlayers() {
-        return Observable.create(new ObservableOnSubscribe<List<PlayerAtpBean>>() {
-            @Override
-            public void subscribe(ObservableEmitter<List<PlayerAtpBean>> e) throws Exception {
-                PlayerAtpBeanDao dao = TApplication.getInstance().getDaoSession().getPlayerAtpBeanDao();
-                List<PlayerAtpBean> list = dao.queryBuilder()
-                        .orderAsc(PlayerAtpBeanDao.Properties.Name)
-                        .build().list();
-                e.onNext(list);
-            }
+        return Observable.create(e -> {
+            PlayerAtpBeanDao dao = TApplication.getInstance().getDaoSession().getPlayerAtpBeanDao();
+            List<PlayerAtpBean> list = dao.queryBuilder()
+                    .orderAsc(PlayerAtpBeanDao.Properties.Name)
+                    .build().list();
+            e.onNext(list);
         });
     }
 
     private Observable<String> createIndex(final List<PlayerAtpBean> list) {
-        return Observable.create(new ObservableOnSubscribe<String>() {
-            @Override
-            public void subscribe(ObservableEmitter<String> e) throws Exception {
-                indexMap.clear();
-                String index = null;
-                for (int i = 0; i < list.size(); i ++) {
-                    String newIndex = String.valueOf(list.get(i).getName().charAt(0));
-                    if (!newIndex.equals(index)) {
-                        indexMap.put(newIndex, i);
-                        index = newIndex;
-                    }
+        return Observable.create(e -> {
+            indexMap.clear();
+            String index = null;
+            for (int i = 0; i < list.size(); i ++) {
+                String newIndex = String.valueOf(list.get(i).getName().charAt(0));
+                if (!newIndex.equals(index)) {
+                    indexMap.put(newIndex, i);
+                    index = newIndex;
                 }
-
-                int last = 0;
-                for (char i = 'A'; i <= 'Z'; i ++) {
-                    String curIndex = String.valueOf(i);
-                    // 如果没有，定位到上一个
-                    if (indexMap.get(curIndex) == null) {
-                        indexMap.put(curIndex, last);
-                    }
-                    else {
-                        last = indexMap.get(curIndex);
-                    }
-                    e.onNext(curIndex);
-                }
-
-                e.onComplete();
             }
+
+            int last = 0;
+            for (char i = 'A'; i <= 'Z'; i ++) {
+                String curIndex = String.valueOf(i);
+                // 如果没有，定位到上一个
+                if (indexMap.get(curIndex) == null) {
+                    indexMap.put(curIndex, last);
+                }
+                else {
+                    last = indexMap.get(curIndex);
+                }
+                e.onNext(curIndex);
+            }
+
+            // 不知道为什么不起作用
+            e.onComplete();
         });
     }
 

@@ -1,6 +1,7 @@
 package com.king.app.tcareer.page.player.manage;
 
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,6 +9,7 @@ import android.widget.CheckBox;
 import android.widget.TextView;
 
 import com.king.app.tcareer.R;
+import com.king.app.tcareer.model.bean.CompetitorBean;
 import com.king.app.tcareer.view.widget.CircleImageView;
 
 import java.util.List;
@@ -56,6 +58,15 @@ public class PlayerItemAdapter extends PlayerManageBaseAdapter {
 
         // check状态
         updateCheckStatus(position, holder.check);
+
+        String atpId = ((CompetitorBean) bean.getData()).getAtpId();
+        if (TextUtils.isEmpty(atpId)) {
+            holder.tvAtpId.setVisibility(View.GONE);
+        }
+        else {
+            holder.tvAtpId.setText(atpId);
+            holder.tvAtpId.setVisibility(View.VISIBLE);
+        }
     }
 
     @Override
@@ -72,6 +83,7 @@ public class PlayerItemAdapter extends PlayerManageBaseAdapter {
         TextView tvNameEng;
         TextView tvCountry;
         TextView tvBirthday;
+        TextView tvAtpId;
         CheckBox check;
         CircleImageView image;
         public ItemHolder(View itemView) {
@@ -83,6 +95,7 @@ public class PlayerItemAdapter extends PlayerManageBaseAdapter {
             tvCountry = (TextView) itemView.findViewById(R.id.manage_item_country);
             tvNameEng = (TextView) itemView.findViewById(R.id.manage_item_name_eng);
             tvBirthday = (TextView) itemView.findViewById(R.id.manage_item_birthday);
+            tvAtpId = (TextView) itemView.findViewById(R.id.tv_atp_id);
             check = (CheckBox) itemView.findViewById(R.id.manage_item_check);
             image = (CircleImageView) itemView.findViewById(R.id.manage_item_image);
         }
