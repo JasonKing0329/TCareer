@@ -18,6 +18,6 @@
         app:showAsAction="ifRoom" />
     <item
         android:id="@+id/menu_manage_expand"
-        android:title="Toggle expand status"
+        android:title="Collapse all"
         app:showAsAction="never" />
 </menu>

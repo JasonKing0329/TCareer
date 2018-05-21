@@ -11,4 +11,6 @@ import com.king.app.tcareer.model.bean.CompetitorBean;
 
 public interface RichPlayerHolder extends IFragmentHolder {
     void onSelectPlayer(CompetitorBean bean);
+
+    void onSortFinished();
 }

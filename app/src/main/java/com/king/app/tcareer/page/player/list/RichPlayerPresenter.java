@@ -17,9 +17,7 @@ import com.king.app.tcareer.page.setting.SettingProperty;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import io.reactivex.Observable;
 import io.reactivex.Observer;
@@ -43,12 +41,13 @@ public class RichPlayerPresenter extends PlayerAtpPresenter<RichPlayerView> {
 
     private List<RichPlayerBean> mFullList;
 
-    private Map<Character, Integer> playerIndexMap;
-
     private String mKeyword;
+
+    private IndexEmitter indexEmitter;
 
     public RichPlayerPresenter() {
         sortType = SettingProperty.getPlayerSortMode();
+        indexEmitter = new IndexEmitter();
     }
 
     public void loadPlayers() {
@@ -61,25 +60,26 @@ public class RichPlayerPresenter extends PlayerAtpPresenter<RichPlayerView> {
                     return list;
                 })
                 .flatMap(list -> sortPlayerRx(list))
+                .flatMap(list -> {
+                    mFullList = list;
+                    mList = new ArrayList<>();
+                    for (RichPlayerBean bean:list) {
+                        mList.add(bean);
+                    }
+                    return createIndexes();
+                })
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
-                .subscribe(new Observer<List<RichPlayerBean>>() {
+                .subscribe(new Observer<String>() {
                     @Override
                     public void onSubscribe(Disposable d) {
                         addDisposable(d);
                     }
 
                     @Override
-                    public void onNext(List<RichPlayerBean> list) {
-                        mFullList = list;
-                        mList = new ArrayList<>();
-                        for (RichPlayerBean bean:list) {
-                            mList.add(bean);
-                        }
-
-                        view.dismissLoading();
-                        view.showPlayers(mList);
-                        createIndex();
+                    public void onNext(String index) {
+                        view.getSidebar().addIndex(index);
+                        view.getSidebar().setVisibility(View.VISIBLE);
                     }
 
                     @Override
@@ -91,7 +91,8 @@ public class RichPlayerPresenter extends PlayerAtpPresenter<RichPlayerView> {
 
                     @Override
                     public void onComplete() {
-
+                        view.dismissLoading();
+                        view.showPlayers(mList);
                     }
                 });
     }
@@ -100,6 +101,7 @@ public class RichPlayerPresenter extends PlayerAtpPresenter<RichPlayerView> {
         return Observable.create(e -> {
             Collections.sort(list, new PlayerComparator(sortType));
             e.onNext(list);
+            e.onComplete();
         });
     }
 
@@ -125,6 +127,7 @@ public class RichPlayerPresenter extends PlayerAtpPresenter<RichPlayerView> {
                 list.add(viewBean);
             }
             e.onNext(list);
+            e.onComplete();
         });
     }
 
@@ -149,65 +152,77 @@ public class RichPlayerPresenter extends PlayerAtpPresenter<RichPlayerView> {
                 list.add(viewBean);
             }
             e.onNext(list);
+            e.onComplete();
         });
     }
 
-    private void createIndex() {
-        if (sortType == SettingProperty.VALUE_SORT_PLAYER_NAME || sortType == SettingProperty.VALUE_SORT_PLAYER_NAME_ENG) {
-            view.getSidebar().clear();
-            playerIndexMap = new HashMap<>();
-            // player list查询出来已经是升序的
-            for (int i = 0; i < mList.size(); i ++) {
-                if (mList.get(i).getCompetitorBean() instanceof User) {
-                    continue;
-                }
-                String targetText;
-                if (sortType == SettingProperty.VALUE_SORT_PLAYER_NAME) {
-                    targetText = mList.get(i).getCompetitorBean().getNamePinyin();
-                }
-                else {
-                    targetText = mList.get(i).getCompetitorBean().getNameEng();
-                    // 没有录入英文名的排在最后
-                    if (TextUtils.isEmpty(targetText)) {
-                        targetText = "ZZZZZZZZ";
-                    }
-                }
-                char first = targetText.charAt(0);
-                Integer index = playerIndexMap.get(first);
-                if (index == null) {
-                    playerIndexMap.put(first, i);
-                    view.getSidebar().addIndex(String.valueOf(first));
-                }
+    private Observable<String> createIndexes() {
+        return Observable.create(e -> {
+            indexEmitter.clear();
+            switch (sortType) {
+                case SettingProperty.VALUE_SORT_PLAYER_NAME:
+                case SettingProperty.VALUE_SORT_PLAYER_NAME_ENG:
+                    indexEmitter.createNameIndex(e, mList, sortType);
+                    break;
+                case SettingProperty.VALUE_SORT_PLAYER_COUNTRY:
+                    indexEmitter.createCountryIndex(e, mList);
+                    break;
+                case SettingProperty.VALUE_SORT_PLAYER_AGE:
+                    indexEmitter.createAgeIndex(e, mList);
+                    break;
+                case SettingProperty.VALUE_SORT_PLAYER_CONSTELLATION:
+                    indexEmitter.createSignIndex(e, mList);
+                    break;
+                case SettingProperty.VALUE_SORT_PLAYER_RECORD:
+                    indexEmitter.createRecordsIndex(e, mList);
+                    break;
+                case SettingProperty.VALUE_SORT_PLAYER_HEIGHT:
+                    indexEmitter.createHeightIndex(e, mList);
+                    break;
+                case SettingProperty.VALUE_SORT_PLAYER_WEIGHT:
+                    indexEmitter.createWeightIndex(e, mList);
+                    break;
+                case SettingProperty.VALUE_SORT_PLAYER_CAREER_HIGH:
+                    indexEmitter.createCareerHighIndex(e, mList);
+                    break;
+                case SettingProperty.VALUE_SORT_PLAYER_CAREER_TITLES:
+                    indexEmitter.createCareerTitlesIndex(e, mList);
+                    break;
+                case SettingProperty.VALUE_SORT_PLAYER_CAREER_WIN:
+                    indexEmitter.createCareerWinIndex(e, mList);
+                    break;
+                case SettingProperty.VALUE_SORT_PLAYER_CAREER_TURNEDPRO:
+                    indexEmitter.createTurnedProIndex(e, mList);
+                    break;
             }
-            view.getSidebar().setVisibility(View.VISIBLE);
-        }
-        else {
-            view.getSidebar().setVisibility(View.GONE);
-        }
+            e.onComplete();
+        });
     }
 
     public int getLetterPosition(String letter) {
-        return playerIndexMap.get(letter.charAt(0));
+        return indexEmitter.getPlayerIndexMap().get(letter);
     }
 
     public void sortPlayer(final int sortType) {
         view.showLoading();
         this.sortType = sortType;
+        view.getSidebar().clear();
         sortPlayerRx(mList)
+                .flatMap(list -> {
+                    SettingProperty.setPlayerSortMode(sortType);
+                    return createIndexes();
+                })
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
-                .subscribe(new Observer<List<RichPlayerBean>>() {
+                .subscribe(new Observer<String>() {
                     @Override
                     public void onSubscribe(Disposable d) {
                         addDisposable(d);
                     }
 
                     @Override
-                    public void onNext(List<RichPlayerBean> list) {
-                        SettingProperty.setPlayerSortMode(sortType);
-                        view.dismissLoading();
-                        view.sortFinished();
-                        createIndex();
+                    public void onNext(String index) {
+                        view.getSidebar().addIndex(index);
                     }
 
                     @Override
@@ -219,7 +234,9 @@ public class RichPlayerPresenter extends PlayerAtpPresenter<RichPlayerView> {
 
                     @Override
                     public void onComplete() {
-
+                        view.dismissLoading();
+                        view.getSidebar().invalidate();
+                        view.sortFinished();
                     }
                 });
     }

@@ -26,29 +26,29 @@
 
     <item
         android:id="@+id/menu_sort_height"
-        android:title="按身高"/>
+        android:title="@string/menu_sort_height"/>
 
     <item
         android:id="@+id/menu_sort_weight"
-        android:title="按体重"/>
+        android:title="@string/menu_sort_weight"/>
 
     <item
         android:id="@+id/menu_sort_career_high"
-        android:title="按最高排名"/>
+        android:title="@string/menu_sort_career_high"/>
 
     <item
         android:id="@+id/menu_sort_career_titles"
-        android:title="按冠军数"/>
+        android:title="@string/menu_sort_career_titles"/>
 
     <item
         android:id="@+id/menu_sort_career_win"
-        android:title="按职业生涯胜场数"/>
+        android:title="@string/menu_sort_career_win"/>
 
     <item
         android:id="@+id/menu_sort_turned_pro"
-        android:title="按转入职业时间"/>
+        android:title="@string/menu_sort_turned_pro"/>
 
     <item
         android:id="@+id/menu_sort_last_update"
-        android:title="按更新时间"/>
+        android:title="@string/menu_sort_last_update"/>
 </menu>

@@ -76,16 +76,15 @@ public class RichPlayerAdapter extends BaseRecyclerAdapter<RichPlayerAdapter.Pla
         playerImageIndexMap = new HashMap<>();
     }
 
-    public void toggleExpandStatus() {
-        isExpandAll = !isExpandAll;
-        setExpandAll(isExpandAll);
-    }
-
     public void setExpandAll(boolean expandAll) {
         isExpandAll = expandAll;
         for (int i = 0; i < getItemCount(); i ++) {
             expandMap.put(i, expandAll);
         }
+    }
+
+    public boolean isExpandAll() {
+        return isExpandAll;
     }
 
     public void setOnRichPlayerListener(OnRichPlayerListener onRichPlayerListener) {
@@ -132,6 +131,9 @@ public class RichPlayerAdapter extends BaseRecyclerAdapter<RichPlayerAdapter.Pla
     public void onBindViewHolder(PlayerHolder holder, int position) {
         CompetitorBean bean = list.get(position).getCompetitorBean();
         PlayerAtpBean atpBean = bean.getAtpBean();
+
+        holder.tvIndex.setVisibility(bean instanceof User ? View.GONE:View.VISIBLE);
+        holder.tvIndex.setText(String.valueOf(position - 3));// 一共4个user
 
         holder.itemView.setBackgroundColor(bean instanceof User ?
                 Color.parseColor("#efefef"):Color.WHITE);
@@ -332,6 +334,8 @@ public class RichPlayerAdapter extends BaseRecyclerAdapter<RichPlayerAdapter.Pla
         ImageView ivPlayer;
         @BindView(R.id.iv_more)
         ImageView ivMore;
+        @BindView(R.id.tv_index)
+        TextView tvIndex;
         @BindView(R.id.tv_name)
         TextView tvName;
         @BindView(R.id.tv_h2h)

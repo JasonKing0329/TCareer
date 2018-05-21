@@ -64,17 +64,67 @@ public class RichPlayerFragment extends BaseMvpFragment<RichPlayerPresenter> imp
         rvList.addItemDecoration(new RecyclerView.ItemDecoration() {
             @Override
             public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
-                outRect.top = ScreenUtils.dp2px(10);
+                if (parent.getChildAdapterPosition(view) > 0) {
+                    outRect.top = ScreenUtils.dp2px(10);
+                }
             }
         });
+
+        rvList.addOnScrollListener(new RecyclerViewListener());
 
         sidebar.setVisibility(View.VISIBLE);
         sidebar.setOnTouchingLetterChangedListener(s -> {
             int selection = presenter.getLetterPosition(s);
-            rvList.scrollToPosition(selection);
+            scrollToPosition(selection);
         });
         sidebar.setTextView(tvIndexPopup);
 
+    }
+
+    private boolean needMove;
+    private int nSelection;
+
+    private void scrollToPosition(int selection) {
+        nSelection = selection;
+        final LinearLayoutManager manager = (LinearLayoutManager) rvList.getLayoutManager();
+        int fir = manager.findFirstVisibleItemPosition();
+        int end = manager.findLastVisibleItemPosition();
+        if (selection <= fir) {
+            rvList.scrollToPosition(selection);
+        } else if (selection <= end) {
+            int top = rvList.getChildAt(selection - fir).getTop();
+            rvList.scrollBy(0, top);
+        } else {
+            //当要置顶的项在当前显示的最后一项的后面时
+            rvList.scrollToPosition(selection);
+            //记录当前需要在RecyclerView滚动监听里面继续第二次滚动
+            needMove = true;
+        }
+    }
+
+    public void toggleSidebar() {
+        if (sidebar.getVisibility() == View.VISIBLE) {
+            sidebar.setVisibility(View.GONE);
+        }
+        else {
+            sidebar.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private class RecyclerViewListener extends RecyclerView.OnScrollListener {
+        @Override
+        public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+            super.onScrolled(recyclerView, dx, dy);
+            //在这里进行第二次滚动（最后的距离）
+            if (needMove) {
+                needMove = false;
+                //获取要置顶的项在当前屏幕的位置，mIndex是记录的要置顶项在RecyclerView中的位置
+                int n = nSelection - ((LinearLayoutManager) recyclerView.getLayoutManager()).findFirstVisibleItemPosition();
+                if (n >= 0 && n < recyclerView.getChildCount()) {
+                    recyclerView.scrollBy(0, recyclerView.getChildAt(n).getTop()); //滚动到顶部
+                }
+            }
+        }
     }
 
     @Override
@@ -185,6 +235,7 @@ public class RichPlayerFragment extends BaseMvpFragment<RichPlayerPresenter> imp
     @Override
     public void sortFinished() {
         adapter.notifyDataSetChanged();
+        holder.onSortFinished();
     }
 
     public void reload() {
@@ -207,8 +258,12 @@ public class RichPlayerFragment extends BaseMvpFragment<RichPlayerPresenter> imp
         presenter.filter(words);
     }
 
-    public void toggleExpandStatus() {
-        adapter.toggleExpandStatus();
+    public boolean isExpandAll() {
+        return adapter.isExpandAll();
+    }
+
+    public void setExpandAll(boolean expand) {
+        adapter.setExpandAll(expand);
         adapter.notifyDataSetChanged();
     }
 }

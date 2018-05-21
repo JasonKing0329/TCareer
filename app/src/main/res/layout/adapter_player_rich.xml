@@ -2,6 +2,7 @@
 <android.support.v7.widget.CardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     app:cardCornerRadius="10dp"
@@ -194,6 +195,18 @@
                 android:textSize="12dp"
                 android:layout_below="@id/tv_career"/>
         </LinearLayout>
+
+        <TextView
+            android:id="@+id/tv_index"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:gravity="center"
+            android:text="195"
+            android:textSize="10dp"
+            android:textColor="@color/white"
+            android:background="@drawable/shape_oval_alpha66"
+            app:layout_constraintBottom_toBottomOf="@+id/iv_player"
+            app:layout_constraintStart_toStartOf="@+id/iv_player" />
 
     </android.support.constraint.ConstraintLayout>
 

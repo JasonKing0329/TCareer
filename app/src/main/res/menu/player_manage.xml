@@ -32,11 +32,11 @@
         android:icon="@drawable/ic_pie_chart_white_24dp"
         app:showAsAction="ifRoom" />
     <item
-        android:id="@+id/menu_manage_expand"
-        android:title="Toggle expand status"
-        app:showAsAction="ifRoom" />
-    <item
         android:id="@+id/menu_manage_fetch"
         android:title="Fetch data"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/menu_manage_expand"
+        android:title="Collapse all"
+        app:showAsAction="never" />
 </menu>

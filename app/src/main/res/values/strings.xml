@@ -141,6 +141,13 @@
     <string name="menu_sort_age">By age</string>
     <string name="menu_sort_constellation">By constellation</string>
     <string name="menu_sort_record">By records</string>
+    <string name="menu_sort_height">By height</string>
+    <string name="menu_sort_weight">By weight</string>
+    <string name="menu_sort_career_high">By career highest</string>
+    <string name="menu_sort_career_titles">By career titles</string>
+    <string name="menu_sort_career_win">By career win</string>
+    <string name="menu_sort_turned_pro">By turned pro</string>
+    <string name="menu_sort_last_update">By last update</string>
     <!-- **************************************************************** -->
     <string name="record_listview_allrecords">All records</string>
     <string name="dlg_loading_msg">loading...</string>

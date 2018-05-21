@@ -138,6 +138,13 @@
     <string name="menu_sort_age">按年龄</string>
     <string name="menu_sort_constellation">按星座</string>
     <string name="menu_sort_record">按交手次数</string>
+    <string name="menu_sort_height">按身高</string>
+    <string name="menu_sort_weight">按体重</string>
+    <string name="menu_sort_career_high">按最高排名</string>
+    <string name="menu_sort_career_titles">按冠军数</string>
+    <string name="menu_sort_career_win">按职业生涯胜场数</string>
+    <string name="menu_sort_turned_pro">按转入职业时间</string>
+    <string name="menu_sort_last_update">按更新时间</string>
     <!-- **************************************************************** -->
     <string name="record_listview_allrecords">全部记录</string>
     <string name="dlg_loading_msg">加载中...</string>

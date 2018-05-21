@@ -1,8 +1,12 @@
 package com.king.app.tcareer.page.player.manage;
 
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.PopupMenu;
+import android.widget.TextView;
 
 import com.king.app.jactionbar.JActionbar;
 import com.king.app.jactionbar.OnConfirmListener;
@@ -31,6 +35,10 @@ public class PlayerManageActivity extends BaseMvpActivity<PlayerManagePresenter>
 
     @BindView(R.id.actionbar)
     JActionbar actionbar;
+    @BindView(R.id.tv_sort)
+    TextView tvSort;
+    @BindView(R.id.iv_sidebar)
+    ImageView ivSidebar;
 
     private PopupMenu popSort;
 
@@ -58,6 +66,11 @@ public class PlayerManageActivity extends BaseMvpActivity<PlayerManagePresenter>
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.group_ft, ftRich, "RichPlayerFragment")
                 .commit();
+
+        updateSortText();
+
+        ivSidebar.setColorFilter(getResources().getColor(R.color.colorPrimary), PorterDuff.Mode.SRC_IN);
+        ivSidebar.setOnClickListener(view -> ftRich.toggleSidebar());
     }
 
     private void initActionbar() {
@@ -86,7 +99,14 @@ public class PlayerManageActivity extends BaseMvpActivity<PlayerManagePresenter>
                     ftRich.setEditMode(true);
                     break;
                 case R.id.menu_manage_expand:
-                    ftRich.toggleExpandStatus();
+                    if (ftRich.isExpandAll()) {
+                        actionbar.updateMenuText(R.id.menu_manage_expand, "Expand all");
+                        ftRich.setExpandAll(false);
+                    }
+                    else {
+                        ftRich.setExpandAll(true);
+                        actionbar.updateMenuText(R.id.menu_manage_expand, "Collapse all");
+                    }
                     break;
                 case R.id.menu_manage_fetch:
                     showConfirmCancelMessage("是否重新从网络获取数据？"
@@ -162,6 +182,11 @@ public class PlayerManageActivity extends BaseMvpActivity<PlayerManagePresenter>
         }
     }
 
+    @Override
+    public void onSortFinished() {
+        updateSortText();
+    }
+
     private void showChartDialog() {
         PlayerChartDialog dialog = new PlayerChartDialog();
         dialog.setPlayerList(ftRich.getPlayerList());
@@ -172,6 +197,50 @@ public class PlayerManageActivity extends BaseMvpActivity<PlayerManagePresenter>
         PlayerEditDialog dialog = new PlayerEditDialog();
         dialog.setOnPlayerEditListener(bean -> ftRich.reload());
         dialog.show(getSupportFragmentManager(), "PlayerEditDialog");
+    }
+
+    private void updateSortText() {
+        switch (SettingProperty.getPlayerSortMode()) {
+            case SettingProperty.VALUE_SORT_PLAYER_NAME:
+                tvSort.setText(R.string.menu_sort_name);
+                break;
+            case SettingProperty.VALUE_SORT_PLAYER_NAME_ENG:
+                tvSort.setText(R.string.menu_sort_name_eng);
+                break;
+            case SettingProperty.VALUE_SORT_PLAYER_COUNTRY:
+                tvSort.setText(R.string.menu_sort_country);
+                break;
+            case SettingProperty.VALUE_SORT_PLAYER_AGE:
+                tvSort.setText(R.string.menu_sort_age);
+                break;
+            case SettingProperty.VALUE_SORT_PLAYER_CONSTELLATION:
+                tvSort.setText(R.string.menu_sort_constellation);
+                break;
+            case SettingProperty.VALUE_SORT_PLAYER_RECORD:
+                tvSort.setText(R.string.menu_sort_record);
+                break;
+            case SettingProperty.VALUE_SORT_PLAYER_HEIGHT:
+                tvSort.setText(R.string.menu_sort_height);
+                break;
+            case SettingProperty.VALUE_SORT_PLAYER_WEIGHT:
+                tvSort.setText(R.string.menu_sort_week);
+                break;
+            case SettingProperty.VALUE_SORT_PLAYER_CAREER_HIGH:
+                tvSort.setText(R.string.menu_sort_career_high);
+                break;
+            case SettingProperty.VALUE_SORT_PLAYER_CAREER_TITLES:
+                tvSort.setText(R.string.menu_sort_career_titles);
+                break;
+            case SettingProperty.VALUE_SORT_PLAYER_CAREER_WIN:
+                tvSort.setText(R.string.menu_sort_career_win);
+                break;
+            case SettingProperty.VALUE_SORT_PLAYER_CAREER_TURNEDPRO:
+                tvSort.setText(R.string.menu_sort_turned_pro);
+                break;
+            case SettingProperty.VALUE_SORT_PLAYER_CAREER_LAST_UPDATE:
+                tvSort.setText(R.string.menu_sort_last_update);
+                break;
+        }
     }
 
     private PopupMenu getSortPopup(View anchor) {

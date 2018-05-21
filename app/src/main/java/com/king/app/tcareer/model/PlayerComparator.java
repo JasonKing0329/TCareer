@@ -77,7 +77,7 @@ public class PlayerComparator implements Comparator<RichPlayerBean> {
             right = rhs.getAtpBean().getCm();
         } catch (Exception e) {}
 
-        return compareLowToHigh(left, right);
+        return compareHighToLow(left, right);
     }
 
     /**
@@ -254,7 +254,7 @@ public class PlayerComparator implements Comparator<RichPlayerBean> {
         if (dateR == null) {
             return -1;
         }
-        return dateL.compareTo(dateR);
+        return dateR.compareTo(dateL);
     }
 
     private String getBirthday(PlayerBean bean) {
