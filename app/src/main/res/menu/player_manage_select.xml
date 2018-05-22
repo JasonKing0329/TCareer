@@ -20,4 +20,8 @@
         android:id="@+id/menu_manage_expand"
         android:title="Collapse all"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/menu_manage_collapse"
+        android:title="Collapse all"
+        app:showAsAction="never" />
 </menu>

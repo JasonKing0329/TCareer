@@ -154,14 +154,13 @@ public class RichPlayerFragment extends BaseMvpFragment<RichPlayerPresenter> imp
     public void showPlayers(List<RichPlayerBean> list) {
         if (adapter == null) {
             adapter = new RichPlayerAdapter();
+            adapter.setExpandMap(presenter.getExpandMap());
             adapter.setOnRichPlayerListener(this);
             adapter.setFragmentManager(getChildFragmentManager());
             adapter.setList(list);
-            adapter.setExpandAll(true);
             rvList.setAdapter(adapter);
         } else {
             adapter.setList(list);
-            adapter.setExpandAll(true);
             adapter.notifyDataSetChanged();
         }
 
@@ -191,11 +190,6 @@ public class RichPlayerFragment extends BaseMvpFragment<RichPlayerPresenter> imp
     @Override
     public void onRefreshItem(int position, CompetitorBean bean) {
         presenter.updateAtpData(bean.getAtpId(), position);
-    }
-
-    @Override
-    public void onClickImage(int position, CompetitorBean bean) {
-
     }
 
     @Override
@@ -266,12 +260,8 @@ public class RichPlayerFragment extends BaseMvpFragment<RichPlayerPresenter> imp
         presenter.filter(words);
     }
 
-    public boolean isExpandAll() {
-        return adapter.isExpandAll();
-    }
-
     public void setExpandAll(boolean expand) {
-        adapter.setExpandAll(expand);
+        presenter.setExpandAll(expand);
         adapter.notifyDataSetChanged();
     }
 }

@@ -46,7 +46,8 @@ import butterknife.ButterKnife;
 
 public class RichPlayerAdapter extends BaseRecyclerAdapter<RichPlayerAdapter.PlayerHolder, RichPlayerBean> {
 
-    private SparseBooleanArray expandMap;
+    private Map<Long, Boolean> mExpandMap;
+
     private SparseBooleanArray checkMap;
     private RequestOptions playerOptions;
     private SimpleDateFormat dateFormat;
@@ -54,8 +55,6 @@ public class RichPlayerAdapter extends BaseRecyclerAdapter<RichPlayerAdapter.Pla
     private OnRichPlayerListener onRichPlayerListener;
 
     private boolean isSelectMode;
-
-    private boolean isExpandAll;
 
     /**
      * 单击头像位置
@@ -69,22 +68,14 @@ public class RichPlayerAdapter extends BaseRecyclerAdapter<RichPlayerAdapter.Pla
 
     public RichPlayerAdapter() {
         super();
-        expandMap = new SparseBooleanArray();
         checkMap = new SparseBooleanArray();
         playerOptions = GlideOptions.getDefaultPlayerOptions();
         dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         playerImageIndexMap = new HashMap<>();
     }
 
-    public void setExpandAll(boolean expandAll) {
-        isExpandAll = expandAll;
-        for (int i = 0; i < getItemCount(); i ++) {
-            expandMap.put(i, expandAll);
-        }
-    }
-
-    public boolean isExpandAll() {
-        return isExpandAll;
+    public void setExpandMap(Map<Long, Boolean> mExpandMap) {
+        this.mExpandMap = mExpandMap;
     }
 
     public void setOnRichPlayerListener(OnRichPlayerListener onRichPlayerListener) {
@@ -188,8 +179,8 @@ public class RichPlayerAdapter extends BaseRecyclerAdapter<RichPlayerAdapter.Pla
         holder.cbCheck.setVisibility(isSelectMode && (bean instanceof PlayerBean) ? View.VISIBLE:View.GONE);
         holder.cbCheck.setChecked(checkMap.get(position));
 
-        boolean expanded = expandMap.get(position) && hasAtpDetail;
-        expandMap.put(position, expanded);
+        // 除了expand map里的状态，还要看是否有atpDetail，以及user没有扩展信息
+        boolean expanded = mExpandMap.get(bean.getId()) && hasAtpDetail;
         holder.groupExpand.setVisibility(expanded ? View.VISIBLE:View.GONE);
         holder.ivMore.setVisibility(hasAtpDetail ? View.VISIBLE:View.GONE);
         holder.ivMore.setImageResource(expanded ? R.drawable.ic_keyboard_arrow_up_666_24dp:R.drawable.ic_keyboard_arrow_down_666_24dp);
@@ -201,8 +192,8 @@ public class RichPlayerAdapter extends BaseRecyclerAdapter<RichPlayerAdapter.Pla
         @Override
         public void onClick(View view) {
             int position = (int) view.getTag();
-            boolean targetExpand = !expandMap.get(position);
-            expandMap.put(position, targetExpand);
+            boolean targetExpand = !mExpandMap.get(list.get(position).getCompetitorBean().getId());
+            mExpandMap.put(list.get(position).getCompetitorBean().getId(), targetExpand);
             notifyItemChanged(position);
         }
     };
@@ -375,6 +366,5 @@ public class RichPlayerAdapter extends BaseRecyclerAdapter<RichPlayerAdapter.Pla
 
     public interface OnRichPlayerListener extends OnItemClickListener<CompetitorBean> {
         void onRefreshItem(int position, CompetitorBean bean);
-        void onClickImage(int position, CompetitorBean bean);
     }
 }

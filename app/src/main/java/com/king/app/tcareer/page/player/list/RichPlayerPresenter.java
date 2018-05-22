@@ -1,12 +1,14 @@
 package com.king.app.tcareer.page.player.list;
 
 import android.text.TextUtils;
+import android.util.SparseBooleanArray;
 import android.view.Gravity;
 import android.view.View;
 
 import com.king.app.tcareer.base.TApplication;
 import com.king.app.tcareer.conf.AppConstants;
 import com.king.app.tcareer.model.PlayerComparator;
+import com.king.app.tcareer.model.bean.CompetitorBean;
 import com.king.app.tcareer.model.bean.H2hBean;
 import com.king.app.tcareer.model.dao.H2HDao;
 import com.king.app.tcareer.model.db.entity.PlayerBean;
@@ -18,7 +20,9 @@ import com.king.app.tcareer.page.setting.SettingProperty;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import io.reactivex.Observable;
 import io.reactivex.Observer;
@@ -46,9 +50,12 @@ public class RichPlayerPresenter extends PlayerAtpPresenter<RichPlayerView> {
 
     private IndexEmitter indexEmitter;
 
+    private Map<Long, Boolean> mExpandMap;
+
     public RichPlayerPresenter() {
         sortType = SettingProperty.getPlayerSortMode();
         indexEmitter = new IndexEmitter();
+        mExpandMap = new HashMap<>();
     }
 
     public void loadPlayers() {
@@ -65,9 +72,12 @@ public class RichPlayerPresenter extends PlayerAtpPresenter<RichPlayerView> {
                 .flatMap(list -> {
                     mFullList = list;
                     mList = new ArrayList<>();
-                    for (RichPlayerBean bean:list) {
+                    // 默认全部展开
+                    for (int i = 0; i < mFullList.size(); i ++) {
+                        RichPlayerBean bean = mFullList.get(i);
                         mList.add(bean);
                     }
+                    setExpandAll(true);
                     return createIndexes();
                 })
                 .observeOn(AndroidSchedulers.mainThread())
@@ -342,4 +352,24 @@ public class RichPlayerPresenter extends PlayerAtpPresenter<RichPlayerView> {
         return false;
     }
 
+    public void setExpandAll(boolean expandAll) {
+        for (int i = 0; i < mList.size(); i ++) {
+            CompetitorBean bean = mList.get(i).getCompetitorBean();
+            if (expandAll) {
+                if (bean instanceof User) {
+                    mExpandMap.put(bean.getId(), false);
+                }
+                else {
+                    mExpandMap.put(bean.getId(), true);
+                }
+            }
+            else {
+                mExpandMap.put(bean.getId(), expandAll);
+            }
+        }
+    }
+
+    public Map<Long, Boolean> getExpandMap() {
+        return mExpandMap;
+    }
 }

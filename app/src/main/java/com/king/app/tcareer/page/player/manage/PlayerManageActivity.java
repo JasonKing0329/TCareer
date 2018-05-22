@@ -1,7 +1,6 @@
 package com.king.app.tcareer.page.player.manage;
 
 import android.content.Intent;
-import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.view.View;
 import android.widget.ImageView;
@@ -99,14 +98,10 @@ public class PlayerManageActivity extends BaseMvpActivity<PlayerManagePresenter>
                     ftRich.setEditMode(true);
                     break;
                 case R.id.menu_manage_expand:
-                    if (ftRich.isExpandAll()) {
-                        actionbar.updateMenuText(R.id.menu_manage_expand, "Expand all");
-                        ftRich.setExpandAll(false);
-                    }
-                    else {
-                        ftRich.setExpandAll(true);
-                        actionbar.updateMenuText(R.id.menu_manage_expand, "Collapse all");
-                    }
+                    ftRich.setExpandAll(true);
+                    break;
+                case R.id.menu_manage_collapse:
+                    ftRich.setExpandAll(false);
                     break;
                 case R.id.menu_manage_fetch:
                     showConfirmCancelMessage("是否重新从网络获取数据？"
