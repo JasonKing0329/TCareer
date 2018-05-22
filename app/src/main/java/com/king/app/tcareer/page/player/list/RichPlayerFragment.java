@@ -15,7 +15,7 @@ import com.king.app.tcareer.model.db.entity.User;
 import com.king.app.tcareer.page.player.manage.PlayerEditDialog;
 import com.king.app.tcareer.page.player.page.PlayerPageActivity;
 import com.king.app.tcareer.utils.ScreenUtils;
-import com.king.app.tcareer.view.widget.SideBar;
+import com.king.app.tcareer.view.widget.FitSideBar;
 
 import java.util.List;
 
@@ -33,7 +33,7 @@ public class RichPlayerFragment extends BaseMvpFragment<RichPlayerPresenter> imp
     @BindView(R.id.rv_list)
     RecyclerView rvList;
     @BindView(R.id.sidebar)
-    SideBar sidebar;
+    FitSideBar sidebar;
     @BindView(R.id.tv_index_popup)
     TextView tvIndexPopup;
 
@@ -72,13 +72,21 @@ public class RichPlayerFragment extends BaseMvpFragment<RichPlayerPresenter> imp
 
         rvList.addOnScrollListener(new RecyclerViewListener());
 
-        sidebar.setVisibility(View.VISIBLE);
-        sidebar.setOnTouchingLetterChangedListener(s -> {
-            int selection = presenter.getLetterPosition(s);
-            scrollToPosition(selection);
-        });
-        sidebar.setTextView(tvIndexPopup);
+        sidebar.setOnSidebarStatusListener(new FitSideBar.OnSidebarStatusListener() {
+            @Override
+            public void onChangeFinished() {
+                tvIndexPopup.setVisibility(View.GONE);
+            }
 
+            @Override
+            public void onSideIndexChanged(String index) {
+                int selection = presenter.getLetterPosition(index);
+                scrollToPosition(selection);
+
+                tvIndexPopup.setText(index);
+                tvIndexPopup.setVisibility(View.VISIBLE);
+            }
+        });
     }
 
     private boolean needMove;
@@ -138,7 +146,7 @@ public class RichPlayerFragment extends BaseMvpFragment<RichPlayerPresenter> imp
     }
 
     @Override
-    public SideBar getSidebar() {
+    public FitSideBar getSidebar() {
         return sidebar;
     }
 

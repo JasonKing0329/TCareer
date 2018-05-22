@@ -223,7 +223,7 @@ public class PlayerManageActivity extends BaseMvpActivity<PlayerManagePresenter>
                 tvSort.setText(R.string.menu_sort_height);
                 break;
             case SettingProperty.VALUE_SORT_PLAYER_WEIGHT:
-                tvSort.setText(R.string.menu_sort_week);
+                tvSort.setText(R.string.menu_sort_weight);
                 break;
             case SettingProperty.VALUE_SORT_PLAYER_CAREER_HIGH:
                 tvSort.setText(R.string.menu_sort_career_high);

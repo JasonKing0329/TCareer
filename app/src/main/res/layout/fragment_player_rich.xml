@@ -5,19 +5,24 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/main_bg">
-    <com.king.app.tcareer.view.widget.SideBar
+    android:background="@color/main_bg"
+    tools:context=".page.player.manage.PlayerManageActivity">
+    <com.king.app.tcareer.view.widget.FitSideBar
         android:id="@+id/sidebar"
-        android:layout_width="22dp"
+        android:layout_width="wrap_content"
         android:layout_height="match_parent"
+        android:background="#99ffffff"
+        android:elevation="@dimen/margin_10"
         android:visibility="gone"
-        app:sideBackground="@color/white"
-        app:indexTextSize="14dp"
-        app:indexColor="@color/colorPrimary"
-        app:indexColorFocus="@color/colorAccent"
+        android:gravity="center"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"/>
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:minWidth="22dp"
+        app:textColor="@color/colorPrimary"
+        app:textColorFocus="@color/colorAccent"
+        app:textSize="14dp"
+        app:textSizeFocus="16dp"/>
 
     <TextView
         android:id="@+id/tv_index_popup"
@@ -40,7 +45,7 @@
         android:layout_height="0dp"
         android:layout_marginEnd="3dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/sidebar"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:listitem="@layout/adapter_player_rich"/>

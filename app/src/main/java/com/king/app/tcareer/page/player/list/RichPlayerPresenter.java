@@ -1,6 +1,7 @@
 package com.king.app.tcareer.page.player.list;
 
 import android.text.TextUtils;
+import android.view.Gravity;
 import android.view.View;
 
 import com.king.app.tcareer.base.TApplication;
@@ -52,6 +53,7 @@ public class RichPlayerPresenter extends PlayerAtpPresenter<RichPlayerView> {
 
     public void loadPlayers() {
         view.showLoading();
+        updateSidebarGravity();
         Observable.combineLatest(queryUsers(), queryPlayers()
                 , (users, players) -> {
                     List<RichPlayerBean> list = new ArrayList<>();
@@ -79,7 +81,6 @@ public class RichPlayerPresenter extends PlayerAtpPresenter<RichPlayerView> {
                     @Override
                     public void onNext(String index) {
                         view.getSidebar().addIndex(index);
-                        view.getSidebar().setVisibility(View.VISIBLE);
                     }
 
                     @Override
@@ -92,6 +93,8 @@ public class RichPlayerPresenter extends PlayerAtpPresenter<RichPlayerView> {
                     @Override
                     public void onComplete() {
                         view.dismissLoading();
+                        view.getSidebar().build();
+                        view.getSidebar().setVisibility(View.VISIBLE);
                         view.showPlayers(mList);
                     }
                 });
@@ -207,6 +210,7 @@ public class RichPlayerPresenter extends PlayerAtpPresenter<RichPlayerView> {
         view.showLoading();
         this.sortType = sortType;
         view.getSidebar().clear();
+        updateSidebarGravity();
         sortPlayerRx(mList)
                 .flatMap(list -> {
                     SettingProperty.setPlayerSortMode(sortType);
@@ -235,10 +239,20 @@ public class RichPlayerPresenter extends PlayerAtpPresenter<RichPlayerView> {
                     @Override
                     public void onComplete() {
                         view.dismissLoading();
-                        view.getSidebar().invalidate();
+                        view.getSidebar().build();
+                        view.getSidebar().setVisibility(View.VISIBLE);
                         view.sortFinished();
                     }
                 });
+    }
+
+    private void updateSidebarGravity() {
+        if (sortType == SettingProperty.VALUE_SORT_PLAYER_CONSTELLATION) {
+            view.getSidebar().setGravity(Gravity.RIGHT);
+        }
+        else {
+            view.getSidebar().setGravity(Gravity.CENTER);
+        }
     }
 
     public void updateAtpData(String atpiId, int position) {
