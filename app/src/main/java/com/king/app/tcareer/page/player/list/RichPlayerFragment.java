@@ -123,6 +123,8 @@ public class RichPlayerFragment extends BaseMvpFragment<RichPlayerPresenter> imp
         presenter.filter(bean);
     }
 
+    private int nCurrentFirst;
+
     private class RecyclerViewListener extends RecyclerView.OnScrollListener {
         @Override
         public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
@@ -135,6 +137,15 @@ public class RichPlayerFragment extends BaseMvpFragment<RichPlayerPresenter> imp
                 if (n >= 0 && n < recyclerView.getChildCount()) {
                     recyclerView.scrollBy(0, recyclerView.getChildAt(n).getTop()); //滚动到顶部
                 }
+            }
+
+            // 更新第一个index标签
+            LinearLayoutManager manager = (LinearLayoutManager) rvList.getLayoutManager();
+            int first = manager.findFirstVisibleItemPosition();
+            if (first != nCurrentFirst) {
+                nCurrentFirst = first;
+                String index = presenter.getItemIndex(nCurrentFirst);
+                holder.updateFirstIndex(index);
             }
         }
     }

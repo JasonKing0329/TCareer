@@ -9,6 +9,7 @@ import com.king.app.tcareer.utils.FormatUtil;
 
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -22,7 +23,7 @@ import io.reactivex.ObservableEmitter;
  */
 public class IndexEmitter {
 
-    private Map<String, Integer> playerIndexMap;
+    private Map<String, IndexRange> playerIndexMap;
 
     public IndexEmitter() {
         playerIndexMap = new HashMap<>();
@@ -32,8 +33,48 @@ public class IndexEmitter {
         playerIndexMap.clear();
     }
 
-    public Map<String, Integer> getPlayerIndexMap() {
+    private IndexRange mLastRange;
+
+    public Map<String, IndexRange> getPlayerIndexMap() {
         return playerIndexMap;
+    }
+
+    public String getIndex(int position) {
+        Iterator<String> iterator = playerIndexMap.keySet().iterator();
+        String index = "Unknown";
+        while (iterator.hasNext()) {
+            String key = iterator.next();
+            IndexRange range = playerIndexMap.get(key);
+            if (position >= range.start && position <= range.end) {
+                index = key;
+                break;
+            }
+        }
+        return index;
+    }
+
+    private void endCreate(int lastIndex) {
+        if (mLastRange != null) {
+            mLastRange.end = lastIndex;
+        }
+    }
+
+    private void addIndex(ObservableEmitter<String> e, String value, int i) {
+        IndexRange range = playerIndexMap.get(value);
+        // 新index出现
+        if (range == null) {
+            // 结束上一个range
+            if (mLastRange != null) {
+                mLastRange.end = i - 1;
+            }
+
+            range = new IndexRange();
+            range.start = i;
+            playerIndexMap.put(value, range);
+
+            mLastRange = range;
+            e.onNext(String.valueOf(value));
+        }
     }
 
     public void createRecordsIndex(ObservableEmitter<String> e, List<RichPlayerBean> mList) {
@@ -47,37 +88,26 @@ public class IndexEmitter {
             String key;
             if (number > 40) {
                 key = "40+";
-            }
-            else if (number > 35 && number <= 40) {
+            } else if (number > 35 && number <= 40) {
                 key = "40";
-            }
-            else if (number > 30 && number <= 35) {
+            } else if (number > 30 && number <= 35) {
                 key = "35";
-            }
-            else if (number > 25 && number <= 30) {
+            } else if (number > 25 && number <= 30) {
                 key = "30";
-            }
-            else if (number > 20 && number <= 25) {
+            } else if (number > 20 && number <= 25) {
                 key = "25";
-            }
-            else if (number > 15 && number <= 20) {
+            } else if (number > 15 && number <= 20) {
                 key = "20";
-            }
-            else if (number > 12 && number <= 15) {
+            } else if (number > 12 && number <= 15) {
                 key = "15";
-            }
-            else if (number > 10 && number <= 12) {
+            } else if (number > 10 && number <= 12) {
                 key = "12";
-            }
-            else {
+            } else {
                 key = String.valueOf(number);
             }
-            Integer index = playerIndexMap.get(key);
-            if (index == null) {
-                playerIndexMap.put(key, i);
-                e.onNext(String.valueOf(key));
-            }
+            addIndex(e, key, i);
         }
+        endCreate(mList.size() - 1);
     }
 
     public void createSignIndex(ObservableEmitter<String> e, List<RichPlayerBean> mList) {
@@ -98,12 +128,9 @@ public class IndexEmitter {
             } catch (ConstellationUtil.ConstellationParseException e1) {
                 sign = "Unknown";
             }
-            Integer index = playerIndexMap.get(sign);
-            if (index == null) {
-                playerIndexMap.put(sign, i);
-                e.onNext(sign);
-            }
+            addIndex(e, sign, i);
         }
+        endCreate(mList.size() - 1);
     }
 
     public void createAgeIndex(ObservableEmitter<String> e, List<RichPlayerBean> mList) {
@@ -125,12 +152,9 @@ public class IndexEmitter {
                 age = Integer.MAX_VALUE;
             }
             String first = age > 35 ? ">35":String.valueOf(age);
-            Integer index = playerIndexMap.get(first);
-            if (index == null) {
-                playerIndexMap.put(first, i);
-                e.onNext(String.valueOf(first));
-            }
+            addIndex(e, first, i);
         }
+        endCreate(mList.size() - 1);
     }
 
     public void createCountryIndex(ObservableEmitter<String> e, List<RichPlayerBean> mList) {
@@ -150,12 +174,9 @@ public class IndexEmitter {
                 country = "ZZZZZZZZ";
             }
             String first = String.valueOf(country.charAt(0));
-            Integer index = playerIndexMap.get(first);
-            if (index == null) {
-                playerIndexMap.put(first, i);
-                e.onNext(String.valueOf(first));
-            }
+            addIndex(e, first, i);
         }
+        endCreate(mList.size() - 1);
     }
 
     public void createNameIndex(ObservableEmitter<String> e, List<RichPlayerBean> mList, int sortType) {
@@ -176,12 +197,9 @@ public class IndexEmitter {
                 }
             }
             String first = String.valueOf(targetText.charAt(0));
-            Integer index = playerIndexMap.get(first);
-            if (index == null) {
-                playerIndexMap.put(first, i);
-                e.onNext(String.valueOf(first));
-            }
+            addIndex(e, first, i);
         }
+        endCreate(mList.size() - 1);
     }
 
     public void createHeightIndex(ObservableEmitter<String> e, List<RichPlayerBean> mList) {
@@ -216,12 +234,9 @@ public class IndexEmitter {
             else {
                 key = FormatUtil.formatNumber(height);
             }
-            Integer index = playerIndexMap.get(key);
-            if (index == null) {
-                playerIndexMap.put(key, i);
-                e.onNext(String.valueOf(key));
-            }
+            addIndex(e, key, i);
         }
+        endCreate(mList.size() - 1);
     }
 
     public void createWeightIndex(ObservableEmitter<String> e, List<RichPlayerBean> mList) {
@@ -262,12 +277,9 @@ public class IndexEmitter {
             else {
                 key = "70-";
             }
-            Integer index = playerIndexMap.get(key);
-            if (index == null) {
-                playerIndexMap.put(key, i);
-                e.onNext(String.valueOf(key));
-            }
+            addIndex(e, key, i);
         }
+        endCreate(mList.size() - 1);
     }
 
     public void createCareerHighIndex(ObservableEmitter<String> e, List<RichPlayerBean> mList) {
@@ -328,12 +340,9 @@ public class IndexEmitter {
             else {
                 key = String.valueOf(high);
             }
-            Integer index = playerIndexMap.get(key);
-            if (index == null) {
-                playerIndexMap.put(key, i);
-                e.onNext(String.valueOf(key));
-            }
+            addIndex(e, key, i);
         }
+        endCreate(mList.size() - 1);
     }
 
     public void createCareerTitlesIndex(ObservableEmitter<String> e, List<RichPlayerBean> mList) {
@@ -388,12 +397,9 @@ public class IndexEmitter {
             else {
                 key = String.valueOf(titles);
             }
-            Integer index = playerIndexMap.get(key);
-            if (index == null) {
-                playerIndexMap.put(key, i);
-                e.onNext(String.valueOf(key));
-            }
+            addIndex(e, key, i);
         }
+        endCreate(mList.size() - 1);
     }
 
     public void createCareerWinIndex(ObservableEmitter<String> e, List<RichPlayerBean> mList) {
@@ -439,12 +445,9 @@ public class IndexEmitter {
             else {
                 key = "50-";
             }
-            Integer index = playerIndexMap.get(key);
-            if (index == null) {
-                playerIndexMap.put(key, i);
-                e.onNext(String.valueOf(key));
-            }
+            addIndex(e, key, i);
         }
+        endCreate(mList.size() - 1);
     }
 
     public void createTurnedProIndex(ObservableEmitter<String> e, List<RichPlayerBean> mList) {
@@ -469,12 +472,9 @@ public class IndexEmitter {
             else {
                 key = String.valueOf(time);
             }
-            Integer index = playerIndexMap.get(key);
-            if (index == null) {
-                playerIndexMap.put(key, i);
-                e.onNext(String.valueOf(key));
-            }
+            addIndex(e, key, i);
         }
+        endCreate(mList.size() - 1);
     }
 
 }

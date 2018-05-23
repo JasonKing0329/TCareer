@@ -26,13 +26,9 @@ import java.util.List;
 import java.util.Map;
 
 import io.reactivex.Observable;
-import io.reactivex.ObservableEmitter;
-import io.reactivex.ObservableOnSubscribe;
-import io.reactivex.ObservableSource;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 
 /**
@@ -218,7 +214,7 @@ public class RichPlayerPresenter extends PlayerAtpPresenter<RichPlayerView> {
     }
 
     public int getLetterPosition(String letter) {
-        return indexEmitter.getPlayerIndexMap().get(letter);
+        return indexEmitter.getPlayerIndexMap().get(letter).start;
     }
 
     public void sortPlayer(final int sortType) {
@@ -521,5 +517,9 @@ public class RichPlayerPresenter extends PlayerAtpPresenter<RichPlayerView> {
 
     public Map<Long, Boolean> getExpandMap() {
         return mExpandMap;
+    }
+
+    public String getItemIndex(int position) {
+        return indexEmitter.getIndex(position);
     }
 }

@@ -13,4 +13,6 @@ public interface RichPlayerHolder extends IFragmentHolder {
     void onSelectPlayer(CompetitorBean bean);
 
     void onSortFinished();
+
+    void updateFirstIndex(String index);
 }

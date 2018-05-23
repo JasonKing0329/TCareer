@@ -38,6 +38,8 @@ public class PlayerManageActivity extends BaseMvpActivity<PlayerManagePresenter>
     JActionbar actionbar;
     @BindView(R.id.tv_sort)
     TextView tvSort;
+    @BindView(R.id.tv_sort_value)
+    TextView tvSortValue;
     @BindView(R.id.iv_sidebar)
     ImageView ivSidebar;
 
@@ -312,4 +314,8 @@ public class PlayerManageActivity extends BaseMvpActivity<PlayerManagePresenter>
         super.onBackPressed();
     }
 
+    @Override
+    public void updateFirstIndex(String index) {
+        tvSortValue.setText(index);
+    }
 }
