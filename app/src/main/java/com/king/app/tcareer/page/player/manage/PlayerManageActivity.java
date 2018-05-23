@@ -13,6 +13,8 @@ import com.king.app.tcareer.R;
 import com.king.app.tcareer.base.BaseMvpActivity;
 import com.king.app.tcareer.model.bean.CompetitorBean;
 import com.king.app.tcareer.model.db.entity.User;
+import com.king.app.tcareer.page.player.list.RichFilterBean;
+import com.king.app.tcareer.page.player.list.RichPlayerFilterDialog;
 import com.king.app.tcareer.page.player.list.RichPlayerFragment;
 import com.king.app.tcareer.page.player.list.RichPlayerHolder;
 import com.king.app.tcareer.page.setting.SettingProperty;
@@ -83,6 +85,9 @@ public class PlayerManageActivity extends BaseMvpActivity<PlayerManagePresenter>
         actionbar.setOnBackListener(() -> onBackPressed());
         actionbar.setOnMenuItemListener(menuId -> {
             switch (menuId) {
+                case R.id.menu_manage_filter:
+                    openFilterDialog();
+                    break;
                 case R.id.menu_manage_count:
                     showChartDialog();
                     break;
@@ -154,6 +159,12 @@ public class PlayerManageActivity extends BaseMvpActivity<PlayerManagePresenter>
             return popupMenu;
         });
         actionbar.setOnSearchListener(words -> ftRich.filter(words));
+    }
+
+    private void openFilterDialog() {
+        RichPlayerFilterDialog dialog = new RichPlayerFilterDialog();
+        dialog.setOnFilterListener(bean -> ftRich.filterPlayer(bean));
+        dialog.show(getSupportFragmentManager(), "RichPlayerFilterDialog");
     }
 
     @Override

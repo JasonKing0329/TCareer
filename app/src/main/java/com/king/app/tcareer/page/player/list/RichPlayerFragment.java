@@ -119,6 +119,10 @@ public class RichPlayerFragment extends BaseMvpFragment<RichPlayerPresenter> imp
         }
     }
 
+    public void filterPlayer(RichFilterBean bean) {
+        presenter.filter(bean);
+    }
+
     private class RecyclerViewListener extends RecyclerView.OnScrollListener {
         @Override
         public void onScrolled(RecyclerView recyclerView, int dx, int dy) {

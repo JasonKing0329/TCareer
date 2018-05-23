@@ -1,7 +1,6 @@
 package com.king.app.tcareer.page.player.list;
 
 import android.text.TextUtils;
-import android.util.SparseBooleanArray;
 import android.view.Gravity;
 import android.view.View;
 
@@ -11,12 +10,14 @@ import com.king.app.tcareer.model.PlayerComparator;
 import com.king.app.tcareer.model.bean.CompetitorBean;
 import com.king.app.tcareer.model.bean.H2hBean;
 import com.king.app.tcareer.model.dao.H2HDao;
+import com.king.app.tcareer.model.db.entity.PlayerAtpBean;
 import com.king.app.tcareer.model.db.entity.PlayerBean;
 import com.king.app.tcareer.model.db.entity.PlayerBeanDao;
 import com.king.app.tcareer.model.db.entity.User;
 import com.king.app.tcareer.model.db.entity.UserDao;
 import com.king.app.tcareer.page.player.atp.PlayerAtpPresenter;
 import com.king.app.tcareer.page.setting.SettingProperty;
+import com.king.app.tcareer.utils.ConstellationUtil;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -25,13 +26,17 @@ import java.util.List;
 import java.util.Map;
 
 import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.ObservableSource;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 
 /**
- * @desc
+ * @desc user永远不参与sort, filter
  * @auth 景阳
  * @time 2018/5/19 0019 15:36
  */
@@ -320,22 +325,80 @@ public class RichPlayerPresenter extends PlayerAtpPresenter<RichPlayerView> {
         return mList;
     }
 
+    /**
+     * filter by inputted text
+     * @param text
+     */
     public void filter(String text) {
         if (!text.equals(mKeyword)) {
+            filterObservable(filterByText(text));
+        }
+    }
+
+    /**
+     * filter by filter bean
+     * @param bean
+     */
+    public void filter(RichFilterBean bean) {
+        filterObservable(filterByBean(bean));
+    }
+
+    private void filterObservable(Observable<Boolean> observable) {
+        view.showLoading();
+        view.getSidebar().clear();
+        observable
+                .flatMap(aBoolean -> createIndexes())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(new Observer<String>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                        addDisposable(d);
+                    }
+
+                    @Override
+                    public void onNext(String index) {
+                        view.getSidebar().addIndex(index);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        e.printStackTrace();
+                        view.dismissLoading();
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        view.dismissLoading();
+                        view.showPlayers(mList);
+                        view.getSidebar().build();
+                    }
+                });
+    }
+
+    private Observable<Boolean> filterByText(String text) {
+        return Observable.create(e -> {
             mList.clear();
             mKeyword = text;
             for (int i = 0; i < mFullList.size(); i ++) {
-                if (TextUtils.isEmpty(text)) {
+                // 只对competitor进行filter
+                if (mFullList.get(i).getCompetitorBean() instanceof User) {
                     mList.add(mFullList.get(i));
                 }
                 else {
-                    if (isMatchForKeyword(mFullList.get(i), text)) {
+                    if (TextUtils.isEmpty(text)) {
                         mList.add(mFullList.get(i));
+                    }
+                    else {
+                        if (isMatchForKeyword(mFullList.get(i), text)) {
+                            mList.add(mFullList.get(i));
+                        }
                     }
                 }
             }
-            view.showPlayers(mList);
-        }
+            e.onNext(true);
+            e.onComplete();
+        });
     }
 
     private boolean isMatchForKeyword(RichPlayerBean bean, String text) {
@@ -350,6 +413,93 @@ public class RichPlayerPresenter extends PlayerAtpPresenter<RichPlayerView> {
             return true;
         }
         return false;
+    }
+
+    private Observable<Boolean> filterByBean(RichFilterBean bean) {
+        return Observable.create(e -> {
+            mList.clear();
+            for (int i = 0; i < mFullList.size(); i ++) {
+                // 只对competitor进行filter
+                if (mFullList.get(i).getCompetitorBean() instanceof PlayerBean) {
+                    if (!checkForehand(mFullList.get(i), bean.getForehand())) {
+                        continue;
+                    }
+                    if (!checkBackhand(mFullList.get(i), bean.getBackhand())) {
+                        continue;
+                    }
+                    if (!checkSign(mFullList.get(i), bean.getSign())) {
+                        continue;
+                    }
+                    if (!checkCountry(mFullList.get(i), bean.getCountry())) {
+                        continue;
+                    }
+                }
+                mList.add(mFullList.get(i));
+            }
+            e.onNext(true);
+            e.onComplete();
+        });
+    }
+
+    private boolean checkForehand(RichPlayerBean bean, int forehand) {
+        PlayerAtpBean atpBean = bean.getCompetitorBean().getAtpBean();
+        switch (forehand) {
+            // left hand
+            case 1:
+                return atpBean != null && atpBean.getPlays().startsWith("Left-Handed");
+            // right hand
+            case 2:
+                return atpBean != null && atpBean.getPlays().startsWith("Right-Handed");
+            default:
+                return true;
+        }
+    }
+
+    private boolean checkBackhand(RichPlayerBean bean, int forehand) {
+        PlayerAtpBean atpBean = bean.getCompetitorBean().getAtpBean();
+        switch (forehand) {
+            // left hand
+            case 1:
+                return atpBean != null && atpBean.getPlays().contains("One-Handed");
+            // right hand
+            case 2:
+                return atpBean != null && atpBean.getPlays().contains("Two-Handed");
+            default:
+                return true;
+        }
+    }
+
+    private boolean checkSign(RichPlayerBean bean, String sign) {
+        if ("All".equals(sign)) {
+            return true;
+        }
+        PlayerAtpBean atpBean = bean.getCompetitorBean().getAtpBean();
+        String birthday;
+        if (atpBean != null && !TextUtils.isEmpty(atpBean.getBirthday())) {
+            birthday = atpBean.getBirthday();
+        }
+        else {
+            birthday = bean.getCompetitorBean().getBirthday();
+        }
+        try {
+            return sign.equals(ConstellationUtil.getConstellationEng(birthday));
+        } catch (Exception e) {}
+        return false;
+    }
+
+    private boolean checkCountry(RichPlayerBean bean, String country) {
+        if ("All".equals(country)) {
+            return true;
+        }
+        PlayerAtpBean atpBean = bean.getCompetitorBean().getAtpBean();
+        String beanCountry;
+        if (atpBean != null && !TextUtils.isEmpty(atpBean.getBirthCountry())) {
+            beanCountry = atpBean.getBirthCountry();
+        }
+        else {
+            beanCountry = bean.getCompetitorBean().getCountry();
+        }
+        return country.equals(beanCountry);
     }
 
     public void setExpandAll(boolean expandAll) {
