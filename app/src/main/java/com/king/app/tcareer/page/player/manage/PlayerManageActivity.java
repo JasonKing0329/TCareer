@@ -1,5 +1,6 @@
 package com.king.app.tcareer.page.player.manage;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.view.View;
@@ -18,6 +19,7 @@ import com.king.app.tcareer.page.player.list.RichPlayerFilterDialog;
 import com.king.app.tcareer.page.player.list.RichPlayerFragment;
 import com.king.app.tcareer.page.player.list.RichPlayerHolder;
 import com.king.app.tcareer.page.setting.SettingProperty;
+import com.king.app.tcareer.view.dialog.AlertDialogFragment;
 
 import butterknife.BindView;
 
@@ -40,6 +42,8 @@ public class PlayerManageActivity extends BaseMvpActivity<PlayerManagePresenter>
     TextView tvSort;
     @BindView(R.id.tv_sort_value)
     TextView tvSortValue;
+    @BindView(R.id.tv_user)
+    TextView tvUser;
     @BindView(R.id.iv_sidebar)
     ImageView ivSidebar;
 
@@ -63,6 +67,8 @@ public class PlayerManageActivity extends BaseMvpActivity<PlayerManagePresenter>
         }
 
         initActionbar();
+
+        tvUser.setOnClickListener(v -> chooseUser());
 
         ftRich = new RichPlayerFragment();
         ftRich.setSelectPlayerMode(isSelectMode);
@@ -167,6 +173,22 @@ public class PlayerManageActivity extends BaseMvpActivity<PlayerManagePresenter>
         RichPlayerFilterDialog dialog = new RichPlayerFilterDialog();
         dialog.setOnFilterListener(bean -> ftRich.filterPlayer(bean));
         dialog.show(getSupportFragmentManager(), "RichPlayerFilterDialog");
+    }
+
+    private void chooseUser() {
+        new AlertDialogFragment()
+                .setItems(presenter.getUserSelector(), (dialog, which) -> onUserChanged(which))
+                .show(getSupportFragmentManager(), "AlertDialogFragment");
+    }
+
+    private void onUserChanged(int position) {
+        if (position == 0) {
+            tvUser.setText("All users");
+        }
+        else {
+            tvUser.setText(presenter.getUser(position).getNameEng());
+        }
+        ftRich.setUser(presenter.getUser(position));
     }
 
     @Override

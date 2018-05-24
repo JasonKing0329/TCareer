@@ -130,7 +130,20 @@ public class RichPlayerAdapter extends BaseRecyclerAdapter<RichPlayerAdapter.Pla
                 Color.parseColor("#efefef"):Color.WHITE);
 
         holder.tvName.setText(bean.getNameEng());
-        holder.tvH2h.setText(list.get(position).getWin() + "-" + list.get(position).getLose());
+        holder.tvWin.setText(String.valueOf(list.get(position).getWin()));
+        holder.tvLose.setText(String.valueOf(list.get(position).getLose()));
+        if (list.get(position).getWin() > list.get(position).getLose()) {
+            holder.tvWin.setTextColor(holder.tvWin.getResources().getColor(R.color.h2hlist_color_win));
+            holder.tvLose.setTextColor(holder.tvWin.getResources().getColor(R.color.h2hlist_color_lose));
+        }
+        else if (list.get(position).getWin() < list.get(position).getLose()) {
+            holder.tvLose.setTextColor(holder.tvWin.getResources().getColor(R.color.h2hlist_color_win));
+            holder.tvWin.setTextColor(holder.tvWin.getResources().getColor(R.color.h2hlist_color_lose));
+        }
+        else {
+            holder.tvWin.setTextColor(holder.tvWin.getResources().getColor(R.color.h2hlist_color_tie));
+            holder.tvLose.setTextColor(holder.tvWin.getResources().getColor(R.color.h2hlist_color_tie));
+        }
         boolean hasAtpDetail = (atpBean != null && atpBean.getLastUpdateDate() > 0);
         if (hasAtpDetail) {
             // basic
@@ -329,8 +342,10 @@ public class RichPlayerAdapter extends BaseRecyclerAdapter<RichPlayerAdapter.Pla
         TextView tvIndex;
         @BindView(R.id.tv_name)
         TextView tvName;
-        @BindView(R.id.tv_h2h)
-        TextView tvH2h;
+        @BindView(R.id.tv_win)
+        TextView tvWin;
+        @BindView(R.id.tv_lose)
+        TextView tvLose;
         @BindView(R.id.tv_place)
         TextView tvPlace;
         @BindView(R.id.tv_birthday)

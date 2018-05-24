@@ -279,4 +279,9 @@ public class RichPlayerFragment extends BaseMvpFragment<RichPlayerPresenter> imp
         presenter.setExpandAll(expand);
         adapter.notifyDataSetChanged();
     }
+
+    public void setUser(User user) {
+        presenter.onUserChanged(user);
+    }
+
 }

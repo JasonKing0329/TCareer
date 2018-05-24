@@ -53,6 +53,8 @@ public class RichPlayerPresenter extends PlayerAtpPresenter<RichPlayerView> {
 
     private Map<Long, Boolean> mExpandMap;
 
+    private User mUser;
+
     public RichPlayerPresenter() {
         sortType = SettingProperty.getPlayerSortMode();
         indexEmitter = new IndexEmitter();
@@ -61,6 +63,7 @@ public class RichPlayerPresenter extends PlayerAtpPresenter<RichPlayerView> {
 
     public void loadPlayers() {
         view.showLoading();
+        view.getSidebar().clear();
         updateSidebarGravity();
         Observable.combineLatest(queryUsers(), queryPlayers()
                 , (users, players) -> {
@@ -130,13 +133,22 @@ public class RichPlayerPresenter extends PlayerAtpPresenter<RichPlayerView> {
                 RichPlayerBean viewBean = new RichPlayerBean();
                 viewBean.setCompetitorBean(user);
 
-                H2hBean h2hK = h2hDao.getH2h(AppConstants.USER_ID_KING, user.getId(), true);
-                H2hBean h2hF = h2hDao.getH2h(AppConstants.USER_ID_FLAMENCO, user.getId(), true);
-                H2hBean h2hH = h2hDao.getH2h(AppConstants.USER_ID_HENRY, user.getId(), true);
-                H2hBean h2hQ = h2hDao.getH2h(AppConstants.USER_ID_QI, user.getId(), true);
+                // search data of all users
+                if (mUser == null) {
+                    H2hBean h2hK = h2hDao.getH2h(AppConstants.USER_ID_KING, user.getId(), true);
+                    H2hBean h2hF = h2hDao.getH2h(AppConstants.USER_ID_FLAMENCO, user.getId(), true);
+                    H2hBean h2hH = h2hDao.getH2h(AppConstants.USER_ID_HENRY, user.getId(), true);
+                    H2hBean h2hQ = h2hDao.getH2h(AppConstants.USER_ID_QI, user.getId(), true);
 
-                viewBean.setWin(h2hK.getWin() + h2hF.getWin() + h2hH.getWin() + h2hQ.getWin());
-                viewBean.setLose(h2hK.getLose() + h2hF.getLose() + h2hH.getLose() + h2hQ.getLose());
+                    viewBean.setWin(h2hK.getWin() + h2hF.getWin() + h2hH.getWin() + h2hQ.getWin());
+                    viewBean.setLose(h2hK.getLose() + h2hF.getLose() + h2hH.getLose() + h2hQ.getLose());
+                }
+                // only search data of current user
+                else {
+                    H2hBean h2h = h2hDao.getH2h(mUser.getId(), user.getId(), true);
+                    viewBean.setWin(h2h.getWin());
+                    viewBean.setLose(h2h.getLose());
+                }
 
                 list.add(viewBean);
             }
@@ -156,12 +168,21 @@ public class RichPlayerPresenter extends PlayerAtpPresenter<RichPlayerView> {
                 RichPlayerBean viewBean = new RichPlayerBean();
                 viewBean.setCompetitorBean(player);
 
-                H2hBean h2hK = h2hDao.getH2h(AppConstants.USER_ID_KING, player.getId(), false);
-                H2hBean h2hF = h2hDao.getH2h(AppConstants.USER_ID_FLAMENCO, player.getId(), false);
-                H2hBean h2hH = h2hDao.getH2h(AppConstants.USER_ID_HENRY, player.getId(), false);
-                H2hBean h2hQ = h2hDao.getH2h(AppConstants.USER_ID_QI, player.getId(), false);
-                viewBean.setWin(h2hK.getWin() + h2hF.getWin() + h2hH.getWin() + h2hQ.getWin());
-                viewBean.setLose(h2hK.getLose() + h2hF.getLose() + h2hH.getLose() + h2hQ.getLose());
+                // search data of all users
+                if (mUser == null) {
+                    H2hBean h2hK = h2hDao.getH2h(AppConstants.USER_ID_KING, player.getId(), false);
+                    H2hBean h2hF = h2hDao.getH2h(AppConstants.USER_ID_FLAMENCO, player.getId(), false);
+                    H2hBean h2hH = h2hDao.getH2h(AppConstants.USER_ID_HENRY, player.getId(), false);
+                    H2hBean h2hQ = h2hDao.getH2h(AppConstants.USER_ID_QI, player.getId(), false);
+                    viewBean.setWin(h2hK.getWin() + h2hF.getWin() + h2hH.getWin() + h2hQ.getWin());
+                    viewBean.setLose(h2hK.getLose() + h2hF.getLose() + h2hH.getLose() + h2hQ.getLose());
+                }
+                // only search data of current user
+                else {
+                    H2hBean h2h = h2hDao.getH2h(mUser.getId(), player.getId(), false);
+                    viewBean.setWin(h2h.getWin());
+                    viewBean.setLose(h2h.getLose());
+                }
 
                 list.add(viewBean);
             }
@@ -521,5 +542,16 @@ public class RichPlayerPresenter extends PlayerAtpPresenter<RichPlayerView> {
 
     public String getItemIndex(int position) {
         return indexEmitter.getIndex(position);
+    }
+
+    /**
+     * h2h will be changed after user changed
+     * @param user
+     */
+    public void onUserChanged(User user) {
+        if (user != mUser) {
+            mUser = user;
+            loadPlayers();
+        }
     }
 }
