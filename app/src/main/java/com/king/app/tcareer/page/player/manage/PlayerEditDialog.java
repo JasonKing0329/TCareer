@@ -7,9 +7,11 @@ import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.king.app.tcareer.R;
+import com.king.app.tcareer.base.BaseView;
 import com.king.app.tcareer.base.IFragmentHolder;
 import com.king.app.tcareer.base.TApplication;
 import com.king.app.tcareer.model.bean.CompetitorBean;
@@ -75,7 +77,7 @@ public class PlayerEditDialog extends DraggableDialogFragment {
         this.customTitle = customTitle;
     }
 
-    public static class EditFragment extends ContentFragment {
+    public static class EditFragment extends ContentFragment implements PlayerEditView {
 
         private final int REQUEST_SELECT_ATP = 101;
 
@@ -93,6 +95,8 @@ public class PlayerEditDialog extends DraggableDialogFragment {
         TextView tvAtpId;
         @BindView(R.id.tv_atp_conclude)
         TextView tvAtpConclude;
+        @BindView(R.id.iv_update)
+        ImageView ivUpdate;
 
         private EditPresenter presenter;
 
@@ -115,6 +119,13 @@ public class PlayerEditDialog extends DraggableDialogFragment {
             ButterKnife.bind(this, view);
 
             presenter = new EditPresenter();
+            presenter.onAttach(this);
+
+            if (competitorBean != null) {
+                atpId = competitorBean.getAtpId();
+            }
+            ivUpdate.setVisibility(atpId == null ? View.GONE:View.VISIBLE);
+
             if (competitorBean != null) {
                 etName.setText(competitorBean.getNameChn());
                 etNameEng.setText(competitorBean.getNameEng());
@@ -128,6 +139,8 @@ public class PlayerEditDialog extends DraggableDialogFragment {
             }
             tvAtpId.setOnClickListener(v -> startActivityForResult(new Intent().setClass(getContext(), AtpManageActivity.class)
                 , REQUEST_SELECT_ATP));
+
+            ivUpdate.setOnClickListener(v -> presenter.updateAtpData(atpId));
         }
 
         private void updateByAtpBean(PlayerAtpBean atpBean) {
@@ -135,11 +148,15 @@ public class PlayerEditDialog extends DraggableDialogFragment {
             etNameEng.setText(atpBean.getName());
             StringBuffer buffer = new StringBuffer();
             buffer.append(atpBean.getOverViewUrl());
-            if (!TextUtils.isEmpty(atpBean.getBirthCountry())) {
+            // 更新过详细信息
+            if (atpBean.getLastUpdateDate() > 0) {
                 etCountry.setText(atpBean.getBirthCountry());
 
                 if (!TextUtils.isEmpty(atpBean.getBirthCity())) {
                     etCity.setText(atpBean.getBirthCity());
+                }
+                if (!TextUtils.isEmpty(atpBean.getBirthday())) {
+                    etBirthday.setText(atpBean.getBirthday());
                 }
 
                 buffer.append("\n").append("Residence: ");
@@ -153,6 +170,11 @@ public class PlayerEditDialog extends DraggableDialogFragment {
                 buffer.append("Career highest rank: ").append(atpBean.getCareerHighSingle()).append(", ").append(atpBean.getCareerHighSingleDate()).append("\n");
                 buffer.append("Year: ").append(atpBean.getYearWin()).append("-").append(atpBean.getYearLose()).append(", ").append(atpBean.getYearPrize()).append("\n");
                 buffer.append("Career: ").append(atpBean.getCareerWin()).append("-").append(atpBean.getCareerLose()).append(", ").append(atpBean.getCareerPrize()).append("\n");
+            }
+            else {
+                etCountry.setText("");
+                etCity.setText("");
+                etBirthday.setText("");
             }
             tvAtpConclude.setText(buffer.toString());
         }
@@ -231,6 +253,7 @@ public class PlayerEditDialog extends DraggableDialogFragment {
             if (requestCode == REQUEST_SELECT_ATP) {
                 if (resultCode == Activity.RESULT_OK) {
                     atpId = data.getStringExtra(AtpManageActivity.RESP_ATP_ID);
+                    ivUpdate.setVisibility(View.VISIBLE);
                     PlayerAtpBean bean = TApplication.getInstance().getDaoSession().getPlayerAtpBeanDao()
                             .queryBuilder()
                             .where(PlayerAtpBeanDao.Properties.Id.eq(atpId))
@@ -238,6 +261,34 @@ public class PlayerEditDialog extends DraggableDialogFragment {
                     updateByAtpBean(bean);
                 }
             }
+        }
+
+        /**
+         * 更新atp数据完成
+         * @param bean
+         */
+        @Override
+        public void onUpdateAtpCompleted(PlayerAtpBean bean) {
+            updateByAtpBean(bean);
+        }
+
+        @Override
+        public void showLoading() {
+            showProgress("loading");
+        }
+
+        @Override
+        public void dismissLoading() {
+            dismissProgress();
+        }
+
+        @Override
+        public void showConfirm(String message) {
+        }
+
+        @Override
+        public void showMessage(String message) {
+            showMessageShort(message);
         }
     }
 

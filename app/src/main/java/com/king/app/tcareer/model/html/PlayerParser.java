@@ -22,7 +22,7 @@ import io.reactivex.Observable;
  */
 public class PlayerParser extends AbsParser {
 
-    public Observable<Boolean> parse(final String atpId, final String url) {
+    public Observable<PlayerAtpBean> parse(final String atpId, final String url) {
         return Observable.create(e -> {
 
             PlayerAtpBeanDao dao = TApplication.getInstance().getDaoSession().getPlayerAtpBeanDao();
@@ -64,14 +64,20 @@ public class PlayerParser extends AbsParser {
             DebugLog.e("lbs:" + lbs + ", kg:" + kg);
             bean.setLbs(Double.parseDouble(lbs));
             kg = kg.split(" ")[0].substring(1);
-            bean.setKg(Double.parseDouble(kg));
+            // 实测有的球员这一项为空
+            if (!TextUtils.isEmpty(kg)) {
+                bean.setKg(Double.parseDouble(kg));
+            }
 
             String ft = tr1Tds.get(1).selectFirst("div.table-big-value-ft").text();
             String cm = tr1Tds.get(1).selectFirst("div.table-big-value-cm").text();
             DebugLog.e("ft:" + ft + ", cm:" + cm);
             bean.setFt(ft);
             cm = cm.split(" ")[0].substring(1);
-            bean.setCm(Double.parseDouble(cm));
+            // 实测有的球员这一项为空
+            if (!TextUtils.isEmpty(cm)) {
+                bean.setCm(Double.parseDouble(cm));
+            }
 
             Element tr2 = trs.get(2);
             String birthPlace = tr2.selectFirst("div.table-value").text();
@@ -164,7 +170,7 @@ public class PlayerParser extends AbsParser {
             dao.update(bean);
             dao.detach(bean);
 
-            e.onNext(true);
+            e.onNext(bean);
         });
     }
 

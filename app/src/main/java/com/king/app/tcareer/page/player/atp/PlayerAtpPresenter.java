@@ -9,13 +9,9 @@ import com.king.app.tcareer.model.html.PlayerParser;
 import com.king.app.tcareer.model.http.AtpWorldTourParams;
 
 import io.reactivex.Observable;
-import io.reactivex.ObservableEmitter;
-import io.reactivex.ObservableOnSubscribe;
-import io.reactivex.ObservableSource;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 
 /**
@@ -42,24 +38,19 @@ public class PlayerAtpPresenter<T extends BaseView> extends BasePresenter<T> {
         }
         view.showLoading();
         getPlayerAtpUrl(atpId)
-                .flatMap(new Function<String, ObservableSource<Boolean>>() {
-                    @Override
-                    public ObservableSource<Boolean> apply(String url) throws Exception {
-                        return new PlayerParser().parse(atpId, url);
-                    }
-                })
+                .flatMap(url -> new PlayerParser().parse(atpId, url))
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
-                .subscribe(new Observer<Boolean>() {
+                .subscribe(new Observer<PlayerAtpBean>() {
                     @Override
                     public void onSubscribe(Disposable d) {
                         addDisposable(d);
                     }
 
                     @Override
-                    public void onNext(Boolean aBoolean) {
+                    public void onNext(PlayerAtpBean bean) {
                         view.dismissLoading();
-                        onUpdateAtpCompleted();
+                        onUpdateAtpCompleted(bean);
                     }
 
                     @Override
@@ -77,27 +68,24 @@ public class PlayerAtpPresenter<T extends BaseView> extends BasePresenter<T> {
     }
 
     // 子类选择覆盖
-    protected void onUpdateAtpCompleted() {
+    protected void onUpdateAtpCompleted(PlayerAtpBean bean) {
         view.showMessage("更新完成");
     }
 
     private Observable<String> getPlayerAtpUrl(final String atpId) {
-        return Observable.create(new ObservableOnSubscribe<String>() {
-            @Override
-            public void subscribe(ObservableEmitter<String> e) throws Exception {
-                PlayerAtpBeanDao dao = TApplication.getInstance().getDaoSession().getPlayerAtpBeanDao();
-                PlayerAtpBean bean = dao.queryBuilder()
-                        .where(PlayerAtpBeanDao.Properties.Id.eq(atpId))
-                        .build().unique();
-                String url = AtpWorldTourParams.BASE_URL;
-                if (bean.getOverViewUrl().startsWith("/")) {
-                    url = url + bean.getOverViewUrl().substring(1);
-                }
-                else {
-                    url = url + bean.getOverViewUrl();
-                }
-                e.onNext(url);
+        return Observable.create(e -> {
+            PlayerAtpBeanDao dao = TApplication.getInstance().getDaoSession().getPlayerAtpBeanDao();
+            PlayerAtpBean bean = dao.queryBuilder()
+                    .where(PlayerAtpBeanDao.Properties.Id.eq(atpId))
+                    .build().unique();
+            String url = AtpWorldTourParams.BASE_URL;
+            if (bean.getOverViewUrl().startsWith("/")) {
+                url = url + bean.getOverViewUrl().substring(1);
             }
+            else {
+                url = url + bean.getOverViewUrl();
+            }
+            e.onNext(url);
         });
     }
 }

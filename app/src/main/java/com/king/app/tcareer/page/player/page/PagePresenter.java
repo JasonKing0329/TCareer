@@ -20,6 +20,7 @@ import com.king.app.tcareer.R;
 import com.king.app.tcareer.base.TApplication;
 import com.king.app.tcareer.model.ImageProvider;
 import com.king.app.tcareer.model.bean.CompetitorBean;
+import com.king.app.tcareer.model.db.entity.PlayerAtpBean;
 import com.king.app.tcareer.model.db.entity.PlayerBeanDao;
 import com.king.app.tcareer.model.db.entity.User;
 import com.king.app.tcareer.model.db.entity.UserDao;
@@ -681,8 +682,8 @@ public class PagePresenter extends PlayerAtpPresenter<IPageView> {
     }
 
     @Override
-    protected void onUpdateAtpCompleted() {
-        super.onUpdateAtpCompleted();
+    protected void onUpdateAtpCompleted(PlayerAtpBean bean) {
+        super.onUpdateAtpCompleted(bean);
         view.onUpdateAtpCompleted();
     }
 }

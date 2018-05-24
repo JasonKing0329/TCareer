@@ -203,10 +203,6 @@ public class AtpEditor extends DraggableDialogFragment {
             this.atpId = atpId;
         }
 
-        @OnClick(R.id.btn_connect)
-        public void onViewClicked() {
-        }
-
         public boolean onClickOk() {
             if (TextUtils.isEmpty(etId.getText().toString())) {
                 showMessageShort("ID不能为空");

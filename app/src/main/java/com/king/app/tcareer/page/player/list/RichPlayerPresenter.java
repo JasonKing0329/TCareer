@@ -272,8 +272,8 @@ public class RichPlayerPresenter extends PlayerAtpPresenter<RichPlayerView> {
     }
 
     @Override
-    protected void onUpdateAtpCompleted() {
-        super.onUpdateAtpCompleted();
+    protected void onUpdateAtpCompleted(PlayerAtpBean bean) {
+        super.onUpdateAtpCompleted(bean);
         view.onUpdateAtpCompleted(mOperationPosition);
     }
 
