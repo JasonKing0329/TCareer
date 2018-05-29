@@ -45,6 +45,7 @@ public class AtpManageAdapter extends BaseRecyclerAdapter<AtpManageAdapter.ItemH
 
     @Override
     public void onBindViewHolder(ItemHolder holder, int position) {
+        holder.tvNo.setText(String.valueOf(position + 1));
         holder.tvId.setText(list.get(position).getId());
         holder.tvName.setText(list.get(position).getName());
         holder.checkBox.setChecked(checkMap.get(position));
@@ -82,6 +83,8 @@ public class AtpManageAdapter extends BaseRecyclerAdapter<AtpManageAdapter.ItemH
 
         @BindView(R.id.tv_id)
         TextView tvId;
+        @BindView(R.id.tv_no)
+        TextView tvNo;
         @BindView(R.id.tv_name)
         TextView tvName;
         @BindView(R.id.checkBox)

@@ -137,8 +137,11 @@ public class PlayerEditDialog extends DraggableDialogFragment {
                     updateByAtpBean(competitorBean.getAtpBean());
                 }
             }
-            tvAtpId.setOnClickListener(v -> startActivityForResult(new Intent().setClass(getContext(), AtpManageActivity.class)
-                , REQUEST_SELECT_ATP));
+            tvAtpId.setOnClickListener(v -> {
+                Intent intent = new Intent().setClass(getContext(), AtpManageActivity.class);
+                intent.putExtra(AtpManageActivity.EXTRA_SELECT, true);
+                startActivityForResult(intent, REQUEST_SELECT_ATP);
+            });
 
             ivUpdate.setOnClickListener(v -> presenter.updateAtpData(atpId));
         }

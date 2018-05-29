@@ -14,6 +14,7 @@ import com.king.app.tcareer.R;
 import com.king.app.tcareer.base.BaseMvpActivity;
 import com.king.app.tcareer.model.bean.CompetitorBean;
 import com.king.app.tcareer.model.db.entity.User;
+import com.king.app.tcareer.page.player.atp.AtpManageActivity;
 import com.king.app.tcareer.page.player.list.RichFilterBean;
 import com.king.app.tcareer.page.player.list.RichPlayerFilterDialog;
 import com.king.app.tcareer.page.player.list.RichPlayerFragment;
@@ -116,9 +117,8 @@ public class PlayerManageActivity extends BaseMvpActivity<PlayerManagePresenter>
                 case R.id.menu_manage_collapse:
                     ftRich.setExpandAll(false);
                     break;
-                case R.id.menu_manage_fetch:
-                    showConfirmCancelMessage("是否重新从网络获取数据？"
-                            , (dialogInterface, i) -> presenter.fetchData(), null);
+                case R.id.menu_manage_atp:
+                    startActivity(new Intent().setClass(PlayerManageActivity.this, AtpManageActivity.class));
                     break;
             }
         });

@@ -32,8 +32,8 @@
         android:icon="@drawable/ic_pie_chart_white_24dp"
         app:showAsAction="ifRoom" />
     <item
-        android:id="@+id/menu_manage_fetch"
-        android:title="Fetch data"
+        android:id="@+id/menu_manage_atp"
+        android:title="Atp world tour"
         app:showAsAction="never" />
     <item
         android:id="@+id/menu_manage_expand"

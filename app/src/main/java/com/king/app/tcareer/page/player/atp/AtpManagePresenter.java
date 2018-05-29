@@ -114,4 +114,11 @@ public class AtpManagePresenter extends PlayerAtpPresenter<AtpManageView> {
         dao.deleteInTx(list);
         dao.detachAll();
     }
+
+    @Override
+    protected void onFetchCompleted() {
+        super.onFetchCompleted();
+        // refresh data
+        loadData();
+    }
 }
