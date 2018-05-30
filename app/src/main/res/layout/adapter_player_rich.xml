@@ -13,18 +13,18 @@
 
         <ImageView
             android:id="@+id/iv_player"
-            android:layout_width="146dp"
-            android:layout_height="90dp"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
             android:scaleType="centerCrop"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/view7_folder_cover_player" />
+            app:srcCompat="@drawable/ic_def_player_head" />
 
         <TextView
             android:id="@+id/tv_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
+            android:layout_marginStart="12dp"
             android:layout_marginTop="4dp"
             android:text="Philipe Koholscriber"
             android:textColor="#3c3c3c"
@@ -36,7 +36,8 @@
             android:id="@+id/tv_place"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="2dp"
+            android:layout_marginStart="6dp"
+            android:layout_marginTop="3dp"
             android:gravity="center_vertical"
             android:drawableLeft="@drawable/ic_location_on_999999_24dp"
             android:text="California, America"
@@ -49,7 +50,8 @@
             android:id="@+id/tv_birthday"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="3dp"
             android:text="29, 1988-05-22, 天秤座"
             android:textColor="#666666"
             android:textSize="12dp"
@@ -60,7 +62,8 @@
             android:id="@+id/tv_body"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginStart="12dp"
             android:text="科赫尔斯奇雷伯, 185cm, 79kg"
             android:textColor="#666666"
             android:textSize="12dp"
@@ -79,9 +82,10 @@
 
         <TextView
             android:id="@+id/tv_lose"
-            android:layout_width="wrap_content"
+            android:gravity="center"
+            android:layout_width="30dp"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
+            android:layout_marginEnd="5dp"
             android:text="15"
             android:textStyle="bold"
             android:textColor="@color/h2hlist_color_lose"
@@ -91,7 +95,8 @@
 
         <TextView
             android:id="@+id/tv_win"
-            android:layout_width="wrap_content"
+            android:gravity="center"
+            android:layout_width="30dp"
             android:layout_height="wrap_content"
             android:layout_marginEnd="10dp"
             android:text="29"

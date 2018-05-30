@@ -109,10 +109,10 @@ public class RichPlayerAdapter extends BaseRecyclerAdapter<RichPlayerAdapter.Pla
     protected String getPlayerPath(int position) {
         String filePath;
         if (playerImageIndexMap.get(list.get(position).getCompetitorBean().getNameChn()) == null) {
-            filePath = ImageProvider.getDetailPlayerPath(list.get(position).getCompetitorBean().getNameChn(), playerImageIndexMap);
+            filePath = ImageProvider.getPlayerHeadPath(list.get(position).getCompetitorBean().getNameChn(), playerImageIndexMap);
         }
         else {
-            filePath = ImageProvider.getDetailPlayerPath(list.get(position).getCompetitorBean().getNameChn()
+            filePath = ImageProvider.getPlayerHeadPath(list.get(position).getCompetitorBean().getNameChn()
                     , playerImageIndexMap.get(list.get(position).getCompetitorBean().getNameChn()));
         }
         return filePath;

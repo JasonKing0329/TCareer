@@ -7,10 +7,12 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.king.app.tcareer.R;
 import com.king.app.tcareer.base.BaseMvpFragment;
 import com.king.app.tcareer.base.IFragmentHolder;
-import com.king.app.tcareer.model.FlagProvider;
+import com.king.app.tcareer.model.GlideOptions;
+import com.king.app.tcareer.model.ImageProvider;
 import com.king.app.tcareer.model.db.entity.User;
 import com.king.app.tcareer.page.score.IScorePageView;
 import com.king.app.tcareer.page.score.ScorePageData;
@@ -40,8 +42,6 @@ public class HomeHeadFragment extends BaseMvpFragment<ScorePresenter> implements
     TextView tvHeight;
     @BindView(R.id.tv_match_number)
     TextView tvMatchNumber;
-    @BindView(R.id.tv_player)
-    TextView tvPlayer;
     @BindView(R.id.tv_total)
     TextView tvTotal;
     @BindView(R.id.tv_rank)
@@ -69,12 +69,11 @@ public class HomeHeadFragment extends BaseMvpFragment<ScorePresenter> implements
 
     @Override
     protected int getContentLayoutRes() {
-        return R.layout.layout_player_basic;
+        return R.layout.fragment_home_head;
     }
 
     @Override
     protected void onCreate(View view) {
-        tvPlayer.setVisibility(View.INVISIBLE);
         ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) tvRank.getLayoutParams();
         params.bottomMargin = params.bottomMargin + ScreenUtils.dp2px(20);
     }
@@ -97,11 +96,16 @@ public class HomeHeadFragment extends BaseMvpFragment<ScorePresenter> implements
 
     @Override
     public void showUser(final User user) {
-        tvPlayer.setText(user.getNameEng());
         tvCountry.setText(user.getCountry());
         tvBirthday.setText(user.getBirthday());
         tvHeight.setText(user.getHeight() + "  " + FormatUtil.formatNumber(user.getWeight()) + "kg");
-        ivFlagBg.setImageResource(FlagProvider.getFlagRes(user.getCountry()));
+
+        String imagePath = ImageProvider.getDetailPlayerPath(user.getNameChn());
+        Glide.with(this)
+                .asBitmap()
+                .load(imagePath)
+                .apply(GlideOptions.getEditorPlayerOptions())
+                .into(ivFlagBg);
     }
 
     @Override

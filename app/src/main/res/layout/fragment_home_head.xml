@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:id="@+id/group_player_basic">
+    <ImageView
+        android:id="@+id/iv_flag_bg"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/player_basic_head_height"
+        android:src="@drawable/ic_def_player_head"
+        android:scaleType="fitXY"/>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/player_basic_head_height"
+        android:orientation="vertical"
+        android:background="@drawable/shape_atp_cover_rtl"
+        android:layout_alignParentRight="true"
+        android:paddingRight="15dp"
+        android:gravity="right">
+        <TextView
+            android:id="@+id/tv_country"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="China"
+            android:textSize="20dp"
+            android:textColor="#e9ffe4"
+            android:layout_marginTop="50dp"/>
+        <TextView
+            android:id="@+id/tv_birthday"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="1991.03.29"
+            android:textSize="20dp"
+            android:textColor="#e1ffff"
+            android:layout_marginTop="10dp"/>
+        <TextView
+            android:id="@+id/tv_height"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="188cm  79kg"
+            android:textSize="16dp"
+            android:textColor="#e6f7ff"
+            android:layout_marginTop="10dp"/>
+        <TextView
+            android:id="@+id/tv_match_number"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Match count  17"
+            android:textSize="17dp"
+            android:textColor="#dfdfdf"
+            android:layout_marginTop="10dp"/>
+    </LinearLayout>
+    <TextView
+        android:id="@+id/tv_rank"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@id/iv_flag_bg"
+        android:layout_marginLeft="30dp"
+        android:layout_marginBottom="40dp"
+        android:text="1"
+        android:textSize="35dp"
+        android:textColor="#3F51B5"
+        android:textStyle="bold"
+        android:shadowColor="#ffffff"
+        android:shadowRadius="3" />
+    <TextView
+        android:id="@+id/tv_total"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/tv_rank"
+        android:layout_alignBottom="@id/tv_rank"
+        android:layout_marginLeft="10dp"
+        android:text="13040"
+        android:textSize="14dp"
+        android:textColor="#7F51B5"
+        android:gravity="center_vertical"/>
+</RelativeLayout>

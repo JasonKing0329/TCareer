@@ -2,6 +2,7 @@ package com.king.app.tcareer.page.home;
 
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentStatePagerAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,7 +12,7 @@ import java.util.List;
  * <p/>作者：景阳
  * <p/>创建时间: 2017/11/14 15:40
  */
-public class HomeHeadAdapter extends FragmentPagerAdapter {
+public class HomeHeadAdapter extends FragmentStatePagerAdapter {
 
     private List<HomeHeadFragment> ftList;
 

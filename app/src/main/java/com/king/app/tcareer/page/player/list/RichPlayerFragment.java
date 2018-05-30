@@ -65,7 +65,7 @@ public class RichPlayerFragment extends BaseMvpFragment<RichPlayerPresenter> imp
             @Override
             public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
                 if (parent.getChildAdapterPosition(view) > 0) {
-                    outRect.top = ScreenUtils.dp2px(10);
+                    outRect.top = ScreenUtils.dp2px(5);
                 }
             }
         });
