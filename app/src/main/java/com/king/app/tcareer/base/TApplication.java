@@ -14,6 +14,7 @@ import com.king.app.tcareer.model.db.entity.PlayerBeanDao;
 import com.king.app.tcareer.model.db.entity.RankWeekDao;
 import com.king.app.tcareer.model.db.entity.UserDao;
 import com.king.app.tcareer.utils.DebugLog;
+import com.squareup.leakcanary.LeakCanary;
 
 import org.greenrobot.greendao.database.Database;
 import org.greenrobot.greendao.query.QueryBuilder;
@@ -55,6 +56,12 @@ public class TApplication extends Application {
 	public void onCreate() {
 		instance = this;
 		super.onCreate();
+		if (LeakCanary.isInAnalyzerProcess(this)) {
+			// This process is dedicated to LeakCanary for heap analysis.
+			// You should not init your app in this process.
+			return;
+		}
+		LeakCanary.install(this);
 	}
 
 	/**

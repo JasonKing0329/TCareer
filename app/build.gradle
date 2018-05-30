@@ -7,8 +7,8 @@ android {
         applicationId "com.king.app.tcareer"
         minSdkVersion 21
         targetSdkVersion 27
-        versionCode 77
-        versionName "3.3.1"
+        versionCode 78
+        versionName "3.3.2"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
         sourceSets.main {
@@ -98,6 +98,10 @@ dependencies {
 
     /*html解析*/
     implementation 'org.jsoup:jsoup:1.11.3'
+
+    /*leakcanary*/
+    debugImplementation 'com.squareup.leakcanary:leakcanary-android:1.5.4'
+    releaseImplementation 'com.squareup.leakcanary:leakcanary-android-no-op:1.5.4'
 
     implementation project(':MPChartLib')
     implementation project(':shapimageview')
