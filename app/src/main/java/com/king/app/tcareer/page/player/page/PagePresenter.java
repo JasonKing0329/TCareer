@@ -190,44 +190,36 @@ public class PagePresenter extends PlayerAtpPresenter<IPageView> {
     }
 
     public void loadTabs() {
-        Observable.create(new ObservableOnSubscribe<List<TabBean>>() {
-            @Override
-            public void subscribe(ObservableEmitter<List<TabBean>> e) throws Exception {
-                List<TabBean> list = subPageModel.createTabs(mUser, mCompetitor);
-                e.onNext(list);
-            }
+        Observable.create((ObservableOnSubscribe<List<TabBean>>) e -> {
+            List<TabBean> list = subPageModel.createTabs(mUser, mCompetitor);
+            e.onNext(list);
         }).observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
-                .subscribe(new Consumer<List<TabBean>>() {
-                    @Override
-                    public void accept(List<TabBean> list) throws Exception {
-                        view.onTabLoaded(list);
-                    }
-                }, new Consumer<Throwable>() {
-                    @Override
-                    public void accept(Throwable throwable) throws Exception {
-                        throwable.printStackTrace();
-                        view.showError("loadRecords error: " + throwable.getMessage());
-                    }
+                .subscribe(list -> view.onTabLoaded(list), throwable -> {
+                    throwable.printStackTrace();
+                    view.showError("loadRecords error: " + throwable.getMessage());
                 });
+    }
+
+    private Observable<PageData> createPageData(final PaletteResponse response) {
+        return Observable.combineLatest(getColorPack(response, 4), getFaceData(response), (colorPack, faceData) -> {
+            PageData data = new PageData();
+            data.faceData = faceData;
+            data.pack = colorPack;
+            if (response != null) {
+                // title bar适应的颜色
+                data.mainSwatch = getTitlebarSwatch(response.palette);
+            }
+            return data;
+        });
     }
 
     /**
      * 根据背景图片为各个UI空间设置合适的颜色
      * @param response
      */
-    public void handlePalette(final PaletteResponse response) {
-        Observable.combineLatest(getColorPack(response, 4), getFaceData(response), new BiFunction<ColorPack, FaceData, PageData>() {
-            @Override
-            public PageData apply(ColorPack colorPack, FaceData faceData) throws Exception {
-                PageData data = new PageData();
-                data.faceData = faceData;
-                data.pack = colorPack;
-                // title bar适应的颜色
-                data.mainSwatch = getTitlebarSwatch(response.palette);
-                return data;
-            }
-        })
+    public void handlePalette(PaletteResponse response) {
+        createPageData(response)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe(new Observer<PageData>() {
@@ -256,30 +248,33 @@ public class PagePresenter extends PlayerAtpPresenter<IPageView> {
 
     private void dispatchData(PageData data) {
 
-        // 修改titlebar的主色调（背景，文字颜色，图标颜色）
-        view.getCollapsingToolbar().setContentScrimColor(data.mainSwatch.getRgb());
-        view.getCollapsingToolbar().setCollapsedTitleTextColor(data.mainSwatch.getTitleTextColor());
-        // toolbar上的图标需要根据展开/折叠状态确定颜色，初始是展开状态
-        handleCollapseScrimChanged(false);
+        if (data.mainSwatch != null) {
+            // 修改titlebar的主色调（背景，文字颜色，图标颜色）
+            view.getCollapsingToolbar().setContentScrimColor(data.mainSwatch.getRgb());
+            view.getCollapsingToolbar().setCollapsedTitleTextColor(data.mainSwatch.getTitleTextColor());
+            // toolbar上的图标需要根据展开/折叠状态确定颜色，初始是展开状态
+            handleCollapseScrimChanged(false);
 
-        // 上次更新时间
-        view.getGroupAtp().setBackgroundColor(data.mainSwatch.getRgb());
-        view.getTvAtpTime().setTextColor(data.mainSwatch.getTitleTextColor());
+            // 上次更新时间
+            view.getGroupAtp().setBackgroundColor(data.mainSwatch.getRgb());
+            view.getTvAtpTime().setTextColor(data.mainSwatch.getTitleTextColor());
 
-        // 修改tab layout的相关颜色
-        view.getTabLayout().setBackgroundColor(data.mainSwatch.getRgb());
-        view.getTabLayout().setSelectedTabIndicatorColor(data.mainSwatch.getTitleTextColor());
-        // 使用了自定义布局，要单独设置
-//        view.getTabLayout().setTabTextColors(data.mainSwatch.getBodyTextColor(), data.mainSwatch.getTitleTextColor());
-        for (int i = 0; i < view.getTabLayout().getTabCount(); i ++) {
-            TabLayout.Tab tab = view.getTabLayout().getTabAt(i);
-            TabCustomView view = (TabCustomView) tab.getCustomView();
-            view.setTextColor(data.mainSwatch.getBodyTextColor(), data.mainSwatch.getTitleTextColor());
+            // 修改tab layout的相关颜色
+            view.getTabLayout().setBackgroundColor(data.mainSwatch.getRgb());
+            view.getTabLayout().setSelectedTabIndicatorColor(data.mainSwatch.getTitleTextColor());
+
+            // 使用了自定义布局，要单独设置
+//          view.getTabLayout().setTabTextColors(data.mainSwatch.getBodyTextColor(), data.mainSwatch.getTitleTextColor());
+            for (int i = 0; i < view.getTabLayout().getTabCount(); i ++) {
+                TabLayout.Tab tab = view.getTabLayout().getTabAt(i);
+                TabCustomView view = (TabCustomView) tab.getCustomView();
+                view.setTextColor(data.mainSwatch.getBodyTextColor(), data.mainSwatch.getTitleTextColor());
+            }
+            view.getTabLayout().invalidate();
+
         }
-        view.getTabLayout().invalidate();
 
-        // 修改信息标签的颜色（eng name, chn name, place, birthday）
-        ColorPack colorPack = data.pack;
+        // 确认主要信息标签的展示个数及文字
         TextView[] textViews;
 
         // 中文名和英文名相同就不显示中文名
@@ -307,8 +302,8 @@ public class PagePresenter extends PlayerAtpPresenter<IPageView> {
             };
         }
 
-        // 修改信息标签的位置（根据人脸位置，统一显示在左侧或右侧）
         isFaceInRight = true;
+        // 修改信息标签的位置（根据人脸位置，统一显示在左侧或右侧）
         int rule = RelativeLayout.ALIGN_PARENT_RIGHT;
         if (data.faceData != null && data.faceData.centerPoint != null) {
             // 人脸在右侧，则text在左侧
@@ -334,26 +329,31 @@ public class PagePresenter extends PlayerAtpPresenter<IPageView> {
             view.getGroupAtpCover().setBackgroundResource(R.drawable.shape_atp_cover_rtl);
         }
 
-        // 修改主要tag标签的颜色
-        for (int i = 0; i < textViews.length; i ++) {
-            textViews[i].setTextColor(colorPack.bodyColors.get(i));
-            GradientDrawable bg;
-            if (isFaceInRight) {
-                bg = (GradientDrawable) textViews[i].getResources().getDrawable(R.drawable.shape_tag_left);
-            }
-            else {
-                bg = (GradientDrawable) textViews[i].getResources().getDrawable(R.drawable.shape_tag_right);
-            }
-            bg.setColor(colorPack.rgbs.get(i));
-            textViews[i].setBackground(bg);
+        // 无图时根据是否有mainSwatch判断，pack和faceData肯定不为null
+        if (data.mainSwatch != null) {
+            // 修改信息标签的颜色（eng name, chn name, place, birthday）
+            ColorPack colorPack = data.pack;
+            // 修改主要tag标签的颜色
+            for (int i = 0; i < textViews.length; i ++) {
+                textViews[i].setTextColor(colorPack.bodyColors.get(i));
+                GradientDrawable bg;
+                if (isFaceInRight) {
+                    bg = (GradientDrawable) textViews[i].getResources().getDrawable(R.drawable.shape_tag_left);
+                }
+                else {
+                    bg = (GradientDrawable) textViews[i].getResources().getDrawable(R.drawable.shape_tag_right);
+                }
+                bg.setColor(colorPack.rgbs.get(i));
+                textViews[i].setBackground(bg);
 
-            // country标签，更改drawable颜色
-            if (textViews[i] == view.getCountryTextView()) {
-                Drawable drawable = view.getContext().getResources().getDrawable(R.drawable.ic_edit_location_white_24dp);
-                drawable.setBounds(0, 0, ScreenUtils.dp2px(20), ScreenUtils.dp2px(20));
-                // 替换原图颜色
-                drawable.setColorFilter(colorPack.bodyColors.get(i), PorterDuff.Mode.SRC_IN);
-                textViews[i].setCompoundDrawables(drawable, null, null, null);
+                // country标签，更改drawable颜色
+                if (textViews[i] == view.getCountryTextView()) {
+                    Drawable drawable = view.getContext().getResources().getDrawable(R.drawable.ic_edit_location_white_24dp);
+                    drawable.setBounds(0, 0, ScreenUtils.dp2px(20), ScreenUtils.dp2px(20));
+                    // 替换原图颜色
+                    drawable.setColorFilter(colorPack.bodyColors.get(i), PorterDuff.Mode.SRC_IN);
+                    textViews[i].setCompoundDrawables(drawable, null, null, null);
+                }
             }
         }
 
@@ -428,19 +428,23 @@ public class PagePresenter extends PlayerAtpPresenter<IPageView> {
      * @param isCollapsing
      */
     public void handleCollapseScrimChanged(boolean isCollapsing) {
-        // 折叠状态运用main swatch的getTitleTextColor
-        if (isCollapsing) {
-            // PorterDuff.Mode作用参考https://www.jianshu.com/p/d11892bbe055
-            // 这里用SRC_IN，第一个参数是source，表示source与原图像叠加后相交的部分运用source的颜色，如果是SRC_TOP则是叠加的情况，SRC则是source color充满整个view区域
-            view.getToolbar().getNavigationIcon().setColorFilter(mPageData.mainSwatch.getTitleTextColor(), PorterDuff.Mode.SRC_IN);
-            view.getToolbar().getOverflowIcon().setColorFilter(mPageData.mainSwatch.getTitleTextColor(), PorterDuff.Mode.SRC_IN);
-        }
-        // 展开状态运用图片区域颜色分析法得到的颜色
-        else {
-            ViewColorBound bound = findViewColorBound(mPageData.pack.colorBounds, view.getToolbar());
-            if (bound != null) {
-                view.getToolbar().getNavigationIcon().setColorFilter(bound.color, PorterDuff.Mode.SRC_IN);
-                view.getToolbar().getOverflowIcon().setColorFilter(bound.color, PorterDuff.Mode.SRC_IN);
+        if (mPageData != null) {
+            // 折叠状态运用main swatch的getTitleTextColor
+            if (isCollapsing) {
+                if (mPageData.mainSwatch != null) {
+                    // PorterDuff.Mode作用参考https://www.jianshu.com/p/d11892bbe055
+                    // 这里用SRC_IN，第一个参数是source，表示source与原图像叠加后相交的部分运用source的颜色，如果是SRC_TOP则是叠加的情况，SRC则是source color充满整个view区域
+                    view.getToolbar().getNavigationIcon().setColorFilter(mPageData.mainSwatch.getTitleTextColor(), PorterDuff.Mode.SRC_IN);
+                    view.getToolbar().getOverflowIcon().setColorFilter(mPageData.mainSwatch.getTitleTextColor(), PorterDuff.Mode.SRC_IN);
+                }
+            }
+            // 展开状态运用图片区域颜色分析法得到的颜色
+            else {
+                ViewColorBound bound = findViewColorBound(mPageData.pack.colorBounds, view.getToolbar());
+                if (bound != null) {
+                    view.getToolbar().getNavigationIcon().setColorFilter(bound.color, PorterDuff.Mode.SRC_IN);
+                    view.getToolbar().getOverflowIcon().setColorFilter(bound.color, PorterDuff.Mode.SRC_IN);
+                }
             }
         }
     }
@@ -513,7 +517,12 @@ public class PagePresenter extends PlayerAtpPresenter<IPageView> {
      * @return
      */
     private Observable<FaceData> getFaceData(final PaletteResponse response) {
-        return faceModel.createFaceData(response.resource);
+        if (response == null) {
+            return faceModel.createFaceData(null);
+        }
+        else {
+            return faceModel.createFaceData(response.resource);
+        }
     }
 
     /**
@@ -523,12 +532,11 @@ public class PagePresenter extends PlayerAtpPresenter<IPageView> {
      * @return
      */
     private Observable<ColorPack> getColorPack(final PaletteResponse response, final int colorNumber) {
-        return Observable.create(new ObservableOnSubscribe<ColorPack>() {
-            @Override
-            public void subscribe(ObservableEmitter<ColorPack> e) throws Exception {
-                ColorPack pack = new ColorPack();
-                pack.colorBounds = response.viewColorBounds;
+        return Observable.create(e -> {
+            ColorPack pack = new ColorPack();
+            if (response != null) {
                 int nTags = colorNumber;
+                pack.colorBounds = response.viewColorBounds;
                 if (response != null && response.palette != null && !ListUtil.isEmpty(response.palette.getSwatches())) {
                     List<Palette.Swatch> swatches = response.palette.getSwatches();
                     for (int i = 0; i < nTags; i++) {
@@ -546,8 +554,8 @@ public class PagePresenter extends PlayerAtpPresenter<IPageView> {
                         pack.bodyColors.add(view.getContext().getResources().getColor(R.color.white));
                     }
                 }
-                e.onNext(pack);
             }
+            e.onNext(pack);
         });
     }
 

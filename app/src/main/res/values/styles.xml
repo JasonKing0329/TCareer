@@ -337,6 +337,7 @@
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">30dp</item>
         <item name="android:textSize">14dp</item>
+        <item name="android:textColor">@color/white</item>
         <item name="android:gravity">center_vertical</item>
         <item name="android:background">@drawable/shape_tag_left</item>
         <item name="android:paddingLeft">10dp</item>

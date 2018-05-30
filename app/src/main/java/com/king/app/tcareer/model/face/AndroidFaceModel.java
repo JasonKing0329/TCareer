@@ -7,8 +7,6 @@ import android.media.FaceDetector;
 import com.king.app.tcareer.utils.DebugLog;
 
 import io.reactivex.Observable;
-import io.reactivex.ObservableEmitter;
-import io.reactivex.ObservableOnSubscribe;
 
 /**
  * 描述: android原生FaceDetector
@@ -18,11 +16,10 @@ import io.reactivex.ObservableOnSubscribe;
 public class AndroidFaceModel implements FaceModel {
     @Override
     public Observable<FaceData> createFaceData(final Bitmap source) {
-        return Observable.create(new ObservableOnSubscribe<FaceData>() {
-            @Override
-            public void subscribe(ObservableEmitter<FaceData> e) throws Exception {
-                long start = System.currentTimeMillis();
-                AndroidFaceData data = new AndroidFaceData();
+        return Observable.create(e -> {
+            long start = System.currentTimeMillis();
+            AndroidFaceData data = new AndroidFaceData();
+            if (source != null) {
                 Bitmap bitmap = getFaceBitmap(source);
                 FaceDetector detector = new FaceDetector(bitmap.getWidth(), bitmap.getHeight(), 1);
                 FaceDetector.Face[] faces = new FaceDetector.Face[1];
@@ -38,14 +35,9 @@ public class AndroidFaceModel implements FaceModel {
 
                 long end = System.currentTimeMillis();
                 DebugLog.e("cost time " + (end - start));
-                e.onNext(data);
             }
+            e.onNext(data);
         });
-    }
-
-    @Override
-    public Observable<FaceData> createFaceData(String filePath) {
-        return null;
     }
 
     @Override

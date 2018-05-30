@@ -11,6 +11,5 @@ import io.reactivex.Observable;
  */
 public interface FaceModel {
     Observable<FaceData> createFaceData(Bitmap bitmap);
-    Observable<FaceData> createFaceData(String filePath);
     void destroy();
 }

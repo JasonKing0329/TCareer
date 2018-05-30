@@ -148,27 +148,20 @@ public class PlayerPageActivity extends BaseMvpActivity<PagePresenter> implement
         toolbar.setOverflowIcon(getResources().getDrawable(R.drawable.ic_more_vert_white_24dp));
 //        toolbar.getNavigationIcon().setColorFilter(
 //                getResources().getColor(R.color.grey), PorterDuff.Mode.SRC_ATOP);
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
+        toolbar.setNavigationOnClickListener(v -> finish());
         collapsingToolbar.setExpandedTitleColor(getResources().getColor(R.color.transparent));
+        collapsingToolbar.setCollapsedTitleTextColor(getResources().getColor(R.color.white));
 
-        collapsingToolbar.post(new Runnable() {
-            @Override
-            public void run() {
-                // getScrimVisibleHeightTrigger里面用到了getHeight，要在控件布局完成后才有数值
-                int trigger = collapsingToolbar.getScrimVisibleHeightTrigger();
-                int total = getResources().getDimensionPixelSize(R.dimen.player_page_head_height);
-                appBarLayout.addOnOffsetChangedListener(new AppBarListener(total, trigger) {
-                    @Override
-                    protected void onCollapseStateChanged(boolean isCollapsing) {
-                        presenter.handleCollapseScrimChanged(isCollapsing);
-                    }
-                });
-            }
+        collapsingToolbar.post(() -> {
+            // getScrimVisibleHeightTrigger里面用到了getHeight，要在控件布局完成后才有数值
+            int trigger = collapsingToolbar.getScrimVisibleHeightTrigger();
+            int total = getResources().getDimensionPixelSize(R.dimen.player_page_head_height);
+            appBarLayout.addOnOffsetChangedListener(new AppBarListener(total, trigger) {
+                @Override
+                protected void onCollapseStateChanged(boolean isCollapsing) {
+                    presenter.handleCollapseScrimChanged(isCollapsing);
+                }
+            });
         });
 
         groupAtp.setVisibility(View.GONE);
@@ -228,27 +221,24 @@ public class PlayerPageActivity extends BaseMvpActivity<PagePresenter> implement
             case R.id.menu_tab_type:
                 String[] array = getResources().getStringArray(R.array.player_tab_type);
                 new AlertDialogFragment()
-                        .setItems(array, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                boolean isTypeChanged = false;
-                                switch (i) {
-                                    case 0:
-                                        isTypeChanged = presenter.updateTabType(PagePresenter.TAB_USER);
-                                        break;
-                                    case 1:
-                                        isTypeChanged = presenter.updateTabType(PagePresenter.TAB_COURT);
-                                        break;
-                                    case 2:
-                                        isTypeChanged = presenter.updateTabType(PagePresenter.TAB_LEVEL);
-                                        break;
-                                    case 3:
-                                        isTypeChanged = presenter.updateTabType(PagePresenter.TAB_YEAR);
-                                        break;
-                                }
-                                if (isTypeChanged) {
-                                    initPlayerAndUser();
-                                }
+                        .setItems(array, (dialogInterface, i) -> {
+                            boolean isTypeChanged = false;
+                            switch (i) {
+                                case 0:
+                                    isTypeChanged = presenter.updateTabType(PagePresenter.TAB_USER);
+                                    break;
+                                case 1:
+                                    isTypeChanged = presenter.updateTabType(PagePresenter.TAB_COURT);
+                                    break;
+                                case 2:
+                                    isTypeChanged = presenter.updateTabType(PagePresenter.TAB_LEVEL);
+                                    break;
+                                case 3:
+                                    isTypeChanged = presenter.updateTabType(PagePresenter.TAB_YEAR);
+                                    break;
+                            }
+                            if (isTypeChanged) {
+                                initPlayerAndUser();
                             }
                         })
                         .show(getSupportFragmentManager(), "AlertDialogFragment");
@@ -366,7 +356,8 @@ public class PlayerPageActivity extends BaseMvpActivity<PagePresenter> implement
 
                     @Override
                     public void noPaletteResponseLoaded(int position) {
-
+                        // 没有图片或加载失败
+                        presenter.handlePalette(null);
                     }
 
                     @Override
@@ -376,12 +367,7 @@ public class PlayerPageActivity extends BaseMvpActivity<PagePresenter> implement
                 }))
                 .into(ivPlayerBg);
 
-        ivPlayerBg.post(new Runnable() {
-            @Override
-            public void run() {
-                startRevealView(500);
-            }
-        });
+        ivPlayerBg.post(() -> startRevealView(500));
 
         if (!disableReloadFragments) {
             initFragments();
@@ -559,12 +545,9 @@ public class PlayerPageActivity extends BaseMvpActivity<PagePresenter> implement
         set.addAnimation(translate);
 
         if (delay > 0) {
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    view.setVisibility(View.VISIBLE);
-                    view.startAnimation(set);
-                }
+            new Handler().postDelayed(() -> {
+                view.setVisibility(View.VISIBLE);
+                view.startAnimation(set);
             }, delay);
         } else {
             view.setVisibility(View.VISIBLE);

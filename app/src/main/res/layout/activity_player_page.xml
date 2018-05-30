@@ -17,7 +17,7 @@
             android:id="@+id/collapsing_toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:contentScrim="@color/white"
+            app:contentScrim="@color/colorPrimary"
             app:expandedTitleGravity="center_horizontal|top"
             app:expandedTitleMarginTop="184dp"
             app:expandedTitleTextAppearance="@style/PlayerCollapsingText"
@@ -29,7 +29,8 @@
                 <ImageView
                     android:id="@+id/iv_player_bg"
                     android:layout_width="360dp"
-                    android:layout_height="@dimen/player_page_head_height" />
+                    android:layout_height="@dimen/player_page_head_height"
+                    android:scaleType="centerCrop"/>
 
                 <RelativeLayout
                     android:id="@+id/group_atp"
@@ -147,6 +148,7 @@
             android:id="@+id/tabLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@color/colorPrimary"
             app:tabSelectedTextColor="#FABF40"
             app:tabTextColor="#575757"
             app:tabIndicatorColor="#FABF40"/>

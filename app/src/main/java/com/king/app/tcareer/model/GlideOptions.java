@@ -21,7 +21,7 @@ public class GlideOptions {
     public static RequestOptions getDefaultPlayerOptions() {
         RequestOptions commonOptions = new RequestOptions();
         commonOptions.centerCrop();
-        commonOptions.error(R.drawable.pic_def);
+        commonOptions.error(R.drawable.ic_def_player_head);
         return commonOptions;
     }
 
@@ -35,7 +35,7 @@ public class GlideOptions {
     public static RequestOptions getEditorPlayerOptions() {
         RequestOptions commonOptions = new RequestOptions();
         commonOptions.centerCrop();
-        commonOptions.error(R.drawable.view7_folder_cover_player);
+        commonOptions.error(R.drawable.ic_def_player);
         return commonOptions;
     }
 
