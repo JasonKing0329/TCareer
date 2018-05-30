@@ -10,10 +10,12 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.github.mikephil.charting.charts.PieChart;
 import com.king.app.tcareer.R;
 import com.king.app.tcareer.base.BaseMvpActivity;
-import com.king.app.tcareer.model.FlagProvider;
+import com.king.app.tcareer.model.GlideOptions;
+import com.king.app.tcareer.model.ImageProvider;
 import com.king.app.tcareer.model.bean.H2hBean;
 import com.king.app.tcareer.model.db.entity.User;
 import com.king.app.tcareer.page.glory.chart.ChartManager;
@@ -161,12 +163,14 @@ public class H2hListActivity extends BaseMvpActivity<H2hPresenter> implements IH
 
     @Override
     public void postShowUser(final User user) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                ctlToolbar.setTitle(user.getNameChn());
-                ivHead.setImageResource(FlagProvider.getFlagRes(user.getCountry()));
-            }
+        runOnUiThread(() -> {
+            ctlToolbar.setTitle(user.getNameChn());
+            String imagePath = ImageProvider.getDetailPlayerPath(user.getNameChn());
+            Glide.with(this)
+                    .asBitmap()
+                    .load(imagePath)
+                    .apply(GlideOptions.getEditorPlayerOptions())
+                    .into(ivHead);
         });
     }
 

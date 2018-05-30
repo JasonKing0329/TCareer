@@ -69,12 +69,12 @@
             android:scaleType="centerCrop"/>
         <com.king.app.tcareer.view.widget.CircleImageView
             android:id="@+id/iv_user_head"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
             android:layout_marginRight="25dp"
             android:layout_alignParentRight="true"
             android:layout_marginTop="20dp"
-            android:src="@drawable/icon_list"
+            android:src="@drawable/ic_def_player_head"
             app:civ_border_width="1dp"
             app:civ_border_color="@color/white" />
         <LinearLayout
