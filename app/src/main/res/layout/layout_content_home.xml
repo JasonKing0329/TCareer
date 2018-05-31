@@ -19,7 +19,7 @@
                 android:id="@+id/iv_record_bk"
                 android:layout_width="match_parent"
                 android:layout_height="200dp"
-                app:siRadius="10dp"
+                app:siRadius="5dp"
                 android:scaleType="fitXY"
                 android:layout_marginLeft="20dp"
                 android:layout_marginRight="20dp"
@@ -51,72 +51,75 @@
             </LinearLayout>
         </RelativeLayout>
 
-        <RelativeLayout
-            android:id="@+id/group_player"
+        <LinearLayout
+            android:id="@+id/group_add"
             android:layout_width="match_parent"
-            android:layout_height="50dp"
+            android:layout_height="wrap_content"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
+            android:gravity="center"
             android:background="?android:attr/selectableItemBackground">
+            <ImageView
+                android:layout_width="165dp"
+                android:layout_height="120dp"
+                android:src="@drawable/pic_player"/>
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="20dp"
-                android:text="Players"
-                android:layout_centerVertical="true"
-                android:textColor="@color/colorPrimary"
-                android:textSize="24dp"/>
+                android:text="New record"
+                android:textSize="18dp"
+                android:textColor="@color/colorPrimary" />
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="Players"
+            android:textSize="18dp"
+            android:textColor="@color/colorPrimary"
+            android:layout_marginLeft="16dp"/>
+        <LinearLayout
+            android:id="@+id/group_player"
+            android:layout_width="match_parent"
+            android:layout_height="120dp"
+            android:layout_marginTop="5dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:background="?android:attr/selectableItemBackground">
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/rv_players"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="match_parent"
+                android:clipChildren="false"
+                android:overScrollMode="never"
+                app:cardWidth="120dp"
+                app:cardsGap="12dp"
+                app:layoutManager="com.king.app.tcareer.view.widget.cardslider.CardSliderLayoutManager"
+                app:viewUpdater="com.king.app.tcareer.page.player.slider.SlideUpdater"/>
             <ImageView
                 android:layout_width="20dp"
                 android:layout_height="20dp"
                 android:src="@drawable/arrow_expand_right"
                 android:scaleType="fitCenter"
-                android:layout_centerVertical="true"
-                android:layout_alignParentRight="true"
-                android:layout_marginRight="20dp"/>
-        </RelativeLayout>
-
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/rv_players"
-            android:layout_width="match_parent"
-            android:layout_height="120dp"
-            android:clipChildren="false"
-            android:overScrollMode="never"
-            app:cardWidth="120dp"
-            app:cardsGap="12dp"
-            app:layoutManager="com.king.app.tcareer.view.widget.cardslider.CardSliderLayoutManager"
-            app:viewUpdater="com.king.app.tcareer.page.player.slider.SlideUpdater"/>
-
-        <LinearLayout
-            android:id="@+id/group_add"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="10dp"
-            android:paddingTop="15dp"
-            android:paddingBottom="15dp"
-            android:orientation="vertical"
-            android:gravity="center"
-            android:transitionName="@string/anim_home_add"
-            android:background="?android:attr/selectableItemBackgroundBorderless" >
-            <ImageView
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:src="@drawable/ic_add"
-                android:scaleType="fitXY"/>
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:scaleType="fitXY"
-                android:text="Add new record"
-                android:textSize="18dp"
-                android:layout_marginTop="5dp"
-                android:textColor="@color/colorPrimary" />
+                android:layout_marginRight="20dp"
+                android:layout_marginLeft="10dp"/>
         </LinearLayout>
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="25dp"
+            android:text="Matches"
+            android:textSize="18dp"
+            android:textColor="@color/colorPrimary"
+            android:layout_marginLeft="16dp"/>
         <LinearLayout
             android:id="@+id/group_match"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="15dp"
+            android:layout_marginTop="5dp"
             android:orientation="vertical">
             <com.king.app.tcareer.view.widget.discrete.DiscreteScrollView
                 android:id="@+id/dsv_match"

@@ -102,7 +102,7 @@ public class HomeActivity extends BaseMvpActivity<HomePresenter> implements IHom
     @BindView(R.id.rv_players)
     RecyclerView rvPlayers;
     @BindView(R.id.group_add)
-    LinearLayout groupAdd;
+    ViewGroup groupAdd;
     @BindView(R.id.dsv_match)
     DiscreteScrollView dsvMatch;
     @BindView(R.id.group_glory)

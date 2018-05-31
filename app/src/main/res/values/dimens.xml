@@ -27,6 +27,7 @@
     <dimen name="margin_10">10dp</dimen>
     <dimen name="match_page_line_left">20dp</dimen>
     <dimen name="player_basic_head_height">200dp</dimen>
+    <dimen name="home_head_height">300dp</dimen>
     <dimen name="download_dlg_height">400dp</dimen>
     <dimen name="dlg_loadfrom_list_height">400dp</dimen>
     <dimen name="dialog_bg_selector_padding">10dp</dimen>

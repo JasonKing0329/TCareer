@@ -153,4 +153,12 @@ public class LoginActivity extends BaseMvpActivity<LoginPresenter> implements Lo
         startActivity(intent);
         finish();
     }
+
+    @Override
+    protected void onDestroy() {
+        if (fingerPrint != null) {
+            fingerPrint.destroy();
+        }
+        super.onDestroy();
+    }
 }

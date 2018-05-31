@@ -5,12 +5,12 @@
     <ImageView
         android:id="@+id/iv_flag_bg"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/player_basic_head_height"
+        android:layout_height="@dimen/home_head_height"
         android:src="@drawable/ic_def_player_head"
         android:scaleType="fitXY"/>
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="@dimen/player_basic_head_height"
+        android:layout_height="@dimen/home_head_height"
         android:orientation="vertical"
         android:background="@drawable/shape_atp_cover_rtl"
         android:layout_alignParentRight="true"
