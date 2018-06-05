@@ -126,4 +126,55 @@
         app:layout_constraintStart_toEndOf="@+id/tv_title_country"
         app:layout_constraintTop_toBottomOf="@+id/sp_signs" />
 
+    <TextView
+        android:id="@+id/tv_title_rank"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="16dp"
+        android:layout_marginTop="20dp"
+        android:text="Rank"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_title_country" />
+
+    <EditText
+        android:id="@+id/et_rank_low"
+        android:layout_width="80dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="36dp"
+        android:layout_marginTop="12dp"
+        android:ems="10"
+        android:hint="Low"
+        android:inputType="number"
+        android:gravity="center"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/sp_country" />
+
+    <EditText
+        android:id="@+id/et_rank_high"
+        android:layout_width="80dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:ems="10"
+        android:hint="High"
+        android:inputType="number"
+        android:gravity="center"
+        app:layout_constraintEnd_toStartOf="@+id/et_rank_low"
+        app:layout_constraintHorizontal_bias="0.787"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/tv_title_rank"
+        app:layout_constraintTop_toBottomOf="@+id/sp_country" />
+
+    <TextView
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:layout_marginEnd="24dp"
+        android:layout_marginStart="24dp"
+        android:text="注：Rank与其他条件互斥。除Rank外，所有条件取交集。"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
 </android.support.constraint.ConstraintLayout>

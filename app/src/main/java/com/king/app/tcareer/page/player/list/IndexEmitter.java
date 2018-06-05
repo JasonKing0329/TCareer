@@ -77,34 +77,123 @@ public class IndexEmitter {
         }
     }
 
-    public void createRecordsIndex(ObservableEmitter<String> e, List<RichPlayerBean> mList) {
-        // player list查询出来已经是升序的
+    private String getRecordsKey(RichPlayerBean bean, int type) {
+        int number;
+        String key;
+        switch (type) {
+            case 100:
+                number = bean.getWin() + bean.getLose();
+                key = getKeyByTotal(number);
+                break;
+            case 1:
+                number = bean.getWin();
+                key = getKeyBySingleTotal(number);
+                break;
+            case 2:
+                number = bean.getWin() - bean.getLose();
+                key = getKeyBySingleOdds(number);
+                break;
+            case 3:
+                number = bean.getLose();
+                key = getKeyBySingleTotal(number);
+                break;
+            case 4:
+                number = bean.getLose() - bean.getWin();
+                key = getKeyBySingleOdds(number);
+                break;
+            default:
+                number = bean.getWin() + bean.getLose();
+                key = getKeyBySingleTotal(number);
+                break;
+        }
+        return key;
+    }
+
+    private String getKeyByTotal(int number) {
+        String key;
+        if (number > 40) {
+            key = "40+";
+        } else if (number > 35 && number <= 40) {
+            key = "40";
+        } else if (number > 30 && number <= 35) {
+            key = "35";
+        } else if (number > 25 && number <= 30) {
+            key = "30";
+        } else if (number > 20 && number <= 25) {
+            key = "25";
+        } else if (number > 15 && number <= 20) {
+            key = "20";
+        } else if (number > 12 && number <= 15) {
+            key = "15";
+        } else if (number > 10 && number <= 12) {
+            key = "12";
+        } else {
+            key = String.valueOf(number);
+        }
+        return key;
+    }
+
+    private String getKeyBySingleTotal(int number) {
+        String key;
+        if (number > 30) {
+            key = "30+";
+        } else if (number > 20 && number <= 30) {
+            key = "30";
+        } else if (number > 15 && number <= 20) {
+            key = "20";
+        } else if (number > 10 && number <= 15) {
+            key = "15";
+        } else if (number > 5 && number <= 10) {
+            key = "10";
+        } else if (number > 3 && number <= 5) {
+            key = "5";
+        } else {
+            key = String.valueOf(number);
+        }
+        return key;
+    }
+
+    private String getKeyBySingleOdds(int number) {
+        String key;
+        if (number > 20) {
+            key = "20+";
+        } else if (number > 15 && number <= 20) {
+            key = "20";
+        } else if (number > 10 && number <= 15) {
+            key = "15";
+        } else if (number > 5 && number <= 10) {
+            key = "10";
+        } else if (number > 3 && number <= 5) {
+            key = "5";
+        } else if (number > 1 && number <= 3) {
+            key = "3";
+        } else if (number > 0 && number <= 1) {
+            key = "1";
+        } else if (number > -1 && number <= 0) {
+            key = "0";
+        } else if (number > -3 && number <= -1) {
+            key = "-1";
+        } else if (number > -5 && number <= -3) {
+            key = "-3";
+        } else if (number > -10 && number <= -5) {
+            key = "-5";
+        } else if (number > -15 && number <= -10) {
+            key = "-10";
+        } else if (number > -20 && number <= -15) {
+            key = "-15";
+        } else {
+            key = "-20+";
+        }
+        return key;
+    }
+
+    public void createRecordsIndex(ObservableEmitter<String> e, List<RichPlayerBean> mList, int type) {
+        // player list查询出来已经是有序的
         for (int i = 0; i < mList.size(); i ++) {
             if (mList.get(i).getCompetitorBean() instanceof User) {
                 continue;
             }
-            int number = mList.get(i).getWin() + mList.get(i).getLose();
-            //1 2 3 4 5 6 7 8 9 10 12 15 20 25 30 35 40 40+
-            String key;
-            if (number > 40) {
-                key = "40+";
-            } else if (number > 35 && number <= 40) {
-                key = "40";
-            } else if (number > 30 && number <= 35) {
-                key = "35";
-            } else if (number > 25 && number <= 30) {
-                key = "30";
-            } else if (number > 20 && number <= 25) {
-                key = "25";
-            } else if (number > 15 && number <= 20) {
-                key = "20";
-            } else if (number > 12 && number <= 15) {
-                key = "15";
-            } else if (number > 10 && number <= 12) {
-                key = "12";
-            } else {
-                key = String.valueOf(number);
-            }
+            String key = getRecordsKey(mList.get(i), type);
             addIndex(e, key, i);
         }
         endCreate(mList.size() - 1);

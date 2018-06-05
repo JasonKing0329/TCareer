@@ -56,6 +56,8 @@ public class RichPlayerAdapter extends BaseRecyclerAdapter<RichPlayerAdapter.Pla
 
     private boolean isSelectMode;
 
+    private int nIndexOffset;
+
     /**
      * 单击头像位置
      */
@@ -80,6 +82,17 @@ public class RichPlayerAdapter extends BaseRecyclerAdapter<RichPlayerAdapter.Pla
 
     public void setOnRichPlayerListener(OnRichPlayerListener onRichPlayerListener) {
         this.onRichPlayerListener = onRichPlayerListener;
+    }
+
+    @Override
+    public void setList(List<RichPlayerBean> list) {
+        super.setList(list);
+        nIndexOffset = 0;
+        for (int i = 0; i < getItemCount(); i ++) {
+            if (list.get(i).getCompetitorBean() instanceof User) {
+                nIndexOffset ++;
+            }
+        }
     }
 
     public void setSelectMode(boolean selectMode) {
@@ -123,8 +136,8 @@ public class RichPlayerAdapter extends BaseRecyclerAdapter<RichPlayerAdapter.Pla
         CompetitorBean bean = list.get(position).getCompetitorBean();
         PlayerAtpBean atpBean = bean.getAtpBean();
 
-        holder.tvIndex.setVisibility(bean instanceof User ? View.GONE:View.VISIBLE);
-        holder.tvIndex.setText(String.valueOf(position - 3));// 一共4个user
+        holder.tvIndex.setVisibility(position < nIndexOffset ? View.GONE:View.VISIBLE);
+        holder.tvIndex.setText(String.valueOf(position - nIndexOffset + 1));
 
         holder.itemView.setBackgroundColor(bean instanceof User ?
                 Color.parseColor("#efefef"):Color.WHITE);

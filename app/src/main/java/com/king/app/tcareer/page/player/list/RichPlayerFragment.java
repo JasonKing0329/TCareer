@@ -2,6 +2,7 @@ package com.king.app.tcareer.page.player.list;
 
 import android.content.Intent;
 import android.graphics.Rect;
+import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -30,6 +31,9 @@ import butterknife.BindView;
 public class RichPlayerFragment extends BaseMvpFragment<RichPlayerPresenter> implements RichPlayerView
         , RichPlayerAdapter.OnRichPlayerListener {
 
+    private static final String KEY_USER_ID = "user_id";
+    private static final String KEY_HEDE_NO_RECORDS = "hide_players_without_records";
+
     @BindView(R.id.rv_list)
     RecyclerView rvList;
     @BindView(R.id.sidebar)
@@ -44,6 +48,17 @@ public class RichPlayerFragment extends BaseMvpFragment<RichPlayerPresenter> imp
     private boolean isSelectPlayerMode;
 
     private boolean isEditMode;
+
+    private int mBottomMargin;
+
+    public static RichPlayerFragment newInstance(long userId, boolean hidePlayersWithoutRecords) {
+        RichPlayerFragment fragment = new RichPlayerFragment();
+        Bundle bundle = new Bundle();
+        bundle.putLong(KEY_USER_ID, userId);
+        bundle.putBoolean(KEY_HEDE_NO_RECORDS, hidePlayersWithoutRecords);
+        fragment.setArguments(bundle);
+        return fragment;
+    }
 
     @Override
     protected void bindFragmentHolder(IFragmentHolder holder) {
@@ -64,8 +79,12 @@ public class RichPlayerFragment extends BaseMvpFragment<RichPlayerPresenter> imp
         rvList.addItemDecoration(new RecyclerView.ItemDecoration() {
             @Override
             public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
-                if (parent.getChildAdapterPosition(view) > 0) {
+                int position = parent.getChildAdapterPosition(view);
+                if (position > 0) {
                     outRect.top = ScreenUtils.dp2px(5);
+                }
+                if (position == presenter.getListSize() - 1) {
+                    outRect.bottom = mBottomMargin;
                 }
             }
         });
@@ -87,6 +106,14 @@ public class RichPlayerFragment extends BaseMvpFragment<RichPlayerPresenter> imp
                 tvIndexPopup.setVisibility(View.VISIBLE);
             }
         });
+    }
+
+    /**
+     * set the bottom margin of the last item in list
+     * @param mBottomMargin
+     */
+    public void setBottomMargin(int mBottomMargin) {
+        this.mBottomMargin = mBottomMargin;
     }
 
     private boolean needMove;
@@ -125,6 +152,18 @@ public class RichPlayerFragment extends BaseMvpFragment<RichPlayerPresenter> imp
 
     private int nCurrentFirst;
 
+    public int[] getWinLoseOfList() {
+        return presenter.getWinLoseOfList();
+    }
+
+    public int getTotalPlayers() {
+        return presenter.getTotalPlayers();
+    }
+
+    public List<String> getFilterTexts() {
+        return presenter.getFilterTexts();
+    }
+
     private class RecyclerViewListener extends RecyclerView.OnScrollListener {
         @Override
         public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
@@ -157,7 +196,12 @@ public class RichPlayerFragment extends BaseMvpFragment<RichPlayerPresenter> imp
 
     @Override
     protected void onCreateData() {
-        presenter.loadPlayers();
+        if (getArguments() == null || getArguments().getLong(KEY_USER_ID, -1) == -1) {
+            presenter.loadPlayers();
+        }
+        else {
+            presenter.loadPlayers(getArguments().getLong(KEY_USER_ID), getArguments().getBoolean(KEY_HEDE_NO_RECORDS));
+        }
     }
 
     @Override
@@ -192,6 +236,9 @@ public class RichPlayerFragment extends BaseMvpFragment<RichPlayerPresenter> imp
             openEditDialog(bean);
         } else {
             Intent intent = new Intent().setClass(getContext(), PlayerPageActivity.class);
+            if (presenter.getUser() != null) {
+                intent.putExtra(PlayerPageActivity.KEY_USER_ID, presenter.getUser().getId());
+            }
             if (bean instanceof User) {
                 intent.putExtra(PlayerPageActivity.KEY_COMPETITOR_IS_USER, true);
                 intent.putExtra(PlayerPageActivity.KEY_COMPETITOR_ID, bean.getId());
@@ -250,12 +297,13 @@ public class RichPlayerFragment extends BaseMvpFragment<RichPlayerPresenter> imp
     }
 
     @Override
-    public void sortFinished() {
+    public void sortFinished(int sortType) {
         adapter.notifyDataSetChanged();
-        holder.onSortFinished();
+        holder.onSortFinished(sortType);
     }
 
     public void reload() {
+        presenter.resetRank();
         presenter.loadPlayers();
     }
 
@@ -280,7 +328,7 @@ public class RichPlayerFragment extends BaseMvpFragment<RichPlayerPresenter> imp
         adapter.notifyDataSetChanged();
     }
 
-    public void setUser(User user) {
+    public void updateUser(User user) {
         presenter.onUserChanged(user);
     }
 

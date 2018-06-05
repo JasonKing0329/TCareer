@@ -38,6 +38,10 @@ public class SettingProperty {
     public static final int VALUE_SORT_PLAYER_CAREER_WIN = 10;
     public static final int VALUE_SORT_PLAYER_CAREER_TURNEDPRO = 11;
     public static final int VALUE_SORT_PLAYER_CAREER_LAST_UPDATE = 12;
+    public static final int VALUE_SORT_PLAYER_RECORD_WIN = 13;
+    public static final int VALUE_SORT_PLAYER_RECORD_LOSE = 14;
+    public static final int VALUE_SORT_PLAYER_RECORD_ODDS_WIN = 15;
+    public static final int VALUE_SORT_PLAYER_RECORD_ODDS_LOSE = 16;
 
     private static final String getString(String key) {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(TApplication.getInstance());

@@ -13,11 +13,15 @@ import com.king.app.tcareer.model.dao.H2HDao;
 import com.king.app.tcareer.model.db.entity.PlayerAtpBean;
 import com.king.app.tcareer.model.db.entity.PlayerBean;
 import com.king.app.tcareer.model.db.entity.PlayerBeanDao;
+import com.king.app.tcareer.model.db.entity.Record;
+import com.king.app.tcareer.model.db.entity.RecordDao;
 import com.king.app.tcareer.model.db.entity.User;
 import com.king.app.tcareer.model.db.entity.UserDao;
 import com.king.app.tcareer.page.player.atp.PlayerAtpPresenter;
 import com.king.app.tcareer.page.setting.SettingProperty;
 import com.king.app.tcareer.utils.ConstellationUtil;
+
+import org.greenrobot.greendao.query.QueryBuilder;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -26,6 +30,8 @@ import java.util.List;
 import java.util.Map;
 
 import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
@@ -53,12 +59,48 @@ public class RichPlayerPresenter extends PlayerAtpPresenter<RichPlayerView> {
 
     private Map<Long, Boolean> mExpandMap;
 
-    private User mUser;
+    private boolean hidePlayersWithoutRecords;
+
+    private int mRankHigh;
+
+    private int mRankLow;
+
+    private List<String> mFilterTexts;
 
     public RichPlayerPresenter() {
-        sortType = SettingProperty.getPlayerSortMode();
+        // 不用SettingProperty.getPlayerSortMode()，因为h2h page与manage page支持的排序类型不尽相同
+        sortType = SettingProperty.VALUE_SORT_PLAYER_NAME;
         indexEmitter = new IndexEmitter();
         mExpandMap = new HashMap<>();
+    }
+
+    public void loadPlayers(long userId, boolean hidePlayersWithoutRecords) {
+        this.hidePlayersWithoutRecords = hidePlayersWithoutRecords;
+        queryUser(userId)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(new Observer<User>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                        addDisposable(d);
+                    }
+
+                    @Override
+                    public void onNext(User user) {
+                        loadPlayers();
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        e.printStackTrace();
+                        view.showMessage(e.getMessage());
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
     }
 
     public void loadPlayers() {
@@ -110,6 +152,7 @@ public class RichPlayerPresenter extends PlayerAtpPresenter<RichPlayerView> {
                         view.getSidebar().build();
                         view.getSidebar().setVisibility(View.VISIBLE);
                         view.showPlayers(mList);
+                        view.sortFinished(sortType);
                     }
                 });
     }
@@ -133,21 +176,37 @@ public class RichPlayerPresenter extends PlayerAtpPresenter<RichPlayerView> {
                 RichPlayerBean viewBean = new RichPlayerBean();
                 viewBean.setCompetitorBean(user);
 
-                // search data of all users
-                if (mUser == null) {
-                    H2hBean h2hK = h2hDao.getH2h(AppConstants.USER_ID_KING, user.getId(), true);
-                    H2hBean h2hF = h2hDao.getH2h(AppConstants.USER_ID_FLAMENCO, user.getId(), true);
-                    H2hBean h2hH = h2hDao.getH2h(AppConstants.USER_ID_HENRY, user.getId(), true);
-                    H2hBean h2hQ = h2hDao.getH2h(AppConstants.USER_ID_QI, user.getId(), true);
-
-                    viewBean.setWin(h2hK.getWin() + h2hF.getWin() + h2hH.getWin() + h2hQ.getWin());
-                    viewBean.setLose(h2hK.getLose() + h2hF.getLose() + h2hH.getLose() + h2hQ.getLose());
+                // count records if control rank
+                if (isControlRank()) {
+                    createRichWithRank(viewBean, user);
+                    if (viewBean.getWin() == 0 && viewBean.getLose() == 0) {
+                        continue;
+                    }
                 }
-                // only search data of current user
                 else {
-                    H2hBean h2h = h2hDao.getH2h(mUser.getId(), user.getId(), true);
-                    viewBean.setWin(h2h.getWin());
-                    viewBean.setLose(h2h.getLose());
+                    // search data of all users
+                    if (mUser == null) {
+                        H2hBean h2hK = h2hDao.getH2h(AppConstants.USER_ID_KING, user.getId(), true);
+                        H2hBean h2hF = h2hDao.getH2h(AppConstants.USER_ID_FLAMENCO, user.getId(), true);
+                        H2hBean h2hH = h2hDao.getH2h(AppConstants.USER_ID_HENRY, user.getId(), true);
+                        H2hBean h2hQ = h2hDao.getH2h(AppConstants.USER_ID_QI, user.getId(), true);
+
+                        viewBean.setWin(h2hK.getWin() + h2hF.getWin() + h2hH.getWin() + h2hQ.getWin());
+                        viewBean.setLose(h2hK.getLose() + h2hF.getLose() + h2hH.getLose() + h2hQ.getLose());
+                    }
+                    // only search data of current user
+                    else {
+                        H2hBean h2h = h2hDao.getH2h(mUser.getId(), user.getId(), true);
+                        viewBean.setWin(h2h.getWin());
+                        viewBean.setLose(h2h.getLose());
+
+                        if (hidePlayersWithoutRecords) {
+                            if (user.getId() == mUser.getId()
+                                    || viewBean.getWin() == 0 && viewBean.getLose() == 0) {
+                                continue;
+                            }
+                        }
+                    }
                 }
 
                 list.add(viewBean);
@@ -157,10 +216,54 @@ public class RichPlayerPresenter extends PlayerAtpPresenter<RichPlayerView> {
         });
     }
 
+    private void createRichWithRank(RichPlayerBean bean, CompetitorBean competitor) {
+        RecordDao dao = TApplication.getInstance().getDaoSession().getRecordDao();
+        QueryBuilder<Record> builder = dao.queryBuilder();
+        if (mUser != null) {
+            builder.where(RecordDao.Properties.UserId.eq(mUser.getId()));
+        }
+        builder.where(RecordDao.Properties.PlayerId.eq(competitor.getId()));
+        builder.where(RecordDao.Properties.PlayerFlag.eq(competitor instanceof User ? AppConstants.COMPETITOR_VIRTUAL:AppConstants.COMPETITOR_NORMAL));
+        builder.where(RecordDao.Properties.RankCpt.ge(mRankHigh));
+        builder.where(RecordDao.Properties.RankCpt.le(mRankLow));
+        List<Record> list = builder.build().list();
+        for (Record record:list) {
+            if (record.getWinnerFlag() == AppConstants.WINNER_USER) {
+                bean.setWin(bean.getWin() + 1);
+            }
+            else {
+                bean.setLose(bean.getLose() + 1);
+            }
+        }
+    }
+
+    private boolean isControlRank() {
+        return mRankHigh != 0 || mRankLow != 0 && mRankHigh <= mRankLow;
+    }
+
     private Observable<List<RichPlayerBean>> queryPlayers() {
         return Observable.create(e -> {
-            PlayerBeanDao dao = TApplication.getInstance().getDaoSession().getPlayerBeanDao();
-            List<PlayerBean> players = dao.queryBuilder().build().list();
+            List<PlayerBean> players;
+            if (hidePlayersWithoutRecords) {
+                // 只查询user交手过的players
+                RecordDao dao = TApplication.getInstance().getDaoSession().getRecordDao();
+                StringBuffer sqlBuffer = new StringBuffer("WHERE ");
+                sqlBuffer.append(RecordDao.Properties.UserId.columnName)
+                        .append(" = ? AND ")
+                        .append(RecordDao.Properties.PlayerFlag.columnName)
+                        .append(" = ? GROUP BY ")
+                        .append(RecordDao.Properties.PlayerId.columnName);
+                List<Record> list = dao.queryRaw(sqlBuffer.toString()
+                        , new String[]{String.valueOf(mUser.getId()), String.valueOf(AppConstants.COMPETITOR_NORMAL)});
+                players = new ArrayList<>();
+                for (Record record:list) {
+                    players.add(record.getCompetitor());
+                }
+            }
+            else {
+                PlayerBeanDao dao = TApplication.getInstance().getDaoSession().getPlayerBeanDao();
+                players = dao.queryBuilder().build().list();
+            }
 
             H2HDao h2hDao = new H2HDao();
             List<RichPlayerBean> list = new ArrayList<>();
@@ -168,20 +271,29 @@ public class RichPlayerPresenter extends PlayerAtpPresenter<RichPlayerView> {
                 RichPlayerBean viewBean = new RichPlayerBean();
                 viewBean.setCompetitorBean(player);
 
-                // search data of all users
-                if (mUser == null) {
-                    H2hBean h2hK = h2hDao.getH2h(AppConstants.USER_ID_KING, player.getId(), false);
-                    H2hBean h2hF = h2hDao.getH2h(AppConstants.USER_ID_FLAMENCO, player.getId(), false);
-                    H2hBean h2hH = h2hDao.getH2h(AppConstants.USER_ID_HENRY, player.getId(), false);
-                    H2hBean h2hQ = h2hDao.getH2h(AppConstants.USER_ID_QI, player.getId(), false);
-                    viewBean.setWin(h2hK.getWin() + h2hF.getWin() + h2hH.getWin() + h2hQ.getWin());
-                    viewBean.setLose(h2hK.getLose() + h2hF.getLose() + h2hH.getLose() + h2hQ.getLose());
+                // count records if control rank
+                if (isControlRank()) {
+                    createRichWithRank(viewBean, player);
+                    if (viewBean.getWin() == 0 && viewBean.getLose() == 0) {
+                        continue;
+                    }
                 }
-                // only search data of current user
                 else {
-                    H2hBean h2h = h2hDao.getH2h(mUser.getId(), player.getId(), false);
-                    viewBean.setWin(h2h.getWin());
-                    viewBean.setLose(h2h.getLose());
+                    // search data of all users
+                    if (mUser == null) {
+                        H2hBean h2hK = h2hDao.getH2h(AppConstants.USER_ID_KING, player.getId(), false);
+                        H2hBean h2hF = h2hDao.getH2h(AppConstants.USER_ID_FLAMENCO, player.getId(), false);
+                        H2hBean h2hH = h2hDao.getH2h(AppConstants.USER_ID_HENRY, player.getId(), false);
+                        H2hBean h2hQ = h2hDao.getH2h(AppConstants.USER_ID_QI, player.getId(), false);
+                        viewBean.setWin(h2hK.getWin() + h2hF.getWin() + h2hH.getWin() + h2hQ.getWin());
+                        viewBean.setLose(h2hK.getLose() + h2hF.getLose() + h2hH.getLose() + h2hQ.getLose());
+                    }
+                    // only search data of current user
+                    else {
+                        H2hBean h2h = h2hDao.getH2h(mUser.getId(), player.getId(), false);
+                        viewBean.setWin(h2h.getWin());
+                        viewBean.setLose(h2h.getLose());
+                    }
                 }
 
                 list.add(viewBean);
@@ -209,7 +321,19 @@ public class RichPlayerPresenter extends PlayerAtpPresenter<RichPlayerView> {
                     indexEmitter.createSignIndex(e, mList);
                     break;
                 case SettingProperty.VALUE_SORT_PLAYER_RECORD:
-                    indexEmitter.createRecordsIndex(e, mList);
+                    indexEmitter.createRecordsIndex(e, mList, mUser == null ? 100:0);
+                    break;
+                case SettingProperty.VALUE_SORT_PLAYER_RECORD_WIN:
+                    indexEmitter.createRecordsIndex(e, mList, 1);
+                    break;
+                case SettingProperty.VALUE_SORT_PLAYER_RECORD_ODDS_WIN:
+                    indexEmitter.createRecordsIndex(e, mList, 2);
+                    break;
+                case SettingProperty.VALUE_SORT_PLAYER_RECORD_LOSE:
+                    indexEmitter.createRecordsIndex(e, mList, 3);
+                    break;
+                case SettingProperty.VALUE_SORT_PLAYER_RECORD_ODDS_LOSE:
+                    indexEmitter.createRecordsIndex(e, mList, 4);
                     break;
                 case SettingProperty.VALUE_SORT_PLAYER_HEIGHT:
                     indexEmitter.createHeightIndex(e, mList);
@@ -244,10 +368,7 @@ public class RichPlayerPresenter extends PlayerAtpPresenter<RichPlayerView> {
         view.getSidebar().clear();
         updateSidebarGravity();
         sortPlayerRx(mList)
-                .flatMap(list -> {
-                    SettingProperty.setPlayerSortMode(sortType);
-                    return createIndexes();
-                })
+                .flatMap(list -> createIndexes())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe(new Observer<String>() {
@@ -273,7 +394,7 @@ public class RichPlayerPresenter extends PlayerAtpPresenter<RichPlayerView> {
                         view.dismissLoading();
                         view.getSidebar().build();
                         view.getSidebar().setVisibility(View.VISIBLE);
-                        view.sortFinished();
+                        view.sortFinished(sortType);
                     }
                 });
     }
@@ -357,7 +478,49 @@ public class RichPlayerPresenter extends PlayerAtpPresenter<RichPlayerView> {
      * @param bean
      */
     public void filter(RichFilterBean bean) {
-        filterObservable(filterByBean(bean));
+        // rank与其他所有条件互斥
+        if (bean.getRankLow() != mRankLow || bean.getRankHigh() != mRankHigh) {
+            mRankLow = bean.getRankLow();
+            mRankHigh = bean.getRankHigh();
+            // 有rank需要过滤records，重新查询记录
+            loadPlayers();
+        }
+        else {
+            // 除了rank以外的条件都能共同作用
+            filterObservable(filterByBean(bean));
+        }
+        createFilterTexts(bean);
+    }
+
+    private void createFilterTexts(RichFilterBean bean) {
+        mFilterTexts = new ArrayList<>();
+        if (isControlRank()) {
+            mFilterTexts.add("Rank between " + mRankHigh + " and " + mRankLow);
+        }
+        else {
+            if (!TextUtils.isEmpty(bean.getSign()) && !bean.getSign().equals(AppConstants.FILTER_ALL)) {
+                mFilterTexts.add(bean.getSign());
+            }
+            if (!TextUtils.isEmpty(bean.getCountry()) && !bean.getCountry().equals(AppConstants.FILTER_ALL)) {
+                mFilterTexts.add(bean.getCountry());
+            }
+            if (bean.getForehand() == 1) {
+                mFilterTexts.add("左手持拍");
+            }
+            else if (bean.getForehand() == 2) {
+                mFilterTexts.add("右手持拍");
+            }
+            if (bean.getBackhand() == 1) {
+                mFilterTexts.add("单手反手");
+            }
+            else if (bean.getForehand() == 2) {
+                mFilterTexts.add("双手反手");
+            }
+        }
+    }
+
+    public List<String> getFilterTexts() {
+        return mFilterTexts;
     }
 
     private void filterObservable(Observable<Boolean> observable) {
@@ -389,6 +552,7 @@ public class RichPlayerPresenter extends PlayerAtpPresenter<RichPlayerView> {
                         view.dismissLoading();
                         view.showPlayers(mList);
                         view.getSidebar().build();
+                        view.sortFinished(sortType);
                     }
                 });
     }
@@ -458,6 +622,15 @@ public class RichPlayerPresenter extends PlayerAtpPresenter<RichPlayerView> {
         });
     }
 
+    private Observable<List<RichPlayerBean>> filterRank() {
+        return Observable.create(new ObservableOnSubscribe<List<RichPlayerBean>>() {
+            @Override
+            public void subscribe(ObservableEmitter<List<RichPlayerBean>> e) throws Exception {
+
+            }
+        });
+    }
+
     private boolean checkForehand(RichPlayerBean bean, int forehand) {
         PlayerAtpBean atpBean = bean.getCompetitorBean().getAtpBean();
         switch (forehand) {
@@ -487,7 +660,7 @@ public class RichPlayerPresenter extends PlayerAtpPresenter<RichPlayerView> {
     }
 
     private boolean checkSign(RichPlayerBean bean, String sign) {
-        if ("All".equals(sign)) {
+        if (AppConstants.FILTER_ALL.equals(sign)) {
             return true;
         }
         PlayerAtpBean atpBean = bean.getCompetitorBean().getAtpBean();
@@ -505,7 +678,7 @@ public class RichPlayerPresenter extends PlayerAtpPresenter<RichPlayerView> {
     }
 
     private boolean checkCountry(RichPlayerBean bean, String country) {
-        if ("All".equals(country)) {
+        if (AppConstants.FILTER_ALL.equals(country)) {
             return true;
         }
         PlayerAtpBean atpBean = bean.getCompetitorBean().getAtpBean();
@@ -553,5 +726,27 @@ public class RichPlayerPresenter extends PlayerAtpPresenter<RichPlayerView> {
             mUser = user;
             loadPlayers();
         }
+    }
+
+    public int[] getWinLoseOfList() {
+        int[] result = new int[2];
+        for (RichPlayerBean bean:mList) {
+            result[0] += bean.getWin();
+            result[1] += bean.getLose();
+        }
+        return result;
+    }
+
+    public void resetRank() {
+        mRankHigh = 0;
+        mRankLow = 0;
+    }
+
+    public int getTotalPlayers() {
+        return mFullList == null ? 0:mFullList.size();
+    }
+
+    public int getListSize() {
+        return mList == null ? 0:mList.size();
     }
 }

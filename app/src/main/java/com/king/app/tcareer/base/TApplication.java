@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Build;
 
+import com.king.app.tcareer.BuildConfig;
 import com.king.app.tcareer.conf.AppConfig;
 import com.king.app.tcareer.model.db.entity.DaoMaster;
 import com.king.app.tcareer.model.db.entity.DaoSession;
@@ -56,12 +57,14 @@ public class TApplication extends Application {
 	public void onCreate() {
 		instance = this;
 		super.onCreate();
-		if (LeakCanary.isInAnalyzerProcess(this)) {
-			// This process is dedicated to LeakCanary for heap analysis.
-			// You should not init your app in this process.
-			return;
+		if (!BuildConfig.disableLeakCanary) {
+			if (LeakCanary.isInAnalyzerProcess(this)) {
+				// This process is dedicated to LeakCanary for heap analysis.
+				// You should not init your app in this process.
+				return;
+			}
+			LeakCanary.install(this);
 		}
-		LeakCanary.install(this);
 	}
 
 	/**

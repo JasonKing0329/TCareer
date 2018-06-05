@@ -1,6 +1,5 @@
 package com.king.app.tcareer.page.player.manage;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.view.View;
@@ -15,7 +14,6 @@ import com.king.app.tcareer.base.BaseMvpActivity;
 import com.king.app.tcareer.model.bean.CompetitorBean;
 import com.king.app.tcareer.model.db.entity.User;
 import com.king.app.tcareer.page.player.atp.AtpManageActivity;
-import com.king.app.tcareer.page.player.list.RichFilterBean;
 import com.king.app.tcareer.page.player.list.RichPlayerFilterDialog;
 import com.king.app.tcareer.page.player.list.RichPlayerFragment;
 import com.king.app.tcareer.page.player.list.RichPlayerHolder;
@@ -76,8 +74,6 @@ public class PlayerManageActivity extends BaseMvpActivity<PlayerManagePresenter>
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.group_ft, ftRich, "RichPlayerFragment")
                 .commit();
-
-        updateSortText();
 
         ivSidebar.setColorFilter(getResources().getColor(R.color.colorPrimary), PorterDuff.Mode.SRC_IN);
         ivSidebar.setOnClickListener(view -> ftRich.toggleSidebar());
@@ -188,7 +184,7 @@ public class PlayerManageActivity extends BaseMvpActivity<PlayerManagePresenter>
         else {
             tvUser.setText(presenter.getUser(position).getNameEng());
         }
-        ftRich.setUser(presenter.getUser(position));
+        ftRich.updateUser(presenter.getUser(position));
     }
 
     @Override
@@ -213,8 +209,8 @@ public class PlayerManageActivity extends BaseMvpActivity<PlayerManagePresenter>
     }
 
     @Override
-    public void onSortFinished() {
-        updateSortText();
+    public void onSortFinished(int sortType) {
+        updateSortText(sortType);
     }
 
     private void showChartDialog() {
@@ -229,8 +225,8 @@ public class PlayerManageActivity extends BaseMvpActivity<PlayerManagePresenter>
         dialog.show(getSupportFragmentManager(), "PlayerEditDialog");
     }
 
-    private void updateSortText() {
-        switch (SettingProperty.getPlayerSortMode()) {
+    private void updateSortText(int sortType) {
+        switch (sortType) {
             case SettingProperty.VALUE_SORT_PLAYER_NAME:
                 tvSort.setText(R.string.menu_sort_name);
                 break;

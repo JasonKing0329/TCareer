@@ -8,6 +8,7 @@ import android.widget.Spinner;
 
 import com.king.app.tcareer.R;
 import com.king.app.tcareer.base.IFragmentHolder;
+import com.king.app.tcareer.page.setting.SettingProperty;
 import com.king.app.tcareer.view.dialog.DraggableDialogFragment;
 
 import butterknife.BindView;
@@ -20,16 +21,6 @@ import butterknife.Unbinder;
  * <p/>创建时间: 2018/2/7 17:27
  */
 public class SortDialog extends DraggableDialogFragment {
-
-    /**
-     * refer h2hlist_sort_type in array.xml
-     */
-    public static final int SORT_TYPE_NAME = 0;
-    public static final int SORT_TYPE_TOTAL = 1;
-    public static final int SORT_TYPE_WIN = 2;
-    public static final int SORT_TYPE_LOSE = 3;
-    public static final int SORT_TYPE_PUREWIN = 4;
-    public static final int SORT_TYPE_PURELOSE = 5;
 
     /**
      * refer sort_order in array.xml
@@ -114,10 +105,30 @@ public class SortDialog extends DraggableDialogFragment {
 
         public boolean onSave() {
             if (onSortListener != null) {
-                onSortListener.onSort(spType.getSelectedItemPosition(), spOrder.getSelectedItemPosition());
+                onSortListener.onSort(getSortType(spType.getSelectedItemPosition()), spOrder.getSelectedItemPosition());
             }
             return true;
         }
+
+        private int getSortType(int position) {
+            switch (position) {
+                case 1:
+                    return SettingProperty.VALUE_SORT_PLAYER_NAME;
+                case 2:
+                    return SettingProperty.VALUE_SORT_PLAYER_RECORD;
+                case 3:
+                    return SettingProperty.VALUE_SORT_PLAYER_RECORD_WIN;
+                case 4:
+                    return SettingProperty.VALUE_SORT_PLAYER_RECORD_LOSE;
+                case 5:
+                    return SettingProperty.VALUE_SORT_PLAYER_RECORD_ODDS_WIN;
+                case 6:
+                    return SettingProperty.VALUE_SORT_PLAYER_RECORD_ODDS_LOSE;
+                default:
+                    return SettingProperty.VALUE_SORT_PLAYER_NAME_ENG;
+            }
+        }
+
     }
 
     public interface OnSortListener {

@@ -148,6 +148,10 @@
     <string name="menu_sort_career_win">By career win</string>
     <string name="menu_sort_turned_pro">By turned pro</string>
     <string name="menu_sort_last_update">By last update</string>
+    <string name="menu_sort_win">By win</string>
+    <string name="menu_sort_lose">By lose</string>
+    <string name="menu_sort_odd_win">By odds win</string>
+    <string name="menu_sort_odd_lose">By odds lose</string>
     <!-- **************************************************************** -->
     <string name="record_listview_allrecords">All records</string>
     <string name="dlg_loading_msg">loading...</string>

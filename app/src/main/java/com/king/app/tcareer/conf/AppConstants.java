@@ -246,4 +246,5 @@ public class AppConstants {
             "America"
     };
 
+    public static final String FILTER_ALL = "All";
 }

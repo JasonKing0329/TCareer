@@ -16,6 +16,10 @@ public class RichFilterBean {
 
     private String country;
 
+    private int rankHigh;
+
+    private int rankLow;
+
     public int getForehand() {
         return forehand;
     }
@@ -46,5 +50,21 @@ public class RichFilterBean {
 
     public void setCountry(String country) {
         this.country = country;
+    }
+
+    public int getRankHigh() {
+        return rankHigh;
+    }
+
+    public void setRankHigh(int rankHigh) {
+        this.rankHigh = rankHigh;
+    }
+
+    public int getRankLow() {
+        return rankLow;
+    }
+
+    public void setRankLow(int rankLow) {
+        this.rankLow = rankLow;
     }
 }

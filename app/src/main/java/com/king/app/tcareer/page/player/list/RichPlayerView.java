@@ -2,7 +2,6 @@ package com.king.app.tcareer.page.player.list;
 
 import com.king.app.tcareer.base.BaseView;
 import com.king.app.tcareer.view.widget.FitSideBar;
-import com.king.app.tcareer.view.widget.SideBar;
 
 import java.util.List;
 
@@ -21,5 +20,5 @@ public interface RichPlayerView extends BaseView {
 
     FitSideBar getSidebar();
 
-    void sortFinished();
+    void sortFinished(int sortType);
 }

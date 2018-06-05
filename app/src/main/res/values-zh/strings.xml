@@ -130,7 +130,7 @@
     <string name="menu_ranking">世界排名</string>
     <string name="menu_show_by_date">按时间显示</string>
     <string name="menu_show_by_player">按对手显示</string>
-    <string name="menu_sort_name">按名称</string>
+    <string name="menu_sort_name">按拼音</string>
     <string name="menu_sort_week">按赛事周数</string>
     <string name="menu_sort_level">按赛事级别</string>
     <string name="menu_sort_name_eng">按英文姓名</string>
@@ -145,6 +145,10 @@
     <string name="menu_sort_career_win">按职业生涯胜场数</string>
     <string name="menu_sort_turned_pro">按转入职业时间</string>
     <string name="menu_sort_last_update">按更新时间</string>
+    <string name="menu_sort_win">按胜场数</string>
+    <string name="menu_sort_lose">按负场数</string>
+    <string name="menu_sort_odd_win">按净胜场数</string>
+    <string name="menu_sort_odd_lose">按净负场数</string>
     <!-- **************************************************************** -->
     <string name="record_listview_allrecords">全部记录</string>
     <string name="dlg_loading_msg">加载中...</string>

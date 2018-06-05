@@ -46,7 +46,15 @@ public class PlayerComparator implements Comparator<RichPlayerBean> {
             case SettingProperty.VALUE_SORT_PLAYER_NAME_ENG:
                 return compareByNameEng(lhs, rhs);
             case SettingProperty.VALUE_SORT_PLAYER_RECORD:
-                return compareByRecords(lpb, rpb);
+                return compareByRecords(lpb, rpb, 0);
+            case SettingProperty.VALUE_SORT_PLAYER_RECORD_WIN:
+                return compareByRecords(lpb, rpb, 1);
+            case SettingProperty.VALUE_SORT_PLAYER_RECORD_ODDS_WIN:
+                return compareByRecords(lpb, rpb, 2);
+            case SettingProperty.VALUE_SORT_PLAYER_RECORD_LOSE:
+                return compareByRecords(lpb, rpb, 3);
+            case SettingProperty.VALUE_SORT_PLAYER_RECORD_ODDS_LOSE:
+                return compareByRecords(lpb, rpb, 4);
             case SettingProperty.VALUE_SORT_PLAYER_HEIGHT:
                 return compareByHeight(lhs, rhs);
             case SettingProperty.VALUE_SORT_PLAYER_WEIGHT:
@@ -198,15 +206,36 @@ public class PlayerComparator implements Comparator<RichPlayerBean> {
         return lhs.getNamePinyin().compareTo(rhs.getNamePinyin());
     }
 
+    private int getRecordsTypeValue(RichPlayerBean bean, int type) {
+        int result;
+        switch (type) {
+            case 1:
+                result = bean.getWin();
+                break;
+            case 2:
+                result = bean.getWin() - bean.getLose();
+                break;
+            case 3:
+                result = bean.getLose();
+                break;
+            case 4:
+                result = bean.getLose() - bean.getWin();
+                break;
+            default:
+                result = bean.getWin() + bean.getLose();
+                break;
+        }
+        return result;
+    }
     /**
      * 交手次数降序排列
      * @param lpb
      * @param rpb
      * @return
      */
-    private int compareByRecords(RichPlayerBean lpb, RichPlayerBean rpb) {
-        int resultL = lpb.getWin() + lpb.getLose();
-        int resultR = rpb.getWin() + rpb.getLose();
+    private int compareByRecords(RichPlayerBean lpb, RichPlayerBean rpb, int type) {
+        int resultL = getRecordsTypeValue(lpb, type);
+        int resultR = getRecordsTypeValue(rpb, type);
         if (resultL > resultR) {
             return -1;
         }

@@ -6,12 +6,14 @@ import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.Spinner;
 
 import com.king.app.tcareer.R;
 import com.king.app.tcareer.base.IFragmentHolder;
 import com.king.app.tcareer.base.TApplication;
+import com.king.app.tcareer.conf.AppConstants;
 import com.king.app.tcareer.model.db.entity.PlayerAtpBeanDao;
 import com.king.app.tcareer.utils.ConstellationUtil;
 import com.king.app.tcareer.view.dialog.DraggableDialogFragment;
@@ -85,6 +87,10 @@ public class RichPlayerFilterDialog extends DraggableDialogFragment {
         RadioButton rbBackhandSingle;
         @BindView(R.id.rb_backhand_double)
         RadioButton rbBackhandDouble;
+        @BindView(R.id.et_rank_high)
+        EditText etRankHigh;
+        @BindView(R.id.et_rank_low)
+        EditText etRankLow;
 
         private List<String> signList;
 
@@ -109,7 +115,7 @@ public class RichPlayerFilterDialog extends DraggableDialogFragment {
 
         private void initSigns() {
             signList = new ArrayList<>();
-            signList.add("All");
+            signList.add(AppConstants.FILTER_ALL);
             signList.addAll(Arrays.asList(ConstellationUtil.starArrEng));
             ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(), R.layout.adapter_filter_spinner_item, signList);
             spSigns.setAdapter(adapter);
@@ -125,7 +131,7 @@ public class RichPlayerFilterDialog extends DraggableDialogFragment {
         private void loadCountries() {
             Observable.create(e -> {
                 countryList = new ArrayList<>();
-                countryList.add( "All");
+                countryList.add(AppConstants.FILTER_ALL);
                 String column = PlayerAtpBeanDao.Properties.BirthCountry.columnName;
                 Cursor cursor = TApplication.getInstance().getDaoSession().getDatabase()
                         .rawQuery("select " + column + " from " + PlayerAtpBeanDao.TABLENAME
@@ -189,6 +195,13 @@ public class RichPlayerFilterDialog extends DraggableDialogFragment {
             }
             bean.setSign(signList.get(spSigns.getSelectedItemPosition()));
             bean.setCountry(countryList.get(spCountry.getSelectedItemPosition()));
+            try {
+                bean.setRankLow(Integer.parseInt(etRankLow.getText().toString()));
+            } catch (Exception e) {}
+            try {
+                bean.setRankHigh(Integer.parseInt(etRankHigh.getText().toString()));
+            } catch (Exception e) {}
+
             if (onFilterListener != null) {
                 onFilterListener.onFilterRichPlayer(bean);
             }

@@ -1,9 +1,8 @@
 package com.king.app.tcareer.page.player.h2hlist;
 
 import android.content.Intent;
+import android.graphics.PorterDuff;
 import android.support.design.widget.CollapsingToolbarLayout;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,11 +15,17 @@ import com.king.app.tcareer.R;
 import com.king.app.tcareer.base.BaseMvpActivity;
 import com.king.app.tcareer.model.GlideOptions;
 import com.king.app.tcareer.model.ImageProvider;
+import com.king.app.tcareer.model.bean.CompetitorBean;
 import com.king.app.tcareer.model.bean.H2hBean;
 import com.king.app.tcareer.model.db.entity.User;
 import com.king.app.tcareer.page.glory.chart.ChartManager;
+import com.king.app.tcareer.page.player.list.RichPlayerFilterDialog;
+import com.king.app.tcareer.page.player.list.RichPlayerFragment;
+import com.king.app.tcareer.page.player.list.RichPlayerHolder;
 import com.king.app.tcareer.page.player.page.PlayerPageActivity;
-import com.king.app.tcareer.view.widget.SideBar;
+import com.king.app.tcareer.page.setting.SettingProperty;
+import com.king.app.tcareer.utils.ListUtil;
+import com.king.app.tcareer.utils.ScreenUtils;
 import com.nightonke.boommenu.BoomButtons.ButtonPlaceAlignmentEnum;
 import com.nightonke.boommenu.BoomButtons.ButtonPlaceEnum;
 import com.nightonke.boommenu.BoomButtons.OnBMClickListener;
@@ -38,8 +43,8 @@ import butterknife.OnClick;
  * Created by Administrator on 2017/4/30 0030.
  */
 
-public class H2hListActivity extends BaseMvpActivity<H2hPresenter> implements IH2hListView, OnItemMenuListener
-        , OnBMClickListener, SideBar.OnTouchingLetterChangedListener {
+public class H2hListActivity extends BaseMvpActivity<H2hPresenter> implements IH2hListView
+        , OnBMClickListener, RichPlayerHolder {
 
     public static final String KEY_USER_ID = "key_user_id";
 
@@ -49,8 +54,6 @@ public class H2hListActivity extends BaseMvpActivity<H2hPresenter> implements IH
     ImageView ivHead;
     @BindView(R.id.tv_total_player)
     TextView tvTotalPlayer;
-    @BindView(R.id.rv_h2h_list)
-    RecyclerView rvH2hList;
     @BindView(R.id.toolbar)
     Toolbar toolbar;
     @BindView(R.id.bmb_menu)
@@ -65,22 +68,27 @@ public class H2hListActivity extends BaseMvpActivity<H2hPresenter> implements IH
     TextView tvSeason;
     @BindView(R.id.tv_lose)
     TextView tvLose;
-    @BindView(R.id.tv_conclude)
-    TextView tvConclude;
+    @BindView(R.id.tv_win_lose)
+    TextView tvWinLose;
+    @BindView(R.id.tv_sort)
+    TextView tvSort;
+    @BindView(R.id.tv_filter)
+    TextView tvFilter;
     @BindView(R.id.ctl_toolbar)
     CollapsingToolbarLayout ctlToolbar;
-    @BindView(R.id.sidebar)
-    SideBar sideBar;
-    @BindView(R.id.tv_index)
-    TextView tvIndex;
-
-    private H2hListAdapter h2hAdapter;
+    @BindView(R.id.iv_collapse_all)
+    ImageView ivCollapseAll;
+    @BindView(R.id.iv_expand_all)
+    ImageView ivExpandAll;
+    @BindView(R.id.iv_side)
+    ImageView ivSide;
 
     private SortDialog sortDialog;
-    private FilterDialog filterDialog;
 
     private ChartManager chartManager;
     private H2hListPageData pageData;
+
+    private RichPlayerFragment ftRich;
 
     @Override
     protected int getContentView() {
@@ -91,27 +99,21 @@ public class H2hListActivity extends BaseMvpActivity<H2hPresenter> implements IH
     protected void initView() {
         initToolbar();
         initBoomButton();
-        LinearLayoutManager manager = new LinearLayoutManager(this);
-        manager.setOrientation(LinearLayoutManager.VERTICAL);
-        rvH2hList.setLayoutManager(manager);
 
-        sideBar.setOnTouchingLetterChangedListener(this);
-        sideBar.setTextView(tvIndex);
-        // 底部栏控制sidebar显示
-        tvConclude.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (presenter.getSortType() == SortDialog.SORT_TYPE_NAME) {
-                    if (sideBar.getVisibility() == View.VISIBLE) {
-                        sideBar.setVisibility(View.GONE);
-                    }
-                    else {
-                        sideBar.setVisibility(View.VISIBLE);
-                    }
-                }
-            }
-        });
+        ftRich = RichPlayerFragment.newInstance(getIntent().getLongExtra(KEY_USER_ID, -1), true);
+        // 底部栏会遮挡，为了保留遮挡效果又不让最后一个内容被遮挡，设置最后一个item的bottom margin即刻
+        ftRich.setBottomMargin(ScreenUtils.dp2px(36));
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.group_ft, ftRich, "RichPlayerFragment")
+                .commit();
 
+        ivSide.setOnClickListener(v -> ftRich.toggleSidebar());
+        ivCollapseAll.setOnClickListener(v -> ftRich.setExpandAll(false));
+        ivExpandAll.setOnClickListener(v -> ftRich.setExpandAll(true));
+
+        ivSide.setColorFilter(getResources().getColor(R.color.colorPrimary), PorterDuff.Mode.SRC_IN);
+        ivCollapseAll.setColorFilter(getResources().getColor(R.color.colorPrimary), PorterDuff.Mode.SRC_IN);
+        ivExpandAll.setColorFilter(getResources().getColor(R.color.colorPrimary), PorterDuff.Mode.SRC_IN);
     }
 
     @Override
@@ -127,25 +129,20 @@ public class H2hListActivity extends BaseMvpActivity<H2hPresenter> implements IH
 
     private void initToolbar() {
         setSupportActionBar(toolbar);
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                finish();
-            }
-        });
+        toolbar.setNavigationOnClickListener(view -> finish());
 
     }
 
     private void initBoomButton() {
-        int radius = bmbMenu.getContext().getResources().getDimensionPixelSize(R.dimen.boom_menu_btn_radius);
+        int radius = getResources().getDimensionPixelSize(R.dimen.boom_menu_btn_radius);
         bmbMenu.setButtonEnum(ButtonEnum.SimpleCircle);
         bmbMenu.setButtonRadius(radius);
         bmbMenu.setPiecePlaceEnum(PiecePlaceEnum.DOT_3_1);
         bmbMenu.setButtonPlaceEnum(ButtonPlaceEnum.Vertical);
-        bmbMenu.setButtonPlaceAlignmentEnum(ButtonPlaceAlignmentEnum.BR);
-        bmbMenu.setButtonRightMargin(bmbMenu.getContext().getResources().getDimensionPixelSize(R.dimen.home_pop_menu_right));
-        bmbMenu.setButtonBottomMargin(bmbMenu.getContext().getResources().getDimensionPixelSize(R.dimen.home_pop_menu_bottom));
-        bmbMenu.setButtonVerticalMargin(bmbMenu.getContext().getResources().getDimensionPixelSize(R.dimen.boom_menu_btn_margin_ver));
+        bmbMenu.setButtonPlaceAlignmentEnum(ButtonPlaceAlignmentEnum.BL);
+        bmbMenu.setButtonLeftMargin(getResources().getDimensionPixelSize(R.dimen.home_pop_menu_right));
+        bmbMenu.setButtonBottomMargin(getResources().getDimensionPixelSize(R.dimen.home_pop_menu_bottom));
+        bmbMenu.setButtonVerticalMargin(getResources().getDimensionPixelSize(R.dimen.boom_menu_btn_margin_ver));
         bmbMenu.addBuilder(new SimpleCircleButton.Builder()
                 .normalImageRes(R.drawable.ic_sort_white_24dp)
                 .buttonRadius(radius)
@@ -178,71 +175,20 @@ public class H2hListActivity extends BaseMvpActivity<H2hPresenter> implements IH
     public void onDataLoaded(H2hListPageData data) {
 
         this.pageData = data;
-        tvTotalPlayer.setText(String.valueOf(data.getHeaderList().size()));
-
-        if (h2hAdapter == null) {
-            h2hAdapter = new H2hListAdapter(this, data.getHeaderList(), this);
-            rvH2hList.setAdapter(h2hAdapter);
-        } else {
-            h2hAdapter.updateData(data.getHeaderList());
-            h2hAdapter.notifyDataSetChanged();
-        }
-        updateCurrentWinLose();
 
         tvCareer.setSelected(true);
         tvWin.setSelected(true);
         showChart();
-
-        updateSideBar();
-    }
-
-    private void updateSideBar() {
-        // 只有按name排序创建并显示side bar
-        if (presenter.getSortType() == SortDialog.SORT_TYPE_NAME) {
-            sideBar.setVisibility(View.VISIBLE);
-            h2hAdapter.updateSideBar(sideBar);
-        }
-        else {
-            sideBar.setVisibility(View.GONE);
-        }
-    }
-
-    @Override
-    public void onTouchingLetterChanged(String letter) {
-        rvH2hList.scrollToPosition(h2hAdapter.getIndexPosition(letter));
     }
 
     @Override
     public void onSortFinished(List<H2hBean> list) {
-        h2hAdapter.updateData(list);
-        h2hAdapter.notifyDataSetChanged();
-        updateSideBar();
+
     }
 
     @Override
     public void onFilterFinished(List<H2hBean> list) {
-        h2hAdapter.updateData(list);
-        h2hAdapter.notifyDataSetChanged();
-        updateCurrentWinLose();
-        updateSideBar();
-    }
 
-    private void updateCurrentWinLose() {
-        int[] winlose = h2hAdapter.getWinLose();
-        tvConclude.setText("Win " + winlose[0] + "  Lose " + winlose[1]);
-    }
-
-    @Override
-    public void onItemClicked(View v, H2hBean item) {
-
-        Intent intent = new Intent();
-        intent.setClass(this, PlayerPageActivity.class);
-        intent.putExtra(PlayerPageActivity.KEY_USER_ID, presenter.getUser().getId());
-        if (item.getCompetitor() instanceof User) {
-            intent.putExtra(PlayerPageActivity.KEY_COMPETITOR_IS_USER, true);
-        }
-        intent.putExtra(PlayerPageActivity.KEY_COMPETITOR_ID, item.getCompetitor().getId());
-        startActivity(intent);
     }
 
     @Override
@@ -257,60 +203,21 @@ public class H2hListActivity extends BaseMvpActivity<H2hPresenter> implements IH
                 break;
             case 2:
                 presenter.loadPlayers(getIntent().getLongExtra(KEY_USER_ID, -1));
+                ftRich.reload();
                 break;
         }
     }
 
     private void showSortDialog() {
         sortDialog = new SortDialog();
-        sortDialog.setOnSortListener(new SortDialog.OnSortListener() {
-            @Override
-            public void onSort(int type, int order) {
-                presenter.sortDatas(type, order);
-            }
-        });
+        sortDialog.setOnSortListener((type, order) -> ftRich.sortPlayer(type));
         sortDialog.show(getSupportFragmentManager(), "SortDialog");
     }
 
     private void showFilterDialog() {
-        filterDialog = new FilterDialog();
-        filterDialog.setOnFilterListener(new FilterDialog.OnFilterListener() {
-            @Override
-            public void onFilterNothing() {
-                presenter.filterNothing();
-            }
-
-            @Override
-            public void onFilterCountry(String country) {
-                presenter.filterCountry(country);
-            }
-
-            @Override
-            public void onFilterRank(int min, int max) {
-
-            }
-
-            @Override
-            public void onFilterCount(int min, int max) {
-                presenter.filterCount(min, max);
-            }
-
-            @Override
-            public void onFilterWin(int min, int max) {
-                presenter.filterWin(min, max);
-            }
-
-            @Override
-            public void onFilterLose(int min, int max) {
-                presenter.filterLose(min, max);
-            }
-
-            @Override
-            public void onFilterDeltaWin(int min, int max) {
-                presenter.filterOdds(min, max);
-            }
-        });
-        filterDialog.show(getSupportFragmentManager(), "FilterDialog");
+        RichPlayerFilterDialog dialog = new RichPlayerFilterDialog();
+        dialog.setOnFilterListener(bean -> ftRich.filterPlayer(bean));
+        dialog.show(getSupportFragmentManager(), "RichPlayerFilterDialog");
     }
 
     @OnClick({R.id.tv_career, R.id.tv_win, R.id.tv_season, R.id.tv_lose})
@@ -345,16 +252,13 @@ public class H2hListActivity extends BaseMvpActivity<H2hPresenter> implements IH
         if (tvCareer.isSelected()) {
             if (tvWin.isSelected()) {
                 targetValues = pageData.getCareerChartWinValues();
-            }
-            else {
+            } else {
                 targetValues = pageData.getCareerChartLoseValues();
             }
-        }
-        else {
+        } else {
             if (tvWin.isSelected()) {
                 targetValues = pageData.getSeasonChartWinValues();
-            }
-            else {
+            } else {
                 targetValues = pageData.getSeasonChartLoseValues();
             }
         }
@@ -363,4 +267,109 @@ public class H2hListActivity extends BaseMvpActivity<H2hPresenter> implements IH
         }
         chartManager.showH2hChart(pieChart, pageData.getChartContents(), values);
     }
+
+    @Override
+    public void onSelectPlayer(CompetitorBean bean) {
+        Intent intent = new Intent();
+        intent.setClass(this, PlayerPageActivity.class);
+        intent.putExtra(PlayerPageActivity.KEY_USER_ID, presenter.getUser().getId());
+        if (bean instanceof User) {
+            intent.putExtra(PlayerPageActivity.KEY_COMPETITOR_IS_USER, true);
+        }
+        intent.putExtra(PlayerPageActivity.KEY_COMPETITOR_ID, bean.getId());
+        startActivity(intent);
+    }
+
+    @Override
+    public void onSortFinished(int sortType) {
+        updateSortText(sortType);
+        // 此页面默认全部收起
+        ftRich.setExpandAll(false);
+    }
+
+    @Override
+    public void updateFirstIndex(String index) {
+
+    }
+
+    private void updateSortText(int sortType) {
+        String sort;
+        switch (sortType) {
+            case SettingProperty.VALUE_SORT_PLAYER_NAME_ENG:
+                sort = getString(R.string.menu_sort_name_eng);
+                break;
+            case SettingProperty.VALUE_SORT_PLAYER_COUNTRY:
+                sort = getString(R.string.menu_sort_country);
+                break;
+            case SettingProperty.VALUE_SORT_PLAYER_AGE:
+                sort = getString(R.string.menu_sort_age);
+                break;
+            case SettingProperty.VALUE_SORT_PLAYER_CONSTELLATION:
+                sort = getString(R.string.menu_sort_constellation);
+                break;
+            case SettingProperty.VALUE_SORT_PLAYER_RECORD:
+                sort = getString(R.string.menu_sort_record);
+                break;
+            case SettingProperty.VALUE_SORT_PLAYER_HEIGHT:
+                sort = getString(R.string.menu_sort_height);
+                break;
+            case SettingProperty.VALUE_SORT_PLAYER_WEIGHT:
+                sort = getString(R.string.menu_sort_weight);
+                break;
+            case SettingProperty.VALUE_SORT_PLAYER_CAREER_HIGH:
+                sort = getString(R.string.menu_sort_career_high);
+                break;
+            case SettingProperty.VALUE_SORT_PLAYER_CAREER_TITLES:
+                sort = getString(R.string.menu_sort_career_titles);
+                break;
+            case SettingProperty.VALUE_SORT_PLAYER_CAREER_WIN:
+                sort = getString(R.string.menu_sort_career_win);
+                break;
+            case SettingProperty.VALUE_SORT_PLAYER_CAREER_TURNEDPRO:
+                sort = getString(R.string.menu_sort_turned_pro);
+                break;
+            case SettingProperty.VALUE_SORT_PLAYER_CAREER_LAST_UPDATE:
+                sort = getString(R.string.menu_sort_last_update);
+                break;
+            case SettingProperty.VALUE_SORT_PLAYER_RECORD_WIN:
+                sort = getString(R.string.menu_sort_win);
+                break;
+            case SettingProperty.VALUE_SORT_PLAYER_RECORD_LOSE:
+                sort = getString(R.string.menu_sort_lose);
+                break;
+            case SettingProperty.VALUE_SORT_PLAYER_RECORD_ODDS_WIN:
+                sort = getString(R.string.menu_sort_odd_win);
+                break;
+            case SettingProperty.VALUE_SORT_PLAYER_RECORD_ODDS_LOSE:
+                sort = getString(R.string.menu_sort_odd_lose);
+                break;
+            default:
+                sort = getString(R.string.menu_sort_name);
+                break;
+        }
+        tvSort.setText(sort + "排序");
+
+        int[] winLose = ftRich.getWinLoseOfList();
+        StringBuffer buffer = new StringBuffer();
+        buffer.append(winLose[0]).append("胜").append(winLose[1]).append("负");
+        tvWinLose.setText(buffer.toString());
+
+        buffer = new StringBuffer("过滤条件：");
+        if (ListUtil.isEmpty(ftRich.getFilterTexts())) {
+            tvFilter.setVisibility(View.GONE);
+        }
+        else {
+            for (int i = 0; i < ftRich.getFilterTexts().size(); i ++) {
+                if (i > 0) {
+                    buffer.append(",");
+                }
+                buffer.append(ftRich.getFilterTexts().get(i));
+            }
+            tvFilter.setText(buffer.toString());
+            tvFilter.setVisibility(View.VISIBLE);
+        }
+
+        tvTotalPlayer.setText(String.valueOf(ftRich.getTotalPlayers()));
+    }
+
 }
