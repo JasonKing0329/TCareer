@@ -7,6 +7,9 @@ import com.google.gson.Gson;
 import com.king.app.tcareer.base.TApplication;
 import com.king.app.tcareer.conf.AppConstants;
 import com.king.app.tcareer.model.bean.AutoFillMatchBean;
+import com.king.app.tcareer.page.record.editor.RecentMatches;
+
+import java.util.ArrayList;
 
 /**
  * 描述:
@@ -255,6 +258,25 @@ public class SettingProperty {
      */
     public static void setPlayerTabType(int mode) {
         setInt("key_player_tab_type", mode);
+    }
+
+    public static void setRecentMatches(RecentMatches rm) {
+        Gson gson = new Gson();
+        setString("editor_recent_matches", gson.toJson(rm));
+    }
+
+    public static RecentMatches getRecentMatches() {
+        String json = getString("editor_recent_matches");
+        RecentMatches rm;
+        try {
+            rm = new Gson().fromJson(json, RecentMatches.class);
+            if (rm != null) {
+                return rm;
+            }
+        } catch (Exception e) {}
+        rm = new RecentMatches();
+        rm.setMatchIdList(new ArrayList<>());
+        return rm;
     }
 
 }

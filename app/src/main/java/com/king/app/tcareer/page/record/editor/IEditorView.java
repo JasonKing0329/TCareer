@@ -32,5 +32,7 @@ public interface IEditorView extends BaseView {
     void showMatchInfor(Record record, MatchNameBean mMatchNameBean, CompetitorBean mCompetitor, List<Score> mScoreList);
 
     void showMatchFill(int year, String round);
+
+    void showRecentMatches(List<MatchNameBean> matches);
 }
 

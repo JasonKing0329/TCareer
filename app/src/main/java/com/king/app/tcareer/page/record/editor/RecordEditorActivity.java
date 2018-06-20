@@ -55,8 +55,6 @@ public class RecordEditorActivity extends BaseMvpActivity<EditorPresenter> imple
     private PlayerEditPage playerEditPage;
     private MatchEditPage matchEditPage;
 
-    private MatchNameBean matchNameBean;
-
     @Override
     protected int getContentView() {
         return R.layout.activity_record_editor;
@@ -257,4 +255,8 @@ public class RecordEditorActivity extends BaseMvpActivity<EditorPresenter> imple
         super.onActivityResult(requestCode, resultCode, data);
     }
 
+    @Override
+    public void showRecentMatches(List<MatchNameBean> matches) {
+        matchEditPage.showRecentMatches(matches);
+    }
 }

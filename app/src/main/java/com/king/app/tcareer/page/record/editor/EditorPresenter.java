@@ -22,6 +22,8 @@ import com.king.app.tcareer.utils.ListUtil;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import io.reactivex.Observable;
@@ -46,6 +48,8 @@ public class EditorPresenter extends BasePresenter<IEditorView> {
     private MatchNameBean mMatchNameBean;
     private List<Score> mScoreList;
 
+    private boolean isEditMode;
+
     @Override
     protected void onCreate() {
         h2hDao = new H2HDao();
@@ -66,10 +70,12 @@ public class EditorPresenter extends BasePresenter<IEditorView> {
                         view.showUser(user);
                         // 修改
                         if (recordId > 0) {
+                            isEditMode = true;
                             loadRecord(recordId);
                         }
                         // 添加
                         else {
+                            isEditMode = false;
                             mRecord = new Record();
                             mRecord.setUserId(mUser.getId());
                         }
@@ -179,6 +185,10 @@ public class EditorPresenter extends BasePresenter<IEditorView> {
 
     public Record getRecord() {
         return mRecord;
+    }
+
+    public boolean isEditMode() {
+        return isEditMode;
     }
 
     public CompetitorBean getCompetitor() {
@@ -335,5 +345,69 @@ public class EditorPresenter extends BasePresenter<IEditorView> {
         mScoreList = null;
         // mMatchNameBean不重置，继续保留上一次的
 //        mMatchNameBean = null;
+    }
+
+    public void loadRecentMatches() {
+        queryRecentMatches()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(new Observer<List<MatchNameBean>>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                        addDisposable(d);
+                    }
+
+                    @Override
+                    public void onNext(List<MatchNameBean> matches) {
+                        view.showRecentMatches(matches);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        e.printStackTrace();
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
+    }
+
+    private Observable<List<MatchNameBean>> queryRecentMatches() {
+        return Observable.create(e -> {
+            List<MatchNameBean> list = new ArrayList<>();
+            RecentMatches rm = SettingProperty.getRecentMatches();
+            // 后加入的显示在前面
+            Collections.reverse(rm.getMatchIdList());
+            MatchNameBeanDao dao = TApplication.getInstance().getDaoSession().getMatchNameBeanDao();
+            for (long id:rm.getMatchIdList()) {
+                try {
+                    list.add(dao.queryBuilder().where(MatchNameBeanDao.Properties.Id.eq(id)).build().unique());
+                } catch (Exception exception) {
+                    rm.getMatchIdList().remove(id);
+                    SettingProperty.setRecentMatches(rm);
+                    break;
+                }
+            }
+            e.onNext(list);
+        });
+    }
+
+    public void saveAsRecentMatch(MatchNameBean mEditMatch) {
+        RecentMatches rm = SettingProperty.getRecentMatches();
+        for (long id:rm.getMatchIdList()) {
+            // 已存在的去掉重新添加，提高优先级
+            if (id == mEditMatch.getMatchId()) {
+                rm.getMatchIdList().remove(id);
+                break;
+            }
+        }
+        rm.getMatchIdList().add(mEditMatch.getId());
+        // 最多只保存3个
+        if (rm.getMatchIdList().size() > 3) {
+            rm.getMatchIdList().remove(0);
+        }
+        SettingProperty.setRecentMatches(rm);
     }
 }

@@ -1,5 +1,7 @@
 package com.king.app.tcareer.page.record.editor;
 
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -22,6 +24,7 @@ import com.king.app.tcareer.model.db.entity.Record;
 import com.king.app.tcareer.model.db.entity.Score;
 import com.king.app.tcareer.page.setting.SettingProperty;
 import com.king.app.tcareer.utils.ListUtil;
+import com.king.app.tcareer.view.adapter.BaseRecyclerAdapter;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -38,6 +41,7 @@ public class MatchEditPage implements View.OnClickListener {
 
     private ImageView ivChangeMatch;
     private ImageView ivMatch;
+    private RecyclerView rvRecentMatches;
     private ViewGroup groupMatch;
     private ViewGroup groupScore;
     private ViewGroup groupWinner;
@@ -52,6 +56,10 @@ public class MatchEditPage implements View.OnClickListener {
 
     private String mStrWinner;
     private String mStrScore;
+
+    private RecentMatchAdapter recentMatchAdapter;
+
+    private MatchNameBean mEditMatch;
 
     public MatchEditPage(IEditorHolder holder) {
         this.holder = holder;
@@ -85,6 +93,7 @@ public class MatchEditPage implements View.OnClickListener {
         tvMatchLevel = (TextView) holder.getActivity().findViewById(R.id.editor_match_level);
         sp_year = (Spinner) holder.getActivity().findViewById(R.id.editor_match_year);
         sp_round = (Spinner) holder.getActivity().findViewById(R.id.editor_match_round);
+        rvRecentMatches = holder.getActivity().findViewById(R.id.rv_recent_matches);
 
         spinnerAdapter = new ArrayAdapter<String>(holder.getActivity(),
                 android.R.layout.simple_spinner_item, arr_year);
@@ -98,10 +107,20 @@ public class MatchEditPage implements View.OnClickListener {
                 .setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         sp_round.setAdapter(spinnerAdapter);
         sp_round.setOnItemSelectedListener(spinnerListener);
+
+        rvRecentMatches.setLayoutManager(new LinearLayoutManager(holder.getActivity(), LinearLayoutManager.HORIZONTAL, false));
     }
 
     public void initData() {
         holder.getPresenter().initMatchPage();
+
+        // 新增record显示最近操作的赛事
+        if (holder.getPresenter().isEditMode()) {
+            rvRecentMatches.setVisibility(View.GONE);
+        }
+        else {
+            holder.getPresenter().loadRecentMatches();
+        }
     }
 
     public void showMatchFill(int year, String round) {
@@ -212,6 +231,7 @@ public class MatchEditPage implements View.OnClickListener {
      * @param bean
      */
     public void onMatchSelected(MatchNameBean bean) {
+        mEditMatch = bean;
         if (bean == null) {
             return;
         }
@@ -247,6 +267,23 @@ public class MatchEditPage implements View.OnClickListener {
      */
     public void saveAutoFill() {
         holder.getPresenter().saveAutoFill(cur_year, arr_round[cur_round]);
+        // 新增模式下保存为最近操作赛事，编辑模式下不保存
+        if (!holder.getPresenter().isEditMode()) {
+            holder.getPresenter().saveAsRecentMatch(mEditMatch);
+        }
+    }
+
+    public void showRecentMatches(List<MatchNameBean> matches) {
+        if (recentMatchAdapter == null) {
+            recentMatchAdapter = new RecentMatchAdapter();
+            recentMatchAdapter.setList(matches);
+            recentMatchAdapter.setOnItemClickListener((position, data) -> onMatchSelected(data));
+            rvRecentMatches.setAdapter(recentMatchAdapter);
+        }
+        else {
+            recentMatchAdapter.setList(matches);
+            recentMatchAdapter.notifyDataSetChanged();
+        }
     }
 
     private class SpinnerListener implements AdapterView.OnItemSelectedListener {
