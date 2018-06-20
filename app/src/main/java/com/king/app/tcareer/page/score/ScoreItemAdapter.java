@@ -8,6 +8,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.king.app.tcareer.R;
+import com.king.app.tcareer.conf.AppConstants;
 
 import java.util.List;
 
@@ -60,11 +61,25 @@ public class ScoreItemAdapter extends RecyclerView.Adapter implements View.OnCli
             if (bean.getMatchBean() == null) {// 500 赛罚分
                 holder.cup.setVisibility(View.INVISIBLE);
                 holder.name.setText("500赛罚分");
+                holder.name.setTextColor(holder.name.getResources().getColor(R.color.text_normal));
                 holder.score.setText("0");
                 holder.complete.setVisibility(View.INVISIBLE);
                 holder.group.setOnClickListener(null);
             }
             else {
+                String court = bean.getMatchBean().getMatchBean().getCourt();
+                if (AppConstants.RECORD_MATCH_COURTS[1].equals(court)) {
+                    holder.name.setTextColor(holder.name.getResources().getColor(R.color.normal_court_clay));
+                }
+                else if (AppConstants.RECORD_MATCH_COURTS[2].equals(court)) {
+                    holder.name.setTextColor(holder.name.getResources().getColor(R.color.normal_court_grass));
+                }
+                else if (AppConstants.RECORD_MATCH_COURTS[3].equals(court)) {
+                    holder.name.setTextColor(holder.name.getResources().getColor(R.color.normal_court_inhard));
+                }
+                else {
+                    holder.name.setTextColor(holder.name.getResources().getColor(R.color.text_normal));
+                }
                 holder.cup.setVisibility(bean.isChampion() ? View.VISIBLE:View.INVISIBLE);
                 holder.name.setText(bean.getMatchBean().getName());
                 holder.score.setText(String.valueOf(bean.getScore()));
