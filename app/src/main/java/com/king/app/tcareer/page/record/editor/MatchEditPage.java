@@ -59,8 +59,6 @@ public class MatchEditPage implements View.OnClickListener {
 
     private RecentMatchAdapter recentMatchAdapter;
 
-    private MatchNameBean mEditMatch;
-
     public MatchEditPage(IEditorHolder holder) {
         this.holder = holder;
         spinnerListener = new SpinnerListener();
@@ -231,7 +229,6 @@ public class MatchEditPage implements View.OnClickListener {
      * @param bean
      */
     public void onMatchSelected(MatchNameBean bean) {
-        mEditMatch = bean;
         if (bean == null) {
             return;
         }
@@ -269,7 +266,7 @@ public class MatchEditPage implements View.OnClickListener {
         holder.getPresenter().saveAutoFill(cur_year, arr_round[cur_round]);
         // 新增模式下保存为最近操作赛事，编辑模式下不保存
         if (!holder.getPresenter().isEditMode()) {
-            holder.getPresenter().saveAsRecentMatch(mEditMatch);
+            holder.getPresenter().saveAsRecentMatch();
         }
     }
 
@@ -277,7 +274,10 @@ public class MatchEditPage implements View.OnClickListener {
         if (recentMatchAdapter == null) {
             recentMatchAdapter = new RecentMatchAdapter();
             recentMatchAdapter.setList(matches);
-            recentMatchAdapter.setOnItemClickListener((position, data) -> onMatchSelected(data));
+            recentMatchAdapter.setOnItemClickListener((position, data) -> {
+                holder.getPresenter().updateMatchNameBean(data);
+                onMatchSelected(data);
+            });
             rvRecentMatches.setAdapter(recentMatchAdapter);
         }
         else {

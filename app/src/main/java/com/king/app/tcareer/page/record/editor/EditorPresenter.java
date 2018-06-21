@@ -195,6 +195,10 @@ public class EditorPresenter extends BasePresenter<IEditorView> {
         return mCompetitor;
     }
 
+    public void updateMatchNameBean(MatchNameBean bean) {
+        mMatchNameBean = bean;
+    }
+
     public MatchNameBean getMatchNameBean() {
         return mMatchNameBean;
     }
@@ -394,16 +398,16 @@ public class EditorPresenter extends BasePresenter<IEditorView> {
         });
     }
 
-    public void saveAsRecentMatch(MatchNameBean mEditMatch) {
+    public void saveAsRecentMatch() {
         RecentMatches rm = SettingProperty.getRecentMatches();
         for (long id:rm.getMatchIdList()) {
             // 已存在的去掉重新添加，提高优先级
-            if (id == mEditMatch.getMatchId()) {
+            if (id == mMatchNameBean.getId()) {
                 rm.getMatchIdList().remove(id);
                 break;
             }
         }
-        rm.getMatchIdList().add(mEditMatch.getId());
+        rm.getMatchIdList().add(mMatchNameBean.getId());
         // 最多只保存3个
         if (rm.getMatchIdList().size() > 3) {
             rm.getMatchIdList().remove(0);
