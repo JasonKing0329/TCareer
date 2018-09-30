@@ -23,7 +23,6 @@
         android:roundIcon="@drawable/app_icon"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-
         <meta-data
             android:name="com.samsung.android.sdk.multiwindow.enable"
             android:value="true" />
@@ -37,8 +36,7 @@
             android:name="com.sec.android.support.multiwindow"
             android:value="true" />
 
-        <activity android:name=".page.login.LoginActivity"
-            android:screenOrientation="portrait">
+        <activity android:name=".page.TestActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -46,92 +44,98 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".page.home.HomeActivity"
-            android:theme="@style/HomeTheme"
-            android:screenOrientation="portrait"/>
-
-        <activity android:name=".page.setting.SettingActivity"
-            android:screenOrientation="portrait"/>
-
-        <activity android:name=".page.record.list.RecordActivity"
-            android:theme="@style/RecordTheme"
-            android:screenOrientation="portrait"/>
-
-        <activity android:name=".page.record.complex.RecordComplexActivity"
-            android:theme="@style/RecordTheme"
-            android:screenOrientation="portrait"/>
-
-        <activity android:name=".page.record.page.RecordPageActivity"
-            android:theme="@style/RecordTheme"
-            android:screenOrientation="portrait"
-            android:launchMode="singleTask"/>
-
-        <activity android:name=".page.record.editor.RecordEditorActivity"
-            android:theme="@style/SubTheme"
-            android:screenOrientation="portrait"/>
-
-        <activity android:name=".page.match.common.MatchCommonActivity"
-            android:theme="@style/NoActionBarTheme"
-            android:screenOrientation="portrait"/>
-
-        <activity android:name=".page.match.manage.MatchManageActivity"
-            android:theme="@style/NoActionBarTheme"
+        <activity
+            android:name=".page.login.LoginActivity"
             android:screenOrientation="portrait">
         </activity>
 
-        <activity android:name=".page.match.page.MatchPageActivity"
-            android:theme="@style/HomeTheme"
-            android:screenOrientation="portrait"/>
-
-        <activity android:name=".page.match.gallery.UserMatchActivity"
-            android:theme="@style/HomeTheme"
-            android:screenOrientation="portrait"/>
-
-        <activity android:name=".page.player.manage.PlayerManageActivity"
-            android:theme="@style/NoActionBarTheme"
-            android:screenOrientation="portrait"/>
-
-        <activity android:name=".page.player.page.PlayerPageActivity"
-            android:theme="@style/HomeTheme"
-            android:screenOrientation="portrait"/>
-
-        <activity android:name=".page.player.slider.PlayerSlideActivity"
-            android:theme="@style/HomeTheme"
-            android:screenOrientation="portrait"/>
-
-        <activity android:name=".page.rank.RankManageActivity"
-            android:theme="@style/NoActionBarTheme"
-            android:screenOrientation="portrait"/>
-
-        <activity android:name=".page.rank.RankDetailActivity"
-            android:theme="@style/NoActionBarTheme"
-            android:screenOrientation="portrait"/>
-
-        <activity android:name=".page.score.ScoreActivity"
-            android:theme="@style/NoActionBarTheme"
-            android:screenOrientation="portrait"/>
-
-        <activity android:name=".page.player.h2hlist.H2hListActivity"
-            android:theme="@style/RecordTheme"
-            android:screenOrientation="portrait"/>
-
-        <activity android:name=".page.glory.GloryActivity"
-            android:theme="@style/HomeTheme"
-            android:screenOrientation="portrait"/>
-
-        <activity android:name=".page.player.atp.AtpManageActivity"
-            android:theme="@style/NoActionBarTheme"
-            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".page.home.HomeActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/HomeTheme" />
+        <activity
+            android:name=".page.setting.SettingActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".page.record.list.RecordActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/RecordTheme" />
+        <activity
+            android:name=".page.record.complex.RecordComplexActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/RecordTheme" />
+        <activity
+            android:name=".page.record.page.RecordPageActivity"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait"
+            android:theme="@style/RecordTheme" />
+        <activity
+            android:name=".page.record.editor.RecordEditorActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/SubTheme" />
+        <activity
+            android:name=".page.match.common.MatchCommonActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoActionBarTheme" />
+        <activity
+            android:name=".page.match.manage.MatchManageActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoActionBarTheme"></activity>
+        <activity
+            android:name=".page.match.page.MatchPageActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/HomeTheme" />
+        <activity
+            android:name=".page.match.gallery.UserMatchActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/HomeTheme" />
+        <activity
+            android:name=".page.player.manage.PlayerManageActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoActionBarTheme" />
+        <activity
+            android:name=".page.player.page.PlayerPageActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/HomeTheme" />
+        <activity
+            android:name=".page.player.slider.PlayerSlideActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/HomeTheme" />
+        <activity
+            android:name=".page.rank.RankManageActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoActionBarTheme" />
+        <activity
+            android:name=".page.rank.RankDetailActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoActionBarTheme" />
+        <activity
+            android:name=".page.score.ScoreActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoActionBarTheme" />
+        <activity
+            android:name=".page.player.h2hlist.H2hListActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/RecordTheme" />
+        <activity
+            android:name=".page.glory.GloryActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/HomeTheme" />
+        <activity
+            android:name=".page.player.atp.AtpManageActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoActionBarTheme" />
 
         <provider
             android:name="android.support.v4.content.FileProvider"
             android:authorities="com.king.app.tcareer.fileProvider"
-            android:grantUriPermissions="true"
-            android:exported="false">
+            android:exported="false"
+            android:grantUriPermissions="true">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
         </provider>
+
     </application>
 
 </manifest>

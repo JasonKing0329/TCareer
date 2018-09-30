@@ -190,4 +190,9 @@
 		<item>Level</item>
 		<item>Year</item>
 	</array>
+
+	<array name="retire_type">
+		<item>Retire</item>
+		<item>Relieve</item>
+	</array>
 </resources>

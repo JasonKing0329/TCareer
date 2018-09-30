@@ -13,12 +13,17 @@ import com.king.app.tcareer.base.BaseMvpFragment;
 import com.king.app.tcareer.base.IFragmentHolder;
 import com.king.app.tcareer.model.GlideOptions;
 import com.king.app.tcareer.model.ImageProvider;
+import com.king.app.tcareer.model.db.entity.Retire;
 import com.king.app.tcareer.model.db.entity.User;
 import com.king.app.tcareer.page.score.IScorePageView;
 import com.king.app.tcareer.page.score.ScorePageData;
 import com.king.app.tcareer.page.score.ScorePresenter;
 import com.king.app.tcareer.utils.FormatUtil;
+import com.king.app.tcareer.utils.RetireUtil;
 import com.king.app.tcareer.utils.ScreenUtils;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import butterknife.BindView;
 import butterknife.OnClick;
@@ -46,8 +51,12 @@ public class HomeHeadFragment extends BaseMvpFragment<ScorePresenter> implements
     TextView tvTotal;
     @BindView(R.id.tv_rank)
     TextView tvRank;
+    @BindView(R.id.tv_retire)
+    TextView tvRetire;
+    @BindView(R.id.tv_retire_time)
+    TextView tvRetireTime;
     @BindView(R.id.group_player_basic)
-    RelativeLayout groupPlayerBasic;
+    ViewGroup groupPlayerBasic;
 
     private IHomeHeaderHolder holder;
 
@@ -85,13 +94,26 @@ public class HomeHeadFragment extends BaseMvpFragment<ScorePresenter> implements
 
     @Override
     protected void onCreateData() {
-        load52WeekScore();
+        // retired and in efficient time
+        if (RetireUtil.isRetired(getUserId(), new Date(), true)) {
+            tvRank.setVisibility(View.INVISIBLE);
+            tvTotal.setVisibility(View.INVISIBLE);
+            showUser(presenter.queryUserInstant(getUserId()));
+        }
+        // count score and rank
+        else {
+            load52WeekScore();
+        }
     }
 
     private void load52WeekScore() {
 
+        presenter.query52WeekRecords(getUserId());
+    }
+
+    private long getUserId() {
         long userId = getArguments().getLong(BUNDLE_USERID);
-        presenter.query52WeekRecords(userId);
+        return userId;
     }
 
     @Override
@@ -106,6 +128,8 @@ public class HomeHeadFragment extends BaseMvpFragment<ScorePresenter> implements
                 .load(imagePath)
                 .apply(GlideOptions.getEditorPlayerOptions())
                 .into(ivFlagBg);
+
+        checkRetirement();
     }
 
     @Override
@@ -126,5 +150,14 @@ public class HomeHeadFragment extends BaseMvpFragment<ScorePresenter> implements
 
     public void onRankChanged() {
         tvRank.setText(String.valueOf(presenter.getRank()));
+    }
+
+    private void checkRetirement() {
+        Retire retire = RetireUtil.getRetired(getUserId(), new Date(), false);
+        if (retire != null) {
+            tvRetire.setVisibility(View.VISIBLE);
+            tvRetireTime.setVisibility(View.VISIBLE);
+            tvRetireTime.setText(new SimpleDateFormat("yyyy-MM-dd").format(retire.getDeclareDate()));
+        }
     }
 }

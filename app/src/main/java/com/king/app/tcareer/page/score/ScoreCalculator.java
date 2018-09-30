@@ -1,13 +1,11 @@
 package com.king.app.tcareer.page.score;
 
-import android.app.DatePickerDialog;
 import android.content.DialogInterface;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -15,12 +13,11 @@ import android.widget.TextView;
 import com.king.app.tcareer.R;
 import com.king.app.tcareer.base.IFragmentHolder;
 import com.king.app.tcareer.base.TApplication;
+import com.king.app.tcareer.model.DateManager;
 import com.king.app.tcareer.model.db.entity.RankWeek;
 import com.king.app.tcareer.model.db.entity.RankWeekDao;
 import com.king.app.tcareer.view.dialog.DraggableDialogFragment;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
@@ -114,19 +111,13 @@ public class ScoreCalculator extends DraggableDialogFragment {
 
         private ScoreModel scoreModel;
 
-        private int nYearStart;
-        private int nMonthStart;
-        private int nDayStart;
-
         private long mUserId;
-
-        private String mDate;
 
         private ValidScores mValidScore;
 
         private RankWeek mUpdateData;
 
-        private SimpleDateFormat dateFormat;
+        private DateManager dateManager;
 
         @Override
         protected int getContentLayoutRes() {
@@ -139,13 +130,13 @@ public class ScoreCalculator extends DraggableDialogFragment {
             scoreModel = new ScoreModel();
             progressBar.setVisibility(View.INVISIBLE);
 
-            dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            dateManager = new DateManager();
 
             if (mUpdateData != null) {
-                mDate = dateFormat.format(mUpdateData.getDate());
+                dateManager.setDate(mUpdateData.getDate());
                 btnOk.setVisibility(View.GONE);
                 btnInsert.setText("Update");
-                btnStart.setText(mDate);
+                btnStart.setText(dateManager.getDateStr());
                 btnStart.setEnabled(false);
                 etRank.setText(String.valueOf(mUpdateData.getRank()));
                 etScore.setText(String.valueOf(mUpdateData.getScore()));
@@ -174,7 +165,12 @@ public class ScoreCalculator extends DraggableDialogFragment {
         public void onViewClicked(View view) {
             switch (view.getId()) {
                 case R.id.btn_start:
-                    pickStartDate();
+                    dateManager.pickDate(getActivity(), () -> {
+                        btnStart.setText(dateManager.getDateStr());
+
+                        etScore.setText("");
+                        onDateChanged();
+                    });
                     break;
                 case R.id.btn_ok:
                     calculateScore();
@@ -185,45 +181,9 @@ public class ScoreCalculator extends DraggableDialogFragment {
             }
         }
 
-        private void pickStartDate() {
-            if (nYearStart == 0) {
-                Calendar calendar = Calendar.getInstance();
-                nYearStart = calendar.get(Calendar.YEAR);
-                nMonthStart= calendar.get(Calendar.MONTH);
-                nDayStart = 1;
-            }
-
-            DatePickerDialog startDlg = new DatePickerDialog(getContext(),
-                    startListener, nYearStart, nMonthStart, nDayStart);
-            startDlg.show();
-        }
-
-        DatePickerDialog.OnDateSetListener startListener = new DatePickerDialog.OnDateSetListener() {
-            @Override
-            public void onDateSet(DatePicker view, int year, int monthOfYear,
-                                  int dayOfMonth) {
-                updateDate(year, monthOfYear, dayOfMonth);
-            }
-        };
-
-        private void updateDate(int year, int monthOfYear, int dayOfMonth) {
-            nYearStart = year;
-            nMonthStart = monthOfYear;//日期控件的月份是从0开始编号的
-            nDayStart = dayOfMonth;
-            StringBuffer buffer = new StringBuffer();
-            buffer.append(nYearStart).append("-");
-            buffer.append(nMonthStart < 10 ? "0" + (nMonthStart + 1) : (nMonthStart + 1)).append("-");
-            buffer.append(nDayStart < 10 ? "0" + nDayStart : nDayStart);
-            mDate = buffer.toString();
-            btnStart.setText(mDate);
-
-            etScore.setText("");
-            onDateChanged();
-        }
-
         private void onDateChanged() {
             // 查询是否已录入rank
-            queryRankWeek(mDate)
+            queryRankWeek(dateManager.getDateStr())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribeOn(Schedulers.io())
                     .subscribe(new Observer<RankWeek>() {
@@ -259,11 +219,11 @@ public class ScoreCalculator extends DraggableDialogFragment {
             tvScore.setText("");
             tvScoreDetail.setText("");
 
-            scoreModel.queryScoreToDate(mDate, mUserId)
+            scoreModel.queryScoreToDate(dateManager.getDateStr(), mUserId)
                     .flatMap(new Function<List<ScoreBean>, ObservableSource<ValidScores>>() {
                         @Override
                         public ObservableSource<ValidScores> apply(List<ScoreBean> list) throws Exception {
-                            return scoreModel.countValidScores(list, mUserId, mDate);
+                            return scoreModel.countValidScores(list, mUserId, dateManager.getDateStr());
                         }
                     })
                     .map(new Function<ValidScores, ValidScores>() {
@@ -346,7 +306,7 @@ public class ScoreCalculator extends DraggableDialogFragment {
                 @Override
                 public void subscribe(ObservableEmitter<RankWeek> e) throws Exception {
                     RankWeekDao dao = TApplication.getInstance().getDaoSession().getRankWeekDao();
-                    Date date = dateFormat.parse(strDate);
+                    Date date = dateManager.getDate();
                     RankWeek week = null;
                     try {
                         week = dao.queryBuilder()
@@ -371,7 +331,7 @@ public class ScoreCalculator extends DraggableDialogFragment {
 
             progressBar.setVisibility(View.VISIBLE);
 
-            queryRankWeek(mDate)
+            queryRankWeek(dateManager.getDateStr())
                     .flatMap(new Function<RankWeek, ObservableSource<?>>() {
                         @Override
                         public ObservableSource<?> apply(final RankWeek rankWeek) throws Exception {
@@ -379,25 +339,21 @@ public class ScoreCalculator extends DraggableDialogFragment {
                                 @Override
                                 public void subscribe(Observer<? super Object> observer) {
                                     RankWeek week = rankWeek;
-                                    try {
-                                        Date date = dateFormat.parse(mDate);
-                                        week.setUserId(mUserId);
-                                        week.setRank(Integer.parseInt(rank));
-                                        int score = mValidScore.getValidScore();
-                                        if (!TextUtils.isEmpty(etScore.getText().toString())) {
-                                            score = Integer.parseInt(etScore.getText().toString());
-                                        }
-                                        week.setScore(score);
-                                        week.setDate(date);
-                                        Calendar calendar = Calendar.getInstance();
-                                        calendar.setTime(date);
-                                        week.setYear(calendar.get(Calendar.YEAR));
-                                        week.setWeek(calendar.get(Calendar.WEEK_OF_YEAR));
-                                        RankWeekDao dao = TApplication.getInstance().getDaoSession().getRankWeekDao();
-                                        dao.insertOrReplace(week);
-                                    } catch (ParseException e) {
-                                        observer.onError(e);
+                                    Date date = dateManager.getDate();
+                                    week.setUserId(mUserId);
+                                    week.setRank(Integer.parseInt(rank));
+                                    int score = mValidScore.getValidScore();
+                                    if (!TextUtils.isEmpty(etScore.getText().toString())) {
+                                        score = Integer.parseInt(etScore.getText().toString());
                                     }
+                                    week.setScore(score);
+                                    week.setDate(date);
+                                    Calendar calendar = Calendar.getInstance();
+                                    calendar.setTime(date);
+                                    week.setYear(calendar.get(Calendar.YEAR));
+                                    week.setWeek(calendar.get(Calendar.WEEK_OF_YEAR));
+                                    RankWeekDao dao = TApplication.getInstance().getDaoSession().getRankWeekDao();
+                                    dao.insertOrReplace(week);
                                     observer.onNext(new Object());
                                 }
                             };

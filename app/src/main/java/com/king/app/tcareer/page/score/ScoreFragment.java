@@ -19,8 +19,10 @@ import com.king.app.tcareer.model.FlagProvider;
 import com.king.app.tcareer.model.db.entity.User;
 import com.king.app.tcareer.page.match.MatchDialog;
 import com.king.app.tcareer.utils.FormatUtil;
+import com.king.app.tcareer.utils.RetireUtil;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import butterknife.BindView;
@@ -125,10 +127,21 @@ public class ScoreFragment extends BaseMvpFragment<ScorePresenter> implements IS
     protected void onCreateData() {
         pageMode = getArguments().getInt(KEY_MODE);
         if (pageMode == FLAG_YEAR) {
-            presenter.queryYearRecords(getArguments().getLong(KEY_USER_ID));
+            presenter.queryYearRecords(getUserId());
         } else {
-            presenter.query52WeekRecords(getArguments().getLong(KEY_USER_ID));
+            if (RetireUtil.isEffecientRetiredNow(getUserId())) {
+                showUser(presenter.queryUserInstant(getUserId()));
+                tvByLevel.setVisibility(View.INVISIBLE);
+                tvByMonth.setVisibility(View.INVISIBLE);
+            }
+            else {
+                presenter.query52WeekRecords(getUserId());
+            }
         }
+    }
+    
+    private long getUserId(){
+        return getArguments().getLong(KEY_USER_ID);
     }
 
     @Override
@@ -159,10 +172,15 @@ public class ScoreFragment extends BaseMvpFragment<ScorePresenter> implements IS
     @Override
     public void onPageDataLoaded(ScorePageData data) {
 
-        if (data.getRank() == 0) {
-            tvRank.setText("--");
-        } else {
-            tvRank.setText(String.valueOf(data.getRank()));
+        if (RetireUtil.isEffecientRetiredNow(getUserId())) {
+            tvRank.setVisibility(View.INVISIBLE);
+        }
+        else {
+            if (data.getRank() == 0) {
+                tvRank.setText("--");
+            } else {
+                tvRank.setText(String.valueOf(data.getRank()));
+            }
         }
 
         tvByLevel.setSelected(true);
@@ -295,14 +313,14 @@ public class ScoreFragment extends BaseMvpFragment<ScorePresenter> implements IS
         int year = presenter.getCurrentYear() - 1;
         presenter.setCurrentYear(year);
         tvYearSelect.setText(String.valueOf(year));
-        presenter.queryYearRecords(getArguments().getLong(KEY_USER_ID));
+        presenter.queryYearRecords(getUserId());
     }
 
     private void showNextYear() {
         int year = presenter.getCurrentYear() + 1;
         presenter.setCurrentYear(year);
         tvYearSelect.setText(String.valueOf(year));
-        presenter.queryYearRecords(getArguments().getLong(KEY_USER_ID));
+        presenter.queryYearRecords(getUserId());
     }
 
     public Animation getDisappearAnim() {

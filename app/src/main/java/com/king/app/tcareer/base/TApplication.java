@@ -13,6 +13,7 @@ import com.king.app.tcareer.model.db.entity.EarlierAchieveDao;
 import com.king.app.tcareer.model.db.entity.PlayerAtpBeanDao;
 import com.king.app.tcareer.model.db.entity.PlayerBeanDao;
 import com.king.app.tcareer.model.db.entity.RankWeekDao;
+import com.king.app.tcareer.model.db.entity.RetireDao;
 import com.king.app.tcareer.model.db.entity.UserDao;
 import com.king.app.tcareer.utils.DebugLog;
 import com.squareup.leakcanary.LeakCanary;
@@ -112,6 +113,8 @@ public class TApplication extends Application {
 					PlayerAtpBeanDao.createTable(db, true);
 					db.execSQL("ALTER TABLE " + UserDao.TABLENAME + " ADD COLUMN " + UserDao.Properties.AtpId.columnName + " TEXT;");
 					db.execSQL("ALTER TABLE " + PlayerBeanDao.TABLENAME + " ADD COLUMN " + PlayerBeanDao.Properties.AtpId.columnName + " TEXT;");
+				case 4:
+					RetireDao.createTable(db, true);
 					break;
 			}
 		}

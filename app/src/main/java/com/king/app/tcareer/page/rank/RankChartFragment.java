@@ -217,6 +217,9 @@ public class RankChartFragment extends BaseMvpFragment<RankPresenter> implements
             @Override
             public String getFormattedValue(float value, Entry entry, int dataSetIndex, ViewPortHandler viewPortHandler) {
                 Rank bean = (Rank) entry.getData();
+                if (bean.getRank() == 0) {
+                    return "--";
+                }
                 return String.valueOf(bean.getRank());
             }
         });

@@ -63,6 +63,7 @@ import com.king.app.tcareer.page.setting.SettingActivity;
 import com.king.app.tcareer.utils.DebugLog;
 import com.king.app.tcareer.view.content.LoadFromContent;
 import com.king.app.tcareer.view.dialog.CommonDialog;
+import com.king.app.tcareer.view.dialog.frame.FrameDialogFragment;
 import com.king.app.tcareer.view.widget.CircleImageView;
 import com.king.app.tcareer.view.widget.discrete.DiscreteScrollView;
 import com.king.app.tcareer.view.widget.discrete.transform.ScaleTransformer;
@@ -461,9 +462,21 @@ public class HomeActivity extends BaseMvpActivity<HomePresenter> implements IHom
             case R.id.menu_home_exit:
                 executeExit();
                 break;
+            case R.id.menu_home_retire:
+                markRetire();
+                break;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void markRetire() {
+        RetireDialog content = new RetireDialog();
+        content.setUserId(presenter.getUser().getId());
+        FrameDialogFragment dialogFragment = new FrameDialogFragment();
+        dialogFragment.setContentFragment(content);
+        dialogFragment.setTitle(presenter.getUser().getNameEng());
+        dialogFragment.show(getSupportFragmentManager(), "FrameDialogFragment");
     }
 
     @Override

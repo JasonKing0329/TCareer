@@ -7,8 +7,8 @@ android {
         applicationId "com.king.app.tcareer"
         minSdkVersion 21
         targetSdkVersion 27
-        versionCode 83
-        versionName "3.4.3"
+        versionCode 84
+        versionName "3.5.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
         sourceSets.main {
@@ -38,7 +38,7 @@ android {
     }
 
     greendao {
-        schemaVersion 4
+        schemaVersion 5
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8

@@ -42,16 +42,15 @@ public abstract class BasePresenter<T extends BaseView> {
     }
 
     protected Observable<User> queryUser(final long userId) {
-        return Observable.create(new ObservableOnSubscribe<User>() {
-            @Override
-            public void subscribe(ObservableEmitter<User> e) throws Exception {
-                UserDao dao = TApplication.getInstance().getDaoSession().getUserDao();
-                mUser = dao.queryBuilder()
-                        .where(UserDao.Properties.Id.eq(userId))
-                        .build().unique();
-                e.onNext(mUser);
-            }
-        });
+        return Observable.create(e -> e.onNext(queryUserInstant(userId)));
+    }
+
+    public User queryUserInstant(long userId) {
+        UserDao dao = TApplication.getInstance().getDaoSession().getUserDao();
+        mUser = dao.queryBuilder()
+                .where(UserDao.Properties.Id.eq(userId))
+                .build().unique();
+        return mUser;
     }
 
     public User getUser() {

@@ -46,4 +46,14 @@
         <attr name="maxWidth" format="dimension"/>
     </declare-styleable>
 
+    <declare-styleable name="LineChart">
+        <attr name="minXCellWidth" format="dimension" />
+        <attr name="minYCellHeight" format="dimension" />
+    </declare-styleable>
+
+    <declare-styleable name="BarChart">
+        <attr name="barWidth" format="dimension" />
+        <attr name="barGap" format="dimension" />
+    </declare-styleable>
+
 </resources>
