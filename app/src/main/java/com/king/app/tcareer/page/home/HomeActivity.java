@@ -51,10 +51,10 @@ import com.king.app.tcareer.page.player.manage.PlayerManageActivity;
 import com.king.app.tcareer.page.player.page.PlayerPageActivity;
 import com.king.app.tcareer.page.player.slider.PlayerSlideActivity;
 import com.king.app.tcareer.page.player.slider.PlayerSlideAdapter;
-import com.king.app.tcareer.page.rank.RankChartFragment;
 import com.king.app.tcareer.page.rank.RankDetailActivity;
 import com.king.app.tcareer.page.rank.RankDetailFragment;
 import com.king.app.tcareer.page.rank.RankManageActivity;
+import com.king.app.tcareer.page.rank.RankYearEndFragment;
 import com.king.app.tcareer.page.record.complex.RecordComplexActivity;
 import com.king.app.tcareer.page.record.editor.RecordEditorActivity;
 import com.king.app.tcareer.page.record.list.RecordActivity;
@@ -140,7 +140,7 @@ public class HomeActivity extends BaseMvpActivity<HomePresenter> implements IHom
 
     private List<UserMatchBean> matchList;
 
-    private RankChartFragment ftChart;
+    private RankYearEndFragment ftChart;
 
     private RankDetailFragment ftRankDetail;
 
@@ -234,15 +234,10 @@ public class HomeActivity extends BaseMvpActivity<HomePresenter> implements IHom
     }
 
     private void initRankChart() {
-        ftChart = RankChartFragment.newInstance(presenter.getUser().getId());
-        ftChart.setOnChartGroupClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startRankManageActivity();
-            }
-        });
+        ftChart = RankYearEndFragment.newInstance(presenter.getUser().getId());
+        ftChart.setOnChartGroupClickListener(v -> startRankManageActivity());
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        ft.replace(R.id.group_chart, ftChart, "RankChartFragment");
+        ft.replace(R.id.group_chart, ftChart, "RankYearEndFragment");
         ft.commit();
     }
 

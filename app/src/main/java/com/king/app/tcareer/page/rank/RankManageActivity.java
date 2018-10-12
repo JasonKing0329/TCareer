@@ -7,7 +7,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import com.king.app.jactionbar.JActionbar;
 import com.king.app.jactionbar.OnBackListener;
@@ -38,7 +37,7 @@ public class RankManageActivity extends BaseMvpActivity<RankPresenter> implement
     @BindView(R.id.rank_manage_list)
     RecyclerView rvRankList;
 
-    private RankChartFragment ftChart;
+    private RankYearEndFragment ftChart;
 
     private RankItemAdapter rankItemAdapter;
 
@@ -116,9 +115,9 @@ public class RankManageActivity extends BaseMvpActivity<RankPresenter> implement
     }
 
     private void initChartFragment() {
-        ftChart = RankChartFragment.newInstance(userId);
+        ftChart = RankYearEndFragment.newInstance(userId);
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        ft.replace(R.id.group_chart_container, ftChart, "RankChartFragment");
+        ft.replace(R.id.group_chart_container, ftChart, "RankYearEndFragment");
         ft.commit();
     }
 

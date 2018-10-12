@@ -23,7 +23,6 @@ import com.king.app.tcareer.base.BaseMvpFragment;
 import com.king.app.tcareer.base.BasePresenter;
 import com.king.app.tcareer.base.IFragmentHolder;
 import com.king.app.tcareer.model.db.entity.Rank;
-import com.king.app.tcareer.model.db.entity.RankWeek;
 import com.king.app.tcareer.utils.DebugLog;
 
 import java.util.ArrayList;
@@ -38,7 +37,9 @@ import butterknife.BindView;
  * 描述:
  * <p/>作者：景阳
  * <p/>创建时间: 2017/4/5 10:29
+ * @deprecated replace with RankYearEndFragment
  */
+@Deprecated
 public class RankChartFragment extends BaseMvpFragment<RankPresenter> implements RankView {
 
     private static final String KEY_USER_ID = "user_id";

@@ -16,7 +16,9 @@
         <com.king.app.tcareer.view.widget.chart.BarChart
             android:id="@+id/bar_chart"
             android:layout_width="wrap_content"
-            android:layout_height="200dp"
-            android:paddingTop="10dp"/>
+            android:layout_height="360dp"
+            android:paddingTop="10dp"
+            app:barWidth="30dp"
+            app:axisXExtendLineWidth="20dp"/>
     </HorizontalScrollView>
 </android.support.constraint.ConstraintLayout>

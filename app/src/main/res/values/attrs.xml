@@ -51,6 +51,10 @@
         <attr name="minYCellHeight" format="dimension" />
     </declare-styleable>
 
+    <declare-styleable name="AxisChart">
+        <attr name="axisXExtendLineWidth" format="dimension" />
+    </declare-styleable>
+
     <declare-styleable name="BarChart">
         <attr name="barWidth" format="dimension" />
         <attr name="barGap" format="dimension" />

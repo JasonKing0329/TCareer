@@ -32,12 +32,9 @@ public class RankPresenter extends BasePresenter<RankView> {
 
     public void loadYearRanks(final long userId) {
         queryUser(userId)
-                .flatMap(new Function<User, ObservableSource<List<Rank>>>() {
-                    @Override
-                    public ObservableSource<List<Rank>> apply(User user) throws Exception {
-                        view.postShowUser(user.getNameEng());
-                        return queryYearRank(userId);
-                    }
+                .flatMap(user -> {
+                    view.postShowUser(user.getNameEng());
+                    return queryYearRank(userId);
                 })
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
@@ -71,15 +68,12 @@ public class RankPresenter extends BasePresenter<RankView> {
      * @return
      */
     private Observable<List<Rank>> queryYearRank(final long userId) {
-        return Observable.create(new ObservableOnSubscribe<List<Rank>>() {
-            @Override
-            public void subscribe(ObservableEmitter<List<Rank>> e) throws Exception {
-                RankDao dao = TApplication.getInstance().getDaoSession().getRankDao();
-                List<Rank> list = dao.queryBuilder()
-                        .where(RankDao.Properties.UserId.eq(userId))
-                        .build().list();
-                e.onNext(list);
-            }
+        return Observable.create(e -> {
+            RankDao dao = TApplication.getInstance().getDaoSession().getRankDao();
+            List<Rank> list = dao.queryBuilder()
+                    .where(RankDao.Properties.UserId.eq(userId))
+                    .build().list();
+            e.onNext(list);
         });
     }
 
