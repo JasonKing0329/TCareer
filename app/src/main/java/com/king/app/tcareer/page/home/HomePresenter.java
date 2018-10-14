@@ -16,6 +16,7 @@ import com.king.app.tcareer.page.match.gallery.UserMatchBean;
 import com.king.app.tcareer.page.match.gallery.UserMatchPresenter;
 import com.king.app.tcareer.page.setting.SettingProperty;
 import com.king.app.tcareer.utils.DBExportor;
+import com.king.app.tcareer.utils.RetireUtil;
 
 import org.greenrobot.greendao.DaoException;
 
@@ -312,61 +313,66 @@ public class HomePresenter extends BasePresenter<IHomeView> {
                 });
     }
 
+    private Observable<List<NotifyRankBean>> getNotifications() {
+        return Observable.create(e -> {
+            RankWeekDao rankDao = TApplication.getInstance().getDaoSession().getRankWeekDao();
+            UserDao userDao = TApplication.getInstance().getDaoSession().getUserDao();
+            List<User> users = userDao.queryBuilder().build().list();
+            List<NotifyRankBean> list = new ArrayList<>();
+
+            // 因为数据库存的是yyyy-MM-dd转化而成的date，所以在取今天的时候也要转化一下，否则后面的比较会出问题
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+            String strToday = format.format(new Date());
+            Date today = format.parse(strToday);
+
+            for (int i = 0; i < users.size(); i ++) {
+                // 已退役生效，不再检查是否更新排名
+                if (RetireUtil.isEffecientRetiredNow(users.get(i).getId())) {
+                    continue;
+                }
+                RankWeek rankWeek = null;
+                try {
+                    rankWeek = rankDao.queryBuilder()
+                            .where(RankWeekDao.Properties.UserId.eq(users.get(i).getId()))
+                            .orderDesc(RankWeekDao.Properties.Date)
+                            .limit(1)
+                            .build().unique();
+                } catch (DaoException de) {}
+
+                if (rankWeek != null) {
+                    GregorianCalendar gc = new GregorianCalendar();
+                    gc.setTime(today);
+                    // 周日是1，周一是2 ...
+                    int dayOfWeek = gc.get(Calendar.DAY_OF_WEEK);
+                    // 采用week和day的计算方式可以解决跨年的问题
+                    // 如果今天是星期日，星期一，比较最近一条是否小于上周一
+                    if (dayOfWeek < 3) {
+                        gc.add(GregorianCalendar.WEEK_OF_YEAR, -1);
+                        gc.add(GregorianCalendar.DAY_OF_YEAR, 2 - dayOfWeek);
+                    }
+                    // 如果今天是星期二到星期六，比较最近一条是否小于本周一
+                    else {
+                        gc.add(GregorianCalendar.DAY_OF_YEAR, 2 - dayOfWeek);
+                    }
+                    Date targetMonday = gc.getTime();
+
+                    if (rankWeek.getDate().getTime() < targetMonday.getTime()) {
+                        NotifyRankBean bean = new NotifyRankBean();
+                        bean.setUser(users.get(i));
+                        bean.setLastRank(rankWeek);
+                        list.add(bean);
+                    }
+                }
+            }
+            e.onNext(list);
+        });
+    }
+
     /**
      * 检查是否更新week rank
      */
     public void checkWeekRank() {
-        Observable.create(new ObservableOnSubscribe<List<NotifyRankBean>>() {
-            @Override
-            public void subscribe(ObservableEmitter<List<NotifyRankBean>> e) throws Exception {
-                RankWeekDao rankDao = TApplication.getInstance().getDaoSession().getRankWeekDao();
-                UserDao userDao = TApplication.getInstance().getDaoSession().getUserDao();
-                List<User> users = userDao.queryBuilder().build().list();
-                List<NotifyRankBean> list = new ArrayList<>();
-
-                // 因为数据库存的是yyyy-MM-dd转化而成的date，所以在取今天的时候也要转化一下，否则后面的比较会出问题
-                SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-                String strToday = format.format(new Date());
-                Date today = format.parse(strToday);
-
-                for (int i = 0; i < users.size(); i ++) {
-                    RankWeek rankWeek = null;
-                    try {
-                        rankWeek = rankDao.queryBuilder()
-                                .where(RankWeekDao.Properties.UserId.eq(users.get(i).getId()))
-                                .orderDesc(RankWeekDao.Properties.Date)
-                                .limit(1)
-                                .build().unique();
-                    } catch (DaoException de) {}
-
-                    if (rankWeek != null) {
-                        GregorianCalendar gc = new GregorianCalendar();
-                        gc.setTime(today);
-                        // 周日是1，周一是2 ...
-                        int dayOfWeek = gc.get(Calendar.DAY_OF_WEEK);
-                        // 采用week和day的计算方式可以解决跨年的问题
-                        // 如果今天是星期日，星期一，比较最近一条是否小于上周一
-                        if (dayOfWeek < 3) {
-                            gc.add(GregorianCalendar.WEEK_OF_YEAR, -1);
-                            gc.add(GregorianCalendar.DAY_OF_YEAR, 2 - dayOfWeek);
-                        }
-                        // 如果今天是星期二到星期六，比较最近一条是否小于本周一
-                        else {
-                            gc.add(GregorianCalendar.DAY_OF_YEAR, 2 - dayOfWeek);
-                        }
-                        Date targetMonday = gc.getTime();
-
-                        if (rankWeek.getDate().getTime() < targetMonday.getTime()) {
-                            NotifyRankBean bean = new NotifyRankBean();
-                            bean.setUser(users.get(i));
-                            bean.setLastRank(rankWeek);
-                            list.add(bean);
-                        }
-                    }
-                }
-                e.onNext(list);
-            }
-        })
+        getNotifications()
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe(new Observer<List<NotifyRankBean>>() {

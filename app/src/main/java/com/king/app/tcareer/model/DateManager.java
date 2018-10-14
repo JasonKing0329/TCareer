@@ -63,7 +63,7 @@ public class DateManager {
                     nDayStart = dayOfMonth;
                     StringBuffer buffer = new StringBuffer();
                     buffer.append(nYearStart).append("-");
-                    buffer.append(nMonthStart < 10 ? "0" + (nMonthStart + 1) : (nMonthStart + 1)).append("-");
+                    buffer.append(nMonthStart + 1 < 10 ? "0" + (nMonthStart + 1) : (nMonthStart + 1)).append("-");
                     buffer.append(nDayStart < 10 ? "0" + nDayStart : nDayStart);
                     dateStr = buffer.toString();
                     try {
