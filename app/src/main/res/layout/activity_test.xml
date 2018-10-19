@@ -13,12 +13,25 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         android:scrollbars="none">
-        <com.king.app.tcareer.view.widget.chart.BarChart
-            android:id="@+id/bar_chart"
+        <FrameLayout
             android:layout_width="wrap_content"
-            android:layout_height="360dp"
-            android:paddingTop="10dp"
-            app:barWidth="30dp"
-            app:axisXExtendLineWidth="20dp"/>
+            android:layout_height="wrap_content">
+            <com.king.app.tcareer.view.widget.chart.BarChart
+                android:id="@+id/bar_chart"
+                android:layout_width="wrap_content"
+                android:layout_height="360dp"
+                android:paddingTop="10dp"
+                app:barWidth="30dp"
+                app:axisXExtendLineWidth="20dp"/>
+        </FrameLayout>
     </HorizontalScrollView>
+    <com.king.app.tcareer.view.widget.chart.LineChart
+        android:id="@+id/line_chart"
+        android:layout_width="wrap_content"
+        android:layout_height="360dp"
+        android:paddingTop="10dp"
+        app:minXCellWidth="20dp"
+        app:axisXExtendLineWidth="0dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
 </android.support.constraint.ConstraintLayout>

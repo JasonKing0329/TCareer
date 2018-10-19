@@ -67,8 +67,7 @@ public class BarChart extends AxisChart {
     @Override
     protected int measureChartWidth(int defaultWidth) {
         if (mAdapter != null) {
-            defaultWidth = getPaddingLeft() + getPaddingRight()
-                    + (mBarWidth + mBarGap) * mAdapter.getXCount();
+            defaultWidth = (mBarWidth + mBarGap) * mAdapter.getXCount();
         }
         return defaultWidth;
     }
@@ -76,7 +75,7 @@ public class BarChart extends AxisChart {
     @Override
     protected int measureChartHeight(int defaultHeight) {
         if (mAdapter != null) {
-            defaultHeight = getPaddingTop() + getPaddingBottom() + mXAxisTextHeight;
+            defaultHeight = mXAxisTextHeight;
         }
         return defaultHeight;
     }
