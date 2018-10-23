@@ -327,7 +327,7 @@ public class HomePresenter extends BasePresenter<IHomeView> {
 
             for (int i = 0; i < users.size(); i ++) {
                 // 已退役生效，不再检查是否更新排名
-                if (RetireUtil.isEffecientRetiredNow(users.get(i).getId())) {
+                if (RetireUtil.isEffectiveRetiredNow(users.get(i).getId())) {
                     continue;
                 }
                 RankWeek rankWeek = null;

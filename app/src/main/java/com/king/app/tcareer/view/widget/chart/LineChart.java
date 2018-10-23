@@ -3,6 +3,7 @@ package com.king.app.tcareer.view.widget.chart;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Point;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
@@ -24,9 +25,24 @@ public class LineChart extends AxisChart {
 
     private LineChartAdapter mAdapter;
 
-    private int mMinXCellWidth = ScreenUtils.dp2px(30);
+    private int mMinXCellWidth = ScreenUtils.dp2px(5);
 
-    private int mMinYCellHeight = ScreenUtils.dp2px(30);
+    private int mNormalXCellWidth = ScreenUtils.dp2px(30);
+
+    private int mXCellWidth;
+
+    private int mValueTextColor;
+
+    private int mLineSize = ScreenUtils.dp2px(1);
+    private int mPointSize = ScreenUtils.dp2px(2);
+    private int mValueTextSize = ScreenUtils.dp2px(12);
+
+    private int mLineColor;
+
+    /**
+     * 指定当运用mMinXCellWidth时，隔几个刻度显示一个刻度
+     */
+    private int mDegreeCombine = 5;
 
     public LineChart(Context context) {
         super(context);
@@ -42,8 +58,12 @@ public class LineChart extends AxisChart {
         setOnTouchListener(this);
 
         TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.LineChart);
-        mMinXCellWidth = a.getDimensionPixelSize(R.styleable.LineChart_minXCellWidth, ScreenUtils.dp2px(30));
-        mMinYCellHeight = a.getDimensionPixelSize(R.styleable.LineChart_minYCellHeight, ScreenUtils.dp2px(30));
+        mMinXCellWidth = a.getDimensionPixelSize(R.styleable.LineChart_minXCellWidth, ScreenUtils.dp2px(5));
+        mNormalXCellWidth = a.getDimensionPixelSize(R.styleable.LineChart_normalXCellWidth, ScreenUtils.dp2px(30));
+        mValueTextColor = a.getColor(R.styleable.LineChart_valueTextColor, Color.parseColor("#333333"));
+        mValueTextSize = a.getDimensionPixelSize(R.styleable.LineChart_valueTextSize, ScreenUtils.dp2px(12));
+        mXCellWidth = mNormalXCellWidth;
+        mLineColor = a.getColor(R.styleable.LineChart_lineColor, Color.parseColor("#3399ff"));
     }
 
     public void setAdapter(LineChartAdapter mAdapter) {
@@ -51,6 +71,10 @@ public class LineChart extends AxisChart {
         this.mAdapter = mAdapter;
         invalidate();
         requestLayout();
+    }
+
+    public void setDegreeCombine(int mDegreeCombine) {
+        this.mDegreeCombine = mDegreeCombine;
     }
 
     @Override
@@ -62,8 +86,15 @@ public class LineChart extends AxisChart {
                     max = mAdapter.getLineData(i).getEndX();
                 }
             }
+            // 超过父容器最大宽度应用最小刻度宽度
+            if (mYAxisTextWidth + 2 * mAxisLineXExtend + max * mNormalXCellWidth > getParentWidth()) {
+                mXCellWidth = mMinXCellWidth;
+            }
+            else {
+                mXCellWidth = mNormalXCellWidth;
+            }
             defaultWidth = getPaddingLeft() + getPaddingRight()
-                    + mMinXCellWidth * max;
+                    + mXCellWidth * max;
         }
         return defaultWidth;
     }
@@ -89,33 +120,70 @@ public class LineChart extends AxisChart {
     }
 
     private void drawPointAndLine(Canvas canvas) {
+        DebugLog.e("cur scroll " + getScrollX());
         Point startPoint;
         for (int i = 0; i < mAdapter.getLineCount(); i ++) {
             LineData line = mAdapter.getLineData(i);
-            mPaint.setColor(line.getColor());
             startPoint = null;
             for (int j = line.getStartX(); j <= line.getEndX(); j ++) {
+                if (line.getColor() == 0) {
+                    mPaint.setColor(mLineColor);
+                }
+                else {
+                    mPaint.setColor(line.getColor());
+                }
+                int pointX = getDegreeX(j);
                 int linePointIndex = j - line.getStartX();
                 Integer value = line.getValues().get(linePointIndex);
 
-                Point point = new Point(getDegreeX(j), getDegreeY(value));
+                Point point = new Point(pointX, getDegreeY(value));
                 if (startPoint != null) {
-                    mPaint.setStrokeWidth(ScreenUtils.dp2px(1));
+                    mPaint.setStrokeWidth(mLineSize);
                     canvas.drawLine(startPoint.x, startPoint.y, point.x, point.y, mPaint);
                 }
-                mPaint.setStrokeWidth(ScreenUtils.dp2px(2));
+                mPaint.setStrokeWidth(mPointSize);
                 canvas.drawPoint(point.x, point.y, mPaint);
                 startPoint = point;
 
                 if (line.getValuesText() != null && linePointIndex >= 0 && linePointIndex < line.getValuesText().size()) {
                     String text = line.getValuesText().get(linePointIndex);
                     if (!TextUtils.isEmpty(text)) {
-                        mPaint.setTextSize(ScreenUtils.dp2px(12));
-                        canvas.drawText(text, point.x + 10, point.y, mPaint);
+                        mPaint.setColor(mValueTextColor);
+                        mPaint.setTextSize(mValueTextSize);
+                        float tw = mPaint.measureText(text);
+                        canvas.drawText(text, point.x - tw / 2, point.y - 10, mPaint);
                     }
                 }
             }
         }
     }
 
+    /**
+     * 如果运用了最小距离表示有很多个点，这种密集情况为了能显示开x坐标文字
+     * 采用每隔mDegreeCombine点显示一个刻度
+     * @param position
+     * @return
+     */
+    @Override
+    protected boolean isDrawDegreeX(int position) {
+        // 最后一个肯定画
+        if (position == axisX.getDegreeCount() - 1) {
+            return true;
+        }
+        // 刻度非常密集的情况
+        if (mXCellWidth == mMinXCellWidth) {
+            // 每隔mDegreeCombine点显示一个刻度
+            if (position % mDegreeCombine != 0) {
+                return false;
+            }
+            else {
+                // 由于刻度按照mDegreeCombine来等分决定，所以会出现倒数第二个刻度仍然离最后一个刻度很近的情况
+                // 这种情况下这个刻度也不画
+                if (axisX.getDegreeCount() - 1 - position < mDegreeCombine) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
 }

@@ -34,4 +34,11 @@ public interface IAxis {
      * @return
      */
     String getTextAt(int position);
+
+    /**
+     * 是否绘制该刻度线及文字
+     * @param position
+     * @return
+     */
+    boolean isNotDraw(int position);
 }

@@ -133,6 +133,11 @@ public class RankYearEndFragment extends BaseMvpFragment<RankPresenter> implemen
             public String getTextAt(int position) {
                 return String.valueOf(2016 + position);
             }
+
+            @Override
+            public boolean isNotDraw(int position) {
+                return false;
+            }
         });
         barChartRank.setAxisY(new IAxis() {
             @Override
@@ -159,6 +164,11 @@ public class RankYearEndFragment extends BaseMvpFragment<RankPresenter> implemen
             public String getTextAt(int position) {
                 int rank = positionToRank(position);
                 return String.valueOf(rank);
+            }
+
+            @Override
+            public boolean isNotDraw(int position) {
+                return false;
             }
         });
         barChartRank.setAdapter(new BarChartAdapter() {

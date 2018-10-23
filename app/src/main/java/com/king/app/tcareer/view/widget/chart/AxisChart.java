@@ -51,6 +51,10 @@ public abstract class AxisChart extends View implements View.OnTouchListener {
 
     protected int mYAxisTextWidth = ScreenUtils.dp2px(30);
 
+    protected int mXAxisTextSize = ScreenUtils.dp2px(12);
+
+    protected int mYAxisTextSize = ScreenUtils.dp2px(12);
+
     private boolean mDrawDashGrid = false;
 
     private boolean mDrawYAxis = true;
@@ -87,6 +91,7 @@ public abstract class AxisChart extends View implements View.OnTouchListener {
             @Override
             public boolean onSingleTapUp(MotionEvent e) {
                 DebugLog.scroll("");
+                performClick();
                 return true;
             }
 
@@ -119,6 +124,9 @@ public abstract class AxisChart extends View implements View.OnTouchListener {
 
         TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.AxisChart);
         mAxisLineXExtend = a.getDimensionPixelSize(R.styleable.AxisChart_axisXExtendLineWidth, ScreenUtils.dp2px(0));
+        mXAxisTextSize = a.getDimensionPixelSize(R.styleable.AxisChart_axisXTextSize, ScreenUtils.dp2px(12));
+        mYAxisTextSize = a.getDimensionPixelSize(R.styleable.AxisChart_axisYTextSize, ScreenUtils.dp2px(12));
+        mYAxisTextWidth = a.getDimensionPixelSize(R.styleable.AxisChart_axisYTextWidth, ScreenUtils.dp2px(30));
     }
 
     public void setAxisX(IAxis axisX) {
@@ -276,6 +284,9 @@ public abstract class AxisChart extends View implements View.OnTouchListener {
 
         // 绘制x轴刻度
         for (int i = 0; i < xCount; i ++) {
+            if (!isDrawDegreeX(i) || axisX.isNotDraw(i)) {
+                continue;
+            }
             int x = getDegreeX(i);
             boolean drawDegree = false;
             // 设置了延长线，刻画第0个点
@@ -305,16 +316,32 @@ public abstract class AxisChart extends View implements View.OnTouchListener {
         }
     }
 
-    protected void drawDegreeXText(String text, int textX, int textY, Canvas canvas) {
+    /**
+     * 是否刻画position位置的刻度及文字
+     * @param position
+     * @return
+     */
+    protected abstract boolean isDrawDegreeX(int position);
+
+    /**
+     * x刻度文字默认位置是以刻度线为中心
+     * @param text
+     * @param degreeX
+     * @param textY
+     * @param canvas
+     */
+    protected void drawDegreeXText(String text, int degreeX, int textY, Canvas canvas) {
         TextPaint textPaint = new TextPaint();
-        textPaint.setTextSize(ScreenUtils.dp2px(12));
+        textPaint.setTextSize(mXAxisTextSize);
         textPaint.setColor(mAxisLineColor);
 
+        float measureWidth = textPaint.measureText(text);
+        float dx = degreeX - measureWidth / 2;
         // StaticLayout只能画在canvas的0,0上，因此必须通过translate画布实现，注意save和restore
         StaticLayout layout = new StaticLayout(text, textPaint
                 , ScreenUtils.dp2px(50), Layout.Alignment.ALIGN_NORMAL, 1.0f, 0f, true);
         canvas.save();
-        canvas.translate(textX - 20, textY);
+        canvas.translate(dx, textY);
         layout.draw(canvas);
         canvas.restore();
     }
@@ -330,18 +357,42 @@ public abstract class AxisChart extends View implements View.OnTouchListener {
             return;
         }
         mPaint.setTextSize(ScreenUtils.dp2px(14));
-        int textTop = ScreenUtils.dp2px(5);
         int degreeWidth = ScreenUtils.dp2px(2);
         for (int i = 0; i < yCount; i ++) {
+            if (axisY.isNotDraw(i)) {
+                continue;
+            }
             int y = getDegreeY(i);
             if (i > 0) {
                 canvas.drawLine(startX, y, startX + degreeWidth, y, mPaint);
             }
             String text = axisY.getTextAt(i);
             if (!TextUtils.isEmpty(text)) {
-                canvas.drawText(text, getPaddingLeft(), y + textTop, mPaint);
+//                canvas.drawText(text, getPaddingLeft(), y + textTop, mPaint);
+                drawDegreeYText(text, y, canvas);
             }
         }
+    }
+
+    /**
+     * y刻度文字默认位置是以刻度线为中心
+     * @param text
+     * @param textY
+     * @param canvas
+     */
+    protected void drawDegreeYText(String text, int textY, Canvas canvas) {
+        TextPaint textPaint = new TextPaint();
+        textPaint.setTextSize(mYAxisTextSize);
+        textPaint.setColor(mAxisLineColor);
+
+        float dy = textY - mYAxisTextSize / 2;
+        // StaticLayout只能画在canvas的0,0上，因此必须通过translate画布实现，注意save和restore
+        StaticLayout layout = new StaticLayout(text, textPaint
+                , mYAxisTextWidth, Layout.Alignment.ALIGN_CENTER, 1.0f, 0f, true);
+        canvas.save();
+        canvas.translate(getPaddingLeft(), dy);
+        layout.draw(canvas);
+        canvas.restore();
     }
 
     /**
@@ -439,7 +490,7 @@ public abstract class AxisChart extends View implements View.OnTouchListener {
     }
 
     /**
-     * 控制边界
+     *
      * @param scrolledX
      */
     private void setScroll(int scrolledX) {
@@ -448,6 +499,11 @@ public abstract class AxisChart extends View implements View.OnTouchListener {
         scrollBy(scrolledX, 0);
     }
 
+    /**
+     * 检查边缘
+     * @param scrolledX
+     * @return
+     */
     private int checkScrollEdge(int scrolledX) {
         // 还没充满父控件不用滑动
         if (getWidth() < getParentWidth()) {
@@ -464,7 +520,7 @@ public abstract class AxisChart extends View implements View.OnTouchListener {
         return scrolledX;
     }
 
-    private int getParentWidth() {
+    protected int getParentWidth() {
         if (getParent() != null && getParent() instanceof ViewGroup) {
             return ((ViewGroup) getParent()).getWidth();
         }
@@ -481,4 +537,18 @@ public abstract class AxisChart extends View implements View.OnTouchListener {
         }
         super.computeScroll();
     }
+
+    public void scrollToEnd() {
+        post(() -> {
+            int scrollTo;
+            if (getWidth() - getParentWidth() < 0) {
+                scrollTo = 0;
+            }
+            else {
+                scrollTo = getWidth() - getParentWidth();
+            }
+            scrollTo(scrollTo, 0);
+        });
+    }
+
 }

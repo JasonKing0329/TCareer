@@ -157,4 +157,9 @@ public class BarChart extends AxisChart {
         layout.draw(canvas);
         canvas.restore();
     }
+
+    @Override
+    protected boolean isDrawDegreeX(int position) {
+        return true;
+    }
 }

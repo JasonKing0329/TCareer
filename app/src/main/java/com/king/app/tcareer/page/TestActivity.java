@@ -17,6 +17,7 @@ import com.king.app.tcareer.view.widget.chart.adapter.IAxis;
 import com.king.app.tcareer.view.widget.chart.adapter.LineChartAdapter;
 import com.king.app.tcareer.view.widget.chart.adapter.LineData;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,6 +41,12 @@ public class TestActivity extends AppCompatActivity {
 
     private List<RankWeek> list;
 
+    private List<RankWeek> listH;
+
+    private List<LineData> lineData;
+
+    private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,22 +61,30 @@ public class TestActivity extends AppCompatActivity {
 
         TApplication.getInstance().createGreenDao();
         list = TApplication.getInstance().getDaoSession().getRankWeekDao().queryBuilder()
-                .where(RankWeekDao.Properties.UserId.eq(AppConstants.USER_ID_FLAMENCO))
+                .where(RankWeekDao.Properties.UserId.eq(AppConstants.USER_ID_QI))
                 .orderAsc(RankWeekDao.Properties.Date)
                 .build().list();
+        listH = TApplication.getInstance().getDaoSession().getRankWeekDao().queryBuilder()
+                .where(RankWeekDao.Properties.UserId.eq(AppConstants.USER_ID_HENRY))
+                .orderAsc(RankWeekDao.Properties.Date)
+                .build().list();
+        createLineData();
+        final int totalCount = getTotalLineXCount();
 
         lineChart.setVisibility(View.VISIBLE);
+        lineChart.setDegreeCombine(8);
         lineChart.setDrawAxisY(true);
         lineChart.setDrawDashGrid(false);
+
         lineChart.setAxisX(new IAxis() {
             @Override
             public int getDegreeCount() {
-                return list.size();
+                return totalCount;
             }
 
             @Override
             public int getTotalWeight() {
-                return list.size();
+                return totalCount;
             }
 
             @Override
@@ -79,7 +94,18 @@ public class TestActivity extends AppCompatActivity {
 
             @Override
             public String getTextAt(int position) {
-                return "" + position;
+                if (position < list.size()) {
+                    return dateFormat.format(list.get(position).getDate());
+                }
+                if (position < listH.size()) {
+                    return dateFormat.format(listH.get(position).getDate());
+                }
+                return "";
+            }
+
+            @Override
+            public boolean isNotDraw(int position) {
+                return false;
             }
         });
         lineChart.setAxisY(new IAxis() {
@@ -101,31 +127,88 @@ public class TestActivity extends AppCompatActivity {
             @Override
             public String getTextAt(int position) {
                 int rank = positionToRankLine(position);
-                if (isKeyDegree(rank)) {
-                    return "" + rank;
-                }
-                return null;
+                return "" + rank;
+            }
+
+            @Override
+            public boolean isNotDraw(int position) {
+                int rank = positionToRankLine(position);
+                return !isKeyDegree(rank);
             }
         });
         lineChart.setAdapter(new LineChartAdapter() {
             @Override
             public int getLineCount() {
-                return 1;
+                return lineData.size();
             }
 
             @Override
             public LineData getLineData(int lineIndex) {
-                LineData data = new LineData();
-                data.setColor(colorBars[0]);
-                data.setStartX(0);
-                data.setEndX(list.size() - 1);
-                data.setValues(new ArrayList<>());
-                for (int i = 0; i < list.size(); i ++) {
-                    data.getValues().add(rankToDegreeLine(list.get(i).getRank()));
-                }
-                return data;
+                return lineData.get(lineIndex);
             }
         });
+        lineChart.scrollToEnd();
+    }
+
+    public int getTotalLineXCount() {
+        int fla = 0;
+        int hen = 0;
+        int count = 0;
+        while (fla < list.size() || hen < listH.size()) {
+            int flaBefore = fla;
+            int henBefore = hen;
+            long timeFla = list.get(fla).getDate().getTime();
+            long timeHen = listH.get(hen).getDate().getTime();
+            if (timeFla > timeHen) {
+                hen ++;
+            }
+            else if (timeFla < timeHen) {
+                fla ++;
+            }
+            else {
+                fla ++;
+                hen ++;
+            }
+            if (flaBefore == 0 && fla == 1) {
+                lineData.get(0).setStartX(count);
+            }
+            if (henBefore == 0 && hen == 1) {
+                lineData.get(1).setStartX(count);
+            }
+            count ++;
+        }
+        lineData.get(0).setEndX(lineData.get(0).getStartX() + lineData.get(0).getValues().size() - 1);
+        lineData.get(1).setEndX(lineData.get(1).getStartX() + lineData.get(1).getValues().size() - 1);
+        return count;
+    }
+
+    private void createLineData() {
+        lineData = new ArrayList<>();
+        for (int n = 0; n < 2; n ++) {
+            List<RankWeek> list = n == 0 ? this.list:listH;
+            LineData data = new LineData();
+            data.setColor(colorBars[n]);
+            data.setStartX(0);
+            data.setEndX(list.size() - 1);
+            data.setValues(new ArrayList<>());
+            data.setValuesText(new ArrayList<>());
+            for (int i = 0; i < list.size(); i ++) {
+                data.getValues().add(rankToDegreeLine(list.get(i).getRank()));
+                if (i > 0) {
+                    // 出现名次变化才显示
+                    if (data.getValues().get(i) != data.getValues().get(i - 1)) {
+                        data.getValuesText().add(String.valueOf(list.get(i).getRank()));
+                    }
+                    else {
+                        data.getValuesText().add(null);
+                    }
+                }
+                else {
+                    data.getValuesText().add(String.valueOf(list.get(i).getRank()));
+                }
+            }
+            lineData.add(data);
+        }
     }
 
     private boolean isKeyDegree(int position) {
@@ -162,6 +245,11 @@ public class TestActivity extends AppCompatActivity {
             public String getTextAt(int position) {
                 return String.valueOf(2016 + position);
             }
+
+            @Override
+            public boolean isNotDraw(int position) {
+                return false;
+            }
         });
         barChart.setAxisY(new IAxis() {
             @Override
@@ -188,6 +276,11 @@ public class TestActivity extends AppCompatActivity {
             public String getTextAt(int position) {
                 int rank = positionToRankBar(position);
                 return String.valueOf(rank);
+            }
+
+            @Override
+            public boolean isNotDraw(int position) {
+                return false;
             }
         });
         barChart.setAdapter(new BarChartAdapter() {

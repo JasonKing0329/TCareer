@@ -22,7 +22,6 @@ import com.king.app.tcareer.utils.FormatUtil;
 import com.king.app.tcareer.utils.RetireUtil;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import butterknife.BindView;
@@ -129,7 +128,7 @@ public class ScoreFragment extends BaseMvpFragment<ScorePresenter> implements IS
         if (pageMode == FLAG_YEAR) {
             presenter.queryYearRecords(getUserId());
         } else {
-            if (RetireUtil.isEffecientRetiredNow(getUserId())) {
+            if (RetireUtil.isEffectiveRetiredNow(getUserId())) {
                 showUser(presenter.queryUserInstant(getUserId()));
                 tvByLevel.setVisibility(View.INVISIBLE);
                 tvByMonth.setVisibility(View.INVISIBLE);
@@ -172,7 +171,7 @@ public class ScoreFragment extends BaseMvpFragment<ScorePresenter> implements IS
     @Override
     public void onPageDataLoaded(ScorePageData data) {
 
-        if (RetireUtil.isEffecientRetiredNow(getUserId())) {
+        if (RetireUtil.isEffectiveRetiredNow(getUserId())) {
             tvRank.setVisibility(View.INVISIBLE);
         }
         else {

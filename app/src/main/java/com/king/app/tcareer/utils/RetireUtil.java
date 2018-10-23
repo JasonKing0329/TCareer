@@ -15,7 +15,7 @@ import java.util.List;
  */
 public class RetireUtil {
 
-    public static boolean isEffecientRetiredNow(long userId) {
+    public static boolean isEffectiveRetiredNow(long userId) {
         return isRetired(userId, new Date(), true);
     }
 

@@ -31,7 +31,9 @@ import butterknife.BindView;
  * 描述:
  * <p/>作者：景阳
  * <p/>创建时间: 2018/3/9 9:52
+ * @deprecated replace with RankWeekFragment
  */
+@Deprecated
 public class RankDetailFragment extends BaseMvpFragment<RankDetailPresenter> implements RankDetailView {
 
     private static final String KEY_USER_ID = "user_id";

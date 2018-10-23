@@ -3,7 +3,6 @@ package com.king.app.tcareer.page.rank;
 import android.content.DialogInterface;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.view.View;
 
 import com.king.app.jactionbar.JActionbar;
 import com.king.app.jactionbar.OnBackListener;
@@ -16,7 +15,6 @@ import com.king.app.tcareer.page.score.ScoreCalculator;
 import java.util.List;
 
 import butterknife.BindView;
-import butterknife.OnClick;
 
 /**
  * 描述:
@@ -34,7 +32,7 @@ public class RankDetailActivity extends BaseMvpActivity<RankDetailPresenter> imp
 
     private RankDetailAdapter detailAdapter;
 
-    private RankDetailFragment ftDetail;
+    private RankWeekFragment ftRankWeek;
 
     @Override
     protected int getContentView() {
@@ -80,9 +78,9 @@ public class RankDetailActivity extends BaseMvpActivity<RankDetailPresenter> imp
     }
 
     private void initChart(long userId) {
-        ftDetail = RankDetailFragment.newInstance(userId);
+        ftRankWeek = RankWeekFragment.newInstance(userId);
         getSupportFragmentManager().beginTransaction()
-                .replace(R.id.group_ft_container, ftDetail, "RankDetailFragment")
+                .replace(R.id.group_ft_container, ftRankWeek, "RankDetailFragment")
                 .commit();
     }
 
@@ -111,7 +109,7 @@ public class RankDetailActivity extends BaseMvpActivity<RankDetailPresenter> imp
                         @Override
                         public void onDismiss(DialogInterface dialogInterface) {
                             detailAdapter.notifyItemChanged(position);
-                            ftDetail.refresh();
+                            ftRankWeek.refresh();
                             setResult(RESULT_OK);
                         }
                     });
@@ -127,7 +125,7 @@ public class RankDetailActivity extends BaseMvpActivity<RankDetailPresenter> imp
                                     presenter.deleteRank(item);
                                     detailAdapter.removeItem(position);
                                     detailAdapter.notifyItemRemoved(position);
-                                    ftDetail.refresh();
+                                    ftRankWeek.refresh();
                                     setResult(RESULT_OK);
                                 }
                             }, null);
@@ -152,7 +150,7 @@ public class RankDetailActivity extends BaseMvpActivity<RankDetailPresenter> imp
         calculator.setOnDismissListener(new DialogInterface.OnDismissListener() {
             @Override
             public void onDismiss(DialogInterface dialogInterface) {
-                ftDetail.refresh();
+                ftRankWeek.refresh();
                 presenter.loadRanks(presenter.getUser().getId(), true);
                 setResult(RESULT_OK);
             }

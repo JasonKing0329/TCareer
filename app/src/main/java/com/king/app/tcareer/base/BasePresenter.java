@@ -1,5 +1,6 @@
 package com.king.app.tcareer.base;
 
+import com.king.app.tcareer.model.db.entity.DaoSession;
 import com.king.app.tcareer.model.db.entity.User;
 import com.king.app.tcareer.model.db.entity.UserDao;
 
@@ -55,5 +56,9 @@ public abstract class BasePresenter<T extends BaseView> {
 
     public User getUser() {
         return mUser;
+    }
+
+    protected DaoSession getDaoSession() {
+        return TApplication.getInstance().getDaoSession();
     }
 }

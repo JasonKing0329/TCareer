@@ -54,6 +54,7 @@ import com.king.app.tcareer.page.player.slider.PlayerSlideAdapter;
 import com.king.app.tcareer.page.rank.RankDetailActivity;
 import com.king.app.tcareer.page.rank.RankDetailFragment;
 import com.king.app.tcareer.page.rank.RankManageActivity;
+import com.king.app.tcareer.page.rank.RankWeekFragment;
 import com.king.app.tcareer.page.rank.RankYearEndFragment;
 import com.king.app.tcareer.page.record.complex.RecordComplexActivity;
 import com.king.app.tcareer.page.record.editor.RecordEditorActivity;
@@ -142,7 +143,7 @@ public class HomeActivity extends BaseMvpActivity<HomePresenter> implements IHom
 
     private RankYearEndFragment ftChart;
 
-    private RankDetailFragment ftRankDetail;
+    private RankWeekFragment ftRankWeek;
 
     private BoomMenuHome boomMenuHome;
 
@@ -242,15 +243,10 @@ public class HomeActivity extends BaseMvpActivity<HomePresenter> implements IHom
     }
 
     private void initRankWeekChart() {
-        ftRankDetail = RankDetailFragment.newInstance(presenter.getUser().getId());
-        ftRankDetail.setOnChartClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startWeekRankActivity(presenter.getUser().getId());
-            }
-        });
+        ftRankWeek = RankWeekFragment.newInstance(presenter.getUser().getId());
+        ftRankWeek.setOnChartClickListener(v -> startWeekRankActivity(presenter.getUser().getId()));
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        ft.replace(R.id.group_chart_week, ftRankDetail, "RankDetailFragment");
+        ft.replace(R.id.group_chart_week, ftRankWeek, "RankWeekFragment");
         ft.commit();
     }
 
@@ -652,7 +648,7 @@ public class HomeActivity extends BaseMvpActivity<HomePresenter> implements IHom
             }
         } else if (requestCode == REQUEST_RANK_DETAIL) {
             if (resultCode == RESULT_OK) {
-                ftRankDetail.refresh();
+                ftRankWeek.refresh();
             }
         } else if (requestCode == REQUEST_SCORE) {
             if (resultCode == RESULT_OK) {
