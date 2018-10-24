@@ -1,5 +1,6 @@
 package com.king.app.tcareer.page.match;
 
+import android.content.Intent;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -20,6 +21,8 @@ import com.king.app.tcareer.model.db.entity.MatchNameBeanDao;
 import com.king.app.tcareer.model.db.entity.Record;
 import com.king.app.tcareer.model.db.entity.RecordDao;
 import com.king.app.tcareer.model.db.entity.User;
+import com.king.app.tcareer.page.match.page.MatchPageActivity;
+import com.king.app.tcareer.page.player.slider.PlayerSlideActivity;
 import com.king.app.tcareer.utils.ScreenUtils;
 import com.king.app.tcareer.view.dialog.DraggableDialogFragment;
 
@@ -119,8 +122,17 @@ public class MatchDialog extends DraggableDialogFragment {
             manager.setOrientation(LinearLayoutManager.VERTICAL);
             rvList.setLayoutManager(manager);
 
+            ivMatch.setOnClickListener(v -> goToMatchPage());
+
             compositeDisposable = new CompositeDisposable();
             loadData();
+        }
+
+        private void goToMatchPage() {
+            Intent intent = new Intent(getContext(), MatchPageActivity.class);
+            intent.putExtra(MatchPageActivity.KEY_USER_ID, user.getId());
+            intent.putExtra(MatchPageActivity.KEY_MATCH_NAME_ID, matchNameId);
+            startActivity(intent);
         }
 
         @Override

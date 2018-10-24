@@ -64,33 +64,44 @@ public class RankModel {
         List<RankWeek> list = dao.queryBuilder()
                 .where(RankWeekDao.Properties.UserId.eq(userId))
                 .build().list();
-
-
-        boolean isLastMatchable = false;
-        int temp = 0;
-        RankWeek startWeek = null;
+        RankRangeBean maxBean = new RankRangeBean();
+        RankRangeBean tempBean = new RankRangeBean();
         for (int i = 0; i < list.size(); i ++) {
             RankWeek week = list.get(i);
-            if (isLastMatchable && week.getRank() >= min && week.getRank() <= max) {
-                temp ++;
+            if (week.getRank() >= min && week.getRank() <= max) {
+                if (tempBean.getRankStart() == null) {
+                    tempBean.setRankStart(week);
+                }
+                tempBean.setSequences(tempBean.getSequences() + 1);
             }
             else {
-                if (temp > bean.getSequences()) {
-                    bean.setSequences(temp);
-                    bean.setRankStart(startWeek);
-                    bean.setRankEnd(list.get(i - 1));
+                if (tempBean.getRankEnd() == null && i > 0) {
+                    tempBean.setRankEnd(list.get(i - 1));
                 }
-                startWeek = week;
-                temp = 0;
+                if (tempBean.getSequences() > maxBean.getSequences()) {
+                    maxBean.setSequences(tempBean.getSequences());
+                    maxBean.setRankStart(tempBean.getRankStart());
+                    maxBean.setRankEnd(tempBean.getRankEnd());
+                }
+                tempBean.setSequences(0);
+                tempBean.setRankStart(null);
+                tempBean.setRankEnd(null);
             }
-            isLastMatchable = week.getRank() >= min && week.getRank() <= max;
         }
-        // 最后一个结束了还要对比至今
-        if (temp > bean.getSequences()) {
-            bean.setSequences(temp);
-            bean.setRankStart(startWeek);
-            bean.setRankEnd(list.get(list.size() - 1));
+        // 连续子串出现在末尾
+        if (tempBean.getRankEnd() == null && list.size() > 0) {
+            tempBean.setRankEnd(list.get(list.size() - 1));
         }
+        if (tempBean.getSequences() > maxBean.getSequences()) {
+            maxBean.setSequences(tempBean.getSequences());
+            maxBean.setRankStart(tempBean.getRankStart());
+            maxBean.setRankEnd(tempBean.getRankEnd());
+        }
+
+        bean.setSequences(maxBean.getSequences());
+        bean.setRankStart(maxBean.getRankStart());
+        bean.setRankEnd(maxBean.getRankEnd());
+
         return bean;
     }
 

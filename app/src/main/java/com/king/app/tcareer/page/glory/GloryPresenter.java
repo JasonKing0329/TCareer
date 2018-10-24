@@ -162,11 +162,11 @@ public class GloryPresenter extends BasePresenter<IGloryView> {
 
     private void parseGsData(GloryTitle data) {
         List<MatchResultBean> gsList = gloryModel.getGsResultList(mUser.getId());
-        Map<String, GloryGsItem> gsMap = new HashMap<>();
+        Map<Integer, GloryGsItem> gsMap = new HashMap<>();
         List<GloryGsItem> gsGlories = new ArrayList<>();
         RecordDao recordDao = TApplication.getInstance().getDaoSession().getRecordDao();
         for (MatchResultBean bean:gsList) {
-            String year = bean.getDate().split("-")[0];
+            int year = Integer.parseInt(bean.getDate().split("-")[0]);
             GloryGsItem item = gsMap.get(year);
 
             Record record = recordDao.queryBuilder()
@@ -178,7 +178,7 @@ public class GloryPresenter extends BasePresenter<IGloryView> {
             if (item == null) {
                 item = new GloryGsItem();
                 gsMap.put(year, item);
-                item.setYear(Integer.parseInt(year));
+                item.setYear(year);
                 gsGlories.add(item);
             }
             if (bean.getMatch().equals("澳大利亚网球公开赛")) {
@@ -218,13 +218,29 @@ public class GloryPresenter extends BasePresenter<IGloryView> {
                 item.setRecordUo(record);
             }
         }
-        Collections.sort(gsGlories, new Comparator<GloryGsItem>() {
-            @Override
-            public int compare(GloryGsItem left, GloryGsItem right) {
-                return left.getYear() - right.getYear();
-            }
-        });
+        Collections.sort(gsGlories, (left, right) -> left.getYear() - right.getYear());
+        // 处理出现一整年未参加大满贯的情况
+        checkSequenceGsYear(gsGlories);
+
         data.setGsItemList(gsGlories);
+    }
+
+    /**
+     * 处理出现一整年未参加大满贯的情况
+     * @param gsGlories
+     */
+    private void checkSequenceGsYear(List<GloryGsItem> gsGlories) {
+        for (int i = 0; i < gsGlories.size(); i ++) {
+            if (i > 0) {
+                if (gsGlories.get(i).getYear() - gsGlories.get(i - 1).getYear() != 1) {
+                    GloryGsItem item = new GloryGsItem();
+                    item.setYear(gsGlories.get(i - 1).getYear() + 1);
+                    gsGlories.add(i, item);
+                    checkSequenceGsYear(gsGlories);
+                    break;
+                }
+            }
+        }
     }
 
     private void parseMasterData(GloryTitle data) {
@@ -250,13 +266,29 @@ public class GloryPresenter extends BasePresenter<IGloryView> {
 
             setMasterResult(item, bean.getMatchId(), bean.getResult(), record);
         }
-        Collections.sort(masterGlories, new Comparator<GloryMasterItem>() {
-            @Override
-            public int compare(GloryMasterItem left, GloryMasterItem right) {
-                return left.getYear() - right.getYear();
-            }
-        });
+        Collections.sort(masterGlories, (left, right) -> left.getYear() - right.getYear());
+        // 处理出现一整年未参加大师赛的情况
+        checkSequenceMasterYear(masterGlories);
+
         data.setMasterItemList(masterGlories);
+    }
+
+    /**
+     * 处理出现一整年未参加大师赛的情况
+     * @param gloryMasterItems
+     */
+    private void checkSequenceMasterYear(List<GloryMasterItem> gloryMasterItems) {
+        for (int i = 0; i < gloryMasterItems.size(); i ++) {
+            if (i > 0) {
+                if (gloryMasterItems.get(i).getYear() - gloryMasterItems.get(i - 1).getYear() != 1) {
+                    GloryMasterItem item = new GloryMasterItem();
+                    item.setYear(gloryMasterItems.get(i - 1).getYear() + 1);
+                    gloryMasterItems.add(i, item);
+                    checkSequenceMasterYear(gloryMasterItems);
+                    break;
+                }
+            }
+        }
     }
 
     private void setMasterResult(GloryMasterItem item, long matchId, String result, Record record) {
