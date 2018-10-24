@@ -1,14 +1,14 @@
 package com.king.app.tcareer.page.record.complex;
 
 import com.king.app.tcareer.base.BasePresenter;
+import com.king.app.tcareer.model.bean.LineChartData;
 import com.king.app.tcareer.model.dao.CareerCompareDao;
+import com.king.app.tcareer.repository.RankRepository;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.Observable;
-import io.reactivex.ObservableEmitter;
-import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
@@ -22,10 +22,12 @@ import io.reactivex.schedulers.Schedulers;
 public class CareerComparePresenter extends BasePresenter<CareerCompareView> {
 
     private CareerCompareDao dao;
+    private RankRepository repository;
 
     @Override
     protected void onCreate() {
         dao = new CareerCompareDao();
+        repository = new RankRepository();
     }
 
     public void loadData() {
@@ -60,20 +62,17 @@ public class CareerComparePresenter extends BasePresenter<CareerCompareView> {
     }
 
     private Observable<List<CompareItem>> queryData() {
-        return Observable.create(new ObservableOnSubscribe<List<CompareItem>>() {
-            @Override
-            public void subscribe(ObservableEmitter<List<CompareItem>> e) throws Exception {
-                List<CompareItem> list = new ArrayList<>();
-                // 冠军（级别，场地）
-                queryChampions(list);
-                // 重要轮次（级别）
-                queryRounds(list);
-                // 胜率（级别，场地，对阵排名，抢七）
-                queryRate(list);
-                // 其他
-                queryOther(list);
-                e.onNext(list);
-            }
+        return Observable.create(e -> {
+            List<CompareItem> list = new ArrayList<>();
+            // 冠军（级别，场地）
+            queryChampions(list);
+            // 重要轮次（级别）
+            queryRounds(list);
+            // 胜率（级别，场地，对阵排名，抢七）
+            queryRate(list);
+            // 其他
+            queryOther(list);
+            e.onNext(list);
         });
     }
 
@@ -133,6 +132,33 @@ public class CareerComparePresenter extends BasePresenter<CareerCompareView> {
         items.add(dao.getBeBagel());
         items.add(dao.getTibreakMatch());
         items.add(dao.getLongestWin());
+    }
+
+    public void loadRankCompares() {
+        repository.compareUserWeekRankChart()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(new Observer<LineChartData>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                        addDisposable(d);
+                    }
+
+                    @Override
+                    public void onNext(LineChartData data) {
+                        view.showChart(data);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        e.printStackTrace();
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
     }
 
 }

@@ -1,5 +1,6 @@
 package com.king.app.tcareer.conf;
 
+import android.graphics.Color;
 import android.text.TextUtils;
 
 /**
@@ -13,6 +14,10 @@ public class AppConstants {
     public static final long USER_ID_FLAMENCO = 2;
     public static final long USER_ID_HENRY = 3;
     public static final long USER_ID_QI = 4;
+    public static final int USER_KING_LINE_COLOR = Color.parseColor("#f12f58");
+    public static final int USER_FLAMENCO_LINE_COLOR = Color.parseColor("#193ddc");
+    public static final int USER_HENRY_LINE_COLOR = Color.parseColor("#b935a5");
+    public static final int USER_QI_LINE_COLOR = Color.parseColor("#24958e");
 
     public static final String SCORE_RETIRE = "W/O";
 

@@ -123,8 +123,9 @@ public class RecordComplexActivity extends BaseMvpActivity<ComplexPresenter> imp
     }
 
     private void showCareerCompare() {
-        CareerCompareDialog dialog = new CareerCompareDialog();
-        dialog.show(getSupportFragmentManager(), "CareerCompareDialog");
+        Intent intent = new Intent();
+        intent.setClass(this, CareerCompareActivity.class);
+        startActivity(intent);
     }
 
     private void initBoomButton() {

@@ -1,78 +1,89 @@
-package com.king.app.tcareer.page.rank;
+package com.king.app.tcareer.page.record.complex;
 
-import android.os.Bundle;
-import android.view.View;
+import android.graphics.PorterDuff;
+import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
+import android.widget.TextView;
 
 import com.king.app.tcareer.R;
-import com.king.app.tcareer.base.BaseMvpFragment;
-import com.king.app.tcareer.base.IFragmentHolder;
+import com.king.app.tcareer.base.BaseMvpActivity;
+import com.king.app.tcareer.conf.AppConstants;
 import com.king.app.tcareer.model.bean.LineChartData;
 import com.king.app.tcareer.view.widget.chart.LineChart;
 import com.king.app.tcareer.view.widget.chart.adapter.IAxis;
 import com.king.app.tcareer.view.widget.chart.adapter.LineChartAdapter;
 import com.king.app.tcareer.view.widget.chart.adapter.LineData;
 
+import java.util.List;
+
 import butterknife.BindView;
 
 /**
- * 描述: 替换RankDetailFragment，采用自定义LineChart，支持退役期间的数据及第二段职业生涯
- * <p/>作者：景阳
- * <p/>创建时间: 2018/3/9 9:52
+ * Desc:
+ *
+ * @author：Jing Yang
+ * @date: 2018/10/23 15:12
  */
-public class RankWeekFragment extends BaseMvpFragment<RankWeekPresenter> implements RankWeekView {
-
-    private static final String KEY_USER_ID = "user_id";
+public class CareerCompareActivity extends BaseMvpActivity<CareerComparePresenter> implements CareerCompareView {
 
     @BindView(R.id.chart_week)
     LineChart chartWeek;
+    @BindView(R.id.toolbar)
+    Toolbar toolbar;
+    @BindView(R.id.ctl_toolbar)
+    CollapsingToolbarLayout ctlToolbar;
+    @BindView(R.id.rv_data)
+    RecyclerView rvData;
+    @BindView(R.id.tv_title_king)
+    TextView tvTitleKing;
+    @BindView(R.id.tv_title_fla)
+    TextView tvTitleFla;
+    @BindView(R.id.tv_title_hen)
+    TextView tvTitleHen;
+    @BindView(R.id.tv_title_qi)
+    TextView tvTitleQi;
 
-    private View.OnClickListener onChartClickListener;
+    private CareerCompareAdapter adapter;
 
-    public static RankWeekFragment newInstance(long userId) {
-        RankWeekFragment fragment = new RankWeekFragment();
-        Bundle bundle = new Bundle();
-        bundle.putLong(KEY_USER_ID, userId);
-        fragment.setArguments(bundle);
-        return fragment;
+    @Override
+    protected int getContentView() {
+        return R.layout.activity_career_compare;
     }
 
     @Override
-    protected void bindFragmentHolder(IFragmentHolder holder) {
+    protected void initView() {
+        toolbar.setNavigationIcon(R.drawable.ic_arrow_back_filterrable);
+        toolbar.getNavigationIcon().setColorFilter(getResources().getColor(R.color.dark_grey), PorterDuff.Mode.SRC_ATOP);
+        toolbar.setNavigationOnClickListener(v -> finish());
 
+        tvTitleKing.setTextColor(AppConstants.USER_KING_LINE_COLOR);
+        tvTitleFla.setTextColor(AppConstants.USER_FLAMENCO_LINE_COLOR);
+        tvTitleHen.setTextColor(AppConstants.USER_HENRY_LINE_COLOR);
+        tvTitleQi.setTextColor(AppConstants.USER_QI_LINE_COLOR);
+
+        LinearLayoutManager manager = new LinearLayoutManager(this);
+        manager.setOrientation(LinearLayoutManager.VERTICAL);
+        rvData.setLayoutManager(manager);
     }
 
     @Override
-    protected int getContentLayoutRes() {
-        return R.layout.fragment_rank_week;
+    protected CareerComparePresenter createPresenter() {
+        return new CareerComparePresenter();
     }
 
     @Override
-    protected void onCreate(View view) {
-        chartWeek.setOnClickListener(onChartClickListener);
+    protected void initData() {
+        presenter.loadData();
+        presenter.loadRankCompares();
     }
 
     @Override
-    protected RankWeekPresenter createPresenter() {
-        return new RankWeekPresenter();
-    }
-
-    public void setOnChartClickListener(View.OnClickListener onChartClickListener) {
-        this.onChartClickListener = onChartClickListener;
-    }
-
-    @Override
-    protected void onCreateData() {
-        long userId = getArguments().getLong(KEY_USER_ID);
-        presenter.loadRanks(userId, false);
-    }
-
-    @Override
-    public void postShowUser(String nameEng) {
-
-    }
-
-    public void refresh() {
-        presenter.loadRanks(presenter.getUser().getId(), false);
+    public void showData(List<CompareItem> list) {
+        adapter = new CareerCompareAdapter();
+        adapter.setList(list);
+        rvData.setAdapter(adapter);
     }
 
     @Override
@@ -144,4 +155,5 @@ public class RankWeekFragment extends BaseMvpFragment<RankWeekPresenter> impleme
         });
         chartWeek.scrollToEnd();
     }
+
 }
