@@ -134,7 +134,7 @@ public class RankWeekFragment extends BaseMvpFragment<RankWeekPresenter> impleme
         chartWeek.setAdapter(new LineChartAdapter() {
             @Override
             public int getLineCount() {
-                return data.getLineList().size();
+                return data.getLineList() == null ? 0:data.getLineList().size();
             }
 
             @Override
