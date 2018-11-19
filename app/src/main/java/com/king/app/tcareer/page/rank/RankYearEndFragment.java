@@ -131,7 +131,7 @@ public class RankYearEndFragment extends BaseMvpFragment<RankPresenter> implemen
 
             @Override
             public String getTextAt(int position) {
-                return String.valueOf(2016 + position);
+                return String.valueOf(rankList.get(position).getYear());
             }
 
             @Override
