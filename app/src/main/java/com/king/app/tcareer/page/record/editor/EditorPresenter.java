@@ -180,6 +180,7 @@ public class EditorPresenter extends BasePresenter<IEditorView> {
         mUser = dao.queryBuilder()
                 .where(UserDao.Properties.Id.eq(userId))
                 .build().unique();
+        mRecord.setUserId(mUser.getId());
     }
 
     public void queryCompetitor(long playerId, boolean isUser) {

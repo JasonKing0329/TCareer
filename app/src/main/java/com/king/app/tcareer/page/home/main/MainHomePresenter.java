@@ -102,7 +102,7 @@ public class MainHomePresenter extends BasePresenter<MainHomeView> {
                 });
     }
 
-    private void loadRecords() {
+    public void loadRecords() {
         getLatestRecords()
                 .flatMap(list -> toViewRecords(list))
                 .observeOn(AndroidSchedulers.mainThread())

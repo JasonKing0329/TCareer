@@ -43,6 +43,8 @@ public class MainHomeActivity extends BaseMvpActivity<MainHomePresenter> impleme
     @BindView(R.id.rv_records)
     RecyclerView rvRecords;
 
+    private RecordsAdapter recordsAdapter;
+
     @Override
     protected int getContentView() {
         return R.layout.activity_main_home;
@@ -111,14 +113,30 @@ public class MainHomeActivity extends BaseMvpActivity<MainHomePresenter> impleme
 
     @Override
     public void showRecords(List<ComplexRecord> records) {
-        RecordsAdapter adapter = new RecordsAdapter();
-        adapter.setList(records);
-        adapter.setOnItemClickListener((position, data) -> {
-            Intent intent = new Intent().setClass(MainHomeActivity.this, RecordEditorActivity.class);
-            intent.putExtra(RecordEditorActivity.KEY_RECORD_ID, data.getRecord().getId());
-            intent.putExtra(RecordEditorActivity.KEY_USER_ID, data.getRecord().getUserId());
-            startActivityForResult(intent, REQUEST_EDIT_RECORD);
-        });
-        rvRecords.setAdapter(adapter);
+        if (recordsAdapter == null) {
+            recordsAdapter = new RecordsAdapter();
+            recordsAdapter.setList(records);
+            recordsAdapter.setOnItemClickListener((position, data) -> {
+                Intent intent = new Intent().setClass(MainHomeActivity.this, RecordEditorActivity.class);
+                intent.putExtra(RecordEditorActivity.KEY_RECORD_ID, data.getRecord().getId());
+                intent.putExtra(RecordEditorActivity.KEY_USER_ID, data.getRecord().getUserId());
+                startActivityForResult(intent, REQUEST_EDIT_RECORD);
+            });
+            rvRecords.setAdapter(recordsAdapter);
+        }
+        else {
+            recordsAdapter.setList(records);
+            recordsAdapter.notifyDataSetChanged();
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_EDIT_RECORD) {
+            if (resultCode == RESULT_OK) {
+                presenter.loadRecords();
+            }
+        }
     }
 }
