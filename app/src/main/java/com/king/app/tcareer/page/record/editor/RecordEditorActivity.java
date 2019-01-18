@@ -33,9 +33,11 @@ public class RecordEditorActivity extends BaseMvpActivity<EditorPresenter> imple
 
     public static final String KEY_USER_ID = "user_id";
     public static final String KEY_RECORD_ID = "record_id";
+    public static final String KEY_CHOOSE_USER = "choose_user";
 
     private final int REQUEST_CHANGE_MATCH = 101;
     private final int REQUEST_CHANGE_PLAYER = 102;
+    private final int REQUEST_CHANGE_USER = 103;
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
@@ -70,7 +72,7 @@ public class RecordEditorActivity extends BaseMvpActivity<EditorPresenter> imple
     private void showPlayerView() {
         if (playerEditPage == null) {
             playerEditPage = new PlayerEditPage(this);
-            playerEditPage.initView();
+            playerEditPage.initView(isSupportChooseUser());
         }
         groupPlayer.setVisibility(View.VISIBLE);
         groupMatch.setVisibility(View.GONE);
@@ -99,9 +101,14 @@ public class RecordEditorActivity extends BaseMvpActivity<EditorPresenter> imple
 
     @Override
     protected void initData() {
+
         long userId = getIntent().getLongExtra(KEY_USER_ID, -1);
         long recordId = getIntent().getLongExtra(KEY_RECORD_ID, -1);
         presenter.init(userId, recordId);
+    }
+
+    private boolean isSupportChooseUser() {
+        return getIntent().getBooleanExtra(KEY_CHOOSE_USER, false);
     }
 
     @Override
@@ -236,6 +243,14 @@ public class RecordEditorActivity extends BaseMvpActivity<EditorPresenter> imple
     }
 
     @Override
+    public void selectUser() {
+        Intent intent = new Intent().setClass(this, PlayerManageActivity.class);
+        intent.putExtra(PlayerManageActivity.KEY_START_MODE, PlayerManageActivity.START_MODE_SELECT);
+        intent.putExtra(PlayerManageActivity.KEY_ONLY_USER, true);
+        startActivityForResult(intent, REQUEST_CHANGE_USER);
+    }
+
+    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_CHANGE_MATCH) {
             if (resultCode == RESULT_OK) {
@@ -250,6 +265,13 @@ public class RecordEditorActivity extends BaseMvpActivity<EditorPresenter> imple
                 boolean isUser = data.getBooleanExtra(PlayerManageActivity.RESPONSE_PLAYER_IS_USER, false);
                 presenter.queryCompetitor(playerId, isUser);
                 playerEditPage.onPlayerSelected(presenter.getCompetitor());
+            }
+        }
+        if (requestCode == REQUEST_CHANGE_USER) {
+            if (resultCode == RESULT_OK) {
+                long userId = data.getLongExtra(PlayerManageActivity.RESPONSE_PLAYER_ID, -1);
+                presenter.reLoadUser(userId);
+                playerEditPage.onUserSelected();
             }
         }
         super.onActivityResult(requestCode, resultCode, data);

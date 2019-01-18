@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="5dp">
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <com.github.siyamed.shapeimageview.BubbleImageView
+            android:id="@+id/iv_match"
+            android:layout_width="150dp"
+            android:layout_height="90dp"
+            android:gravity="center"
+            android:scaleType="fitXY"
+            android:src="@drawable/default_img"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:siArrowPosition="right"
+            app:siTriangleHeight="8dp" />
+
+        <TextView
+            android:id="@+id/tv_match_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="印第安维尔斯大师赛"
+            android:textColor="@color/actionbar_bk_blue"
+            app:layout_constraintVertical_chainStyle="spread"
+            app:layout_constraintBottom_toTopOf="@+id/tv_winner"
+            app:layout_constraintStart_toEndOf="@+id/iv_match"
+            app:layout_constraintTop_toTopOf="@id/iv_match" />
+
+        <TextView
+            android:id="@+id/tv_round"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:text="R128"
+            android:textColor="@color/actionbar_bk_blue"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/tv_match_name" />
+
+        <TextView
+            android:id="@+id/tv_winner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="Flamenco"
+            android:textColor="@color/red"
+            app:layout_constraintVertical_chainStyle="spread"
+            app:layout_constraintStart_toEndOf="@+id/iv_match"
+            app:layout_constraintTop_toBottomOf="@+id/tv_match_name"
+            app:layout_constraintBottom_toTopOf="@+id/tv_score" />
+
+        <TextView
+            android:id="@+id/tv_def"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:text="def."
+            app:layout_constraintTop_toTopOf="@id/tv_winner"
+            app:layout_constraintLeft_toRightOf="@id/tv_winner" />
+
+        <TextView
+            android:id="@+id/tv_loser"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:text="科赫尔斯奇雷伯"
+            app:layout_constraintTop_toTopOf="@id/tv_def"
+            app:layout_constraintLeft_toRightOf="@id/tv_def" />
+
+        <TextView
+            android:id="@+id/tv_score"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="7-6(9)/6-7(4)/7-6(3)/6-7(4)/12-10"
+            app:layout_constraintStart_toEndOf="@+id/iv_match"
+            app:layout_constraintTop_toBottomOf="@+id/tv_winner"
+            app:layout_constraintBottom_toBottomOf="@id/iv_match" />
+    </android.support.constraint.ConstraintLayout>
+</android.support.v7.widget.CardView>

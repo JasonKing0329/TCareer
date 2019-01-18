@@ -59,4 +59,8 @@
     <dimen name="record_year_text">20dp</dimen>
     <dimen name="record_year_size">60dp</dimen>
     <dimen name="player_page_update_time_height">40dp</dimen>
+    <dimen name="home_user_height">100dp</dimen>
+    <dimen name="home_user_width">160dp</dimen>
+    <dimen name="home_match_height">200dp</dimen>
+    <dimen name="home_match_width">344dp</dimen>
 </resources>

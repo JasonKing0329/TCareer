@@ -36,6 +36,7 @@ import com.github.siyamed.shapeimageview.RoundedImageView;
 import com.king.app.tcareer.R;
 import com.king.app.tcareer.base.BaseMvpActivity;
 import com.king.app.tcareer.base.TApplication;
+import com.king.app.tcareer.conf.AppConstants;
 import com.king.app.tcareer.model.GlideOptions;
 import com.king.app.tcareer.model.ImageProvider;
 import com.king.app.tcareer.model.SeasonManager;
@@ -77,6 +78,8 @@ import butterknife.BindView;
 import butterknife.OnClick;
 
 public class HomeActivity extends BaseMvpActivity<HomePresenter> implements IHomeView, OnBMClickListener, IHomeHeaderHolder {
+
+    public static final String KEY_USER_ID = "user_id";
 
     private final int REQUEST_RANK = 101;
     private final int REQUEST_ADD = 102;
@@ -203,7 +206,7 @@ public class HomeActivity extends BaseMvpActivity<HomePresenter> implements IHom
      */
     @Override
     public void initData() {
-        presenter.loadHomeDatas();
+        presenter.loadHomeDatas(getIntent().getLongExtra(KEY_USER_ID, AppConstants.USER_ID_KING));
         presenter.checkWeekRank();
     }
 

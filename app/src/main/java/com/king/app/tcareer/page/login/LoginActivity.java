@@ -9,6 +9,7 @@ import android.widget.LinearLayout;
 import com.king.app.tcareer.R;
 import com.king.app.tcareer.base.BaseMvpActivity;
 import com.king.app.tcareer.page.home.HomeActivity;
+import com.king.app.tcareer.page.home.main.MainHomeActivity;
 import com.king.app.tcareer.page.setting.SettingActivity;
 import com.king.app.tcareer.utils.DBExportor;
 import com.tbruyelle.rxpermissions2.RxPermissions;
@@ -149,7 +150,7 @@ public class LoginActivity extends BaseMvpActivity<LoginPresenter> implements Lo
     }
 
     private void startHome() {
-        Intent intent = new Intent(this, HomeActivity.class);
+        Intent intent = new Intent(this, MainHomeActivity.class);
         startActivity(intent);
         finish();
     }

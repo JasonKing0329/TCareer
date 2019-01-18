@@ -24,4 +24,6 @@ public interface IEditorHolder {
     void selectPlayer();
 
     void selectMatch();
+
+    void selectUser();
 }

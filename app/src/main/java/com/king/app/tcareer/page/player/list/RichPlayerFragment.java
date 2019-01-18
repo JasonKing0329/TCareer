@@ -51,6 +51,8 @@ public class RichPlayerFragment extends BaseMvpFragment<RichPlayerPresenter> imp
 
     private int mBottomMargin;
 
+    private boolean mOnlyShowUser;
+
     public static RichPlayerFragment newInstance(long userId, boolean hidePlayersWithoutRecords) {
         RichPlayerFragment fragment = new RichPlayerFragment();
         Bundle bundle = new Bundle();
@@ -164,6 +166,10 @@ public class RichPlayerFragment extends BaseMvpFragment<RichPlayerPresenter> imp
         return presenter.getFilterTexts();
     }
 
+    public void setOnlyShowUser(boolean onlyShowUser) {
+        mOnlyShowUser = onlyShowUser;
+    }
+
     private class RecyclerViewListener extends RecyclerView.OnScrollListener {
         @Override
         public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
@@ -197,10 +203,10 @@ public class RichPlayerFragment extends BaseMvpFragment<RichPlayerPresenter> imp
     @Override
     protected void onCreateData() {
         if (getArguments() == null || getArguments().getLong(KEY_USER_ID, -1) == -1) {
-            presenter.loadPlayers();
+            presenter.loadPlayers(mOnlyShowUser);
         }
         else {
-            presenter.loadPlayers(getArguments().getLong(KEY_USER_ID), getArguments().getBoolean(KEY_HEDE_NO_RECORDS));
+            presenter.loadPlayers(getArguments().getLong(KEY_USER_ID), getArguments().getBoolean(KEY_HEDE_NO_RECORDS), mOnlyShowUser);
         }
     }
 
@@ -304,7 +310,7 @@ public class RichPlayerFragment extends BaseMvpFragment<RichPlayerPresenter> imp
 
     public void reload() {
         presenter.resetRank();
-        presenter.loadPlayers();
+        presenter.loadPlayers(mOnlyShowUser);
     }
 
     public boolean onBackPressed() {

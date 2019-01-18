@@ -67,6 +67,8 @@ public class RichPlayerPresenter extends PlayerAtpPresenter<RichPlayerView> {
 
     private List<String> mFilterTexts;
 
+    private boolean mOnlyShowUser;
+
     public RichPlayerPresenter() {
         // 不用SettingProperty.getPlayerSortMode()，因为h2h page与manage page支持的排序类型不尽相同
         sortType = SettingProperty.VALUE_SORT_PLAYER_NAME;
@@ -74,7 +76,8 @@ public class RichPlayerPresenter extends PlayerAtpPresenter<RichPlayerView> {
         mExpandMap = new HashMap<>();
     }
 
-    public void loadPlayers(long userId, boolean hidePlayersWithoutRecords) {
+    public void loadPlayers(long userId, boolean hidePlayersWithoutRecords, boolean onlyShowUser) {
+        mOnlyShowUser = onlyShowUser;
         this.hidePlayersWithoutRecords = hidePlayersWithoutRecords;
         queryUser(userId)
                 .observeOn(AndroidSchedulers.mainThread())
@@ -87,7 +90,7 @@ public class RichPlayerPresenter extends PlayerAtpPresenter<RichPlayerView> {
 
                     @Override
                     public void onNext(User user) {
-                        loadPlayers();
+                        loadPlayers(onlyShowUser);
                     }
 
                     @Override
@@ -103,7 +106,8 @@ public class RichPlayerPresenter extends PlayerAtpPresenter<RichPlayerView> {
                 });
     }
 
-    public void loadPlayers() {
+    public void loadPlayers(boolean onlyShowUser) {
+        mOnlyShowUser = onlyShowUser;
         view.showLoading();
         view.getSidebar().clear();
         updateSidebarGravity();
@@ -111,7 +115,9 @@ public class RichPlayerPresenter extends PlayerAtpPresenter<RichPlayerView> {
                 , (users, players) -> {
                     List<RichPlayerBean> list = new ArrayList<>();
                     list.addAll(users);
-                    list.addAll(players);
+                    if (!onlyShowUser) {
+                        list.addAll(players);
+                    }
                     return list;
                 })
                 .flatMap(list -> sortPlayerRx(list))
@@ -483,7 +489,7 @@ public class RichPlayerPresenter extends PlayerAtpPresenter<RichPlayerView> {
             mRankLow = bean.getRankLow();
             mRankHigh = bean.getRankHigh();
             // 有rank需要过滤records，重新查询记录
-            loadPlayers();
+            loadPlayers(mOnlyShowUser);
         }
         else {
             // 除了rank以外的条件都能共同作用
@@ -724,7 +730,7 @@ public class RichPlayerPresenter extends PlayerAtpPresenter<RichPlayerView> {
     public void onUserChanged(User user) {
         if (user != mUser) {
             mUser = user;
-            loadPlayers();
+            loadPlayers(mOnlyShowUser);
         }
     }
 

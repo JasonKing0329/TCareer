@@ -20,6 +20,10 @@
             app:contentScrim="?attr/colorPrimary"
             app:scrimVisibleHeightTrigger="@dimen/home_scrim_visible_height"
             app:layout_scrollFlags="scroll|exitUntilCollapsed">
+            <!--
+            app:expandedTitleGravity="center_horizontal|top"
+            app:expandedTitleMarginTop="184dp"
+            app:expandedTitleTextAppearance="@style/PlayerCollapsingText" -->
 
             <com.king.app.tcareer.view.widget.chart.LineChart
                 android:id="@+id/chart_week"

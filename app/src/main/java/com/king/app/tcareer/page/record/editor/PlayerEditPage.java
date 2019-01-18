@@ -26,6 +26,7 @@ public class PlayerEditPage implements View.OnClickListener {
 
     private IEditorHolder holder;
     private ImageView ivChangePlayer;
+    private ImageView ivChangeUser;
     private ImageView ivPlayer;
     private ViewGroup groupPlayer;
 
@@ -39,7 +40,7 @@ public class PlayerEditPage implements View.OnClickListener {
         this.holder = holder;
     }
 
-    public void initView() {
+    public void initView(boolean supportChooseUser) {
         groupPlayer = (ViewGroup) holder.getActivity().findViewById(R.id.editor_player_group);
         et_rankp1 = (EditText) holder.getActivity().findViewById(R.id.editor_player_rank1);
         et_seedp1 = (EditText) holder.getActivity().findViewById(R.id.editor_player_seed1);
@@ -54,6 +55,11 @@ public class PlayerEditPage implements View.OnClickListener {
         ivPlayer = (ImageView) holder.getActivity().findViewById(R.id.editor_player_image);
         ivChangePlayer = (ImageView) holder.getActivity().findViewById(R.id.edit_player_change);
         ivChangePlayer.setOnClickListener(this);
+        ivChangeUser = (ImageView) holder.getActivity().findViewById(R.id.iv_choose_user);
+        ivChangeUser.setOnClickListener(this);
+        if (!supportChooseUser) {
+            ivChangeUser.setVisibility(View.GONE);
+        }
     }
 
     public void showUser(User user) {
@@ -79,6 +85,9 @@ public class PlayerEditPage implements View.OnClickListener {
             holder.selectPlayer();
         } else if (v == tvH2h) {
             showH2hDetails();
+        } else if (v == ivChangeUser) {
+            // 回调在onPlayerSelected
+            holder.selectUser();
         }
     }
 
@@ -115,6 +124,10 @@ public class PlayerEditPage implements View.OnClickListener {
                 .into(ivPlayer);
 
         holder.getPresenter().queryH2H();
+    }
+
+    public void onUserSelected() {
+        tvUser.setText(holder.getPresenter().getUser().getNameEng());
     }
 
     public void showH2h(int win, int lose) {

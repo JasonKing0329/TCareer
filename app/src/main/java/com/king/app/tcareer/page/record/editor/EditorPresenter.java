@@ -24,6 +24,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 import io.reactivex.Observable;
@@ -56,6 +57,12 @@ public class EditorPresenter extends BasePresenter<IEditorView> {
     }
 
     public void init(long userId, final long recordId) {
+        if (userId == -1) {
+            // 新增记录，且支持选择user
+            isEditMode = false;
+            mRecord = new Record();
+            return;
+        }
         queryUser(userId)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
@@ -165,6 +172,13 @@ public class EditorPresenter extends BasePresenter<IEditorView> {
         MatchNameBeanDao dao = TApplication.getInstance().getDaoSession().getMatchNameBeanDao();
         mMatchNameBean = dao.queryBuilder()
                 .where(MatchNameBeanDao.Properties.Id.eq(matchNameId))
+                .build().unique();
+    }
+
+    public void reLoadUser(long userId) {
+        UserDao dao = TApplication.getInstance().getDaoSession().getUserDao();
+        mUser = dao.queryBuilder()
+                .where(UserDao.Properties.Id.eq(userId))
                 .build().unique();
     }
 

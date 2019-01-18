@@ -64,9 +64,7 @@ public class HomePresenter extends BasePresenter<IHomeView> {
      * load login user,all users,
      * load last record,recent players,matches for login user
      */
-    public void loadHomeDatas() {
-        view.showLoading();
-        long userId = SettingProperty.getUserId();
+    public void loadHomeDatas(long userId) {
         if (userId == -1) {
             userId = AppConstants.USER_ID_KING;
         }

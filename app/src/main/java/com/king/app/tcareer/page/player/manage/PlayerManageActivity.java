@@ -30,6 +30,7 @@ import butterknife.BindView;
 public class PlayerManageActivity extends BaseMvpActivity<PlayerManagePresenter> implements PlayerManageView, RichPlayerHolder {
 
     public static final String KEY_START_MODE = "key_start_mode";
+    public static final String KEY_ONLY_USER = "only_user";
     public static final int START_MODE_SELECT = 1;
 
     public static final String RESPONSE_PLAYER_ID = "resp_player_id";
@@ -71,6 +72,7 @@ public class PlayerManageActivity extends BaseMvpActivity<PlayerManagePresenter>
 
         ftRich = new RichPlayerFragment();
         ftRich.setSelectPlayerMode(isSelectMode);
+        ftRich.setOnlyShowUser(isOnlyShowUser());
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.group_ft, ftRich, "RichPlayerFragment")
                 .commit();
@@ -195,6 +197,10 @@ public class PlayerManageActivity extends BaseMvpActivity<PlayerManagePresenter>
     @Override
     protected void initData() {
 
+    }
+
+    private boolean isOnlyShowUser() {
+        return getIntent().getBooleanExtra(KEY_ONLY_USER, false);
     }
 
     @Override
