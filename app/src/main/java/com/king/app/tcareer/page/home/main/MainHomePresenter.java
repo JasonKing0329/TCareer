@@ -137,6 +137,16 @@ public class MainHomePresenter extends BasePresenter<MainHomeView> {
             List<MatchBean> list = getDaoSession().getMatchBeanDao().queryBuilder()
                     .where(MatchBeanDao.Properties.Week.eq(week))
                     .build().list();
+            int thisWeek = week;
+            while (list.size() == 0 && week > 0) {
+                week --;
+                list = getDaoSession().getMatchBeanDao().queryBuilder()
+                        .where(MatchBeanDao.Properties.Week.eq(week))
+                        .build().list();
+            }
+            if (week != thisWeek) {
+                view.postWeekInfo("Week " + week);
+            }
 
             List<MatchNameBean> matches = new ArrayList<>();
             for (MatchBean bean:list) {

@@ -18,4 +18,6 @@ public interface MainHomeView extends BaseView {
     void showMatches(List<MatchNameBean> list);
 
     void showRecords(List<ComplexRecord> records);
+
+    void postWeekInfo(String weekText);
 }

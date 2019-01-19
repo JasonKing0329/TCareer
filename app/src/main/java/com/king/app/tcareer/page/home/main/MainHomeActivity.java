@@ -139,4 +139,9 @@ public class MainHomeActivity extends BaseMvpActivity<MainHomePresenter> impleme
             }
         }
     }
+
+    @Override
+    public void postWeekInfo(String weekText) {
+        runOnUiThread(() -> tvTop.setText(weekText));
+    }
 }
