@@ -12,10 +12,12 @@ import com.king.app.tcareer.base.BaseMvpActivity;
 import com.king.app.tcareer.model.db.entity.MatchNameBean;
 import com.king.app.tcareer.model.db.entity.User;
 import com.king.app.tcareer.page.home.HomeActivity;
+import com.king.app.tcareer.page.match.recent.RecentMatchActivity;
 import com.king.app.tcareer.page.record.editor.RecordEditorActivity;
 import com.king.app.tcareer.utils.ScreenUtils;
 import com.king.app.tcareer.view.adapter.BaseRecyclerAdapter;
 
+import java.util.Calendar;
 import java.util.List;
 
 import butterknife.BindView;
@@ -102,11 +104,11 @@ public class MainHomeActivity extends BaseMvpActivity<MainHomePresenter> impleme
     public void showMatches(List<MatchNameBean> list) {
         MatchAdapter adapter = new MatchAdapter();
         adapter.setList(list);
-        adapter.setOnItemClickListener(new BaseRecyclerAdapter.OnItemClickListener<MatchNameBean>() {
-            @Override
-            public void onClickItem(int position, MatchNameBean data) {
-
-            }
+        adapter.setOnItemClickListener((position, data) -> {
+            Intent intent = new Intent().setClass(MainHomeActivity.this, RecentMatchActivity.class);
+            intent.putExtra(RecentMatchActivity.KEY_MATCH_ID, data.getMatchId());
+            intent.putExtra(RecentMatchActivity.KEY_YEAR, Calendar.getInstance().get(Calendar.YEAR));
+            startActivity(intent);
         });
         rvWeek.setAdapter(adapter);
     }

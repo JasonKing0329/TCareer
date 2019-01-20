@@ -91,6 +91,16 @@ public class AppConstants {
             "Bronze medal"
     };
 
+    public static int getRoundSortValue(String value) {
+        int sortValue = 0;
+        for (int i = 0; i < RECORD_MATCH_ROUNDS.length; i ++) {
+            if (RECORD_MATCH_ROUNDS[i].equals(value)) {
+                sortValue = i;
+            }
+        }
+        return sortValue;
+    }
+
     public static final String[] RECORD_MATCH_ROUNDS_SHORT = new String[] {
 
             "F",

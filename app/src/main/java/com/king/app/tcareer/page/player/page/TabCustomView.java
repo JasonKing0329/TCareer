@@ -18,6 +18,7 @@ package com.king.app.tcareer.page.player.page;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.support.annotation.StringRes;
+import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.widget.LinearLayout;
@@ -65,7 +66,13 @@ public class TabCustomView extends LinearLayout {
 
     public void setCount(String count) {
         this.count = count;
-        countText.setText(count);
+        if (TextUtils.isEmpty(count)) {
+            countText.setVisibility(GONE);
+        }
+        else {
+            countText.setVisibility(VISIBLE);
+            countText.setText(count);
+        }
     }
 
     public String getContentCategory() {
