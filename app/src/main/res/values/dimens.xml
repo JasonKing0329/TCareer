@@ -63,4 +63,7 @@
     <dimen name="home_user_width">160dp</dimen>
     <dimen name="home_match_height">200dp</dimen>
     <dimen name="home_match_width">344dp</dimen>
+
+    <dimen name="dlg_fingerprint_width">320dp</dimen>
+    <dimen name="dlg_fingerprint_height">200dp</dimen>
 </resources>

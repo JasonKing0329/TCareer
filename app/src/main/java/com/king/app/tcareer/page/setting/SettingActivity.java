@@ -17,7 +17,7 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.king.app.tcareer.R;
-import com.king.app.tcareer.page.login.FingerPrintController;
+import com.king.app.tcareer.model.fingerprint.FingerprintHelper;
 import com.king.app.tcareer.page.update.UpdateManager;
 
 import java.util.List;
@@ -157,7 +157,7 @@ public class SettingActivity extends AppCompatPreferenceActivity {
         fakeHeader.setTitle(R.string.pref_title_safe);
         getPreferenceScreen().addPreference(fakeHeader);
         addPreferencesFromResource(R.xml.pref_setting_safe);
-        if (!new FingerPrintController(this).isSupported()) {
+        if (!FingerprintHelper.isDeviceSupport(this)) {
             findPreference("enable_finger_print").setEnabled(false);
         }
 
@@ -171,28 +171,6 @@ public class SettingActivity extends AppCompatPreferenceActivity {
         findPreference("pref_safeset").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                if (SettingProperty.isEnableFingerPrint()) {
-                    new FingerPrintController(SettingActivity.this).showIdentifyDialog(false, new FingerPrintController.SimpleIdentifyListener() {
-
-                        @Override
-                        public void onSuccess() {
-                            showPasswordEditor(false);
-                        }
-
-                        @Override
-                        public void onFail() {
-
-                        }
-
-                        @Override
-                        public void onCancel() {
-
-                        }
-                    });
-                }
-                else {
-                    showPasswordEditor(true);
-                }
                 return true;
             }
         });
@@ -268,7 +246,7 @@ public class SettingActivity extends AppCompatPreferenceActivity {
             addPreferencesFromResource(R.xml.pref_setting_safe);
             setHasOptionsMenu(true);
 
-            if (!new FingerPrintController(getActivity()).isSupported()) {
+            if (!FingerprintHelper.isDeviceSupport(getActivity())) {
                 findPreference("enable_finger_print").setEnabled(false);
             }
 
