@@ -76,7 +76,9 @@
         app:layout_constraintBottom_toBottomOf="@+id/iv_player1"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/tv_player1"
-        app:layout_constraintTop_toTopOf="@+id/iv_player1"/>
+        app:layout_constraintTop_toTopOf="@+id/iv_player1">
+
+    </LinearLayout>
 
     <LinearLayout
         android:id="@+id/ll_score2"
@@ -87,7 +89,9 @@
         app:layout_constraintBottom_toBottomOf="@+id/iv_player2"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/tv_player2"
-        app:layout_constraintTop_toTopOf="@+id/iv_player2"/>
+        app:layout_constraintTop_toTopOf="@+id/iv_player2">
+
+    </LinearLayout>
 
     <TextView
         android:id="@+id/tv_round"
@@ -98,4 +102,32 @@
         app:layout_constraintBottom_toBottomOf="@+id/tv_name"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/tv_name" />
+    <TextView
+        android:id="@+id/tv_wo1"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginStart="1dp"
+        android:text="W/O"
+        android:gravity="center_vertical"
+        android:background="@color/white"
+        android:paddingLeft="10dp"
+        app:layout_constraintBottom_toBottomOf="@+id/iv_player1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/tv_player1"
+        app:layout_constraintTop_toTopOf="@+id/iv_player1" />
+    <TextView
+        android:id="@+id/tv_wo2"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:text="W/O"
+        android:background="@color/white"
+        android:gravity="center_vertical"
+        android:layout_marginStart="1dp"
+        android:paddingLeft="10dp"
+        app:layout_constraintBottom_toBottomOf="@+id/iv_player2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/tv_player2"
+        app:layout_constraintTop_toTopOf="@+id/iv_player2" />
 </android.support.constraint.ConstraintLayout>

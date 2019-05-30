@@ -14,6 +14,7 @@ import com.bumptech.glide.Glide;
 import com.king.app.tcareer.R;
 import com.king.app.tcareer.model.GlideOptions;
 import com.king.app.tcareer.model.db.entity.Score;
+import com.king.app.tcareer.utils.ListUtil;
 import com.king.app.tcareer.utils.ScreenUtils;
 
 import java.util.ArrayList;
@@ -29,6 +30,8 @@ public class ScoreBoard extends FrameLayout {
     private ImageView ivPlayer2;
     private LinearLayout llScore1;
     private LinearLayout llScore2;
+    private TextView tvWO1;
+    private TextView tvWO2;
 
     private ScoreBoardParam param;
 
@@ -60,6 +63,8 @@ public class ScoreBoard extends FrameLayout {
         tvPlayer2 = view.findViewById(R.id.tv_player2);
         llScore1 = view.findViewById(R.id.ll_score1);
         llScore2 = view.findViewById(R.id.ll_score2);
+        tvWO1 = view.findViewById(R.id.tv_wo1);
+        tvWO2 = view.findViewById(R.id.tv_wo2);
         addView(view);
         addScores();
     }
@@ -116,6 +121,21 @@ public class ScoreBoard extends FrameLayout {
         for (int i = 0; i < 5; i ++) {
             setSetScore(i);
         }
+        // 没有比分代表有W/0
+        if (ListUtil.isEmpty(param.getScoreList())) {
+            if (param.getWinnerIndex() == 0) {
+                tvWO1.setVisibility(GONE);
+                tvWO2.setVisibility(VISIBLE);
+            }
+            else {
+                tvWO1.setVisibility(VISIBLE);
+                tvWO2.setVisibility(GONE);
+            }
+        }
+        else {
+            tvWO1.setVisibility(GONE);
+            tvWO2.setVisibility(GONE);
+        }
     }
 
     private void setSetScore(int index) {
@@ -147,7 +167,12 @@ public class ScoreBoard extends FrameLayout {
                 scoreViews1.get(index).setScoreSub(score.getUserTiebreak());
                 scoreViews2.get(index).setScore(score.getCompetitorTiebreak());
             }
-        } catch (Exception e) {}
+        } catch (Exception e) {
+            scoreViews1.get(index).setScore(null);
+            scoreViews2.get(index).setScore(null);
+            scoreViews1.get(index).setScoreSub(null);
+            scoreViews2.get(index).setScoreSub(null);
+        }
     }
 
 }
