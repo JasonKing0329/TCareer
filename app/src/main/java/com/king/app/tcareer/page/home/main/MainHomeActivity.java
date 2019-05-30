@@ -16,6 +16,8 @@ import com.king.app.tcareer.page.match.recent.RecentMatchActivity;
 import com.king.app.tcareer.page.record.editor.RecordEditorActivity;
 import com.king.app.tcareer.utils.ScreenUtils;
 import com.king.app.tcareer.view.adapter.BaseRecyclerAdapter;
+import com.king.app.tcareer.view.widget.scoreboard.ScoreBoardParam;
+import com.king.app.tcareer.view.widget.scoreboard.ScoreView;
 
 import java.util.Calendar;
 import java.util.List;
@@ -46,6 +48,7 @@ public class MainHomeActivity extends BaseMvpActivity<MainHomePresenter> impleme
     RecyclerView rvRecords;
 
     private RecordsAdapter recordsAdapter;
+    private ScoreBoardAdapter scoreBoardAdapter;
 
     @Override
     protected int getContentView() {
@@ -129,6 +132,25 @@ public class MainHomeActivity extends BaseMvpActivity<MainHomePresenter> impleme
         else {
             recordsAdapter.setList(records);
             recordsAdapter.notifyDataSetChanged();
+        }
+    }
+
+    @Override
+    public void showScoreBoards(List<ScoreBoardParam> records) {
+        if (scoreBoardAdapter == null) {
+            scoreBoardAdapter = new ScoreBoardAdapter();
+            scoreBoardAdapter.setList(records);
+            scoreBoardAdapter.setOnItemClickListener((position, data) -> {
+                Intent intent = new Intent().setClass(MainHomeActivity.this, RecordEditorActivity.class);
+                intent.putExtra(RecordEditorActivity.KEY_RECORD_ID, data.getRecord().getId());
+                intent.putExtra(RecordEditorActivity.KEY_USER_ID, data.getRecord().getUserId());
+                startActivityForResult(intent, REQUEST_EDIT_RECORD);
+            });
+            rvRecords.setAdapter(scoreBoardAdapter);
+        }
+        else {
+            scoreBoardAdapter.setList(records);
+            scoreBoardAdapter.notifyDataSetChanged();
         }
     }
 

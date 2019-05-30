@@ -5,12 +5,14 @@ import com.king.app.tcareer.conf.AppConstants;
 import com.king.app.tcareer.model.CompetitorParser;
 import com.king.app.tcareer.model.ImageProvider;
 import com.king.app.tcareer.model.ScoreParser;
+import com.king.app.tcareer.model.bean.CompetitorBean;
 import com.king.app.tcareer.model.db.entity.MatchBean;
 import com.king.app.tcareer.model.db.entity.MatchBeanDao;
 import com.king.app.tcareer.model.db.entity.MatchNameBean;
 import com.king.app.tcareer.model.db.entity.Record;
 import com.king.app.tcareer.model.db.entity.RecordDao;
 import com.king.app.tcareer.model.db.entity.User;
+import com.king.app.tcareer.view.widget.scoreboard.ScoreBoardParam;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -104,18 +106,40 @@ public class MainHomePresenter extends BasePresenter<MainHomeView> {
 
     public void loadRecords() {
         getLatestRecords()
-                .flatMap(list -> toViewRecords(list))
+                .flatMap(list -> toScoreBoards(list))
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
-                .subscribe(new Observer<List<ComplexRecord>>() {
+//                .subscribe(new Observer<List<ComplexRecord>>() {
+//                    @Override
+//                    public void onSubscribe(Disposable d) {
+//                        addDisposable(d);
+//                    }
+//
+//                    @Override
+//                    public void onNext(List<ComplexRecord> records) {
+//                        view.showRecords(records);
+//                    }
+//
+//                    @Override
+//                    public void onError(Throwable e) {
+//                        e.printStackTrace();
+//                        view.showMessage(e.getMessage());
+//                    }
+//
+//                    @Override
+//                    public void onComplete() {
+//
+//                    }
+//                });
+                .subscribe(new Observer<List<ScoreBoardParam>>() {
                     @Override
                     public void onSubscribe(Disposable d) {
                         addDisposable(d);
                     }
 
                     @Override
-                    public void onNext(List<ComplexRecord> records) {
-                        view.showRecords(records);
+                    public void onNext(List<ScoreBoardParam> records) {
+                        view.showScoreBoards(records);
                     }
 
                     @Override
@@ -165,6 +189,32 @@ public class MainHomePresenter extends BasePresenter<MainHomeView> {
                     .build().list();
             e.onNext(list);
         });
+    }
+
+    private ObservableSource<List<ScoreBoardParam>> toScoreBoards(List<Record> list) {
+        return observer -> {
+            List<ScoreBoardParam> result = new ArrayList<>();
+            for (Record record:list) {
+                ScoreBoardParam param = new ScoreBoardParam();
+                param.setRecord(record);
+                param.setPlayer1(record.getUser().getNameEng());
+                CompetitorBean bean = CompetitorParser.getCompetitorFrom(record);
+                param.setPlayer2(bean.getNameEng());
+                param.setPlayerUrl1(ImageProvider.getPlayerHeadPath(record.getUser().getNameChn()));
+                param.setPlayerUrl2(ImageProvider.getPlayerHeadPath(bean.getNameChn()));
+                if (record.getWinnerFlag() == AppConstants.WINNER_USER) {
+                    param.setWinnerIndex(0);
+                }
+                else {
+                    param.setWinnerIndex(1);
+                }
+                param.setMatchName(record.getMatch().getName());
+                param.setRound(AppConstants.getRoundShortName(record.getRound()));
+                param.setScoreList(record.getScoreList());
+                result.add(param);
+            }
+            observer.onNext(result);
+        };
     }
 
     private ObservableSource<List<ComplexRecord>> toViewRecords(List<Record> list) {
