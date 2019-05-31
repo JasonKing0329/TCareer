@@ -12,6 +12,7 @@ import com.king.app.tcareer.model.db.entity.MatchNameBean;
 import com.king.app.tcareer.model.db.entity.Record;
 import com.king.app.tcareer.model.db.entity.RecordDao;
 import com.king.app.tcareer.model.db.entity.User;
+import com.king.app.tcareer.view.widget.scoreboard.BoardStyleProvider;
 import com.king.app.tcareer.view.widget.scoreboard.ScoreBoardParam;
 
 import java.util.ArrayList;
@@ -213,6 +214,7 @@ public class MainHomePresenter extends BasePresenter<MainHomeView> {
     private ObservableSource<List<ScoreBoardParam>> toScoreBoards(List<Record> list) {
         return observer -> {
             List<ScoreBoardParam> result = new ArrayList<>();
+            BoardStyleProvider styleProvider = new BoardStyleProvider();
             for (Record record:list) {
                 ScoreBoardParam param = new ScoreBoardParam();
                 param.setRecord(record);
@@ -240,6 +242,20 @@ public class MainHomePresenter extends BasePresenter<MainHomeView> {
                 param.setMatchName(record.getMatch().getName());
                 param.setRound(AppConstants.getRoundShortName(record.getRound()));
                 param.setScoreList(record.getScoreList());
+
+                if (record.getMatch().getMatchBean().getCourt().equals(AppConstants.RECORD_MATCH_COURTS[0])) {
+                    param.setBoardStyle(styleProvider.getAustriliaOpen());
+                }
+                else if (record.getMatch().getMatchBean().getCourt().equals(AppConstants.RECORD_MATCH_COURTS[1])) {
+                    param.setBoardStyle(styleProvider.getFrenchOpen());
+                }
+                else if (record.getMatch().getMatchBean().getCourt().equals(AppConstants.RECORD_MATCH_COURTS[2])) {
+                    param.setBoardStyle(styleProvider.getWimbledonOpen());
+                }
+                else {
+                    param.setBoardStyle(styleProvider.getDefault());
+                }
+
                 result.add(param);
             }
             observer.onNext(result);

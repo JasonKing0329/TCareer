@@ -25,6 +25,8 @@ public class ScoreBoardParam {
 
     private List<Score> scoreList;
 
+    private BoardStyle boardStyle;
+
     public String getMatchName() {
         return matchName;
     }
@@ -95,5 +97,13 @@ public class ScoreBoardParam {
 
     public void setRecord(Record record) {
         this.record = record;
+    }
+
+    public BoardStyle getBoardStyle() {
+        return boardStyle;
+    }
+
+    public void setBoardStyle(BoardStyle boardStyle) {
+        this.boardStyle = boardStyle;
     }
 }

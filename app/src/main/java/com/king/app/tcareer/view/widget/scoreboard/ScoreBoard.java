@@ -2,6 +2,7 @@ package com.king.app.tcareer.view.widget.scoreboard;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -34,6 +35,7 @@ public class ScoreBoard extends FrameLayout {
     private TextView tvWO2;
 
     private ScoreBoardParam param;
+    private BoardStyle boardStyle;
 
     private List<ScoreView> scoreViews1;
     private List<ScoreView> scoreViews2;
@@ -68,6 +70,25 @@ public class ScoreBoard extends FrameLayout {
         addView(view);
     }
 
+    public void setParam(ScoreBoardParam param) {
+        this.param = param;
+        setBoardStyle(param.getBoardStyle());
+        initData();
+    }
+
+    /**
+     * call this before after setParam
+     * @param boardStyle
+     */
+    private void setBoardStyle(BoardStyle boardStyle) {
+        this.boardStyle = boardStyle;
+        if (boardStyle == null) {
+            boardStyle = new BoardStyleProvider().getDefault();
+        }
+        tvName.setTextColor(boardStyle.getMatchNameColor());
+        tvRound.setTextColor(boardStyle.getMatchRoundColor());
+    }
+
     private void addScores() {
         scoreViews1 = new ArrayList<>();
         scoreViews2 = new ArrayList<>();
@@ -83,13 +104,12 @@ public class ScoreBoard extends FrameLayout {
         params.weight = 1;
         params.leftMargin = ScreenUtils.dp2px(1);
         scoreView.setLayoutParams(params);
+        scoreView.setBgColor(boardStyle.getNormalBgColor());
+        scoreView.setBgColorFocus(boardStyle.getFocusBgColor());
+        scoreView.setTextColor(boardStyle.getNormalTextColor());
+        scoreView.setTextColorFocus(boardStyle.getFocusTextColor());
         group.addView(scoreView);
         return scoreView;
-    }
-
-    public void setParam(ScoreBoardParam param) {
-        this.param = param;
-        initData();
     }
 
     private void initData() {
@@ -101,16 +121,28 @@ public class ScoreBoard extends FrameLayout {
         tvPlayer1.setText(param.getPlayer1());
         tvPlayer2.setText(param.getPlayer2());
         if (param.getWinnerIndex() == 0) {
-            tvPlayer1.setBackgroundColor(Color.parseColor("#64907f"));
-            tvPlayer1.setTextColor(Color.WHITE);
-            tvPlayer2.setBackgroundColor(Color.WHITE);
-            tvPlayer2.setTextColor(Color.parseColor("#333333"));
+            TextPaint paint1 = tvPlayer1.getPaint();
+            paint1.setFakeBoldText(true);
+            TextPaint paint2 = tvPlayer2.getPaint();
+            paint2.setFakeBoldText(false);
+            tvPlayer1.setBackgroundColor(boardStyle.getFocusBgColor());
+            tvPlayer1.setTextColor(boardStyle.getFocusTextColor());
+            tvPlayer2.setBackgroundColor(boardStyle.getNormalBgColor());
+            tvPlayer2.setTextColor(boardStyle.getNormalTextColor());
+            tvWO1.setBackgroundColor(boardStyle.getFocusBgColor());
+            tvWO2.setBackgroundColor(boardStyle.getNormalBgColor());
         }
         else {
-            tvPlayer2.setBackgroundColor(Color.parseColor("#64907f"));
-            tvPlayer2.setTextColor(Color.WHITE);
-            tvPlayer1.setBackgroundColor(Color.WHITE);
-            tvPlayer1.setTextColor(Color.parseColor("#333333"));
+            TextPaint paint1 = tvPlayer2.getPaint();
+            paint1.setFakeBoldText(true);
+            TextPaint paint2 = tvPlayer1.getPaint();
+            paint2.setFakeBoldText(false);
+            tvPlayer2.setBackgroundColor(boardStyle.getFocusBgColor());
+            tvPlayer2.setTextColor(boardStyle.getFocusTextColor());
+            tvPlayer1.setBackgroundColor(boardStyle.getNormalBgColor());
+            tvPlayer1.setTextColor(boardStyle.getNormalTextColor());
+            tvWO2.setBackgroundColor(boardStyle.getFocusBgColor());
+            tvWO1.setBackgroundColor(boardStyle.getNormalBgColor());
         }
         Glide.with(getContext())
                 .load(param.getPlayerUrl1())

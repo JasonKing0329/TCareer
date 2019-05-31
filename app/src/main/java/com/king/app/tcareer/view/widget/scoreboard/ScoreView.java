@@ -66,6 +66,22 @@ public class ScoreView extends View {
         invalidate();
     }
 
+    public void setBgColor(int bgColor) {
+        this.bgColor = bgColor;
+    }
+
+    public void setBgColorFocus(int bgColorFocus) {
+        this.bgColorFocus = bgColorFocus;
+    }
+
+    public void setTextColor(int textColor) {
+        this.textColor = textColor;
+    }
+
+    public void setTextColorFocus(int textColorFocus) {
+        this.textColorFocus = textColorFocus;
+    }
+
     public void setTextBold(boolean textBold) {
         isTextBold = textBold;
     }
