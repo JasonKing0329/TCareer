@@ -17,7 +17,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.king.app.tcareer.R;
-import com.king.app.tcareer.base.BaseFragment;
 import com.king.app.tcareer.base.BaseMvpFragment;
 import com.king.app.tcareer.base.BasePresenter;
 import com.king.app.tcareer.base.IFragmentHolder;
@@ -312,7 +311,7 @@ public abstract class DraggableDialogFragment extends BaseDialogFragment {
         }
     }
 
-    public static abstract class ContentFragment extends BaseFragment {
+    public static abstract class ContentFragment extends BaseMvpFragment<BasePresenter> {
 
         @Override
         protected void bindFragmentHolder(IFragmentHolder holder) {
@@ -324,6 +323,16 @@ public abstract class DraggableDialogFragment extends BaseDialogFragment {
         }
 
         protected abstract void bindChildFragmentHolder(IFragmentHolder holder);
+
+        @Override
+        protected BasePresenter createPresenter() {
+            return null;
+        }
+
+        @Override
+        protected void onCreateData() {
+
+        }
 
         @Nullable
         @Override

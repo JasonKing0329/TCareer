@@ -6,6 +6,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import butterknife.ButterKnife;
+import butterknife.Unbinder;
+
 /**
  * 描述: mvp架构的base fragment
  * <p/>作者：景阳
@@ -13,16 +16,20 @@ import android.view.ViewGroup;
  */
 public abstract class BaseMvpFragment<T extends BasePresenter> extends BaseFragment implements BaseView {
 
+    private Unbinder unbinder;
+
     protected T presenter;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = super.onCreateView(inflater, container, savedInstanceState);
+        View view = inflater.inflate(getContentLayoutRes(), container, false);
+        unbinder = ButterKnife.bind(this, view);
         presenter = createPresenter();
         if (presenter != null) {
             presenter.onAttach(this);
         }
+        onCreate(view);
         return view;
     }
 
@@ -38,6 +45,9 @@ public abstract class BaseMvpFragment<T extends BasePresenter> extends BaseFragm
 
     @Override
     public void onDestroyView() {
+        if (unbinder != null) {
+            unbinder.unbind();
+        }
         if (presenter != null) {
             presenter.onDestroy();
         }

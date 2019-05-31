@@ -17,7 +17,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.king.app.tcareer.R;
-import com.king.app.tcareer.base.BaseFragment;
 import com.king.app.tcareer.base.BaseFragmentApp;
 import com.king.app.tcareer.base.IFragmentHolder;
 import com.king.app.tcareer.utils.DebugLog;

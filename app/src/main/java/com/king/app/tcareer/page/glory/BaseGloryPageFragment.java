@@ -1,6 +1,7 @@
 package com.king.app.tcareer.page.glory;
 
-import com.king.app.tcareer.base.BaseFragment;
+import com.king.app.tcareer.base.BaseMvpFragment;
+import com.king.app.tcareer.base.BasePresenter;
 import com.king.app.tcareer.base.IFragmentHolder;
 import com.king.app.tcareer.model.db.entity.Record;
 import com.king.app.tcareer.page.match.MatchDialog;
@@ -10,7 +11,7 @@ import com.king.app.tcareer.page.match.MatchDialog;
  * <p/>作者：景阳
  * <p/>创建时间: 2017/6/1 18:37
  */
-public abstract class BaseGloryPageFragment extends BaseFragment {
+public abstract class BaseGloryPageFragment extends BaseMvpFragment<BasePresenter> {
 
     protected IGloryHolder gloryHolder;
 
@@ -28,5 +29,15 @@ public abstract class BaseGloryPageFragment extends BaseFragment {
         dialog.setUser(gloryHolder.getPresenter().getUser());
         dialog.setMatch(record.getMatchNameId(), record.getMatch().getName(), record.getDateStr());
         dialog.show(getChildFragmentManager(), "MatchDialog");
+    }
+
+    @Override
+    protected BasePresenter createPresenter() {
+        return null;
+    }
+
+    @Override
+    protected void onCreateData() {
+
     }
 }

@@ -6,7 +6,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.king.app.tcareer.base.BaseFragment;
+import com.king.app.tcareer.base.BaseMvpFragment;
+import com.king.app.tcareer.base.BasePresenter;
 import com.king.app.tcareer.base.IFragmentHolder;
 import com.king.app.tcareer.utils.ScreenUtils;
 
@@ -15,7 +16,7 @@ import com.king.app.tcareer.utils.ScreenUtils;
  * <p/>作者：景阳
  * <p/>创建时间: 2018/2/8 14:38
  */
-public abstract class CommonContentFragment extends BaseFragment {
+public abstract class CommonContentFragment extends BaseMvpFragment<BasePresenter> {
 
     protected CommonHolder dialogHolder;
 
@@ -32,6 +33,11 @@ public abstract class CommonContentFragment extends BaseFragment {
         }
         customToolbar();
         return super.onCreateView(inflater, container, savedInstanceState);
+    }
+
+    @Override
+    protected BasePresenter createPresenter() {
+        return null;
     }
 
     protected abstract void customToolbar();

@@ -1,14 +1,14 @@
 package com.king.app.tcareer.page.login;
 
 import android.Manifest;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.support.v4.hardware.fingerprint.FingerprintManagerCompat;
 import android.view.View;
-import android.widget.EditText;
-import android.widget.LinearLayout;
 
 import com.king.app.tcareer.R;
-import com.king.app.tcareer.base.BaseMvpActivity;
+import com.king.app.tcareer.base.mvvm.MvvmActivity;
+import com.king.app.tcareer.databinding.ActivityLoginBinding;
 import com.king.app.tcareer.model.fingerprint.samsung.SamsungFingerPrint;
 import com.king.app.tcareer.page.home.main.MainHomeActivity;
 import com.king.app.tcareer.page.setting.SettingActivity;
@@ -21,20 +21,12 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
-import butterknife.BindView;
-import butterknife.OnClick;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.functions.Consumer;
 
 /**
  * login page
  */
-public class LoginActivity extends BaseMvpActivity<LoginPresenter> implements LoginView {
-
-    @BindView(R.id.et_pwd)
-    EditText etPwd;
-    @BindView(R.id.group_login)
-    LinearLayout groupLogin;
+public class LoginActivity extends MvvmActivity<ActivityLoginBinding, LoginViewModel> {
 
     private SamsungFingerPrint fingerPrint;
 
@@ -45,12 +37,13 @@ public class LoginActivity extends BaseMvpActivity<LoginPresenter> implements Lo
 
     @Override
     protected void initView() {
-        groupLogin.setVisibility(View.INVISIBLE);
+        mBinding.groupLogin.setVisibility(View.INVISIBLE);
+        mBinding.btnLogin.setOnClickListener(v -> mModel.checkPassword(mBinding.etPwd.getText().toString()));
     }
 
     @Override
-    protected LoginPresenter createPresenter() {
-        return new LoginPresenter();
+    protected LoginViewModel createViewModel() {
+        return ViewModelProviders.of(this).get(LoginViewModel.class);
     }
 
     @Override
@@ -64,27 +57,29 @@ public class LoginActivity extends BaseMvpActivity<LoginPresenter> implements Lo
                 .request(Manifest.permission.READ_EXTERNAL_STORAGE,
                         Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<Boolean>() {
-                    @Override
-                    public void accept(Boolean isGranted) throws Exception {
-                        if (isGranted) {
-                            initCreate();
-                        }
+                .subscribe(isGranted -> {
+                    if (isGranted) {
+                        initCreate();
                     }
-                }, new Consumer<Throwable>() {
-                    @Override
-                    public void accept(Throwable throwable) throws Exception {
-                        throwable.printStackTrace();
-                        finish();
-                    }
+                }, throwable -> {
+                    throwable.printStackTrace();
+                    finish();
                 });
 
     }
 
     private void initCreate() {
+        mModel.showFingerPrint.observe(this, show -> showFingerPrint());
+        mModel.showLoginFrame.observe(this, show -> showLoginFrame());
+        mModel.loginSuccess.observe(this, success -> {
+            if (success) {
+                permitLogin();
+            }
+        });
+
         // 每次进入导出一次数据库
         DBExportor.execute();
-        presenter.prepare();
+        mModel.prepare();
     }
 
     /**
@@ -114,13 +109,11 @@ public class LoginActivity extends BaseMvpActivity<LoginPresenter> implements Lo
         }
     }
 
-    @Override
-    public void showLoginFrame() {
-        groupLogin.setVisibility(View.VISIBLE);
+    private void showLoginFrame() {
+        mBinding.groupLogin.setVisibility(View.VISIBLE);
     }
 
-    @Override
-    public void showFingerPrint() {
+    private void showFingerPrint() {
         checkFingerprint();
     }
 
@@ -187,12 +180,6 @@ public class LoginActivity extends BaseMvpActivity<LoginPresenter> implements Lo
         });
     }
 
-    @OnClick(R.id.btn_login)
-    public void onViewClicked() {
-        presenter.checkPassword(etPwd.getText().toString());
-    }
-
-    @Override
     public void permitLogin() {
         // 弃用
 //        showYesNoMessage("是否打开设置页面？",
@@ -220,10 +207,5 @@ public class LoginActivity extends BaseMvpActivity<LoginPresenter> implements Lo
         Intent intent = new Intent(this, MainHomeActivity.class);
         startActivity(intent);
         finish();
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
     }
 }

@@ -8,7 +8,7 @@ android {
         minSdkVersion 21
         targetSdkVersion 28
         versionCode 101
-        versionName "4.3.3"
+        versionName "5.0.0.1"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
         sourceSets.main {
@@ -44,6 +44,9 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+    dataBinding {
+        enabled = true
+    }
 }
 
 dependencies {
@@ -56,6 +59,8 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
+
+    implementation 'android.arch.lifecycle:extensions:1.1.1'
 
     /*butterknife*/
     implementation 'com.jakewharton:butterknife:8.5.1'
@@ -95,7 +100,7 @@ dependencies {
 
     /*轮播视图*/
     implementation 'com.youth.banner:banner:1.4.10'
-    implementation 'com.king.lib:jactionbar:1.0.7'
+    implementation 'com.king.lib:jactionbar:1.0.8'
     implementation 'com.guo.android_extend:android-extend:1.0.1'
 
     /*html解析*/

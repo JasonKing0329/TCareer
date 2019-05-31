@@ -46,7 +46,11 @@ public class DebugLog {
         getMethodNames(new Throwable().getStackTrace());
         Log.e(className, createLog(message));
     }
- 
+
+    public static void e(){
+        e("");
+    }
+
     public static void e(String message){
         if (!isDebug)
             return;

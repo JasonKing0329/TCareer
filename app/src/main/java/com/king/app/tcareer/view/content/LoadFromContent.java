@@ -55,11 +55,10 @@ public class LoadFromContent extends CommonContentFragment {
         LinearLayoutManager manager = new LinearLayoutManager(getActivity());
         manager.setOrientation(LinearLayoutManager.VERTICAL);
         rvList.setLayoutManager(manager);
-
-        loadData();
     }
 
-    private void loadData() {
+    @Override
+    protected void onCreateData() {
         File file = new File(AppConfig.HISTORY_BASE);
         list = Arrays.asList(file.listFiles());
 
