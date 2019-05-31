@@ -191,15 +191,44 @@ public class MainHomePresenter extends BasePresenter<MainHomeView> {
         });
     }
 
+    /**
+     * short for name
+     * eg. set Novak Djokovic as N.Djokovic
+     * @param name
+     * @return
+     */
+    private String formatEngName(String name, CompetitorBean bean) {
+        try {
+            String[] arr = name.split(" ");
+            if (bean instanceof User && (bean.getId() == AppConstants.USER_ID_KING || bean.getId() == AppConstants.USER_ID_QI)) {
+                return arr[1].charAt(0) + "." + arr[0];
+            }
+            else {
+                return arr[0].charAt(0) + "." + arr[1];
+            }
+        } catch (Exception e) {}
+        return name;
+    }
+
     private ObservableSource<List<ScoreBoardParam>> toScoreBoards(List<Record> list) {
         return observer -> {
             List<ScoreBoardParam> result = new ArrayList<>();
             for (Record record:list) {
                 ScoreBoardParam param = new ScoreBoardParam();
                 param.setRecord(record);
-                param.setPlayer1(record.getUser().getNameEng());
+                if (record.getSeed() > 0) {
+                    param.setPlayer1(formatEngName(record.getUser().getNameEng(), record.getUser()) + "[" + record.getSeed() + "]");
+                }
+                else {
+                    param.setPlayer1(formatEngName(record.getUser().getNameEng(), record.getUser()));
+                }
                 CompetitorBean bean = CompetitorParser.getCompetitorFrom(record);
-                param.setPlayer2(bean.getNameEng());
+                if (record.getSeedpCpt() > 0) {
+                    param.setPlayer2(formatEngName(bean.getNameEng(), bean) + "[" + record.getSeedpCpt() + "]");
+                }
+                else {
+                    param.setPlayer2(formatEngName(bean.getNameEng(), bean));
+                }
                 param.setPlayerUrl1(ImageProvider.getPlayerHeadPath(record.getUser().getNameChn()));
                 param.setPlayerUrl2(ImageProvider.getPlayerHeadPath(bean.getNameChn()));
                 if (record.getWinnerFlag() == AppConstants.WINNER_USER) {

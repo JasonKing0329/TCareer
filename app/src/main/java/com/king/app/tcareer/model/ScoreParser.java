@@ -46,7 +46,7 @@ public class ScoreParser {
                     buffer.append(score.getCompetitorPoint()).append("-").append(score.getUserPoint());
                 }
                 if (score.getIsTiebreak()) {
-                    buffer.append("(").append(score.getUserTiebreak() > 0 ? score.getUserTiebreak() : score.getCompetitorTiebreak()).append(")");
+                    buffer.append("(").append(score.getUserTiebreak() > score.getCompetitorTiebreak() ? score.getCompetitorTiebreak() : score.getUserTiebreak()).append(")");
                 }
             }
             if (retireFlag == AppConstants.RETIRE_WITH_SCORE) {

@@ -20,6 +20,9 @@
     <EditText
         android:id="@+id/et_tie"
         style="@style/InputScoreTieEdit"/>
+    <EditText
+        android:id="@+id/et_tie_cpt"
+        style="@style/InputScoreTieEdit"/>
     <ImageView
         android:id="@+id/iv_delete"
         style="@style/InputScoreIconRemove" />

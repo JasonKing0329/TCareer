@@ -228,11 +228,13 @@ public class RecordScoreDialog extends DraggableDialogFragment {
             EditText etScoreUser = group.findViewById(R.id.et_score_user);
             EditText etScoreCpt = group.findViewById(R.id.et_score_cpt);
             final EditText etTie = group.findViewById(R.id.et_tie);
+            final EditText etTieCpt = group.findViewById(R.id.et_tie_cpt);
             tvSet.setText("Set" + (stackSet.size() + 1));
             group.findViewById(R.id.tv_tie).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     etTie.setVisibility(etTie.getVisibility() == View.VISIBLE ? View.GONE:View.VISIBLE);
+                    etTieCpt.setVisibility(etTieCpt.getVisibility() == View.VISIBLE ? View.GONE:View.VISIBLE);
                 }
             });
             ImageView ivDelete = group.findViewById(R.id.iv_delete);
@@ -251,8 +253,9 @@ public class RecordScoreDialog extends DraggableDialogFragment {
                 etScoreCpt.setText(String.valueOf(score.getCompetitorPoint()));
                 if (score.getIsTiebreak()) {
                     etTie.setVisibility(View.VISIBLE);
-                    etTie.setText(String.valueOf(score.getUserTiebreak() > 0
-                            ? score.getUserTiebreak():score.getCompetitorTiebreak()));
+                    etTie.setText(String.valueOf(score.getUserTiebreak()));
+                    etTieCpt.setVisibility(View.VISIBLE);
+                    etTieCpt.setText(String.valueOf(score.getCompetitorTiebreak()));
                 }
             }
 
@@ -335,6 +338,10 @@ public class RecordScoreDialog extends DraggableDialogFragment {
             return group.findViewById(R.id.et_tie);
         }
 
+        private EditText getTieCptEdit(ViewGroup group) {
+            return group.findViewById(R.id.et_tie_cpt);
+        }
+
         private Score formatScore(ViewGroup group) {
             Score score = new Score();
             score.setSetNo(stackSet.size() + 1);
@@ -346,16 +353,12 @@ public class RecordScoreDialog extends DraggableDialogFragment {
             } catch (Exception e) {}
             if (getTieEdit(group).getVisibility() == View.VISIBLE) {
                 score.setIsTiebreak(true);
-                if (score.getUserPoint() > score.getCompetitorPoint()) {
-                    try {
-                        score.setCompetitorTiebreak(Integer.parseInt(getTieEdit(group).getText().toString()));
-                    } catch (Exception e) {}
-                }
-                else {
-                    try {
-                        score.setUserTiebreak(Integer.parseInt(getTieEdit(group).getText().toString()));
-                    } catch (Exception e) {}
-                }
+                try {
+                    score.setUserTiebreak(Integer.parseInt(getTieEdit(group).getText().toString()));
+                } catch (Exception e) {}
+                try {
+                    score.setCompetitorTiebreak(Integer.parseInt(getTieCptEdit(group).getText().toString()));
+                } catch (Exception e) {}
             }
             return score;
         }

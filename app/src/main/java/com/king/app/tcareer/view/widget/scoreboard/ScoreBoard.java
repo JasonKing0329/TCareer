@@ -66,7 +66,6 @@ public class ScoreBoard extends FrameLayout {
         tvWO1 = view.findViewById(R.id.tv_wo1);
         tvWO2 = view.findViewById(R.id.tv_wo2);
         addView(view);
-        addScores();
     }
 
     private void addScores() {
@@ -94,6 +93,9 @@ public class ScoreBoard extends FrameLayout {
     }
 
     private void initData() {
+        llScore1.removeAllViews();
+        llScore2.removeAllViews();
+        addScores();
         tvName.setText(param.getMatchName());
         tvRound.setText(param.getRound());
         tvPlayer1.setText(param.getPlayer1());
@@ -165,7 +167,7 @@ public class ScoreBoard extends FrameLayout {
             scoreViews2.get(index).setScore(score.getCompetitorPoint());
             if (score.getIsTiebreak()) {
                 scoreViews1.get(index).setScoreSub(score.getUserTiebreak());
-                scoreViews2.get(index).setScore(score.getCompetitorTiebreak());
+                scoreViews2.get(index).setScoreSub(score.getCompetitorTiebreak());
             }
         } catch (Exception e) {
             scoreViews1.get(index).setScore(null);

@@ -17,8 +17,8 @@ public class ScoreView extends View {
 
     private Paint paint;
 
-    private int textScoreSize = dp2px(14);
-    private int textScoreSubSize = dp2px(10);
+    private int textScoreSize = dp2px(16);
+    private int textScoreSubSize = dp2px(12);
     private int bgColor = Color.WHITE;
     private int bgColorFocus = Color.parseColor("#64907f");
     private int textColor = Color.parseColor("#333333");
@@ -73,7 +73,6 @@ public class ScoreView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         RectF rectF = new RectF(0, 0, getWidth(), getHeight());
-        DebugLog.e("[" + rectF.left + "," + rectF.top + "," + rectF.right + "," + rectF.bottom + "]");
         drawBackground(rectF, canvas);
         drawScore(rectF, canvas);
         paint.reset();
@@ -115,8 +114,8 @@ public class ScoreView extends View {
         } else {
             paint.setColor(textColor);
         }
-        float x = rectF.centerX() + mainTextRect.width() / 2;
-        float y = baseline - mainTextRect.height() / 2;
+        float x = rectF.centerX() + mainTextRect.width() / 2 + dp2px(2);
+        float y = baseline - mainTextRect.height();
         canvas.drawText(String.valueOf(scoreSub), x, y, paint);
     }
 
