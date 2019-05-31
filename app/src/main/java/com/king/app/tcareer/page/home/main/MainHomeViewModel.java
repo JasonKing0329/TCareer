@@ -22,6 +22,7 @@ import com.king.app.tcareer.model.db.entity.RecordDao;
 import com.king.app.tcareer.model.db.entity.User;
 import com.king.app.tcareer.model.db.entity.UserDao;
 import com.king.app.tcareer.page.home.NotifyRankBean;
+import com.king.app.tcareer.utils.DBExportor;
 import com.king.app.tcareer.utils.RetireUtil;
 import com.king.app.tcareer.view.widget.scoreboard.BoardStyleProvider;
 import com.king.app.tcareer.view.widget.scoreboard.ScoreBoardParam;
@@ -381,4 +382,35 @@ public class MainHomeViewModel extends BaseViewModel {
             observer.onNext(result);
         };
     }
+
+    public void saveDatabase() {
+        Observable.create(e -> {
+            DBExportor.exportAsHistory();
+            e.onNext(new Object());
+        }).observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(new Observer<Object>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                        addDisposable(d);
+                    }
+
+                    @Override
+                    public void onNext(Object object) {
+                        messageObserver.setValue("save successfully");
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        e.printStackTrace();
+                        messageObserver.setValue("save failed: " + e.getMessage());
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
+    }
+
 }

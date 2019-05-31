@@ -68,6 +68,16 @@ public class MainHomeActivity extends MvvmActivity<ActivityMainHomeBinding, Main
         mBinding.setModel(mModel);
 
         mBinding.actionbar.setOnClickListener(v -> mBinding.drawerLayout.openDrawer(GravityCompat.START));
+        mBinding.actionbar.setOnMenuItemListener(menuId -> {
+            switch (menuId) {
+                case R.id.menu_home_save:
+                    mModel.saveDatabase();
+                    break;
+                case R.id.menu_home_exit:
+                    finish();
+                    break;
+            }
+        });
 
         mBinding.groupNav.setOnClickListener(v -> {});// 防止事件透传
         mBinding.groupNavLoad.setOnClickListener(navGroupListener);

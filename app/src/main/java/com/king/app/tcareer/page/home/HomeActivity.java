@@ -359,15 +359,6 @@ public class HomeActivity extends BaseMvpActivity<HomePresenter> implements IHom
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         switch (id) {
-            case R.id.menu_home_save:
-                executeSave();
-                break;
-            case R.id.menu_home_saveas:
-                executeSaveAs();
-                break;
-            case R.id.menu_home_exit:
-                executeExit();
-                break;
             case R.id.menu_home_retire:
                 markRetire();
                 break;
