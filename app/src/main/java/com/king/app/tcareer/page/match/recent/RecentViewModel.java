@@ -1,8 +1,11 @@
 package com.king.app.tcareer.page.match.recent;
 
+import android.app.Application;
+import android.arch.lifecycle.MutableLiveData;
+import android.support.annotation.NonNull;
 import android.support.v7.graphics.Palette;
 
-import com.king.app.tcareer.base.BasePresenter;
+import com.king.app.tcareer.base.mvvm.BaseViewModel;
 import com.king.app.tcareer.conf.AppConstants;
 import com.king.app.tcareer.model.db.entity.MatchNameBean;
 import com.king.app.tcareer.model.db.entity.MatchNameBeanDao;
@@ -24,7 +27,13 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
-public class RecentPresenter extends BasePresenter<RecentMatchView> {
+public class RecentViewModel extends BaseViewModel {
+
+    public MutableLiveData<MatchNameBean> matchObserver = new MutableLiveData<>();
+
+    public MutableLiveData<List<Integer>> yearsObserver = new MutableLiveData<>();
+
+    public MutableLiveData<List<Object>> recordsObserver = new MutableLiveData<>();
 
     private MatchNameBean matchNameBean;
 
@@ -32,16 +41,15 @@ public class RecentPresenter extends BasePresenter<RecentMatchView> {
 
     private Map<Integer, List<Record>> yearMap;
 
-    @Override
-    protected void onCreate() {
-
+    public RecentViewModel(@NonNull Application application) {
+        super(application);
     }
 
     public void loadMatch(long matchId, int startYear) {
         getMatch(matchId)
                 .flatMap(bean -> {
                     matchNameBean = bean;
-                    view.postShowMatch(bean);
+                    matchObserver.postValue(bean);
                     return loadRecords();
                 })
                 .observeOn(AndroidSchedulers.mainThread())
@@ -54,8 +62,7 @@ public class RecentPresenter extends BasePresenter<RecentMatchView> {
 
                     @Override
                     public void onNext(Object o) {
-                        view.showYears(yearList);
-
+                        yearsObserver.setValue(yearList);
                         int index = 0;
                         for (int i = 0; i < yearList.size(); i ++) {
                             if (yearList.get(i) == startYear) {
@@ -68,7 +75,7 @@ public class RecentPresenter extends BasePresenter<RecentMatchView> {
                     @Override
                     public void onError(Throwable e) {
                         e.printStackTrace();
-                        view.showMessage(e.getMessage());
+                        messageObserver.setValue(e.getMessage());
                     }
 
                     @Override
@@ -119,13 +126,13 @@ public class RecentPresenter extends BasePresenter<RecentMatchView> {
 
                     @Override
                     public void onNext(List<Object> list) {
-                        view.showRecords(list);
+                        recordsObserver.setValue(list);
                     }
 
                     @Override
                     public void onError(Throwable e) {
                         e.printStackTrace();
-                        view.showMessage(e.getMessage());
+                        messageObserver.setValue(e.getMessage());
                     }
 
                     @Override
@@ -139,7 +146,7 @@ public class RecentPresenter extends BasePresenter<RecentMatchView> {
         return Observable.create(e -> {
             List<Object> list = new ArrayList<>();
             List<String> rounds = new ArrayList<>();
-            List<Record> records = yearMap.get(yearList.get(yearIndex));
+            List<Record> records = yearMap.get(yearsObserver.getValue().get(yearIndex));
             Map<String, List<Record>> map = new HashMap<>();
             for (Record record:records) {
                 String round = record.getRound();

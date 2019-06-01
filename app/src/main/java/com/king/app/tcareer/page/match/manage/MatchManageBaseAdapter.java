@@ -1,17 +1,15 @@
 package com.king.app.tcareer.page.match.manage;
 
+import android.databinding.ViewDataBinding;
 import android.support.v4.app.FragmentManager;
-import android.support.v7.widget.RecyclerView;
-import android.text.TextUtils;
 import android.util.SparseBooleanArray;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
-import com.king.app.tcareer.R;
 import com.king.app.tcareer.base.TApplication;
+import com.king.app.tcareer.base.mvvm.BaseBindingAdapter;
 import com.king.app.tcareer.model.GlideOptions;
 import com.king.app.tcareer.model.ImageProvider;
 import com.king.app.tcareer.model.db.entity.MatchNameBean;
@@ -19,7 +17,6 @@ import com.king.app.tcareer.model.http.Command;
 import com.king.app.tcareer.model.http.bean.ImageUrlBean;
 import com.king.app.tcareer.page.imagemanager.DataController;
 import com.king.app.tcareer.page.imagemanager.ImageManager;
-import com.king.app.tcareer.page.player.manage.PlayerViewBean;
 import com.king.app.tcareer.utils.DebugLog;
 
 import java.util.ArrayList;
@@ -32,15 +29,10 @@ import java.util.Map;
  * <p/>作者：景阳
  * <p/>创建时间: 2017/10/18 10:56
  */
-public abstract class MatchManageBaseAdapter extends RecyclerView.Adapter implements View.OnClickListener {
+public abstract class MatchManageBaseAdapter<V extends ViewDataBinding> extends BaseBindingAdapter<V, MatchNameBean> {
 
-    protected List<MatchNameBean> list;
-    private List<MatchNameBean> originList;
-
-    private String mKeyword;
     protected boolean selectMode;
     protected SparseBooleanArray mCheckMap;
-    protected OnMatchItemClickListener onMatchItemClickListener;
 
     /**
      * 保存首次从文件夹加载的图片序号
@@ -54,10 +46,9 @@ public abstract class MatchManageBaseAdapter extends RecyclerView.Adapter implem
 
     private FragmentManager fragmentManager;
 
-    public MatchManageBaseAdapter(List<MatchNameBean> list) {
+    public MatchManageBaseAdapter() {
         mCheckMap = new SparseBooleanArray();
         imageIndexMap = new HashMap<>();
-        setList(list);
     }
 
     public void setSelectMode(boolean selectMode) {
@@ -67,25 +58,7 @@ public abstract class MatchManageBaseAdapter extends RecyclerView.Adapter implem
         }
     }
 
-    public void setOnMatchItemClickListener(OnMatchItemClickListener onMatchItemClickListener) {
-        this.onMatchItemClickListener = onMatchItemClickListener;
-    }
-
-    public void setList(List<MatchNameBean> data) {
-        originList = data;
-        list = new ArrayList<>();
-        for (MatchNameBean t:originList) {
-            list.add(t);
-        }
-    }
-
-    @Override
-    public int getItemCount() {
-        return list == null ? 0:list.size();
-    }
-
-    protected void onBindImage(ImageView image, int position) {
-        MatchNameBean bean = list.get(position);
+    protected void onBindImage(ImageView image, int position, MatchNameBean bean) {
         String filePath;
         if (imageIndexMap.get(bean.getName()) == null) {
             filePath = ImageProvider.getMatchHeadPath(bean.getName(), bean.getMatchBean().getCourt(), imageIndexMap);
@@ -97,18 +70,12 @@ public abstract class MatchManageBaseAdapter extends RecyclerView.Adapter implem
                 .load("file://" + filePath)
                 .apply(GlideOptions.getDefaultMatchOptions())
                 .into(image);
-        image.setOnClickListener(this);
-        image.setTag(R.id.tag_record_list_player_group_index, position);
+        image.setOnClickListener(v -> showImageAction(v, position, bean));
     }
 
     protected void onBindCheckStatus(CheckBox check, int position) {
         check.setVisibility(selectMode ? View.VISIBLE:View.GONE);
         check.setChecked(mCheckMap.get(position));
-    }
-
-    protected void onBindGroupStatus(ViewGroup group, int position) {
-        group.setTag(position);
-        group.setOnClickListener(this);
     }
 
     public void notifyItemChanged(MatchNameBean editBean) {
@@ -124,16 +91,12 @@ public abstract class MatchManageBaseAdapter extends RecyclerView.Adapter implem
         this.fragmentManager = fragmentManager;
     }
 
-    public interface OnMatchItemClickListener {
-        void onMatchItemClick(MatchNameBean bean);
-    }
-
-    protected void showImageAction(View v) {
-        nGroupPosition = (int) v.getTag(R.id.tag_record_list_player_group_index);
+    protected void showImageAction(View v, int position, MatchNameBean bean) {
+        nGroupPosition = position;
         ImageManager manager = new ImageManager(v.getContext());
         manager.setOnActionListener(imageActionListener);
         manager.setDataProvider(dataProvider);
-        manager.showOptions(list.get(nGroupPosition).getName(), nGroupPosition, Command.TYPE_IMG_MATCH, list.get(nGroupPosition).getName());
+        manager.showOptions(bean.getName(), position, Command.TYPE_IMG_MATCH, bean.getName());
     }
 
     ImageManager.DataProvider dataProvider = new ImageManager.DataProvider() {
@@ -180,58 +143,14 @@ public abstract class MatchManageBaseAdapter extends RecyclerView.Adapter implem
     }
 
     @Override
-    public void onClick(View v) {
-        if (v instanceof ViewGroup) {
-            onClickItem(v);
-        }
-        else if (v instanceof ImageView) {
-            showImageAction(v);
-        }
-    }
-
-    protected void onClickItem(View v) {
-        int position = (int) v.getTag();
+    protected void onClickItem(View v, int position) {
         if (selectMode) {
             mCheckMap.put(position, !mCheckMap.get(position));
             notifyDataSetChanged();
         }
         else {
-            if (onMatchItemClickListener != null) {
-                onMatchItemClickListener.onMatchItemClick(list.get(position));
-            }
+            super.onClickItem(v, position);
         }
-    }
-
-    public void filter(String text) {
-        if (!text.equals(mKeyword)) {
-            list.clear();
-            mKeyword = text;
-            for (int i = 0; i < originList.size(); i ++) {
-                if (TextUtils.isEmpty(text)) {
-                    list.add(originList.get(i));
-                }
-                else {
-                    if (isMatchForKeyword(originList.get(i), text)) {
-                        list.add(originList.get(i));
-                    }
-                }
-            }
-            notifyDataSetChanged();
-        }
-    }
-
-    private boolean isMatchForKeyword(MatchNameBean bean, String text) {
-        // 支持name，国家，城市
-        if (bean.getName().toLowerCase().contains(text.toLowerCase())) {
-            return true;
-        }
-        if (bean.getMatchBean().getCountry().contains(text.toLowerCase())) {
-            return true;
-        }
-        if (bean.getMatchBean().getCity().contains(text.toLowerCase())) {
-            return true;
-        }
-        return false;
     }
 
 }

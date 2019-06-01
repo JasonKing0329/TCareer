@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent" android:layout_height="wrap_content">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <android.support.v7.widget.CardView
-        android:id="@+id/group_card"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
@@ -12,66 +10,72 @@
         android:background="?android:attr/selectableItemBackground"
         app:cardElevation="5dp"
         app:cardCornerRadius="2dp">
-        <RelativeLayout
+        <android.support.constraint.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingBottom="15dp">
             <ImageView
                 android:id="@+id/iv_match"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="90dp"
-                android:scaleType="fitXY"/>
-            <LinearLayout
-                android:id="@+id/group_name"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:layout_below="@id/iv_match"
+                android:scaleType="fitXY"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"/>
+            <TextView
+                android:id="@+id/tv_name"
                 android:layout_marginTop="10dp"
-                android:layout_centerHorizontal="true">
-                <TextView
-                    android:id="@+id/tv_name"
-                    style="@style/MatchManageItem"
-                    android:textSize="14dp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
-            </LinearLayout>
+                android:textColor="@color/text_normal"
+                android:textSize="14dp"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/iv_match"/>
             <TextView
                 android:id="@+id/tv_country"
-                style="@style/MatchManageItemSub"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_centerHorizontal="true"
                 android:layout_below="@id/group_name"
+                android:textColor="@color/text_second"
                 android:textSize="12dp"
-                android:layout_marginTop="3dp"/>
+                android:layout_marginTop="3dp"
+                android:gravity="center"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_name"/>
             <TextView
                 android:id="@+id/tv_line2"
-                style="@style/MatchManageItemSub"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
                 android:layout_below="@id/tv_country"
+                android:textColor="@color/text_second"
                 android:textSize="12dp"
-                android:layout_marginTop="3dp"/>
+                android:layout_marginTop="3dp"
+                android:gravity="center"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_country"/>
             <TextView
                 android:id="@+id/tv_week"
                 android:layout_width="25dp"
                 android:layout_height="25dp"
                 android:background="@drawable/shape_oval_hard"
-                android:layout_alignBottom="@id/tv_line2"
-                android:layout_alignParentRight="true"
-                android:layout_marginRight="5dp"
+                android:layout_marginEnd="5dp"
                 android:gravity="center"
                 android:textSize="10dp"
-                android:textColor="@color/white"/>
+                android:textColor="@color/white"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_country"/>
             <CheckBox
                 android:id="@+id/cb_check"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignBottom="@id/tv_line2"
-                android:clickable="false"/>
-        </RelativeLayout>
+                android:clickable="false"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"/>
+        </android.support.constraint.ConstraintLayout>
     </android.support.v7.widget.CardView>
-</RelativeLayout>
+</layout>

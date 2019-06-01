@@ -1,7 +1,12 @@
 package com.king.app.tcareer.page.match.manage;
 
-import com.king.app.tcareer.base.BasePresenter;
+import android.app.Application;
+import android.arch.lifecycle.MutableLiveData;
+import android.support.annotation.NonNull;
+import android.text.TextUtils;
+
 import com.king.app.tcareer.base.TApplication;
+import com.king.app.tcareer.base.mvvm.BaseViewModel;
 import com.king.app.tcareer.model.MatchComparator;
 import com.king.app.tcareer.model.db.entity.MatchBean;
 import com.king.app.tcareer.model.db.entity.MatchBeanDao;
@@ -11,17 +16,14 @@ import com.king.app.tcareer.page.setting.SettingProperty;
 
 import org.greenrobot.greendao.query.QueryBuilder;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import io.reactivex.Observable;
-import io.reactivex.ObservableEmitter;
-import io.reactivex.ObservableOnSubscribe;
-import io.reactivex.ObservableSource;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 
 /**
@@ -29,28 +31,30 @@ import io.reactivex.schedulers.Schedulers;
  * <p/>作者：景阳
  * <p/>创建时间: 2018/1/30 14:13
  */
-public class MatchManagePresenter extends BasePresenter<MatchManageView> {
+public class MatchManageViewModel extends BaseViewModel {
 
     private int sortType;
 
     private List<MatchNameBean> matchList;
 
-    @Override
-    protected void onCreate() {
+    private String mKeyword;
+
+    public MutableLiveData<List<MatchNameBean>> matchesObserver = new MutableLiveData<>();
+
+    public MatchManageViewModel(@NonNull Application application) {
+        super(application);
         sortType = SettingProperty.getMatchSortMode();
     }
 
     public void loadMatches() {
-        view.showLoading();
+        loadingObserver.setValue(true);
         Observable<List<MatchNameBean>> observable = queryMatches();
         // week是默认排序
         if (sortType != SettingProperty.VALUE_SORT_MATCH_WEEK) {
-            observable.flatMap(new Function<List<MatchNameBean>, ObservableSource<List<MatchNameBean>>>() {
-                @Override
-                public ObservableSource<List<MatchNameBean>> apply(List<MatchNameBean> list) throws Exception {
-                    return sortMatchesRx(list, sortType);
-                }
-            });
+            observable.flatMap(list -> sortMatchesRx(list, sortType));
+        }
+        if (!TextUtils.isEmpty(mKeyword)) {
+            observable.flatMap(list -> filterMatch(list));
         }
         observable.observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
@@ -63,15 +67,15 @@ public class MatchManagePresenter extends BasePresenter<MatchManageView> {
                     @Override
                     public void onNext(List<MatchNameBean> list) {
                         matchList = list;
-                        view.dismissLoading();
-                        view.showMatches(list);
+                        loadingObserver.setValue(false);
+                        matchesObserver.setValue(list);
                     }
 
                     @Override
                     public void onError(Throwable e) {
                         e.printStackTrace();
-                        view.dismissLoading();
-                        view.showMessage("Load matches failed:" + e.getMessage());
+                        loadingObserver.setValue(false);
+                        messageObserver.setValue("Load matches failed:" + e.getMessage());
                     }
 
                     @Override
@@ -82,30 +86,55 @@ public class MatchManagePresenter extends BasePresenter<MatchManageView> {
     }
 
     public Observable<List<MatchNameBean>> queryMatches() {
-        return Observable.create(new ObservableOnSubscribe<List<MatchNameBean>>() {
-            @Override
-            public void subscribe(ObservableEmitter<List<MatchNameBean>> e) throws Exception {
-                MatchNameBeanDao dao = TApplication.getInstance().getDaoSession().getMatchNameBeanDao();
-                QueryBuilder<MatchNameBean> builder = dao.queryBuilder();
-                builder.join(MatchNameBeanDao.Properties.MatchId, MatchBean.class);
+        return Observable.create(e -> {
+            MatchNameBeanDao dao = TApplication.getInstance().getDaoSession().getMatchNameBeanDao();
+            QueryBuilder<MatchNameBean> builder = dao.queryBuilder();
+            builder.join(MatchNameBeanDao.Properties.MatchId, MatchBean.class);
 
-                // 默认按week升序排列
-                String sortColumn = MatchBeanDao.Properties.Week.columnName;
-                builder.orderRaw("J1." + sortColumn);
-                List<MatchNameBean> list = builder.build().list();
-                e.onNext(list);
-            }
+            // 默认按week升序排列
+            String sortColumn = MatchBeanDao.Properties.Week.columnName;
+            builder.orderRaw("J1." + sortColumn);
+            List<MatchNameBean> list = builder.build().list();
+            e.onNext(list);
         });
     }
 
     private Observable<List<MatchNameBean>> sortMatchesRx(final List<MatchNameBean> list, final int sortType) {
-        return Observable.create(new ObservableOnSubscribe<List<MatchNameBean>>() {
-            @Override
-            public void subscribe(ObservableEmitter<List<MatchNameBean>> e) throws Exception {
-                Collections.sort(list, new MatchComparator(sortType));
-                e.onNext(list);
-            }
+        return Observable.create(e -> {
+            Collections.sort(list, new MatchComparator(sortType));
+            e.onNext(list);
         });
+    }
+
+    private Observable<List<MatchNameBean>> filterMatch(List<MatchNameBean> list) {
+        return Observable.create(e -> {
+            List<MatchNameBean> results = new ArrayList<>();
+            for (int i = 0; i < list.size(); i ++) {
+                if (TextUtils.isEmpty(mKeyword)) {
+                    results.add(list.get(i));
+                }
+                else {
+                    if (isMatchForKeyword(list.get(i), mKeyword)) {
+                        results.add(list.get(i));
+                    }
+                }
+            }
+            e.onNext(results);
+        });
+    }
+
+    private boolean isMatchForKeyword(MatchNameBean bean, String text) {
+        // 支持name，国家，城市
+        if (bean.getName().toLowerCase().contains(text.toLowerCase())) {
+            return true;
+        }
+        if (bean.getMatchBean().getCountry().contains(text.toLowerCase())) {
+            return true;
+        }
+        if (bean.getMatchBean().getCity().contains(text.toLowerCase())) {
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -116,7 +145,7 @@ public class MatchManagePresenter extends BasePresenter<MatchManageView> {
         if (matchList == null) {
             return;
         }
-        view.showLoading();
+        loadingObserver.setValue(true);
         sortMatchesRx(matchList, sortType)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
@@ -130,15 +159,15 @@ public class MatchManagePresenter extends BasePresenter<MatchManageView> {
                     public void onNext(Object o) {
                         updateSortType(sortType);
                         SettingProperty.setMatchSortMode(sortType);
-                        view.dismissLoading();
-                        view.sortFinished(matchList);
+                        loadingObserver.setValue(false);
+                        matchesObserver.setValue(matchList);
                     }
 
                     @Override
                     public void onError(Throwable e) {
                         e.printStackTrace();
-                        view.dismissLoading();
-                        view.showMessage("Sort failed: " + e.getMessage());
+                        loadingObserver.setValue(false);
+                        messageObserver.setValue("Sort failed: " + e.getMessage());
                     }
 
                     @Override
@@ -169,14 +198,14 @@ public class MatchManagePresenter extends BasePresenter<MatchManageView> {
 
                     @Override
                     public void onNext(Object o) {
-                        view.showMessage("Delete successfully");
-                        view.deleteSuccess();
+                        messageObserver.setValue("Delete successfully");
+                        loadMatches();
                     }
 
                     @Override
                     public void onError(Throwable e) {
                         e.printStackTrace();
-                        view.showMessage("Delete failed: " + e.getMessage());
+                        messageObserver.setValue("Delete failed: " + e.getMessage());
                     }
 
                     @Override
@@ -187,23 +216,25 @@ public class MatchManagePresenter extends BasePresenter<MatchManageView> {
     }
 
     private Observable<Object> deleteMatchRx(final List<MatchNameBean> list) {
-        return Observable.create(new ObservableOnSubscribe<Object>() {
-            @Override
-            public void subscribe(ObservableEmitter<Object> e) throws Exception {
-                for (MatchNameBean bean:list) {
-                    // 1对1的MatchNameBean还要删除MatchBean
-                    if (bean.getMatchBean().getNameBeanList().size() == 1) {
-                        MatchBeanDao dao = TApplication.getInstance().getDaoSession().getMatchBeanDao();
-                        dao.queryBuilder().where(MatchBeanDao.Properties.Id.eq(bean.getMatchBean().getId()))
-                                .buildDelete()
-                                .executeDeleteWithoutDetachingEntities();
-                    }
-                    MatchNameBeanDao dao = TApplication.getInstance().getDaoSession().getMatchNameBeanDao();
-                    dao.queryBuilder().where(MatchNameBeanDao.Properties.Id.eq(bean.getId()))
+        return Observable.create(e -> {
+            for (MatchNameBean bean:list) {
+                // 1对1的MatchNameBean还要删除MatchBean
+                if (bean.getMatchBean().getNameBeanList().size() == 1) {
+                    MatchBeanDao dao = TApplication.getInstance().getDaoSession().getMatchBeanDao();
+                    dao.queryBuilder().where(MatchBeanDao.Properties.Id.eq(bean.getMatchBean().getId()))
                             .buildDelete()
                             .executeDeleteWithoutDetachingEntities();
                 }
+                MatchNameBeanDao dao = TApplication.getInstance().getDaoSession().getMatchNameBeanDao();
+                dao.queryBuilder().where(MatchNameBeanDao.Properties.Id.eq(bean.getId()))
+                        .buildDelete()
+                        .executeDeleteWithoutDetachingEntities();
             }
         });
+    }
+
+    public void filterMatches(String words) {
+        mKeyword = words;
+        loadMatches();
     }
 }

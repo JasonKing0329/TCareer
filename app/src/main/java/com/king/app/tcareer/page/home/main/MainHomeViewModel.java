@@ -10,7 +10,6 @@ import com.king.app.tcareer.base.mvvm.BaseViewModel;
 import com.king.app.tcareer.conf.AppConstants;
 import com.king.app.tcareer.model.CompetitorParser;
 import com.king.app.tcareer.model.ImageProvider;
-import com.king.app.tcareer.model.ScoreParser;
 import com.king.app.tcareer.model.bean.CompetitorBean;
 import com.king.app.tcareer.model.db.entity.MatchBean;
 import com.king.app.tcareer.model.db.entity.MatchBeanDao;
@@ -21,7 +20,6 @@ import com.king.app.tcareer.model.db.entity.Record;
 import com.king.app.tcareer.model.db.entity.RecordDao;
 import com.king.app.tcareer.model.db.entity.User;
 import com.king.app.tcareer.model.db.entity.UserDao;
-import com.king.app.tcareer.page.home.NotifyRankBean;
 import com.king.app.tcareer.utils.DBExportor;
 import com.king.app.tcareer.utils.RetireUtil;
 import com.king.app.tcareer.view.widget.scoreboard.BoardStyleProvider;
@@ -352,32 +350,6 @@ public class MainHomeViewModel extends BaseViewModel {
                 }
 
                 result.add(param);
-            }
-            observer.onNext(result);
-        };
-    }
-
-    private ObservableSource<List<ComplexRecord>> toViewRecords(List<Record> list) {
-        return observer -> {
-            List<ComplexRecord> result = new ArrayList<>();
-            for (Record record:list) {
-                ComplexRecord cr = new ComplexRecord();
-                cr.setRecord(record);
-                cr.setMatchName(record.getMatch().getName());
-                cr.setMatchRound(AppConstants.getRoundShortName(record.getRound()));
-                cr.setImgUrl(ImageProvider.getMatchHeadPath(record.getMatch().getName(), record.getMatch().getMatchBean().getCourt()));
-                cr.setScore(ScoreParser.getScoreText(record.getScoreList(), record.getWinnerFlag(), record.getRetireFlag()));
-                String userName = record.getUser().getNameShort();
-                String compName = CompetitorParser.getCompetitorFrom(record).getNameChn();
-                if (record.getWinnerFlag() == AppConstants.WINNER_USER) {
-                    cr.setWinner(userName);
-                    cr.setLoser(compName);
-                }
-                else {
-                    cr.setWinner(compName);
-                    cr.setLoser(userName);
-                }
-                result.add(cr);
             }
             observer.onNext(result);
         };

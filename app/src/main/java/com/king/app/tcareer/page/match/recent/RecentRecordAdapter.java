@@ -1,4 +1,4 @@
-package com.king.app.tcareer.page.home.main;
+package com.king.app.tcareer.page.match.recent;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.View;

@@ -1,4 +1,4 @@
-package com.king.app.tcareer.page.home;
+package com.king.app.tcareer.page.home.main;
 
 import com.bumptech.glide.Glide;
 import com.king.app.tcareer.R;

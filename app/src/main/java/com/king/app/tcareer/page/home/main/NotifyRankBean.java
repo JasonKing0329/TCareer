@@ -1,4 +1,4 @@
-package com.king.app.tcareer.page.home;
+package com.king.app.tcareer.page.home.main;
 
 import com.king.app.tcareer.model.db.entity.RankWeek;
 import com.king.app.tcareer.model.db.entity.User;

@@ -20,8 +20,6 @@ import com.king.app.tcareer.model.SeasonManager;
 import com.king.app.tcareer.model.db.entity.MatchNameBean;
 import com.king.app.tcareer.model.db.entity.User;
 import com.king.app.tcareer.page.home.HomeActivity;
-import com.king.app.tcareer.page.home.NotifyRankAdapter;
-import com.king.app.tcareer.page.home.NotifyRankBean;
 import com.king.app.tcareer.page.match.manage.MatchManageActivity;
 import com.king.app.tcareer.page.match.recent.RecentMatchActivity;
 import com.king.app.tcareer.page.player.manage.PlayerManageActivity;
