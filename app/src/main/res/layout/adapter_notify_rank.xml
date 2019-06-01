@@ -1,35 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="horizontal" android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:paddingTop="10dp"
-    android:paddingBottom="10dp"
-    android:gravity="center"
-    android:id="@+id/group_item"
-    android:background="?android:attr/selectableItemBackground"
-    android:paddingLeft="@dimen/activity_horizontal_margin">
-    <com.king.app.tcareer.view.widget.CircleImageView
-        android:id="@+id/iv_user"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:scaleType="centerCrop"/>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:orientation="horizontal" android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_marginLeft="15dp">
-        <TextView
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
+        android:gravity="center"
+        android:id="@+id/group_item"
+        android:background="?android:attr/selectableItemBackground"
+        android:paddingLeft="@dimen/activity_horizontal_margin">
+        <com.king.app.tcareer.view.widget.CircleImageView
+            android:id="@+id/iv_user"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:scaleType="centerCrop"/>
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Last update time"
-            android:textSize="14dp"
-            android:textColor="@color/actionbar_bk_blue"/>
-        <TextView
-            android:id="@+id/tv_date"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
-            android:textSize="16dp"
-            android:textColor="@color/tab_actionbar_text_focus"/>
+            android:orientation="vertical"
+            android:layout_marginLeft="15dp">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Last update time"
+                android:textSize="14dp"
+                android:textColor="@color/actionbar_bk_blue"/>
+            <TextView
+                android:id="@+id/tv_date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:textSize="16dp"
+                android:textColor="@color/tab_actionbar_text_focus"/>
+        </LinearLayout>
     </LinearLayout>
-</LinearLayout>
+</layout>

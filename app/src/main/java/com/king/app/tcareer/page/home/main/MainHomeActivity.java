@@ -46,7 +46,6 @@ import java.util.List;
 public class MainHomeActivity extends MvvmActivity<ActivityMainHomeBinding, MainHomeViewModel> {
 
     private final int REQUEST_EDIT_RECORD = 1101;
-    private final int REQUEST_RANK_DETAIL = 1102;
     private final int REQUEST_RECORD_COMPLEX = 1103;
 
     private ScoreBoardAdapter scoreBoardAdapter;
@@ -170,7 +169,7 @@ public class MainHomeActivity extends MvvmActivity<ActivityMainHomeBinding, Main
 
                 notifyRankAdapter = new NotifyRankAdapter();
                 notifyRankAdapter.setList(list);
-                notifyRankAdapter.setOnItemListener((bean, position) -> startWeekRankActivity(bean.getUser().getId()));
+                notifyRankAdapter.setOnItemClickListener((view, position, bean) -> startWeekRankActivity(bean.getUser().getId()));
                 mBinding.rvNotify.setAdapter(notifyRankAdapter);
             }
             else {
@@ -202,7 +201,7 @@ public class MainHomeActivity extends MvvmActivity<ActivityMainHomeBinding, Main
     private void showMatches(List<MatchNameBean> list) {
         MatchAdapter adapter = new MatchAdapter();
         adapter.setList(list);
-        adapter.setOnItemClickListener((position, data) -> {
+        adapter.setOnItemClickListener((view, position, data) -> {
             Intent intent = new Intent().setClass(MainHomeActivity.this, RecentMatchActivity.class);
             intent.putExtra(RecentMatchActivity.KEY_MATCH_ID, data.getMatchId());
             intent.putExtra(RecentMatchActivity.KEY_YEAR, Calendar.getInstance().get(Calendar.YEAR));
@@ -215,7 +214,7 @@ public class MainHomeActivity extends MvvmActivity<ActivityMainHomeBinding, Main
         if (scoreBoardAdapter == null) {
             scoreBoardAdapter = new ScoreBoardAdapter();
             scoreBoardAdapter.setList(records);
-            scoreBoardAdapter.setOnItemClickListener((position, data) -> {
+            scoreBoardAdapter.setOnItemClickListener((view, position, data) -> {
                 Intent intent = new Intent().setClass(MainHomeActivity.this, RecordEditorActivity.class);
                 intent.putExtra(RecordEditorActivity.KEY_RECORD_ID, data.getRecord().getId());
                 intent.putExtra(RecordEditorActivity.KEY_USER_ID, data.getRecord().getUserId());
@@ -229,27 +228,24 @@ public class MainHomeActivity extends MvvmActivity<ActivityMainHomeBinding, Main
         }
     }
 
-    private View.OnClickListener navGroupListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View view) {
-            switch (view.getId()) {
-                case R.id.group_nav_player:
-                    startPlayerManageActivity();
-                    break;
-                case R.id.group_nav_match:
-                    startMatchManageActivity();
-                    break;
-                case R.id.group_nav_load:
-                    showLoadFromDialog();
-                    break;
-                case R.id.group_nav_setting:
-                    startSettingActivity();
-                    break;
-                case R.id.tv_nav_complex:
-                    Intent intent = new Intent().setClass(MainHomeActivity.this, RecordComplexActivity.class);
-                    startActivityForResult(intent, REQUEST_RECORD_COMPLEX);
-                    break;
-            }
+    private View.OnClickListener navGroupListener = view -> {
+        switch (view.getId()) {
+            case R.id.group_nav_player:
+                startPlayerManageActivity();
+                break;
+            case R.id.group_nav_match:
+                startMatchManageActivity();
+                break;
+            case R.id.group_nav_load:
+                showLoadFromDialog();
+                break;
+            case R.id.group_nav_setting:
+                startSettingActivity();
+                break;
+            case R.id.tv_nav_complex:
+                Intent intent = new Intent().setClass(MainHomeActivity.this, RecordComplexActivity.class);
+                startActivityForResult(intent, REQUEST_RECORD_COMPLEX);
+                break;
         }
     };
 
