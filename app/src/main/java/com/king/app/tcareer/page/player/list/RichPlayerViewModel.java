@@ -1,8 +1,10 @@
 package com.king.app.tcareer.page.player.list;
 
+import android.app.Application;
+import android.arch.lifecycle.MutableLiveData;
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.view.Gravity;
-import android.view.View;
 
 import com.king.app.tcareer.base.TApplication;
 import com.king.app.tcareer.conf.AppConstants;
@@ -17,7 +19,7 @@ import com.king.app.tcareer.model.db.entity.Record;
 import com.king.app.tcareer.model.db.entity.RecordDao;
 import com.king.app.tcareer.model.db.entity.User;
 import com.king.app.tcareer.model.db.entity.UserDao;
-import com.king.app.tcareer.page.player.atp.PlayerAtpPresenter;
+import com.king.app.tcareer.page.player.atp.PlayerAtpViewModel;
 import com.king.app.tcareer.page.setting.SettingProperty;
 import com.king.app.tcareer.utils.ConstellationUtil;
 
@@ -43,7 +45,24 @@ import io.reactivex.schedulers.Schedulers;
  * @time 2018/5/19 0019 15:36
  */
 
-public class RichPlayerPresenter extends PlayerAtpPresenter<RichPlayerView> {
+public class RichPlayerViewModel extends PlayerAtpViewModel {
+
+    public MutableLiveData<String> indexObserver = new MutableLiveData<>();
+
+    public MutableLiveData<Boolean> onIndexCreated = new MutableLiveData<>();
+
+    public MutableLiveData<Integer> onSortFinished = new MutableLiveData<>();
+
+    public MutableLiveData<List<RichPlayerBean>> playersObserver = new MutableLiveData<>();
+
+    public MutableLiveData<Integer> updateIndexGravity = new MutableLiveData<>();
+
+    public MutableLiveData<Boolean> setDeleteMode = new MutableLiveData<>();
+
+    public MutableLiveData<Boolean> clearIndex = new MutableLiveData<>();
+
+    public MutableLiveData<Integer> onUpdateAtpCompleted = new MutableLiveData<>();
+
 
     private int sortType;
 
@@ -69,7 +88,8 @@ public class RichPlayerPresenter extends PlayerAtpPresenter<RichPlayerView> {
 
     private boolean mOnlyShowUser;
 
-    public RichPlayerPresenter() {
+    public RichPlayerViewModel(@NonNull Application application) {
+        super(application);
         // 不用SettingProperty.getPlayerSortMode()，因为h2h page与manage page支持的排序类型不尽相同
         sortType = SettingProperty.VALUE_SORT_PLAYER_NAME;
         indexEmitter = new IndexEmitter();
@@ -96,7 +116,7 @@ public class RichPlayerPresenter extends PlayerAtpPresenter<RichPlayerView> {
                     @Override
                     public void onError(Throwable e) {
                         e.printStackTrace();
-                        view.showMessage(e.getMessage());
+                        messageObserver.setValue(e.getMessage());
                     }
 
                     @Override
@@ -108,8 +128,8 @@ public class RichPlayerPresenter extends PlayerAtpPresenter<RichPlayerView> {
 
     public void loadPlayers(boolean onlyShowUser) {
         mOnlyShowUser = onlyShowUser;
-        view.showLoading();
-        view.getSidebar().clear();
+        loadingObserver.setValue(true);
+        clearIndex.setValue(true);
         updateSidebarGravity();
         Observable.combineLatest(queryUsers(), queryPlayers()
                 , (users, players) -> {
@@ -142,23 +162,22 @@ public class RichPlayerPresenter extends PlayerAtpPresenter<RichPlayerView> {
 
                     @Override
                     public void onNext(String index) {
-                        view.getSidebar().addIndex(index);
+                        indexObserver.setValue(index);
                     }
 
                     @Override
                     public void onError(Throwable e) {
                         e.printStackTrace();
-                        view.dismissLoading();
-                        view.showMessage("Load players failed: " + e.getMessage());
+                        loadingObserver.setValue(false);
+                        messageObserver.setValue("Load players failed: " + e.getMessage());
                     }
 
                     @Override
                     public void onComplete() {
-                        view.dismissLoading();
-                        view.getSidebar().build();
-                        view.getSidebar().setVisibility(View.VISIBLE);
-                        view.showPlayers(mList);
-                        view.sortFinished(sortType);
+                        loadingObserver.setValue(false);
+                        onIndexCreated.setValue(true);
+                        playersObserver.setValue(mList);
+                        onSortFinished.setValue(sortType);
                     }
                 });
     }
@@ -368,10 +387,9 @@ public class RichPlayerPresenter extends PlayerAtpPresenter<RichPlayerView> {
         return indexEmitter.getPlayerIndexMap().get(letter).start;
     }
 
-    public void sortPlayer(final int sortType) {
-        view.showLoading();
+    public void sortPlayer(int sortType) {
+        loadingObserver.setValue(true);
         this.sortType = sortType;
-        view.getSidebar().clear();
         updateSidebarGravity();
         sortPlayerRx(mList)
                 .flatMap(list -> createIndexes())
@@ -385,32 +403,31 @@ public class RichPlayerPresenter extends PlayerAtpPresenter<RichPlayerView> {
 
                     @Override
                     public void onNext(String index) {
-                        view.getSidebar().addIndex(index);
+                        indexObserver.setValue(index);
                     }
 
                     @Override
                     public void onError(Throwable e) {
                         e.printStackTrace();
-                        view.dismissLoading();
-                        view.showMessage("Sort players failed: " + e.getMessage());
+                        loadingObserver.setValue(false);
+                        messageObserver.setValue("Sort players failed: " + e.getMessage());
                     }
 
                     @Override
                     public void onComplete() {
-                        view.dismissLoading();
-                        view.getSidebar().build();
-                        view.getSidebar().setVisibility(View.VISIBLE);
-                        view.sortFinished(sortType);
+                        loadingObserver.setValue(false);
+                        onIndexCreated.setValue(true);
+                        onSortFinished.setValue(sortType);
                     }
                 });
     }
 
     private void updateSidebarGravity() {
         if (sortType == SettingProperty.VALUE_SORT_PLAYER_CONSTELLATION) {
-            view.getSidebar().setGravity(Gravity.RIGHT);
+            updateIndexGravity.setValue(Gravity.RIGHT);
         }
         else {
-            view.getSidebar().setGravity(Gravity.CENTER);
+            updateIndexGravity.setValue(Gravity.CENTER);
         }
     }
 
@@ -422,7 +439,7 @@ public class RichPlayerPresenter extends PlayerAtpPresenter<RichPlayerView> {
     @Override
     protected void onUpdateAtpCompleted(PlayerAtpBean bean) {
         super.onUpdateAtpCompleted(bean);
-        view.onUpdateAtpCompleted(mOperationPosition);
+        onUpdateAtpCompleted.setValue(mOperationPosition);
     }
 
     public void deletePlayer(final List<RichPlayerBean> list) {
@@ -449,13 +466,13 @@ public class RichPlayerPresenter extends PlayerAtpPresenter<RichPlayerView> {
 
                     @Override
                     public void onNext(Object o) {
-                        view.deleteSuccess();
+                        setDeleteMode.setValue(false);
                     }
 
                     @Override
                     public void onError(Throwable e) {
                         e.printStackTrace();
-                        view.showMessage("Delete failed: " + e.getMessage());
+                        messageObserver.setValue("Delete failed: " + e.getMessage());
                     }
 
                     @Override
@@ -530,8 +547,8 @@ public class RichPlayerPresenter extends PlayerAtpPresenter<RichPlayerView> {
     }
 
     private void filterObservable(Observable<Boolean> observable) {
-        view.showLoading();
-        view.getSidebar().clear();
+        loadingObserver.setValue(true);
+        clearIndex.setValue(true);
         observable
                 .flatMap(aBoolean -> createIndexes())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -544,21 +561,21 @@ public class RichPlayerPresenter extends PlayerAtpPresenter<RichPlayerView> {
 
                     @Override
                     public void onNext(String index) {
-                        view.getSidebar().addIndex(index);
+                        indexObserver.setValue(index);
                     }
 
                     @Override
                     public void onError(Throwable e) {
                         e.printStackTrace();
-                        view.dismissLoading();
+                        loadingObserver.setValue(false);
                     }
 
                     @Override
                     public void onComplete() {
-                        view.dismissLoading();
-                        view.showPlayers(mList);
-                        view.getSidebar().build();
-                        view.sortFinished(sortType);
+                        loadingObserver.setValue(false);
+                        playersObserver.setValue(mList);
+                        onIndexCreated.setValue(true);
+                        onSortFinished.setValue(sortType);
                     }
                 });
     }

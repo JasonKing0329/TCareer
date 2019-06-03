@@ -1,5 +1,9 @@
 package com.king.app.tcareer.page.player.atp;
 
+import android.app.Application;
+import android.arch.lifecycle.MutableLiveData;
+import android.databinding.ObservableInt;
+import android.support.annotation.NonNull;
 import android.view.View;
 
 import com.king.app.tcareer.base.TApplication;
@@ -22,21 +26,24 @@ import io.reactivex.schedulers.Schedulers;
  * @author：Jing Yang
  * @date: 2018/5/18 9:22
  */
-public class AtpManagePresenter extends PlayerAtpPresenter<AtpManageView> {
+public class AtpManageViewModel extends PlayerAtpViewModel {
 
+    public MutableLiveData<String> indexObserver = new MutableLiveData<>();
+    public MutableLiveData<Boolean> clearIndex = new MutableLiveData<>();
+    public MutableLiveData<List<PlayerAtpBean>> playersObserver = new MutableLiveData<>();
+    public ObservableInt sideBarVisibility = new ObservableInt(View.GONE);
     private Map<String, Integer> indexMap;
 
-    @Override
-    protected void onCreate() {
-        super.onCreate();
+    public AtpManageViewModel(@NonNull Application application) {
+        super(application);
         indexMap = new HashMap<>();
     }
 
     public void loadData() {
-        view.getSideBar().clear();
+        clearIndex.setValue(true);
         loadAtpPlayers()
                 .flatMap(list -> {
-                    view.postShowPlayers(list);
+                    playersObserver.postValue(list);
                     return createIndex(list);
                 })
                 .observeOn(AndroidSchedulers.mainThread())
@@ -49,8 +56,7 @@ public class AtpManagePresenter extends PlayerAtpPresenter<AtpManageView> {
 
                     @Override
                     public void onNext(String index) {
-                        view.getSideBar().setVisibility(View.VISIBLE);
-                        view.getSideBar().addIndex(index);
+                        indexObserver.setValue(index);
                     }
 
                     @Override
@@ -60,7 +66,7 @@ public class AtpManagePresenter extends PlayerAtpPresenter<AtpManageView> {
 
                     @Override
                     public void onComplete() {
-                        view.getSideBar().setVisibility(View.VISIBLE);
+                        sideBarVisibility.set(View.VISIBLE);
                     }
                 });
     }

@@ -22,12 +22,12 @@ public abstract class MvvmFragment<T extends ViewDataBinding, VM extends BaseVie
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        super.onCreateView(inflater, container, savedInstanceState);
         mBinding = DataBindingUtil.inflate(inflater, getContentLayoutRes(), container, false);
         mModel = createViewModel();
         initViewModel();
 
         View view = mBinding.getRoot();
+        onCreate(view);
         onCreateData();
         return view;
     }

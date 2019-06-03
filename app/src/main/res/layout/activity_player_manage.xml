@@ -1,73 +1,76 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
 	xmlns:app="http://schemas.android.com/apk/res-auto"
-	xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/main_bg"
-	tools:context=".page.player.manage.PlayerManageActivity">
+	xmlns:tools="http://schemas.android.com/tools">
 
-	<com.king.app.jactionbar.JActionbar
-		android:id="@+id/actionbar"
-		android:layout_width="match_parent"
-		android:layout_height="?android:attr/actionBarSize"
-		android:theme="@style/EtActionSearch"
-		android:background="@color/colorPrimary"
-		app:iconSize="@dimen/actionbar_icon_size"
-		app:iconPadding="@dimen/actionbar_icon_padding"
-		app:showIconBack="true"
-		app:rippleColor="@color/ripple_actionbar_icon"
-		app:maxShowIcon="5"
-		app:title="@string/player_manage_title"
-		app:supportSearch="true"/>
-
-
-	<TextView
-		android:id="@+id/tv_sort_value"
-		android:layout_width="wrap_content"
-		android:layout_height="34dp"
-		android:layout_below="@id/actionbar"
-		android:gravity="center_vertical"
-		android:textSize="16dp"
-		android:layout_marginLeft="@dimen/activity_horizontal_margin"/>
-
-	<ImageView
-		android:id="@+id/iv_sidebar"
-		android:layout_width="34dp"
-		android:layout_height="34dp"
-		android:layout_below="@id/actionbar"
-		android:layout_alignParentRight="true"
-		android:layout_marginRight="5dp"
-		android:padding="5dp"
-		android:src="@drawable/ic_sort_by_alpha_black_24dp"
-		android:background="?android:attr/selectableItemBackgroundBorderless"/>
-
-	<TextView
-		android:id="@+id/tv_sort"
-		android:layout_width="wrap_content"
-		android:layout_height="34dp"
-		android:layout_below="@id/actionbar"
-		android:layout_toLeftOf="@id/iv_sidebar"
-		android:textSize="16dp"
-		android:gravity="center_vertical"
-		android:layout_marginLeft="@dimen/activity_horizontal_margin"/>
-
-	<TextView
-		android:id="@+id/tv_user"
-		android:layout_width="match_parent"
-		android:layout_height="34dp"
-		android:layout_below="@id/actionbar"
-		android:layout_toRightOf="@id/tv_sort_value"
-		android:layout_toLeftOf="@id/tv_sort"
-		android:layout_centerHorizontal="true"
-		android:gravity="center"
-		android:textSize="16dp"
-		android:text="All users"/>
-
-	<FrameLayout
-		android:id="@+id/group_ft"
+	<RelativeLayout
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"
-		android:layout_below="@id/tv_sort"/>
+		android:background="@color/main_bg"
+		tools:context=".page.player.manage.PlayerManageActivity">
 
-</RelativeLayout>
+		<com.king.app.jactionbar.JActionbar
+			android:id="@+id/actionbar"
+			android:layout_width="match_parent"
+			android:layout_height="?android:attr/actionBarSize"
+			android:theme="@style/EtActionSearch"
+			android:background="@color/colorPrimary"
+			app:iconSize="@dimen/actionbar_icon_size"
+			app:iconPadding="@dimen/actionbar_icon_padding"
+			app:showIconBack="true"
+			app:rippleColor="@color/ripple_actionbar_icon"
+			app:maxShowIcon="5"
+			app:title="@string/player_manage_title"
+			app:supportSearch="true"/>
+
+
+		<TextView
+			android:id="@+id/tv_sort_value"
+			android:layout_width="wrap_content"
+			android:layout_height="34dp"
+			android:layout_below="@id/actionbar"
+			android:gravity="center_vertical"
+			android:textSize="16dp"
+			android:layout_marginLeft="@dimen/activity_horizontal_margin"/>
+
+		<ImageView
+			android:id="@+id/iv_sidebar"
+			android:layout_width="34dp"
+			android:layout_height="34dp"
+			android:layout_below="@id/actionbar"
+			android:layout_alignParentRight="true"
+			android:layout_marginRight="5dp"
+			android:padding="5dp"
+			android:src="@drawable/ic_sort_by_alpha_black_24dp"
+			android:background="?android:attr/selectableItemBackgroundBorderless"/>
+
+		<TextView
+			android:id="@+id/tv_sort"
+			android:layout_width="wrap_content"
+			android:layout_height="34dp"
+			android:layout_below="@id/actionbar"
+			android:layout_toLeftOf="@id/iv_sidebar"
+			android:textSize="16dp"
+			android:gravity="center_vertical"
+			android:layout_marginLeft="@dimen/activity_horizontal_margin"/>
+
+		<TextView
+			android:id="@+id/tv_user"
+			android:layout_width="match_parent"
+			android:layout_height="34dp"
+			android:layout_below="@id/actionbar"
+			android:layout_toRightOf="@id/tv_sort_value"
+			android:layout_toLeftOf="@id/tv_sort"
+			android:layout_centerHorizontal="true"
+			android:gravity="center"
+			android:textSize="16dp"
+			android:text="All users"/>
+
+		<FrameLayout
+			android:id="@+id/group_ft"
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			android:layout_below="@id/tv_sort"/>
+
+	</RelativeLayout>
+</layout>

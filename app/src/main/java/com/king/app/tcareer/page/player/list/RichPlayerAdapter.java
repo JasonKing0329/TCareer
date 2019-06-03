@@ -2,18 +2,15 @@ package com.king.app.tcareer.page.player.list;
 
 import android.graphics.Color;
 import android.support.v4.app.FragmentManager;
-import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.SparseBooleanArray;
 import android.view.View;
-import android.widget.CheckBox;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.king.app.tcareer.R;
+import com.king.app.tcareer.base.mvvm.BaseBindingAdapter;
+import com.king.app.tcareer.databinding.AdapterPlayerRichBinding;
 import com.king.app.tcareer.model.GlideOptions;
 import com.king.app.tcareer.model.ImageProvider;
 import com.king.app.tcareer.model.bean.CompetitorBean;
@@ -26,7 +23,6 @@ import com.king.app.tcareer.page.imagemanager.DataController;
 import com.king.app.tcareer.page.imagemanager.ImageManager;
 import com.king.app.tcareer.utils.ConstellationUtil;
 import com.king.app.tcareer.utils.FormatUtil;
-import com.king.app.tcareer.view.adapter.BaseRecyclerAdapter;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -35,16 +31,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
-
 /**
  * @desc
  * @auth 景阳
  * @time 2018/5/19 0019 14:54
  */
 
-public class RichPlayerAdapter extends BaseRecyclerAdapter<RichPlayerAdapter.PlayerHolder, RichPlayerBean> {
+public class RichPlayerAdapter extends BaseBindingAdapter<AdapterPlayerRichBinding, RichPlayerBean> {
 
     private Map<Long, Boolean> mExpandMap;
 
@@ -109,11 +102,6 @@ public class RichPlayerAdapter extends BaseRecyclerAdapter<RichPlayerAdapter.Pla
         return R.layout.adapter_player_rich;
     }
 
-    @Override
-    protected PlayerHolder newViewHolder(View view) {
-        return new PlayerHolder(view);
-    }
-
     /**
      * image path
      * @param position
@@ -132,67 +120,68 @@ public class RichPlayerAdapter extends BaseRecyclerAdapter<RichPlayerAdapter.Pla
     }
 
     @Override
-    public void onBindViewHolder(PlayerHolder holder, int position) {
-        CompetitorBean bean = list.get(position).getCompetitorBean();
+    protected void onBindItem(AdapterPlayerRichBinding binding, int position, RichPlayerBean data) {
+
+        CompetitorBean bean = data.getCompetitorBean();
         PlayerAtpBean atpBean = bean.getAtpBean();
 
-        holder.tvIndex.setVisibility(position < nIndexOffset ? View.GONE:View.VISIBLE);
-        holder.tvIndex.setText(String.valueOf(position - nIndexOffset + 1));
+        binding.tvIndex.setVisibility(position < nIndexOffset ? View.GONE:View.VISIBLE);
+        binding.tvIndex.setText(String.valueOf(position - nIndexOffset + 1));
 
-        holder.itemView.setBackgroundColor(bean instanceof User ?
+        binding.getRoot().setBackgroundColor(bean instanceof User ?
                 Color.parseColor("#efefef"):Color.WHITE);
 
-        holder.tvName.setText(bean.getNameEng());
-        holder.tvWin.setText(String.valueOf(list.get(position).getWin()));
-        holder.tvLose.setText(String.valueOf(list.get(position).getLose()));
+        binding.tvName.setText(bean.getNameEng());
+        binding.tvWin.setText(String.valueOf(list.get(position).getWin()));
+        binding.tvLose.setText(String.valueOf(list.get(position).getLose()));
         if (list.get(position).getWin() > list.get(position).getLose()) {
-            holder.tvWin.setTextColor(holder.tvWin.getResources().getColor(R.color.h2hlist_color_win));
-            holder.tvLose.setTextColor(holder.tvWin.getResources().getColor(R.color.h2hlist_color_lose));
+            binding.tvWin.setTextColor(binding.tvWin.getResources().getColor(R.color.h2hlist_color_win));
+            binding.tvLose.setTextColor(binding.tvWin.getResources().getColor(R.color.h2hlist_color_lose));
         }
         else if (list.get(position).getWin() < list.get(position).getLose()) {
-            holder.tvLose.setTextColor(holder.tvWin.getResources().getColor(R.color.h2hlist_color_win));
-            holder.tvWin.setTextColor(holder.tvWin.getResources().getColor(R.color.h2hlist_color_lose));
+            binding.tvLose.setTextColor(binding.tvWin.getResources().getColor(R.color.h2hlist_color_win));
+            binding.tvWin.setTextColor(binding.tvWin.getResources().getColor(R.color.h2hlist_color_lose));
         }
         else {
-            holder.tvWin.setTextColor(holder.tvWin.getResources().getColor(R.color.h2hlist_color_tie));
-            holder.tvLose.setTextColor(holder.tvWin.getResources().getColor(R.color.h2hlist_color_tie));
+            binding.tvWin.setTextColor(binding.tvWin.getResources().getColor(R.color.h2hlist_color_tie));
+            binding.tvLose.setTextColor(binding.tvWin.getResources().getColor(R.color.h2hlist_color_tie));
         }
         boolean hasAtpDetail = (atpBean != null && atpBean.getLastUpdateDate() > 0);
         if (hasAtpDetail) {
             // basic
-            holder.tvPlace.setText(getPlaceFromAtp(atpBean.getBirthCity(), atpBean.getBirthCountry()));
-            holder.tvBirthday.setText(getBirthdayDetail(atpBean.getBirthday()));
-            holder.tvBody.setText(bean.getNameChn()
+            binding.tvPlace.setText(getPlaceFromAtp(atpBean.getBirthCity(), atpBean.getBirthCountry()));
+            binding.tvBirthday.setText(getBirthdayDetail(atpBean.getBirthday()));
+            binding.tvBody.setText(bean.getNameChn()
                     + ", " + FormatUtil.formatNumber(atpBean.getCm()) + "cm, "
                     + FormatUtil.formatNumber(atpBean.getKg()) + "kg");
 
             // more
-            holder.tvTurnedPro.setText("Turned Pro  " + atpBean.getTurnedPro());
-            holder.tvTime.setText(dateFormat.format(new Date(atpBean.getLastUpdateDate())));
-            holder.tvResidence.setText("Residence:  " + getPlaceFromAtp(atpBean.getResidenceCity(), atpBean.getResidenceCountry()));
-            holder.tvPlays.setText("Plays:  " + atpBean.getPlays());
-            holder.tvHigh.setText("生涯最高排名 【" + atpBean.getCareerHighSingle() + "】 " + atpBean.getCareerHighSingleDate());
-            holder.tvCareer.setText("职业生涯  " + atpBean.getCareerSingles() + "冠  "
+            binding.tvTurnedPro.setText("Turned Pro  " + atpBean.getTurnedPro());
+            binding.tvTime.setText(dateFormat.format(new Date(atpBean.getLastUpdateDate())));
+            binding.tvResidence.setText("Residence:  " + getPlaceFromAtp(atpBean.getResidenceCity(), atpBean.getResidenceCountry()));
+            binding.tvPlays.setText("Plays:  " + atpBean.getPlays());
+            binding.tvHigh.setText("生涯最高排名 【" + atpBean.getCareerHighSingle() + "】 " + atpBean.getCareerHighSingleDate());
+            binding.tvCareer.setText("职业生涯  " + atpBean.getCareerSingles() + "冠  "
                     + atpBean.getCareerWin() + "胜" + atpBean.getCareerLose() + "负  总奖金" + atpBean.getCareerPrize());
-            holder.tvCoach.setText("Coach:  " + atpBean.getCoach());
-            holder.tvCoach.setVisibility(TextUtils.isEmpty(atpBean.getCoach()) ? View.GONE:View.VISIBLE);
+            binding.tvCoach.setText("Coach:  " + atpBean.getCoach());
+            binding.tvCoach.setVisibility(TextUtils.isEmpty(atpBean.getCoach()) ? View.GONE:View.VISIBLE);
         }
         else {
             // basic
-            holder.tvPlace.setText(bean.getCountry());
-            holder.tvBirthday.setText(getBirthdayDetail(bean.getBirthday()));
-            holder.tvBody.setText(bean.getNameChn());
+            binding.tvPlace.setText(bean.getCountry());
+            binding.tvBirthday.setText(getBirthdayDetail(bean.getBirthday()));
+            binding.tvBody.setText(bean.getNameChn());
         }
-        Glide.with(holder.ivPlayer.getContext())
+        Glide.with(binding.ivPlayer.getContext())
                 .load(getPlayerPath(position))
                 .apply(playerOptions)
-                .into(holder.ivPlayer);
+                .into(binding.ivPlayer);
 
-        holder.ivRefresh.setVisibility(bean.getAtpId() == null ? View.INVISIBLE:View.VISIBLE);
-        holder.ivRefresh.setTag(position);
-        holder.ivRefresh.setOnClickListener(refreshListener);
+        binding.ivRefresh.setVisibility(bean.getAtpId() == null ? View.INVISIBLE:View.VISIBLE);
+        binding.ivRefresh.setTag(position);
+        binding.ivRefresh.setOnClickListener(refreshListener);
 
-        holder.ivPlayer.setOnClickListener(view -> {
+        binding.ivPlayer.setOnClickListener(view -> {
             nGroupPosition = position;
 
             ImageManager imageManager = new ImageManager(view.getContext());
@@ -202,16 +191,16 @@ public class RichPlayerAdapter extends BaseRecyclerAdapter<RichPlayerAdapter.Pla
                     , nGroupPosition, Command.TYPE_IMG_PLAYER, list.get(nGroupPosition).getCompetitorBean().getNameChn());
         });
 
-        holder.cbCheck.setVisibility(isSelectMode && (bean instanceof PlayerBean) ? View.VISIBLE:View.GONE);
-        holder.cbCheck.setChecked(checkMap.get(position));
+        binding.cbCheck.setVisibility(isSelectMode && (bean instanceof PlayerBean) ? View.VISIBLE:View.GONE);
+        binding.cbCheck.setChecked(checkMap.get(position));
 
         // 除了expand map里的状态，还要看是否有atpDetail，以及user没有扩展信息
         boolean expanded = mExpandMap.get(bean.getId()) && hasAtpDetail;
-        holder.groupExpand.setVisibility(expanded ? View.VISIBLE:View.GONE);
-        holder.ivMore.setVisibility(hasAtpDetail ? View.VISIBLE:View.GONE);
-        holder.ivMore.setImageResource(expanded ? R.drawable.ic_keyboard_arrow_up_666_24dp:R.drawable.ic_keyboard_arrow_down_666_24dp);
-        holder.ivMore.setTag(position);
-        holder.ivMore.setOnClickListener(moreListener);
+        binding.groupExpand.setVisibility(expanded ? View.VISIBLE:View.GONE);
+        binding.ivMore.setVisibility(hasAtpDetail ? View.VISIBLE:View.GONE);
+        binding.ivMore.setImageResource(expanded ? R.drawable.ic_keyboard_arrow_up_666_24dp:R.drawable.ic_keyboard_arrow_down_666_24dp);
+        binding.ivMore.setTag(position);
+        binding.ivMore.setOnClickListener(moreListener);
     }
 
     private View.OnClickListener moreListener = new View.OnClickListener() {
@@ -225,15 +214,16 @@ public class RichPlayerAdapter extends BaseRecyclerAdapter<RichPlayerAdapter.Pla
     };
 
     @Override
-    protected void onClickItem(View v, PlayerHolder holder) {
+    protected void onClickItem(View v, int position) {
+        super.onClickItem(v, position);
         if (isSelectMode()) {
-            boolean targetCheck = !checkMap.get(holder.getLayoutPosition());
-            holder.cbCheck.setChecked(targetCheck);
-            checkMap.put(holder.getLayoutPosition(), targetCheck);
+            boolean targetCheck = !checkMap.get(position);
+            checkMap.put(position, targetCheck);
+            notifyItemChanged(position);
         }
         else {
             if (onRichPlayerListener != null) {
-                onRichPlayerListener.onClickItem(holder.getLayoutPosition(), list.get(holder.getLayoutPosition()).getCompetitorBean());
+                onRichPlayerListener.onClickItem(v, position, list.get(position).getCompetitorBean());
             }
         }
     }
@@ -344,53 +334,6 @@ public class RichPlayerAdapter extends BaseRecyclerAdapter<RichPlayerAdapter.Pla
             return bean;
         }
     };
-
-    public static class PlayerHolder extends RecyclerView.ViewHolder {
-
-        @BindView(R.id.iv_player)
-        ImageView ivPlayer;
-        @BindView(R.id.iv_more)
-        ImageView ivMore;
-        @BindView(R.id.tv_index)
-        TextView tvIndex;
-        @BindView(R.id.tv_name)
-        TextView tvName;
-        @BindView(R.id.tv_win)
-        TextView tvWin;
-        @BindView(R.id.tv_lose)
-        TextView tvLose;
-        @BindView(R.id.tv_place)
-        TextView tvPlace;
-        @BindView(R.id.tv_birthday)
-        TextView tvBirthday;
-        @BindView(R.id.tv_body)
-        TextView tvBody;
-        @BindView(R.id.tv_turned_pro)
-        TextView tvTurnedPro;
-        @BindView(R.id.tv_time)
-        TextView tvTime;
-        @BindView(R.id.tv_residence)
-        TextView tvResidence;
-        @BindView(R.id.tv_plays)
-        TextView tvPlays;
-        @BindView(R.id.tv_high)
-        TextView tvHigh;
-        @BindView(R.id.tv_career)
-        TextView tvCareer;
-        @BindView(R.id.tv_coach)
-        TextView tvCoach;
-        @BindView(R.id.group_expand)
-        LinearLayout groupExpand;
-        @BindView(R.id.iv_refresh)
-        ImageView ivRefresh;
-        @BindView(R.id.cb_check)
-        CheckBox cbCheck;
-
-        public PlayerHolder(View itemView) {
-            super(itemView);
-            ButterKnife.bind(this, itemView);
-        }
-    }
 
     public interface OnRichPlayerListener extends OnItemClickListener<CompetitorBean> {
         void onRefreshItem(int position, CompetitorBean bean);

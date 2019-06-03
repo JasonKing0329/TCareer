@@ -1,16 +1,17 @@
 package com.king.app.tcareer.page.player.list;
 
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
-import android.widget.TextView;
 
 import com.king.app.tcareer.R;
-import com.king.app.tcareer.base.BaseMvpFragment;
 import com.king.app.tcareer.base.IFragmentHolder;
+import com.king.app.tcareer.base.mvvm.MvvmFragment;
+import com.king.app.tcareer.databinding.FragmentPlayerRichBinding;
 import com.king.app.tcareer.model.bean.CompetitorBean;
 import com.king.app.tcareer.model.db.entity.User;
 import com.king.app.tcareer.page.player.manage.PlayerEditDialog;
@@ -20,26 +21,16 @@ import com.king.app.tcareer.view.widget.FitSideBar;
 
 import java.util.List;
 
-import butterknife.BindView;
-
 /**
  * @desc
  * @auth 景阳
  * @time 2018/5/19 0019 15:37
  */
 
-public class RichPlayerFragment extends BaseMvpFragment<RichPlayerPresenter> implements RichPlayerView
-        , RichPlayerAdapter.OnRichPlayerListener {
+public class RichPlayerFragment extends MvvmFragment<FragmentPlayerRichBinding, RichPlayerViewModel> {
 
     private static final String KEY_USER_ID = "user_id";
     private static final String KEY_HEDE_NO_RECORDS = "hide_players_without_records";
-
-    @BindView(R.id.rv_list)
-    RecyclerView rvList;
-    @BindView(R.id.sidebar)
-    FitSideBar sidebar;
-    @BindView(R.id.tv_index_popup)
-    TextView tvIndexPopup;
 
     private RichPlayerHolder holder;
 
@@ -68,6 +59,11 @@ public class RichPlayerFragment extends BaseMvpFragment<RichPlayerPresenter> imp
     }
 
     @Override
+    protected RichPlayerViewModel createViewModel() {
+        return ViewModelProviders.of(this).get(RichPlayerViewModel.class);
+    }
+
+    @Override
     protected int getContentLayoutRes() {
         return R.layout.fragment_player_rich;
     }
@@ -76,36 +72,36 @@ public class RichPlayerFragment extends BaseMvpFragment<RichPlayerPresenter> imp
     protected void onCreate(View view) {
         LinearLayoutManager manager = new LinearLayoutManager(getContext());
         manager.setOrientation(LinearLayoutManager.VERTICAL);
-        rvList.setLayoutManager(manager);
+        mBinding.rvList.setLayoutManager(manager);
 
-        rvList.addItemDecoration(new RecyclerView.ItemDecoration() {
+        mBinding.rvList.addItemDecoration(new RecyclerView.ItemDecoration() {
             @Override
             public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
                 int position = parent.getChildAdapterPosition(view);
                 if (position > 0) {
                     outRect.top = ScreenUtils.dp2px(5);
                 }
-                if (position == presenter.getListSize() - 1) {
+                if (position == mModel.getListSize() - 1) {
                     outRect.bottom = mBottomMargin;
                 }
             }
         });
 
-        rvList.addOnScrollListener(new RecyclerViewListener());
+        mBinding.rvList.addOnScrollListener(new RecyclerViewListener());
 
-        sidebar.setOnSidebarStatusListener(new FitSideBar.OnSidebarStatusListener() {
+        mBinding.sidebar.setOnSidebarStatusListener(new FitSideBar.OnSidebarStatusListener() {
             @Override
             public void onChangeFinished() {
-                tvIndexPopup.setVisibility(View.GONE);
+                mBinding.tvIndexPopup.setVisibility(View.GONE);
             }
 
             @Override
             public void onSideIndexChanged(String index) {
-                int selection = presenter.getLetterPosition(index);
+                int selection = mModel.getLetterPosition(index);
                 scrollToPosition(selection);
 
-                tvIndexPopup.setText(index);
-                tvIndexPopup.setVisibility(View.VISIBLE);
+                mBinding.tvIndexPopup.setText(index);
+                mBinding.tvIndexPopup.setVisibility(View.VISIBLE);
             }
         });
     }
@@ -123,47 +119,47 @@ public class RichPlayerFragment extends BaseMvpFragment<RichPlayerPresenter> imp
 
     private void scrollToPosition(int selection) {
         nSelection = selection;
-        final LinearLayoutManager manager = (LinearLayoutManager) rvList.getLayoutManager();
+        final LinearLayoutManager manager = (LinearLayoutManager) mBinding.rvList.getLayoutManager();
         int fir = manager.findFirstVisibleItemPosition();
         int end = manager.findLastVisibleItemPosition();
         if (selection <= fir) {
-            rvList.scrollToPosition(selection);
+            mBinding.rvList.scrollToPosition(selection);
         } else if (selection <= end) {
-            int top = rvList.getChildAt(selection - fir).getTop();
-            rvList.scrollBy(0, top);
+            int top = mBinding.rvList.getChildAt(selection - fir).getTop();
+            mBinding.rvList.scrollBy(0, top);
         } else {
             //当要置顶的项在当前显示的最后一项的后面时
-            rvList.scrollToPosition(selection);
+            mBinding.rvList.scrollToPosition(selection);
             //记录当前需要在RecyclerView滚动监听里面继续第二次滚动
             needMove = true;
         }
     }
 
     public void toggleSidebar() {
-        if (sidebar.getVisibility() == View.VISIBLE) {
-            sidebar.setVisibility(View.GONE);
+        if (mBinding.sidebar.getVisibility() == View.VISIBLE) {
+            mBinding.sidebar.setVisibility(View.GONE);
         }
         else {
-            sidebar.setVisibility(View.VISIBLE);
+            mBinding.sidebar.setVisibility(View.VISIBLE);
         }
     }
 
     public void filterPlayer(RichFilterBean bean) {
-        presenter.filter(bean);
+        mModel.filter(bean);
     }
 
     private int nCurrentFirst;
 
     public int[] getWinLoseOfList() {
-        return presenter.getWinLoseOfList();
+        return mModel.getWinLoseOfList();
     }
 
     public int getTotalPlayers() {
-        return presenter.getTotalPlayers();
+        return mModel.getTotalPlayers();
     }
 
     public List<String> getFilterTexts() {
-        return presenter.getFilterTexts();
+        return mModel.getFilterTexts();
     }
 
     public void setOnlyShowUser(boolean onlyShowUser) {
@@ -185,84 +181,83 @@ public class RichPlayerFragment extends BaseMvpFragment<RichPlayerPresenter> imp
             }
 
             // 更新第一个index标签
-            LinearLayoutManager manager = (LinearLayoutManager) rvList.getLayoutManager();
+            LinearLayoutManager manager = (LinearLayoutManager) mBinding.rvList.getLayoutManager();
             int first = manager.findFirstVisibleItemPosition();
             if (first != nCurrentFirst) {
                 nCurrentFirst = first;
-                String index = presenter.getItemIndex(nCurrentFirst);
+                String index = mModel.getItemIndex(nCurrentFirst);
                 holder.updateFirstIndex(index);
             }
         }
     }
 
     @Override
-    protected RichPlayerPresenter createPresenter() {
-        return new RichPlayerPresenter();
-    }
-
-    @Override
     protected void onCreateData() {
+        mModel.indexObserver.observe(this, index -> mBinding.sidebar.addIndex(index));
+        mModel.updateIndexGravity.observe(this, gravity -> mBinding.sidebar.setGravity(gravity));
+        mModel.clearIndex.observe(this, deleteMode -> mBinding.sidebar.clear());
+        mModel.onIndexCreated.observe(this, finished -> {
+            mBinding.sidebar.build();
+            mBinding.sidebar.setVisibility(View.VISIBLE);
+        });
+        mModel.onSortFinished.observe(this, sortType -> {
+            adapter.notifyDataSetChanged();
+            holder.onSortFinished(sortType);
+        });
+        mModel.setDeleteMode.observe(this, deleteMode -> setDeleteMode(deleteMode));
+        mModel.playersObserver.observe(this, list -> showPlayers(list));
+        mModel.onUpdateAtpCompleted.observe(this, position -> adapter.notifyItemChanged(position));
+
         if (getArguments() == null || getArguments().getLong(KEY_USER_ID, -1) == -1) {
-            presenter.loadPlayers(mOnlyShowUser);
+            mModel.loadPlayers(mOnlyShowUser);
         }
         else {
-            presenter.loadPlayers(getArguments().getLong(KEY_USER_ID), getArguments().getBoolean(KEY_HEDE_NO_RECORDS), mOnlyShowUser);
+            mModel.loadPlayers(getArguments().getLong(KEY_USER_ID), getArguments().getBoolean(KEY_HEDE_NO_RECORDS), mOnlyShowUser);
         }
     }
 
-    @Override
-    public FitSideBar getSidebar() {
-        return sidebar;
-    }
-
-    @Override
-    public void showPlayers(List<RichPlayerBean> list) {
+    private void showPlayers(List<RichPlayerBean> list) {
         if (adapter == null) {
             adapter = new RichPlayerAdapter();
-            adapter.setExpandMap(presenter.getExpandMap());
-            adapter.setOnRichPlayerListener(this);
+            adapter.setExpandMap(mModel.getExpandMap());
+            adapter.setOnRichPlayerListener(new RichPlayerAdapter.OnRichPlayerListener() {
+                @Override
+                public void onRefreshItem(int position, CompetitorBean bean) {
+                    mModel.updateAtpData(bean.getAtpId(), position);
+                }
+
+                @Override
+                public void onClickItem(View view, int position, CompetitorBean bean) {
+                    if (isSelectPlayerMode) {
+                        if (holder != null) {
+                            holder.onSelectPlayer(bean);
+                        }
+                    } else if (isEditMode) {
+                        openEditDialog(bean);
+                    } else {
+                        Intent intent = new Intent().setClass(getContext(), PlayerPageActivity.class);
+                        if (mModel.getUser() != null) {
+                            intent.putExtra(PlayerPageActivity.KEY_USER_ID, mModel.getUser().getId());
+                        }
+                        if (bean instanceof User) {
+                            intent.putExtra(PlayerPageActivity.KEY_COMPETITOR_IS_USER, true);
+                            intent.putExtra(PlayerPageActivity.KEY_COMPETITOR_ID, bean.getId());
+                        } else {
+                            intent.putExtra(PlayerPageActivity.KEY_COMPETITOR_ID, bean.getId());
+                        }
+                        startActivity(intent);
+                    }
+                }
+            });
             adapter.setFragmentManager(getChildFragmentManager());
             adapter.setList(list);
-            rvList.setAdapter(adapter);
+            mBinding.rvList.setAdapter(adapter);
         } else {
             adapter.setList(list);
             adapter.notifyDataSetChanged();
         }
 
-        sidebar.post(() -> sidebar.invalidate());
-    }
-
-    @Override
-    public void onClickItem(int position, CompetitorBean bean) {
-        if (isSelectPlayerMode) {
-            if (holder != null) {
-                holder.onSelectPlayer(bean);
-            }
-        } else if (isEditMode) {
-            openEditDialog(bean);
-        } else {
-            Intent intent = new Intent().setClass(getContext(), PlayerPageActivity.class);
-            if (presenter.getUser() != null) {
-                intent.putExtra(PlayerPageActivity.KEY_USER_ID, presenter.getUser().getId());
-            }
-            if (bean instanceof User) {
-                intent.putExtra(PlayerPageActivity.KEY_COMPETITOR_IS_USER, true);
-                intent.putExtra(PlayerPageActivity.KEY_COMPETITOR_ID, bean.getId());
-            } else {
-                intent.putExtra(PlayerPageActivity.KEY_COMPETITOR_ID, bean.getId());
-            }
-            startActivity(intent);
-        }
-    }
-
-    @Override
-    public void onRefreshItem(int position, CompetitorBean bean) {
-        presenter.updateAtpData(bean.getAtpId(), position);
-    }
-
-    @Override
-    public void onUpdateAtpCompleted(int position) {
-        adapter.notifyItemChanged(position);
+        mBinding.sidebar.post(() -> mBinding.sidebar.invalidate());
     }
 
     private void openEditDialog(CompetitorBean bean) {
@@ -290,27 +285,17 @@ public class RichPlayerFragment extends BaseMvpFragment<RichPlayerPresenter> imp
      * confirm delete
      */
     public void confirmDelete() {
-        presenter.deletePlayer(adapter.getSelectedList());
-    }
-
-    @Override
-    public void deleteSuccess() {
-        setDeleteMode(false);
+        mModel.deletePlayer(adapter.getSelectedList());
     }
 
     public void sortPlayer(int sortType) {
-        presenter.sortPlayer(sortType);
-    }
-
-    @Override
-    public void sortFinished(int sortType) {
-        adapter.notifyDataSetChanged();
-        holder.onSortFinished(sortType);
+        mBinding.sidebar.clear();
+        mModel.sortPlayer(sortType);
     }
 
     public void reload() {
-        presenter.resetRank();
-        presenter.loadPlayers(mOnlyShowUser);
+        mModel.resetRank();
+        mModel.loadPlayers(mOnlyShowUser);
     }
 
     public boolean onBackPressed() {
@@ -322,20 +307,20 @@ public class RichPlayerFragment extends BaseMvpFragment<RichPlayerPresenter> imp
     }
 
     public List<RichPlayerBean> getPlayerList() {
-        return presenter.getPlayerList();
+        return mModel.getPlayerList();
     }
 
     public void filter(String words) {
-        presenter.filter(words);
+        mModel.filter(words);
     }
 
     public void setExpandAll(boolean expand) {
-        presenter.setExpandAll(expand);
+        mModel.setExpandAll(expand);
         adapter.notifyDataSetChanged();
     }
 
     public void updateUser(User user) {
-        presenter.onUserChanged(user);
+        mModel.onUserChanged(user);
     }
 
 }

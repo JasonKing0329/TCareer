@@ -7,7 +7,10 @@ import android.support.annotation.NonNull;
 
 import com.king.app.tcareer.base.TApplication;
 import com.king.app.tcareer.model.db.entity.DaoSession;
+import com.king.app.tcareer.model.db.entity.User;
+import com.king.app.tcareer.model.db.entity.UserDao;
 
+import io.reactivex.Observable;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 
@@ -22,6 +25,8 @@ public class BaseViewModel extends AndroidViewModel {
 
     public MutableLiveData<Boolean> loadingObserver = new MutableLiveData<>();
     public MutableLiveData<String> messageObserver = new MutableLiveData<>();
+
+    protected User mUser;
 
     public BaseViewModel(@NonNull Application application) {
         super(application);
@@ -48,6 +53,22 @@ public class BaseViewModel extends AndroidViewModel {
         if (compositeDisposable != null) {
             compositeDisposable.clear();
         }
+    }
+
+    protected Observable<User> queryUser(final long userId) {
+        return Observable.create(e -> e.onNext(queryUserInstant(userId)));
+    }
+
+    public User queryUserInstant(long userId) {
+        UserDao dao = TApplication.getInstance().getDaoSession().getUserDao();
+        mUser = dao.queryBuilder()
+                .where(UserDao.Properties.Id.eq(userId))
+                .build().unique();
+        return mUser;
+    }
+
+    public User getUser() {
+        return mUser;
     }
 
     protected DaoSession getDaoSession() {

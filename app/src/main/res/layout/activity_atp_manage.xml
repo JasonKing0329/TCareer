@@ -1,64 +1,73 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <com.king.app.jactionbar.JActionbar
-        android:id="@+id/actionbar"
+    <data>
+        <variable
+            name="model"
+            type="com.king.app.tcareer.page.player.atp.AtpManageViewModel"/>
+    </data>
+
+    <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="?android:attr/actionBarSize"
-        android:background="@color/colorPrimary"
-        app:iconPadding="@dimen/actionbar_icon_padding"
-        app:iconSize="@dimen/actionbar_icon_size"
-        app:layout_constraintBottom_toTopOf="@+id/rv_items"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:menu="@menu/atp_manage"
-        app:rippleColor="@color/ripple_actionbar_icon"
-        app:showIconBack="true"
-        app:title="AtpWorldTour" />
+        android:layout_height="match_parent">
 
-    <com.king.app.tcareer.view.widget.SideBar
-        android:id="@+id/sideBar"
-        android:layout_width="35dp"
-        android:layout_height="0dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/rv_items"
-        app:layout_constraintTop_toBottomOf="@+id/actionbar"
-        android:visibility="gone"
-        app:sideBackground="@color/transparent"
-        app:indexTextSize="12dp"
-        app:indexColor="@color/colorPrimary"
-        app:indexColorFocus="@color/tab_actionbar_text_focus" />
+        <com.king.app.jactionbar.JActionbar
+            android:id="@+id/actionbar"
+            android:layout_width="match_parent"
+            android:layout_height="?android:attr/actionBarSize"
+            android:background="@color/colorPrimary"
+            app:iconPadding="@dimen/actionbar_icon_padding"
+            app:iconSize="@dimen/actionbar_icon_size"
+            app:layout_constraintBottom_toTopOf="@+id/rv_items"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:menu="@menu/atp_manage"
+            app:rippleColor="@color/ripple_actionbar_icon"
+            app:showIconBack="true"
+            app:title="AtpWorldTour" />
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/rv_items"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/actionbar"
-        app:layout_constraintEnd_toStartOf="@id/sideBar"
-        tools:listitem="@layout/adapter_atp_item"/>
+        <com.king.app.tcareer.view.widget.SideBar
+            android:id="@+id/sideBar"
+            android:layout_width="35dp"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/rv_items"
+            app:layout_constraintTop_toBottomOf="@+id/actionbar"
+            android:visibility="@{model.sideBarVisibility}"
+            app:sideBackground="@color/transparent"
+            app:indexTextSize="12dp"
+            app:indexColor="@color/colorPrimary"
+            app:indexColorFocus="@color/tab_actionbar_text_focus" />
 
-    <TextView
-        android:id="@+id/tv_index_popup"
-        android:layout_width="@dimen/swipecard_indexbar_popup_size"
-        android:layout_height="@dimen/swipecard_indexbar_popup_size"
-        android:background="@drawable/shape_swipecard_sidebar_popup_bk"
-        android:layout_centerInParent="true"
-        android:gravity="center"
-        android:textColor="@color/white"
-        android:textSize="@dimen/swipecard_indexbar_popup_text_size"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-</android.support.constraint.ConstraintLayout>
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/rv_items"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/actionbar"
+            app:layout_constraintEnd_toStartOf="@id/sideBar"
+            tools:listitem="@layout/adapter_atp_item"/>
+
+        <TextView
+            android:id="@+id/tv_index_popup"
+            android:layout_width="@dimen/swipecard_indexbar_popup_size"
+            android:layout_height="@dimen/swipecard_indexbar_popup_size"
+            android:background="@drawable/shape_swipecard_sidebar_popup_bk"
+            android:layout_centerInParent="true"
+            android:gravity="center"
+            android:textColor="@color/white"
+            android:textSize="@dimen/swipecard_indexbar_popup_text_size"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+    </android.support.constraint.ConstraintLayout>
+</layout>

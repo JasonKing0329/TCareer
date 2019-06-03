@@ -1,7 +1,10 @@
 package com.king.app.tcareer.page.player.manage;
 
-import com.king.app.tcareer.base.BasePresenter;
+import android.app.Application;
+import android.support.annotation.NonNull;
+
 import com.king.app.tcareer.base.TApplication;
+import com.king.app.tcareer.base.mvvm.BaseViewModel;
 import com.king.app.tcareer.model.db.entity.User;
 import com.king.app.tcareer.model.db.entity.UserDao;
 
@@ -13,12 +16,12 @@ import java.util.List;
  * @time 2018/1/31 0031 11:48
  */
 
-public class PlayerManagePresenter extends BasePresenter<PlayerManageView> {
+public class PlayerManageViewModel extends BaseViewModel {
 
     private List<User> userList;
 
-    @Override
-    protected void onCreate() {
+    public PlayerManageViewModel(@NonNull Application application) {
+        super(application);
     }
 
     public String[] getUserSelector() {

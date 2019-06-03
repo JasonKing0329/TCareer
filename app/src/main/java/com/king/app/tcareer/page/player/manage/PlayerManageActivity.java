@@ -1,16 +1,15 @@
 package com.king.app.tcareer.page.player.manage;
 
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.PopupMenu;
-import android.widget.TextView;
 
-import com.king.app.jactionbar.JActionbar;
 import com.king.app.jactionbar.OnConfirmListener;
 import com.king.app.tcareer.R;
-import com.king.app.tcareer.base.BaseMvpActivity;
+import com.king.app.tcareer.base.mvvm.MvvmActivity;
+import com.king.app.tcareer.databinding.ActivityPlayerManageBinding;
 import com.king.app.tcareer.model.bean.CompetitorBean;
 import com.king.app.tcareer.model.db.entity.User;
 import com.king.app.tcareer.page.player.atp.AtpManageActivity;
@@ -20,14 +19,12 @@ import com.king.app.tcareer.page.player.list.RichPlayerHolder;
 import com.king.app.tcareer.page.setting.SettingProperty;
 import com.king.app.tcareer.view.dialog.AlertDialogFragment;
 
-import butterknife.BindView;
-
 /**
  * @desc
  * @auth 景阳
  * @time 2018/1/31 0031 11:49
  */
-public class PlayerManageActivity extends BaseMvpActivity<PlayerManagePresenter> implements PlayerManageView, RichPlayerHolder {
+public class PlayerManageActivity extends MvvmActivity<ActivityPlayerManageBinding, PlayerManageViewModel> implements RichPlayerHolder {
 
     public static final String KEY_START_MODE = "key_start_mode";
     public static final String KEY_ONLY_USER = "only_user";
@@ -35,17 +32,6 @@ public class PlayerManageActivity extends BaseMvpActivity<PlayerManagePresenter>
 
     public static final String RESPONSE_PLAYER_ID = "resp_player_id";
     public static final String RESPONSE_PLAYER_IS_USER = "resp_player_is_user";
-
-    @BindView(R.id.actionbar)
-    JActionbar actionbar;
-    @BindView(R.id.tv_sort)
-    TextView tvSort;
-    @BindView(R.id.tv_sort_value)
-    TextView tvSortValue;
-    @BindView(R.id.tv_user)
-    TextView tvUser;
-    @BindView(R.id.iv_sidebar)
-    ImageView ivSidebar;
 
     private PopupMenu popSort;
 
@@ -59,6 +45,11 @@ public class PlayerManageActivity extends BaseMvpActivity<PlayerManagePresenter>
     }
 
     @Override
+    protected PlayerManageViewModel createViewModel() {
+        return ViewModelProviders.of(this).get(PlayerManageViewModel.class);
+    }
+
+    @Override
     protected void initView() {
 
         int mode = getIntent().getIntExtra(KEY_START_MODE, 0);
@@ -68,7 +59,7 @@ public class PlayerManageActivity extends BaseMvpActivity<PlayerManagePresenter>
 
         initActionbar();
 
-        tvUser.setOnClickListener(v -> chooseUser());
+        mBinding.tvUser.setOnClickListener(v -> chooseUser());
 
         ftRich = new RichPlayerFragment();
         ftRich.setSelectPlayerMode(isSelectMode);
@@ -77,20 +68,20 @@ public class PlayerManageActivity extends BaseMvpActivity<PlayerManagePresenter>
                 .replace(R.id.group_ft, ftRich, "RichPlayerFragment")
                 .commit();
 
-        ivSidebar.setColorFilter(getResources().getColor(R.color.colorPrimary), PorterDuff.Mode.SRC_IN);
-        ivSidebar.setOnClickListener(view -> ftRich.toggleSidebar());
+        mBinding.ivSidebar.setColorFilter(getResources().getColor(R.color.colorPrimary), PorterDuff.Mode.SRC_IN);
+        mBinding.ivSidebar.setOnClickListener(view -> ftRich.toggleSidebar());
     }
 
     private void initActionbar() {
-        actionbar.setTitle(getString(R.string.player_manage_title));
+        mBinding.actionbar.setTitle(getString(R.string.player_manage_title));
         if (isSelectMode) {
-            actionbar.inflateMenu(R.menu.player_manage_select);
+            mBinding.actionbar.inflateMenu(R.menu.player_manage_select);
         }
         else {
-            actionbar.inflateMenu(R.menu.player_manage);
+            mBinding.actionbar.inflateMenu(R.menu.player_manage);
         }
-        actionbar.setOnBackListener(() -> onBackPressed());
-        actionbar.setOnMenuItemListener(menuId -> {
+        mBinding.actionbar.setOnBackListener(() -> onBackPressed());
+        mBinding.actionbar.setOnMenuItemListener(menuId -> {
             switch (menuId) {
                 case R.id.menu_manage_filter:
                     openFilterDialog();
@@ -102,11 +93,11 @@ public class PlayerManageActivity extends BaseMvpActivity<PlayerManagePresenter>
                     addNewPlayer();
                     break;
                 case R.id.menu_manage_delete:
-                    actionbar.showConfirmStatus(menuId);
+                    mBinding.actionbar.showConfirmStatus(menuId);
                     ftRich.setDeleteMode(true);
                     break;
                 case R.id.menu_manage_edit:
-                    actionbar.showConfirmStatus(menuId);
+                    mBinding.actionbar.showConfirmStatus(menuId);
                     ftRich.setEditMode(true);
                     break;
                 case R.id.menu_manage_expand:
@@ -120,7 +111,7 @@ public class PlayerManageActivity extends BaseMvpActivity<PlayerManagePresenter>
                     break;
             }
         });
-        actionbar.setOnConfirmListener(new OnConfirmListener() {
+        mBinding.actionbar.setOnConfirmListener(new OnConfirmListener() {
             @Override
             public boolean disableInstantDismissConfirm() {
                 return false;
@@ -154,8 +145,8 @@ public class PlayerManageActivity extends BaseMvpActivity<PlayerManagePresenter>
                 return true;
             }
         });
-        actionbar.registerPopupMenu(R.id.menu_manage_sort);
-        actionbar.setPopupMenuProvider((iconMenuId, anchorView) -> {
+        mBinding.actionbar.registerPopupMenu(R.id.menu_manage_sort);
+        mBinding.actionbar.setPopupMenuProvider((iconMenuId, anchorView) -> {
             PopupMenu popupMenu = null;
             switch (iconMenuId) {
                 case R.id.menu_manage_sort:
@@ -164,7 +155,7 @@ public class PlayerManageActivity extends BaseMvpActivity<PlayerManagePresenter>
             }
             return popupMenu;
         });
-        actionbar.setOnSearchListener(words -> ftRich.filter(words));
+        mBinding.actionbar.setOnSearchListener(words -> ftRich.filter(words));
     }
 
     private void openFilterDialog() {
@@ -175,23 +166,18 @@ public class PlayerManageActivity extends BaseMvpActivity<PlayerManagePresenter>
 
     private void chooseUser() {
         new AlertDialogFragment()
-                .setItems(presenter.getUserSelector(), (dialog, which) -> onUserChanged(which))
+                .setItems(mModel.getUserSelector(), (dialog, which) -> onUserChanged(which))
                 .show(getSupportFragmentManager(), "AlertDialogFragment");
     }
 
     private void onUserChanged(int position) {
         if (position == 0) {
-            tvUser.setText("All users");
+            mBinding.tvUser.setText("All users");
         }
         else {
-            tvUser.setText(presenter.getUser(position).getNameEng());
+            mBinding.tvUser.setText(mModel.getUser(position).getNameEng());
         }
-        ftRich.updateUser(presenter.getUser(position));
-    }
-
-    @Override
-    protected PlayerManagePresenter createPresenter() {
-        return new PlayerManagePresenter();
+        ftRich.updateUser(mModel.getUser(position));
     }
 
     @Override
@@ -234,43 +220,43 @@ public class PlayerManageActivity extends BaseMvpActivity<PlayerManagePresenter>
     private void updateSortText(int sortType) {
         switch (sortType) {
             case SettingProperty.VALUE_SORT_PLAYER_NAME:
-                tvSort.setText(R.string.menu_sort_name);
+                mBinding.tvSort.setText(R.string.menu_sort_name);
                 break;
             case SettingProperty.VALUE_SORT_PLAYER_NAME_ENG:
-                tvSort.setText(R.string.menu_sort_name_eng);
+                mBinding.tvSort.setText(R.string.menu_sort_name_eng);
                 break;
             case SettingProperty.VALUE_SORT_PLAYER_COUNTRY:
-                tvSort.setText(R.string.menu_sort_country);
+                mBinding.tvSort.setText(R.string.menu_sort_country);
                 break;
             case SettingProperty.VALUE_SORT_PLAYER_AGE:
-                tvSort.setText(R.string.menu_sort_age);
+                mBinding.tvSort.setText(R.string.menu_sort_age);
                 break;
             case SettingProperty.VALUE_SORT_PLAYER_CONSTELLATION:
-                tvSort.setText(R.string.menu_sort_constellation);
+                mBinding.tvSort.setText(R.string.menu_sort_constellation);
                 break;
             case SettingProperty.VALUE_SORT_PLAYER_RECORD:
-                tvSort.setText(R.string.menu_sort_record);
+                mBinding.tvSort.setText(R.string.menu_sort_record);
                 break;
             case SettingProperty.VALUE_SORT_PLAYER_HEIGHT:
-                tvSort.setText(R.string.menu_sort_height);
+                mBinding.tvSort.setText(R.string.menu_sort_height);
                 break;
             case SettingProperty.VALUE_SORT_PLAYER_WEIGHT:
-                tvSort.setText(R.string.menu_sort_weight);
+                mBinding.tvSort.setText(R.string.menu_sort_weight);
                 break;
             case SettingProperty.VALUE_SORT_PLAYER_CAREER_HIGH:
-                tvSort.setText(R.string.menu_sort_career_high);
+                mBinding.tvSort.setText(R.string.menu_sort_career_high);
                 break;
             case SettingProperty.VALUE_SORT_PLAYER_CAREER_TITLES:
-                tvSort.setText(R.string.menu_sort_career_titles);
+                mBinding.tvSort.setText(R.string.menu_sort_career_titles);
                 break;
             case SettingProperty.VALUE_SORT_PLAYER_CAREER_WIN:
-                tvSort.setText(R.string.menu_sort_career_win);
+                mBinding.tvSort.setText(R.string.menu_sort_career_win);
                 break;
             case SettingProperty.VALUE_SORT_PLAYER_CAREER_TURNEDPRO:
-                tvSort.setText(R.string.menu_sort_turned_pro);
+                mBinding.tvSort.setText(R.string.menu_sort_turned_pro);
                 break;
             case SettingProperty.VALUE_SORT_PLAYER_CAREER_LAST_UPDATE:
-                tvSort.setText(R.string.menu_sort_last_update);
+                mBinding.tvSort.setText(R.string.menu_sort_last_update);
                 break;
         }
     }
@@ -329,7 +315,7 @@ public class PlayerManageActivity extends BaseMvpActivity<PlayerManagePresenter>
 
     @Override
     public void onBackPressed() {
-        if (actionbar != null && actionbar.onBackPressed()) {
+        if (mBinding.actionbar != null && mBinding.actionbar.onBackPressed()) {
             return;
         }
         if (ftRich != null && ftRich.onBackPressed()) {
@@ -340,6 +326,6 @@ public class PlayerManageActivity extends BaseMvpActivity<PlayerManagePresenter>
 
     @Override
     public void updateFirstIndex(String index) {
-        tvSortValue.setText(index);
+        mBinding.tvSortValue.setText(index);
     }
 }
