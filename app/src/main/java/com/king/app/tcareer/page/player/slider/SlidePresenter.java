@@ -1,13 +1,12 @@
 package com.king.app.tcareer.page.player.slider;
 
 import com.king.app.tcareer.base.BasePresenter;
-import com.king.app.tcareer.base.TApplication;
 import com.king.app.tcareer.conf.AppConstants;
+import com.king.app.tcareer.model.ImageProvider;
 import com.king.app.tcareer.model.bean.H2hBean;
 import com.king.app.tcareer.model.dao.H2HDao;
 import com.king.app.tcareer.model.db.entity.Record;
 import com.king.app.tcareer.model.db.entity.User;
-import com.king.app.tcareer.model.db.entity.UserDao;
 import com.king.app.tcareer.page.player.page.PageTitleBean;
 
 import java.util.ArrayList;
@@ -112,6 +111,7 @@ public class SlidePresenter extends BasePresenter<ISlideView> {
                 Map<Integer, List<Record>> map = new HashMap<>();
                 for (int i = 0; i < recordList.size(); i ++) {
                     Record record = recordList.get(i);
+                    record.setImageUrl(ImageProvider.getMatchHeadPath(record.getMatch().getName(), record.getMatch().getMatchBean().getCourt()));
                     String strYear = record.getDateStr().split("-")[0];
                     int year = Integer.parseInt(strYear);
                     List<Record> child = map.get(year);

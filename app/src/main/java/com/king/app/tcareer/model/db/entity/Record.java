@@ -7,6 +7,7 @@ import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.NotNull;
 import org.greenrobot.greendao.annotation.ToMany;
 import org.greenrobot.greendao.annotation.ToOne;
+import org.greenrobot.greendao.annotation.Transient;
 
 import java.util.List;
 
@@ -74,6 +75,9 @@ public class Record {
      * 2: retire before match(W/0)
      */
     private int retireFlag;
+
+    @Transient
+    private String imageUrl;
 
     /** Used to resolve relations */
     @Generated(hash = 2040040024)
@@ -430,11 +434,18 @@ public class Record {
         myDao.update(this);
     }
 
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+
     /** called by internal mechanisms, do not call yourself. */
     @Generated(hash = 1505145191)
     public void __setDaoSession(DaoSession daoSession) {
         this.daoSession = daoSession;
         myDao = daoSession != null ? daoSession.getRecordDao() : null;
     }
-
 }

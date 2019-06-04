@@ -17,7 +17,6 @@ import android.widget.ViewSwitcher;
 import com.king.app.tcareer.R;
 import com.king.app.tcareer.base.BaseMvpActivity;
 import com.king.app.tcareer.model.bean.H2hBean;
-import com.king.app.tcareer.model.db.entity.Record;
 import com.king.app.tcareer.model.db.entity.User;
 import com.king.app.tcareer.page.match.page.MatchPageActivity;
 import com.king.app.tcareer.page.player.page.PageRecordAdapter;
@@ -175,16 +174,14 @@ public class PlayerSlideActivity extends BaseMvpActivity<SlidePresenter> impleme
     @Override
     public void onRecordLoaded(List<Object> list) {
         if (recordAdapter == null) {
-            recordAdapter = new PageRecordAdapter(presenter.getUser());
+            recordAdapter = new PageRecordAdapter();
+            recordAdapter.setUser(presenter.getUser());
             recordAdapter.setList(list);
-            recordAdapter.setOnItemClickListener(new PageRecordAdapter.OnItemClickListener() {
-                @Override
-                public void onClickRecord(View v, Record record) {
-                    Intent intent = new Intent(PlayerSlideActivity.this, MatchPageActivity.class);
-                    intent.putExtra(MatchPageActivity.KEY_USER_ID, presenter.getUser().getId());
-                    intent.putExtra(MatchPageActivity.KEY_MATCH_NAME_ID, record.getMatchNameId());
-                    startActivity(intent);
-                }
+            recordAdapter.setOnItemClickListener((view, position, data) -> {
+                Intent intent = new Intent(PlayerSlideActivity.this, MatchPageActivity.class);
+                intent.putExtra(MatchPageActivity.KEY_USER_ID, presenter.getUser().getId());
+                intent.putExtra(MatchPageActivity.KEY_MATCH_NAME_ID, data.getMatchNameId());
+                startActivity(intent);
             });
             rvRecords.setAdapter(recordAdapter);
         }

@@ -1,164 +1,172 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/group_root"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
-    <!-- 加android:stateListAnimator="@null"解决Can't call void android.view.View.setElevation(float) on null object引起的闪退 -->
-    <android.support.design.widget.AppBarLayout
-        android:id="@+id/appbar_layout"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <data>
+        <variable
+            name="model"
+            type="com.king.app.tcareer.page.player.page.PageViewModel"/>
+    </data>
+    <android.support.design.widget.CoordinatorLayout
+        android:id="@+id/group_root"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:stateListAnimator="@null"
-        android:background="@color/white">
+        android:layout_height="match_parent">
 
-        <android.support.design.widget.CollapsingToolbarLayout
-            android:id="@+id/collapsing_toolbar"
+        <!-- 加android:stateListAnimator="@null"解决Can't call void android.view.View.setElevation(float) on null object引起的闪退 -->
+        <android.support.design.widget.AppBarLayout
+            android:id="@+id/appbar_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:contentScrim="@color/colorPrimary"
-            app:expandedTitleGravity="center_horizontal|top"
-            app:expandedTitleMarginTop="184dp"
-            app:expandedTitleTextAppearance="@style/PlayerCollapsingText"
-            app:layout_scrollFlags="scroll|exitUntilCollapsed|enterAlwaysCollapsed|snap">
+            android:stateListAnimator="@null"
+            android:background="@color/white">
 
-            <RelativeLayout
+            <android.support.design.widget.CollapsingToolbarLayout
+                android:id="@+id/collapsing_toolbar"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-                <ImageView
-                    android:id="@+id/iv_player_bg"
-                    android:layout_width="360dp"
-                    android:layout_height="@dimen/player_page_head_height"
-                    android:scaleType="centerCrop"/>
+                android:layout_height="wrap_content"
+                app:title="@{model.toolbarText}"
+                app:contentScrim="@color/colorPrimary"
+                app:expandedTitleGravity="center_horizontal|top"
+                app:expandedTitleMarginTop="184dp"
+                app:expandedTitleTextAppearance="@style/PlayerCollapsingText"
+                app:layout_scrollFlags="scroll|exitUntilCollapsed|enterAlwaysCollapsed|snap">
 
                 <RelativeLayout
-                    android:id="@+id/group_atp"
                     android:layout_width="match_parent"
-                    android:layout_height="@dimen/player_page_update_time_height"
-                    android:visibility="gone"
-                    android:layout_below="@id/iv_player_bg"
-                    android:paddingLeft="@dimen/activity_horizontal_margin"
-                    android:paddingRight="@dimen/activity_horizontal_margin">
-                    <TextView
-                        android:id="@+id/tv_atp_time"
-                        android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+                    <ImageView
+                        android:id="@+id/iv_player_bg"
+                        android:layout_width="360dp"
+                        android:layout_height="@dimen/player_page_head_height"
+                        android:scaleType="centerCrop"/>
+
+                    <RelativeLayout
+                        android:id="@+id/group_atp"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/player_page_update_time_height"
+                        android:visibility="gone"
+                        android:layout_below="@id/iv_player_bg"
+                        android:paddingLeft="@dimen/activity_horizontal_margin"
+                        android:paddingRight="@dimen/activity_horizontal_margin">
+                        <TextView
+                            android:id="@+id/tv_atp_time"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentRight="true"
+                            android:layout_centerVertical="true"
+                            android:textColor="#dedede"
+                            android:text="上次更新时间： 2018-05-16 14:23:00"/>
+                    </RelativeLayout>
+
+                    <LinearLayout
+                        android:id="@+id/group_atp_cover"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/player_page_head_height"
+                        android:orientation="vertical"
+                        android:gravity="center_vertical"
+                        android:background="@drawable/shape_atp_cover_ltr"
+                        android:paddingLeft="@dimen/activity_horizontal_margin"
+                        android:paddingRight="@dimen/activity_horizontal_margin"
+                        android:paddingTop="40dp"
+                        android:paddingBottom="@dimen/margin_10">
+                        <TextView
+                            android:id="@+id/tv_turned_pro"
+                            style="@style/TvAtpCoverValue"
+                            android:text="Turned Pro    2005" />
+                        <TextView
+                            style="@style/TvAtpCoverTitle"
+                            android:text="Residence" />
+                        <TextView
+                            android:id="@+id/tv_residence"
+                            style="@style/TvAtpCoverValue"
+                            android:text="California, America" />
+                        <TextView
+                            style="@style/TvAtpCoverTitle"
+                            android:text="Plays"/>
+                        <TextView
+                            android:id="@+id/tv_plays"
+                            style="@style/TvAtpCoverValue"
+                            android:text="Right-hand forehand, 2-hand backhand" />
+                        <TextView
+                            style="@style/TvAtpCoverTitle"
+                            android:text="Coach"/>
+                        <TextView
+                            android:id="@+id/tv_coach"
+                            style="@style/TvAtpCoverValue"
+                            android:text="Jonas Comberbench" />
+                        <TextView
+                            style="@style/TvAtpCoverTitle"
+                            android:text="Titles(singles/doubles)" />
+                        <TextView
+                            android:id="@+id/tv_titles_year"
+                            style="@style/TvAtpCoverValue"
+                            android:text="2018(5/0)" />
+                        <TextView
+                            android:id="@+id/tv_titles_career"
+                            style="@style/TvAtpCoverValue"
+                            android:text="Career(66/14)" />
+                        <TextView
+                            style="@style/TvAtpCoverTitle"
+                            android:text="Win-Lose and Prize" />
+                        <TextView
+                            android:id="@+id/tv_win_lose_prize_year"
+                            style="@style/TvAtpCoverValue"
+                            android:text="2018  22-10  $1,163,254" />
+                        <TextView
+                            android:id="@+id/tv_win_lose_prize_career"
+                            style="@style/TvAtpCoverValue"
+                            android:text="Career  543-225  $116,163,254" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_marginTop="150dp"
                         android:layout_alignParentRight="true"
-                        android:layout_centerVertical="true"
-                        android:textColor="#dedede"
-                        android:text="上次更新时间： 2018-05-16 14:23:00"/>
+                        android:orientation="vertical">
+                        <TextView
+                            android:id="@+id/tv_country"
+                            style="@style/TvPlayerTag"
+                            android:drawableLeft="@drawable/ic_edit_location_white_24dp"/>
+                        <TextView
+                            android:id="@+id/tv_birthday"
+                            style="@style/TvPlayerTag"/>
+                        <TextView
+                            android:id="@+id/tv_name_chn"
+                            style="@style/TvPlayerTag" />
+                        <TextView
+                            android:id="@+id/tv_name_eng"
+                            style="@style/TvPlayerTag"
+                            android:singleLine="true"
+                            android:ellipsize="marquee"
+                            android:textSize="18dp"/>
+                    </LinearLayout>
+
                 </RelativeLayout>
 
-                <LinearLayout
-                    android:id="@+id/group_atp_cover"
+                <android.support.v7.widget.Toolbar
+                    android:id="@+id/toolbar"
                     android:layout_width="match_parent"
-                    android:layout_height="@dimen/player_page_head_height"
-                    android:orientation="vertical"
-                    android:gravity="center_vertical"
-                    android:background="@drawable/shape_atp_cover_ltr"
-                    android:paddingLeft="@dimen/activity_horizontal_margin"
-                    android:paddingRight="@dimen/activity_horizontal_margin"
-                    android:paddingTop="40dp"
-                    android:paddingBottom="@dimen/margin_10">
-                    <TextView
-                        android:id="@+id/tv_turned_pro"
-                        style="@style/TvAtpCoverValue"
-                        android:text="Turned Pro    2005" />
-                    <TextView
-                        style="@style/TvAtpCoverTitle"
-                        android:text="Residence" />
-                    <TextView
-                        android:id="@+id/tv_residence"
-                        style="@style/TvAtpCoverValue"
-                        android:text="California, America" />
-                    <TextView
-                        style="@style/TvAtpCoverTitle"
-                        android:text="Plays"/>
-                    <TextView
-                        android:id="@+id/tv_plays"
-                        style="@style/TvAtpCoverValue"
-                        android:text="Right-hand forehand, 2-hand backhand" />
-                    <TextView
-                        style="@style/TvAtpCoverTitle"
-                        android:text="Coach"/>
-                    <TextView
-                        android:id="@+id/tv_coach"
-                        style="@style/TvAtpCoverValue"
-                        android:text="Jonas Comberbench" />
-                    <TextView
-                        style="@style/TvAtpCoverTitle"
-                        android:text="Titles(singles/doubles)" />
-                    <TextView
-                        android:id="@+id/tv_titles_year"
-                        style="@style/TvAtpCoverValue"
-                        android:text="2018(5/0)" />
-                    <TextView
-                        android:id="@+id/tv_titles_career"
-                        style="@style/TvAtpCoverValue"
-                        android:text="Career(66/14)" />
-                    <TextView
-                        style="@style/TvAtpCoverTitle"
-                        android:text="Win-Lose and Prize" />
-                    <TextView
-                        android:id="@+id/tv_win_lose_prize_year"
-                        style="@style/TvAtpCoverValue"
-                        android:text="2018  22-10  $1,163,254" />
-                    <TextView
-                        android:id="@+id/tv_win_lose_prize_career"
-                        style="@style/TvAtpCoverValue"
-                        android:text="Career  543-225  $116,163,254" />
-                </LinearLayout>
+                    android:layout_height="?attr/actionBarSize"
+                    app:layout_collapseMode="pin" />
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="150dp"
-                    android:layout_alignParentRight="true"
-                    android:orientation="vertical">
-                    <TextView
-                        android:id="@+id/tv_country"
-                        style="@style/TvPlayerTag"
-                        android:drawableLeft="@drawable/ic_edit_location_white_24dp"/>
-                    <TextView
-                        android:id="@+id/tv_birthday"
-                        style="@style/TvPlayerTag"/>
-                    <TextView
-                        android:id="@+id/tv_name_chn"
-                        style="@style/TvPlayerTag" />
-                    <TextView
-                        android:id="@+id/tv_name_eng"
-                        style="@style/TvPlayerTag"
-                        android:singleLine="true"
-                        android:ellipsize="marquee"
-                        android:textSize="18dp"/>
-                </LinearLayout>
+            </android.support.design.widget.CollapsingToolbarLayout>
 
-            </RelativeLayout>
-
-            <android.support.v7.widget.Toolbar
-                android:id="@+id/toolbar"
+            <android.support.design.widget.TabLayout
+                android:id="@+id/tabLayout"
                 android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                app:layout_collapseMode="pin" />
+                android:layout_height="wrap_content"
+                android:background="@color/colorPrimary"
+                app:tabSelectedTextColor="#FABF40"
+                app:tabTextColor="#575757"
+                app:tabIndicatorColor="#FABF40"/>
 
-        </android.support.design.widget.CollapsingToolbarLayout>
+        </android.support.design.widget.AppBarLayout>
 
-        <android.support.design.widget.TabLayout
-            android:id="@+id/tabLayout"
+        <android.support.v4.view.ViewPager
+            android:id="@+id/viewpager"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/colorPrimary"
-            app:tabSelectedTextColor="#FABF40"
-            app:tabTextColor="#575757"
-            app:tabIndicatorColor="#FABF40"/>
+            android:layout_height="match_parent"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
-    </android.support.design.widget.AppBarLayout>
-
-    <android.support.v4.view.ViewPager
-        android:id="@+id/viewpager"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
-
-</android.support.design.widget.CoordinatorLayout>
+    </android.support.design.widget.CoordinatorLayout>
+</layout>

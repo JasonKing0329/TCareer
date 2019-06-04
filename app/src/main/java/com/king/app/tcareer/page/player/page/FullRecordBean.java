@@ -14,4 +14,13 @@ public class FullRecordBean {
     public int year;
     public int yearWin;
     public int yearLose;
+    private String imageUrl;
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
 }

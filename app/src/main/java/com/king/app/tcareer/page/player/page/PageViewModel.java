@@ -2,9 +2,13 @@ package com.king.app.tcareer.page.player.page;
 
 import android.animation.Animator;
 import android.animation.ObjectAnimator;
+import android.app.Application;
+import android.arch.lifecycle.MutableLiveData;
+import android.databinding.ObservableField;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
+import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
 import android.support.v7.graphics.Palette;
 import android.text.TextUtils;
@@ -30,9 +34,8 @@ import com.king.app.tcareer.model.face.FaceModelFactory;
 import com.king.app.tcareer.model.http.bean.ImageUrlBean;
 import com.king.app.tcareer.model.palette.PaletteResponse;
 import com.king.app.tcareer.model.palette.ViewColorBound;
-import com.king.app.tcareer.page.imagemanager.DataController;
 import com.king.app.tcareer.page.imagemanager.ImageManager;
-import com.king.app.tcareer.page.player.atp.PlayerAtpPresenter;
+import com.king.app.tcareer.page.player.atp.PlayerAtpViewModel;
 import com.king.app.tcareer.page.setting.SettingProperty;
 import com.king.app.tcareer.utils.ConstellationUtil;
 import com.king.app.tcareer.utils.FormatUtil;
@@ -43,14 +46,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.Observable;
-import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.ObservableSource;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.BiFunction;
-import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 
@@ -59,12 +59,24 @@ import io.reactivex.schedulers.Schedulers;
  * <p/>作者：景阳
  * <p/>创建时间: 2017/11/20 15:48
  */
-public class PagePresenter extends PlayerAtpPresenter<IPageView> {
+public class PageViewModel extends PlayerAtpViewModel {
 
     public static final int TAB_USER = 0;
     public static final int TAB_COURT = 1;
     public static final int TAB_LEVEL = 2;
     public static final int TAB_YEAR = 3;
+
+    public ObservableField<String> toolbarText = new ObservableField<>();
+    
+    public MutableLiveData<String> playerImageUrl = new MutableLiveData<>();
+
+    public MutableLiveData<PlayerAtpBean> atpInfo = new MutableLiveData<>();
+
+    public MutableLiveData<PlayerAtpBean> atpInfoUpdated = new MutableLiveData<>();
+
+    public MutableLiveData<List<TabBean>> tabsObserver = new MutableLiveData<>();
+
+    public MutableLiveData<Boolean> animWithRightFace = new MutableLiveData<>();
 
     protected CompetitorBean mCompetitor;
 
@@ -77,11 +89,17 @@ public class PagePresenter extends PlayerAtpPresenter<IPageView> {
     private SubPageModel subPageModel;
 
     private boolean isFaceInRight;
+    
+    private ViewProvider viewProvider;
 
-    @Override
-    protected void onCreate() {
+    public PageViewModel(@NonNull Application application) {
+        super(application);
         faceModel = FaceModelFactory.create();
         mTabType = SettingProperty.getPlayerTabType();
+    }
+
+    public void setViewProvider(ViewProvider viewProvider) {
+        this.viewProvider = viewProvider;
     }
 
     public void preparePage(long userId, final long playerId, final boolean playerIsUser) {
@@ -107,12 +125,7 @@ public class PagePresenter extends PlayerAtpPresenter<IPageView> {
         }
         else {
             observable = queryUser(userId)
-                    .flatMap(new Function<User, ObservableSource<CompetitorBean>>() {
-                        @Override
-                        public ObservableSource<CompetitorBean> apply(User user) throws Exception {
-                            return queryCompetitor(playerId, playerIsUser);
-                        }
-                    });
+                    .flatMap((Function<User, ObservableSource<CompetitorBean>>) user -> queryCompetitor(playerId, playerIsUser));
         }
         observable
                 .observeOn(AndroidSchedulers.mainThread())
@@ -131,7 +144,7 @@ public class PagePresenter extends PlayerAtpPresenter<IPageView> {
                     @Override
                     public void onError(Throwable e) {
                         e.printStackTrace();
-                        view.showError("Load player failed: " + e.getMessage());
+                        messageObserver.setValue("Load player failed: " + e.getMessage());
                     }
 
                     @Override
@@ -155,37 +168,29 @@ public class PagePresenter extends PlayerAtpPresenter<IPageView> {
     }
 
     protected Observable<CompetitorBean> queryCompetitor(final long playerId, final boolean playerIsUser) {
-        return Observable.create(new ObservableOnSubscribe<CompetitorBean>() {
-            @Override
-            public void subscribe(ObservableEmitter<CompetitorBean> e) throws Exception {
-                if (playerIsUser) {
-                    UserDao userDao = TApplication.getInstance().getDaoSession().getUserDao();
-                    mCompetitor = userDao.queryBuilder()
-                            .where(UserDao.Properties.Id.eq(playerId))
-                            .build().unique();
-                } else {
-                    PlayerBeanDao playerBeanDao = TApplication.getInstance().getDaoSession().getPlayerBeanDao();
-                    mCompetitor = playerBeanDao.queryBuilder()
-                            .where(PlayerBeanDao.Properties.Id.eq(playerId))
-                            .build().unique();
-                }
-                e.onNext(mCompetitor);
+        return Observable.create(e -> {
+            if (playerIsUser) {
+                UserDao userDao = TApplication.getInstance().getDaoSession().getUserDao();
+                mCompetitor = userDao.queryBuilder()
+                        .where(UserDao.Properties.Id.eq(playerId))
+                        .build().unique();
+            } else {
+                PlayerBeanDao playerBeanDao = TApplication.getInstance().getDaoSession().getPlayerBeanDao();
+                mCompetitor = playerBeanDao.queryBuilder()
+                        .where(PlayerBeanDao.Properties.Id.eq(playerId))
+                        .build().unique();
             }
+            e.onNext(mCompetitor);
         });
     }
 
     protected void loadPlayerInfor() {
 
-        // 先全部隐藏，等到调色板相关参数都加载完再动画渐入
-        view.getEngNameTextView().setVisibility(View.GONE);
-        view.getChnNameTextView().setVisibility(View.GONE);
-        view.getBirthdayTextView().setVisibility(View.GONE);
-        view.getCountryTextView().setVisibility(View.GONE);
-
-        view.showCompetitor(mCompetitor.getNameEng(), ImageProvider.getDetailPlayerPath(mCompetitor.getNameChn()));
+        toolbarText.set(mCompetitor.getNameEng());
+        playerImageUrl.setValue(ImageProvider.getDetailPlayerPath(mCompetitor.getNameChn()));
 
         if (mCompetitor.getAtpBean() != null) {
-            view.showAtpInfo(mCompetitor.getAtpBean());
+            atpInfo.setValue(mCompetitor.getAtpBean());
         }
     }
 
@@ -195,9 +200,27 @@ public class PagePresenter extends PlayerAtpPresenter<IPageView> {
             e.onNext(list);
         }).observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
-                .subscribe(list -> view.onTabLoaded(list), throwable -> {
-                    throwable.printStackTrace();
-                    view.showError("loadRecords error: " + throwable.getMessage());
+                .subscribe(new Observer<List<TabBean>>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                        addDisposable(d);
+                    }
+
+                    @Override
+                    public void onNext(List<TabBean> tabBeans) {
+                        tabsObserver.postValue(tabBeans);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        e.printStackTrace();
+                        messageObserver.setValue("loadRecords error: " + e.getMessage());
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
                 });
     }
 
@@ -250,27 +273,27 @@ public class PagePresenter extends PlayerAtpPresenter<IPageView> {
 
         if (data.mainSwatch != null) {
             // 修改titlebar的主色调（背景，文字颜色，图标颜色）
-            view.getCollapsingToolbar().setContentScrimColor(data.mainSwatch.getRgb());
-            view.getCollapsingToolbar().setCollapsedTitleTextColor(data.mainSwatch.getTitleTextColor());
+            viewProvider.getCollapsingToolbar().setContentScrimColor(data.mainSwatch.getRgb());
+            viewProvider.getCollapsingToolbar().setCollapsedTitleTextColor(data.mainSwatch.getTitleTextColor());
             // toolbar上的图标需要根据展开/折叠状态确定颜色，初始是展开状态
             handleCollapseScrimChanged(false);
 
             // 上次更新时间
-            view.getGroupAtp().setBackgroundColor(data.mainSwatch.getRgb());
-            view.getTvAtpTime().setTextColor(data.mainSwatch.getTitleTextColor());
+            viewProvider.getGroupAtp().setBackgroundColor(data.mainSwatch.getRgb());
+            viewProvider.getTvAtpTime().setTextColor(data.mainSwatch.getTitleTextColor());
 
             // 修改tab layout的相关颜色
-            view.getTabLayout().setBackgroundColor(data.mainSwatch.getRgb());
-            view.getTabLayout().setSelectedTabIndicatorColor(data.mainSwatch.getTitleTextColor());
+            viewProvider.getTabLayout().setBackgroundColor(data.mainSwatch.getRgb());
+            viewProvider.getTabLayout().setSelectedTabIndicatorColor(data.mainSwatch.getTitleTextColor());
 
             // 使用了自定义布局，要单独设置
-//          view.getTabLayout().setTabTextColors(data.mainSwatch.getBodyTextColor(), data.mainSwatch.getTitleTextColor());
-            for (int i = 0; i < view.getTabLayout().getTabCount(); i ++) {
-                TabLayout.Tab tab = view.getTabLayout().getTabAt(i);
-                TabCustomView view = (TabCustomView) tab.getCustomView();
-                view.setTextColor(data.mainSwatch.getBodyTextColor(), data.mainSwatch.getTitleTextColor());
+//          viewProvider.getTabLayout().setTabTextColors(data.mainSwatch.getBodyTextColor(), data.mainSwatch.getTitleTextColor());
+            for (int i = 0; i < viewProvider.getTabLayout().getTabCount(); i ++) {
+                TabLayout.Tab tab = viewProvider.getTabLayout().getTabAt(i);
+                TabCustomView viewProvider = (TabCustomView) tab.getCustomView();
+                viewProvider.setTextColor(data.mainSwatch.getBodyTextColor(), data.mainSwatch.getTitleTextColor());
             }
-            view.getTabLayout().invalidate();
+            viewProvider.getTabLayout().invalidate();
 
         }
 
@@ -283,7 +306,7 @@ public class PagePresenter extends PlayerAtpPresenter<IPageView> {
         boolean hasAtpParams = mCompetitor.getAtpBean() != null && mCompetitor.getAtpBean().getCm() != 0;
         if (hasValuedChnName || hasAtpParams) {
             textViews = new TextView[] {
-                    view.getEngNameTextView(), view.getChnNameTextView(), view.getCountryTextView(), view.getBirthdayTextView()
+                    viewProvider.getEngNameTextView(), viewProvider.getChnNameTextView(), viewProvider.getCountryTextView(), viewProvider.getBirthdayTextView()
             };
             String name = hasValuedChnName ? mCompetitor.getNameChn():"";
             if (hasAtpParams) {
@@ -294,11 +317,11 @@ public class PagePresenter extends PlayerAtpPresenter<IPageView> {
                 name = name + FormatUtil.formatNumber(mCompetitor.getAtpBean().getCm()) + "cm，"
                         + FormatUtil.formatNumber(mCompetitor.getAtpBean().getKg()) + "kg";
             }
-            view.getChnNameTextView().setText(name);
+            viewProvider.getChnNameTextView().setText(name);
         }
         else {
             textViews = new TextView[] {
-                    view.getEngNameTextView(), view.getCountryTextView(), view.getBirthdayTextView()
+                    viewProvider.getEngNameTextView(), viewProvider.getCountryTextView(), viewProvider.getBirthdayTextView()
             };
         }
 
@@ -321,12 +344,12 @@ public class PagePresenter extends PlayerAtpPresenter<IPageView> {
         layout.setLayoutParams(rParams);
         // 主要tag标签在哪侧，次要atp标签就在另一侧
         if (isFaceInRight) {
-            view.getGroupAtpCover().setGravity(Gravity.LEFT);
-            view.getGroupAtpCover().setBackgroundResource(R.drawable.shape_atp_cover_ltr);
+            viewProvider.getGroupAtpCover().setGravity(Gravity.LEFT);
+            viewProvider.getGroupAtpCover().setBackgroundResource(R.drawable.shape_atp_cover_ltr);
         }
         else {
-            view.getGroupAtpCover().setGravity(Gravity.RIGHT);
-            view.getGroupAtpCover().setBackgroundResource(R.drawable.shape_atp_cover_rtl);
+            viewProvider.getGroupAtpCover().setGravity(Gravity.RIGHT);
+            viewProvider.getGroupAtpCover().setBackgroundResource(R.drawable.shape_atp_cover_rtl);
         }
 
         // 无图时根据是否有mainSwatch判断，pack和faceData肯定不为null
@@ -347,8 +370,8 @@ public class PagePresenter extends PlayerAtpPresenter<IPageView> {
                 textViews[i].setBackground(bg);
 
                 // country标签，更改drawable颜色
-                if (textViews[i] == view.getCountryTextView()) {
-                    Drawable drawable = view.getContext().getResources().getDrawable(R.drawable.ic_edit_location_white_24dp);
+                if (textViews[i] == viewProvider.getCountryTextView()) {
+                    Drawable drawable = viewProvider.getResources().getDrawable(R.drawable.ic_edit_location_white_24dp);
                     drawable.setBounds(0, 0, ScreenUtils.dp2px(20), ScreenUtils.dp2px(20));
                     // 替换原图颜色
                     drawable.setColorFilter(colorPack.bodyColors.get(i), PorterDuff.Mode.SRC_IN);
@@ -378,26 +401,26 @@ public class PagePresenter extends PlayerAtpPresenter<IPageView> {
         if (!TextUtils.isEmpty(constel)) {
             buffer.append(", ").append(constel);
         }
-        view.getBirthdayTextView().setText(buffer.toString());
-        view.getEngNameTextView().setText(mCompetitor.getNameEng());
+        viewProvider.getBirthdayTextView().setText(buffer.toString());
+        viewProvider.getEngNameTextView().setText(mCompetitor.getNameEng());
         if (mCompetitor.getAtpBean() == null) {
-            view.getCountryTextView().setText(mCompetitor.getCountry());
+            viewProvider.getCountryTextView().setText(mCompetitor.getCountry());
         }
         else {
             if (TextUtils.isEmpty(mCompetitor.getAtpBean().getBirthCity())) {
                 if (TextUtils.isEmpty(mCompetitor.getAtpBean().getBirthCountry())) {
-                    view.getCountryTextView().setText(mCompetitor.getCountry());
+                    viewProvider.getCountryTextView().setText(mCompetitor.getCountry());
                 }
                 else {
-                    view.getCountryTextView().setText(mCompetitor.getAtpBean().getBirthCountry());
+                    viewProvider.getCountryTextView().setText(mCompetitor.getAtpBean().getBirthCountry());
                 }
             }
             else {
-                view.getCountryTextView().setText(mCompetitor.getAtpBean().getBirthCity() + ", " + mCompetitor.getAtpBean().getBirthCountry());
+                viewProvider.getCountryTextView().setText(mCompetitor.getAtpBean().getBirthCity() + ", " + mCompetitor.getAtpBean().getBirthCountry());
             }
         }
 
-        view.animTags(isFaceInRight);
+        animWithRightFace.setValue(isFaceInRight);
     }
 
     /**
@@ -434,25 +457,25 @@ public class PagePresenter extends PlayerAtpPresenter<IPageView> {
                 if (mPageData.mainSwatch != null) {
                     // PorterDuff.Mode作用参考https://www.jianshu.com/p/d11892bbe055
                     // 这里用SRC_IN，第一个参数是source，表示source与原图像叠加后相交的部分运用source的颜色，如果是SRC_TOP则是叠加的情况，SRC则是source color充满整个view区域
-                    view.getToolbar().getNavigationIcon().setColorFilter(mPageData.mainSwatch.getTitleTextColor(), PorterDuff.Mode.SRC_IN);
-                    view.getToolbar().getOverflowIcon().setColorFilter(mPageData.mainSwatch.getTitleTextColor(), PorterDuff.Mode.SRC_IN);
+                    viewProvider.getToolbar().getNavigationIcon().setColorFilter(mPageData.mainSwatch.getTitleTextColor(), PorterDuff.Mode.SRC_IN);
+                    viewProvider.getToolbar().getOverflowIcon().setColorFilter(mPageData.mainSwatch.getTitleTextColor(), PorterDuff.Mode.SRC_IN);
                 }
             }
             // 展开状态运用图片区域颜色分析法得到的颜色
             else {
-                ViewColorBound bound = findViewColorBound(mPageData.pack.colorBounds, view.getToolbar());
+                ViewColorBound bound = findViewColorBound(mPageData.pack.colorBounds, viewProvider.getToolbar());
                 if (bound != null) {
-                    view.getToolbar().getNavigationIcon().setColorFilter(bound.color, PorterDuff.Mode.SRC_IN);
-                    view.getToolbar().getOverflowIcon().setColorFilter(bound.color, PorterDuff.Mode.SRC_IN);
+                    viewProvider.getToolbar().getNavigationIcon().setColorFilter(bound.color, PorterDuff.Mode.SRC_IN);
+                    viewProvider.getToolbar().getOverflowIcon().setColorFilter(bound.color, PorterDuff.Mode.SRC_IN);
                 }
             }
         }
     }
 
-    private ViewColorBound findViewColorBound(List<ViewColorBound> colorBounds, View view) {
+    private ViewColorBound findViewColorBound(List<ViewColorBound> colorBounds, View viewProvider) {
         if (!ListUtil.isEmpty(colorBounds)) {
             for (ViewColorBound bound:colorBounds) {
-                if (bound.view == view) {
+                if (bound.view == viewProvider) {
                     return bound;
                 }
             }
@@ -465,20 +488,16 @@ public class PagePresenter extends PlayerAtpPresenter<IPageView> {
     }
 
     public ImageManager.DataProvider getImageProvider() {
-        return new ImageManager.DataProvider() {
-
-            @Override
-            public ImageUrlBean createImageUrlBean(DataController dataController) {
-                ImageUrlBean bean = dataController.getPlayerImageUrlBean(mCompetitor.getNameChn());
-                return bean;
-            }
+        return dataController -> {
+            ImageUrlBean bean = dataController.getPlayerImageUrlBean(mCompetitor.getNameChn());
+            return bean;
         };
     }
 
     public String getTargetViewTypeString() {
         int viewType = SettingProperty.getPlayerPageViewType();
         String text;
-        if (viewType == SubPagePresenter.TYPE_PURE) {
+        if (viewType == SubPageViewModel.TYPE_PURE) {
             text = "卡片布局";
         }
         else {
@@ -489,11 +508,11 @@ public class PagePresenter extends PlayerAtpPresenter<IPageView> {
 
     public void changeSubViewType() {
         int viewType = SettingProperty.getPlayerPageViewType();
-        if (viewType == SubPagePresenter.TYPE_PURE) {
-            viewType = SubPagePresenter.TYPE_CARD;
+        if (viewType == SubPageViewModel.TYPE_PURE) {
+            viewType = SubPageViewModel.TYPE_CARD;
         }
         else {
-            viewType = SubPagePresenter.TYPE_PURE;
+            viewType = SubPageViewModel.TYPE_PURE;
         }
         SettingProperty.setPlayerPageViewType(viewType);
     }
@@ -550,8 +569,8 @@ public class PagePresenter extends PlayerAtpPresenter<IPageView> {
                     }
                 } else {
                     for (int i = 0; i < nTags; i++) {
-                        pack.rgbs.add(view.getContext().getResources().getColor(R.color.colorPrimary));
-                        pack.bodyColors.add(view.getContext().getResources().getColor(R.color.white));
+                        pack.rgbs.add(viewProvider.getResources().getColor(R.color.colorPrimary));
+                        pack.bodyColors.add(viewProvider.getResources().getColor(R.color.white));
                     }
                 }
             }
@@ -574,17 +593,17 @@ public class PagePresenter extends PlayerAtpPresenter<IPageView> {
     public void playAtpInfo() {
         // 只进行groupAtp的动画会有空白出现在过程中，因此需要在groupAtp下面的布局做文章
         // 因此动画采取groupAtp之下的tabLayout与viewPager整体平移的联动策略实现效果理想的动画
-        view.getGroupAtp().setVisibility(View.VISIBLE);
-        int offset = view.getContext().getResources().getDimensionPixelSize(R.dimen.player_page_update_time_height);
-        ObjectAnimator.ofFloat(view.getTabLayout(), "translationY", -offset, 0)
+        viewProvider.getGroupAtp().setVisibility(View.VISIBLE);
+        int offset = viewProvider.getResources().getDimensionPixelSize(R.dimen.player_page_update_time_height);
+        ObjectAnimator.ofFloat(viewProvider.getTabLayout(), "translationY", -offset, 0)
                 .setDuration(500)
                 .start();
-        ObjectAnimator.ofFloat(view.getViewpager(), "translationY", -offset, 0)
+        ObjectAnimator.ofFloat(viewProvider.getViewpager(), "translationY", -offset, 0)
                 .setDuration(500)
                 .start();
 
         // groupAtpCover的动画直接根据位置进行scale缩放即刻，不跟其他view进行联动
-        view.getGroupAtpCover().setVisibility(View.VISIBLE);
+        viewProvider.getGroupAtpCover().setVisibility(View.VISIBLE);
         ScaleAnimation scale;
         if (isFaceInRight) {
             // 从左至右放大
@@ -597,7 +616,7 @@ public class PagePresenter extends PlayerAtpPresenter<IPageView> {
                     Animation.RELATIVE_TO_PARENT, 1.0f, Animation.RELATIVE_TO_PARENT, 0);
         }
         scale.setDuration(500);
-        view.getGroupAtpCover().startAnimation(scale);
+        viewProvider.getGroupAtpCover().startAnimation(scale);
     }
 
     /**
@@ -605,8 +624,8 @@ public class PagePresenter extends PlayerAtpPresenter<IPageView> {
      * groupAtpCover水平方向scale合拢
      */
     public void dismissAtpInfo() {
-        int offset = view.getGroupAtp().getHeight();
-        ObjectAnimator tabAnim = ObjectAnimator.ofFloat(view.getTabLayout(), "translationY", 0, -offset)
+        int offset = viewProvider.getGroupAtp().getHeight();
+        ObjectAnimator tabAnim = ObjectAnimator.ofFloat(viewProvider.getTabLayout(), "translationY", 0, -offset)
                 .setDuration(500);
         tabAnim.addListener(new Animator.AnimatorListener() {
             @Override
@@ -616,9 +635,9 @@ public class PagePresenter extends PlayerAtpPresenter<IPageView> {
 
             @Override
             public void onAnimationEnd(Animator animation) {
-                view.getGroupAtp().setVisibility(View.GONE);
+                viewProvider.getGroupAtp().setVisibility(View.GONE);
                 // 属性动画影响了tabLayout和viewpager的最终translation，因此groupAtp设置为GONE后需要复原
-                view.getTabLayout().setTranslationY(0);
+                viewProvider.getTabLayout().setTranslationY(0);
             }
 
             @Override
@@ -632,7 +651,7 @@ public class PagePresenter extends PlayerAtpPresenter<IPageView> {
             }
         });
         tabAnim.start();
-        ObjectAnimator vpAnim = ObjectAnimator.ofFloat(view.getViewpager(), "translationY", 0, -offset)
+        ObjectAnimator vpAnim = ObjectAnimator.ofFloat(viewProvider.getViewpager(), "translationY", 0, -offset)
                 .setDuration(500);
         vpAnim.addListener(new Animator.AnimatorListener() {
             @Override
@@ -643,7 +662,7 @@ public class PagePresenter extends PlayerAtpPresenter<IPageView> {
             @Override
             public void onAnimationEnd(Animator animation) {
                 // 属性动画影响了tabLayout和viewpager的最终translation，因此groupAtp设置为GONE后，动画也结束了，需要复原
-                view.getViewpager().setTranslationY(0);
+                viewProvider.getViewpager().setTranslationY(0);
             }
 
             @Override
@@ -678,7 +697,7 @@ public class PagePresenter extends PlayerAtpPresenter<IPageView> {
 
             @Override
             public void onAnimationEnd(Animation animation) {
-                view.getGroupAtpCover().setVisibility(View.GONE);
+                viewProvider.getGroupAtpCover().setVisibility(View.GONE);
             }
 
             @Override
@@ -686,12 +705,12 @@ public class PagePresenter extends PlayerAtpPresenter<IPageView> {
 
             }
         });
-        view.getGroupAtpCover().startAnimation(scale);
+        viewProvider.getGroupAtpCover().startAnimation(scale);
     }
 
     @Override
     protected void onUpdateAtpCompleted(PlayerAtpBean bean) {
         super.onUpdateAtpCompleted(bean);
-        view.onUpdateAtpCompleted();
+        atpInfoUpdated.setValue(bean);
     }
 }

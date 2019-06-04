@@ -1,83 +1,92 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent" android:layout_height="wrap_content"
-    android:id="@+id/group_record">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <data>
+        <variable
+            name="bean"
+            type="com.king.app.tcareer.page.player.page.FullRecordBean"/>
+    </data>
+    <RelativeLayout
+        android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:id="@+id/group_record">
 
-    <ImageView
-        android:id="@+id/iv_match"
-        android:layout_width="360dp"
-        android:layout_height="202dp"
-        android:scaleType="fitXY"/>
-    <android.support.constraint.ConstraintLayout
-        android:layout_width="360dp"
-        android:layout_height="202dp"
-        android:background="@color/player_page_cover_bg">
+        <ImageView
+            android:id="@+id/iv_match"
+            android:layout_width="360dp"
+            android:layout_height="202dp"
+            android:scaleType="fitXY"
+            app:matchUrl="@{bean.imageUrl}"/>
+
+        <android.support.constraint.ConstraintLayout
+            android:layout_width="360dp"
+            android:layout_height="202dp"
+            android:background="@color/player_page_cover_bg">
+
+            <TextView
+                android:id="@+id/tv_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="28dp"
+                android:layout_marginTop="28dp"
+                android:text="蒙特卡洛大师赛"
+                android:textColor="@color/player_page_cover_text"
+                android:textSize="20dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/tv_round"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="28dp"
+                android:layout_marginTop="2dp"
+                android:text="Semi Final"
+                android:textColor="@color/player_page_cover_text"
+                android:textSize="16dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tv_name"
+                app:layout_constraintVertical_bias="0.0" />
+
+            <TextView
+                android:id="@+id/tv_year"
+                android:layout_width="@dimen/record_year_size"
+                android:layout_height="@dimen/record_year_size"
+                android:layout_marginEnd="@dimen/record_year_right"
+                android:layout_marginRight="@dimen/record_year_right"
+                android:layout_marginTop="@dimen/record_year_right"
+                android:background="@drawable/shape_oval_alpha66"
+                android:gravity="center"
+                android:textColor="@color/player_page_cover_text"
+                android:textSize="@dimen/record_year_text"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/tv_month"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="44dp"
+                android:layout_marginTop="44dp"
+                android:text="11月"
+                android:textColor="@color/player_page_cover_text"
+                android:textSize="16dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tv_round" />
+        </android.support.constraint.ConstraintLayout>
 
         <TextView
-            android:id="@+id/tv_name"
-            android:layout_width="wrap_content"
+            android:id="@+id/tv_score"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="28dp"
-            android:layout_marginTop="28dp"
-            android:text="蒙特卡洛大师赛"
+            android:text="Flamenco  7-6(5)/6-4/3-6/2-6/7-6(8)"
+            android:layout_below="@id/iv_match"
+            android:paddingTop="7dp"
+            android:paddingBottom="7dp"
+            android:paddingLeft="28dp"
+            android:background="@color/player_page_cover_bg"
             android:textColor="@color/player_page_cover_text"
-            android:textSize="20dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <TextView
-            android:id="@+id/tv_round"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="28dp"
-            android:layout_marginTop="2dp"
-            android:text="Semi Final"
-            android:textColor="@color/player_page_cover_text"
-            android:textSize="16dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tv_name"
-            app:layout_constraintVertical_bias="0.0" />
-
-        <TextView
-            android:id="@+id/tv_year"
-            android:layout_width="@dimen/record_year_size"
-            android:layout_height="@dimen/record_year_size"
-            android:layout_marginEnd="@dimen/record_year_right"
-            android:layout_marginRight="@dimen/record_year_right"
-            android:layout_marginTop="@dimen/record_year_right"
-            android:background="@drawable/shape_oval_alpha66"
-            android:gravity="center"
-            android:textColor="@color/player_page_cover_text"
-            android:textSize="@dimen/record_year_text"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <TextView
-            android:id="@+id/tv_month"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="44dp"
-            android:layout_marginTop="44dp"
-            android:text="11月"
-            android:textColor="@color/player_page_cover_text"
-            android:textSize="16dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tv_round" />
-    </android.support.constraint.ConstraintLayout>
-
-    <TextView
-        android:id="@+id/tv_score"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Flamenco  7-6(5)/6-4/3-6/2-6/7-6(8)"
-        android:layout_below="@id/iv_match"
-        android:paddingTop="7dp"
-        android:paddingBottom="7dp"
-        android:paddingLeft="28dp"
-        android:background="@color/player_page_cover_bg"
-        android:textColor="@color/player_page_cover_text"
-        android:textSize="14dp"/>
-</RelativeLayout>
+            android:textSize="14dp"/>
+    </RelativeLayout>
+</layout>
