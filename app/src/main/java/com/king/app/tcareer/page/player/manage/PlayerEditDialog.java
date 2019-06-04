@@ -1,19 +1,17 @@
 package com.king.app.tcareer.page.player.manage;
 
 import android.app.Activity;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.king.app.tcareer.R;
-import com.king.app.tcareer.base.BaseView;
 import com.king.app.tcareer.base.IFragmentHolder;
 import com.king.app.tcareer.base.TApplication;
+import com.king.app.tcareer.databinding.DialogPlayerManageBinding;
 import com.king.app.tcareer.model.bean.CompetitorBean;
 import com.king.app.tcareer.model.db.entity.PlayerAtpBean;
 import com.king.app.tcareer.model.db.entity.PlayerAtpBeanDao;
@@ -22,9 +20,6 @@ import com.king.app.tcareer.model.db.entity.User;
 import com.king.app.tcareer.page.player.atp.AtpManageActivity;
 import com.king.app.tcareer.utils.PinyinUtil;
 import com.king.app.tcareer.view.dialog.DraggableDialogFragment;
-
-import butterknife.BindView;
-import butterknife.ButterKnife;
 
 /**
  * @desc
@@ -77,28 +72,9 @@ public class PlayerEditDialog extends DraggableDialogFragment {
         this.customTitle = customTitle;
     }
 
-    public static class EditFragment extends ContentFragment implements PlayerEditView {
+    public static class EditFragment extends BindingContentFragment<DialogPlayerManageBinding, EditViewModel> {
 
         private final int REQUEST_SELECT_ATP = 101;
-
-        @BindView(R.id.et_name)
-        EditText etName;
-        @BindView(R.id.et_name_eng)
-        EditText etNameEng;
-        @BindView(R.id.et_country)
-        EditText etCountry;
-        @BindView(R.id.et_city)
-        EditText etCity;
-        @BindView(R.id.et_birthday)
-        EditText etBirthday;
-        @BindView(R.id.tv_atp_id)
-        TextView tvAtpId;
-        @BindView(R.id.tv_atp_conclude)
-        TextView tvAtpConclude;
-        @BindView(R.id.iv_update)
-        ImageView ivUpdate;
-
-        private EditPresenter presenter;
 
         private CompetitorBean competitorBean;
         private OnPlayerEditListener onPlayerEditListener;
@@ -110,56 +86,57 @@ public class PlayerEditDialog extends DraggableDialogFragment {
             return R.layout.dialog_player_manage;
         }
 
+        @Override
+        protected EditViewModel createViewModel() {
+            return ViewModelProviders.of(this).get(EditViewModel.class);
+        }
+
         public void setCompetitorBean(CompetitorBean competitorBean) {
             this.competitorBean = competitorBean;
         }
 
         @Override
         protected void onCreate(View view) {
-            ButterKnife.bind(this, view);
-
-            presenter = new EditPresenter();
-            presenter.onAttach(this);
-
             if (competitorBean != null) {
                 atpId = competitorBean.getAtpId();
             }
-            ivUpdate.setVisibility(atpId == null ? View.GONE:View.VISIBLE);
+            mBinding.ivUpdate.setVisibility(atpId == null ? View.GONE:View.VISIBLE);
 
             if (competitorBean != null) {
-                etName.setText(competitorBean.getNameChn());
-                etNameEng.setText(competitorBean.getNameEng());
-                etCountry.setText(competitorBean.getCountry());
-                etCity.setText(competitorBean.getCity());
-                etBirthday.setText(competitorBean.getBirthday());
+                mBinding.etName.setText(competitorBean.getNameChn());
+                mBinding.etNameEng.setText(competitorBean.getNameEng());
+                mBinding.etCountry.setText(competitorBean.getCountry());
+                mBinding.etCity.setText(competitorBean.getCity());
+                mBinding.etBirthday.setText(competitorBean.getBirthday());
                 if (competitorBean.getAtpBean() != null) {
                     atpId = competitorBean.getAtpId();
                     updateByAtpBean(competitorBean.getAtpBean());
                 }
             }
-            tvAtpId.setOnClickListener(v -> {
+            mBinding.tvAtpId.setOnClickListener(v -> {
                 Intent intent = new Intent().setClass(getContext(), AtpManageActivity.class);
                 intent.putExtra(AtpManageActivity.EXTRA_SELECT, true);
                 startActivityForResult(intent, REQUEST_SELECT_ATP);
             });
 
-            ivUpdate.setOnClickListener(v -> presenter.updateAtpData(atpId));
+            mModel.onUpdateAtpCompleted.observe(this, bean -> onUpdateAtpCompleted(bean));
+            mBinding.ivUpdate.setOnClickListener(v -> mModel.updateAtpData(atpId));
         }
 
         private void updateByAtpBean(PlayerAtpBean atpBean) {
-            tvAtpId.setText("Atp id: " + atpBean.getId());
-            etNameEng.setText(atpBean.getName());
+            mBinding.tvAtpId.setText("Atp id: " + atpBean.getId());
+            mBinding.etNameEng.setText(atpBean.getName());
             StringBuffer buffer = new StringBuffer();
             buffer.append(atpBean.getOverViewUrl());
             // 更新过详细信息
             if (atpBean.getLastUpdateDate() > 0) {
-                etCountry.setText(atpBean.getBirthCountry());
+                mBinding.etCountry.setText(atpBean.getBirthCountry());
 
                 if (!TextUtils.isEmpty(atpBean.getBirthCity())) {
-                    etCity.setText(atpBean.getBirthCity());
+                    mBinding.etCity.setText(atpBean.getBirthCity());
                 }
                 if (!TextUtils.isEmpty(atpBean.getBirthday())) {
-                    etBirthday.setText(atpBean.getBirthday());
+                    mBinding.etBirthday.setText(atpBean.getBirthday());
                 }
 
                 buffer.append("\n").append("Residence: ");
@@ -175,11 +152,11 @@ public class PlayerEditDialog extends DraggableDialogFragment {
                 buffer.append("Career: ").append(atpBean.getCareerWin()).append("-").append(atpBean.getCareerLose()).append(", ").append(atpBean.getCareerPrize()).append("\n");
             }
             else {
-                etCountry.setText("");
-                etCity.setText("");
-                etBirthday.setText("");
+                mBinding.etCountry.setText("");
+                mBinding.etCity.setText("");
+                mBinding.etBirthday.setText("");
             }
-            tvAtpConclude.setText(buffer.toString());
+            mBinding.tvAtpConclude.setText(buffer.toString());
         }
 
         @Override
@@ -188,20 +165,20 @@ public class PlayerEditDialog extends DraggableDialogFragment {
         }
 
         public boolean onSave() {
-            String name = etName.getText().toString();
+            String name = mBinding.etName.getText().toString();
             if (TextUtils.isEmpty(name)) {
-                etName.setError("Name can't be null");
+                mBinding.etName.setError("Name can't be null");
                 return false;
             }
-            String country = etCountry.getText().toString();
+            String country = mBinding.etCountry.getText().toString();
             if (TextUtils.isEmpty(country)) {
-                etCountry.setError("Country can't be null");
+                mBinding.etCountry.setError("Country can't be null");
                 return false;
             }
 
-            String city = etCity.getText().toString();
-            String birthday = etBirthday.getText().toString();
-            String engName = etNameEng.getText().toString();
+            String city = mBinding.etCity.getText().toString();
+            String birthday = mBinding.etBirthday.getText().toString();
+            String engName = mBinding.etNameEng.getText().toString();
             // 修改
             if (competitorBean != null) {
                 if (competitorBean instanceof User) {
@@ -213,7 +190,7 @@ public class PlayerEditDialog extends DraggableDialogFragment {
                     user.setNameEng(engName);
                     user.setNamePinyin(PinyinUtil.getPinyin(name));
                     user.setAtpId(atpId);
-                    presenter.updateUser(user);
+                    mModel.updateUser(user);
                 }
                 else {
                     PlayerBean playerBean = (PlayerBean) competitorBean;
@@ -224,7 +201,7 @@ public class PlayerEditDialog extends DraggableDialogFragment {
                     playerBean.setNameEng(engName);
                     playerBean.setNamePinyin(PinyinUtil.getPinyin(name));
                     playerBean.setAtpId(atpId);
-                    presenter.updatePlayer(playerBean);
+                    mModel.updatePlayer(playerBean);
                 }
             }
             // 添加
@@ -237,7 +214,7 @@ public class PlayerEditDialog extends DraggableDialogFragment {
                 bean.setNameEng(engName);
                 bean.setNamePinyin(PinyinUtil.getPinyin(name));
                 bean.setAtpId(atpId);
-                presenter.insertPlayer(bean);
+                mModel.insertPlayer(bean);
             }
             if (onPlayerEditListener != null) {
                 onPlayerEditListener.onPlayerUpdated(competitorBean);
@@ -256,7 +233,7 @@ public class PlayerEditDialog extends DraggableDialogFragment {
             if (requestCode == REQUEST_SELECT_ATP) {
                 if (resultCode == Activity.RESULT_OK) {
                     atpId = data.getStringExtra(AtpManageActivity.RESP_ATP_ID);
-                    ivUpdate.setVisibility(View.VISIBLE);
+                    mBinding.ivUpdate.setVisibility(View.VISIBLE);
                     PlayerAtpBean bean = TApplication.getInstance().getDaoSession().getPlayerAtpBeanDao()
                             .queryBuilder()
                             .where(PlayerAtpBeanDao.Properties.Id.eq(atpId))
@@ -270,28 +247,8 @@ public class PlayerEditDialog extends DraggableDialogFragment {
          * 更新atp数据完成
          * @param bean
          */
-        @Override
-        public void onUpdateAtpCompleted(PlayerAtpBean bean) {
+        private void onUpdateAtpCompleted(PlayerAtpBean bean) {
             updateByAtpBean(bean);
-        }
-
-        @Override
-        public void showLoading() {
-            showProgress("loading");
-        }
-
-        @Override
-        public void dismissLoading() {
-            dismissProgress();
-        }
-
-        @Override
-        public void showConfirm(String message) {
-        }
-
-        @Override
-        public void showMessage(String message) {
-            showMessageShort(message);
         }
     }
 

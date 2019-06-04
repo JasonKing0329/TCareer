@@ -35,13 +35,14 @@ public abstract class BaseDialogFragment extends DialogFragment {
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        return super.onCreateDialog(savedInstanceState);
+        Dialog dialog = super.onCreateDialog(savedInstanceState);
+        windowParams = dialog.getWindow().getAttributes();
+        return dialog;
     }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        windowParams = getDialog().getWindow().getAttributes();
         View view = inflater.inflate(getLayoutResource(), container, false);
         initView(view);
         return view;

@@ -1,180 +1,181 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout
+<layout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/tv_title_forehand"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="16dp"
-        android:layout_marginTop="16dp"
-        android:text="Forehand"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <RadioGroup
-        android:id="@+id/group_forehand"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:orientation="horizontal"
-        android:layout_marginLeft="20dp"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/tv_title_forehand">
-        <RadioButton
-            android:id="@+id/rb_forehand_all"
+        <TextView
+            android:id="@+id/tv_title_forehand"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:checked="true"
-            android:text="All"/>
-        <RadioButton
-            android:id="@+id/rb_forehand_left"
+            android:layout_marginLeft="16dp"
+            android:layout_marginTop="16dp"
+            android:text="Forehand"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <RadioGroup
+            android:id="@+id/group_forehand"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Left"/>
-        <RadioButton
-            android:id="@+id/rb_forehand_right"
+            android:layout_marginTop="8dp"
+            android:orientation="horizontal"
+            android:layout_marginLeft="20dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/tv_title_forehand">
+            <RadioButton
+                android:id="@+id/rb_forehand_all"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:text="All"/>
+            <RadioButton
+                android:id="@+id/rb_forehand_left"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Left"/>
+            <RadioButton
+                android:id="@+id/rb_forehand_right"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Right"/>
+        </RadioGroup>
+
+        <TextView
+            android:id="@+id/tv_title_backhand"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Right"/>
-    </RadioGroup>
+            android:layout_marginLeft="16dp"
+            android:layout_marginTop="20dp"
+            android:text="Backhand"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tv_title_forehand" />
 
-    <TextView
-        android:id="@+id/tv_title_backhand"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="16dp"
-        android:layout_marginTop="20dp"
-        android:text="Backhand"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tv_title_forehand" />
-
-    <RadioGroup
-        android:id="@+id/radioGroup"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:orientation="horizontal"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/tv_title_backhand"
-        app:layout_constraintTop_toBottomOf="@id/group_forehand">
-
-        <RadioButton
-            android:id="@+id/rb_backhand_all"
+        <RadioGroup
+            android:id="@+id/radioGroup"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:checked="true"
-            android:text="All" />
+            android:layout_marginTop="8dp"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/tv_title_backhand"
+            app:layout_constraintTop_toBottomOf="@id/group_forehand">
 
-        <RadioButton
-            android:id="@+id/rb_backhand_single"
+            <RadioButton
+                android:id="@+id/rb_backhand_all"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:text="All" />
+
+            <RadioButton
+                android:id="@+id/rb_backhand_single"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Single" />
+
+            <RadioButton
+                android:id="@+id/rb_backhand_double"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Double" />
+        </RadioGroup>
+
+        <TextView
+            android:id="@+id/tv_title_signs"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Single" />
+            android:layout_marginLeft="16dp"
+            android:layout_marginTop="28dp"
+            android:text="Signs"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tv_title_backhand" />
 
-        <RadioButton
-            android:id="@+id/rb_backhand_double"
+        <Spinner
+            android:id="@+id/sp_signs"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Double" />
-    </RadioGroup>
+            android:layout_marginTop="18dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.705"
+            app:layout_constraintStart_toEndOf="@+id/tv_title_signs"
+            app:layout_constraintTop_toBottomOf="@+id/radioGroup" />
 
-    <TextView
-        android:id="@+id/tv_title_signs"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="16dp"
-        android:layout_marginTop="28dp"
-        android:text="Signs"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tv_title_backhand" />
+        <TextView
+            android:id="@+id/tv_title_country"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="16dp"
+            android:layout_marginTop="22dp"
+            android:text="Country"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tv_title_signs" />
 
-    <Spinner
-        android:id="@+id/sp_signs"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="18dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.705"
-        app:layout_constraintStart_toEndOf="@+id/tv_title_signs"
-        app:layout_constraintTop_toBottomOf="@+id/radioGroup" />
+        <Spinner
+            android:id="@+id/sp_country"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="10dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.705"
+            app:layout_constraintStart_toEndOf="@+id/tv_title_country"
+            app:layout_constraintTop_toBottomOf="@+id/sp_signs" />
 
-    <TextView
-        android:id="@+id/tv_title_country"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="16dp"
-        android:layout_marginTop="22dp"
-        android:text="Country"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tv_title_signs" />
+        <TextView
+            android:id="@+id/tv_title_rank"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="16dp"
+            android:layout_marginTop="20dp"
+            android:text="Rank"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tv_title_country" />
 
-    <Spinner
-        android:id="@+id/sp_country"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="10dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.705"
-        app:layout_constraintStart_toEndOf="@+id/tv_title_country"
-        app:layout_constraintTop_toBottomOf="@+id/sp_signs" />
+        <EditText
+            android:id="@+id/et_rank_low"
+            android:layout_width="80dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="36dp"
+            android:layout_marginTop="12dp"
+            android:ems="10"
+            android:hint="Low"
+            android:inputType="number"
+            android:gravity="center"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/sp_country" />
 
-    <TextView
-        android:id="@+id/tv_title_rank"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="16dp"
-        android:layout_marginTop="20dp"
-        android:text="Rank"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tv_title_country" />
+        <EditText
+            android:id="@+id/et_rank_high"
+            android:layout_width="80dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:ems="10"
+            android:hint="High"
+            android:inputType="number"
+            android:gravity="center"
+            app:layout_constraintEnd_toStartOf="@+id/et_rank_low"
+            app:layout_constraintHorizontal_bias="0.787"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/tv_title_rank"
+            app:layout_constraintTop_toBottomOf="@+id/sp_country" />
 
-    <EditText
-        android:id="@+id/et_rank_low"
-        android:layout_width="80dp"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="36dp"
-        android:layout_marginTop="12dp"
-        android:ems="10"
-        android:hint="Low"
-        android:inputType="number"
-        android:gravity="center"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/sp_country" />
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:layout_marginEnd="24dp"
+            android:layout_marginStart="24dp"
+            android:text="注：Rank与其他条件互斥。除Rank外，所有条件取交集。"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
 
-    <EditText
-        android:id="@+id/et_rank_high"
-        android:layout_width="80dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:ems="10"
-        android:hint="High"
-        android:inputType="number"
-        android:gravity="center"
-        app:layout_constraintEnd_toStartOf="@+id/et_rank_low"
-        app:layout_constraintHorizontal_bias="0.787"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/tv_title_rank"
-        app:layout_constraintTop_toBottomOf="@+id/sp_country" />
-
-    <TextView
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:layout_marginEnd="24dp"
-        android:layout_marginStart="24dp"
-        android:text="注：Rank与其他条件互斥。除Rank外，所有条件取交集。"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
-</android.support.constraint.ConstraintLayout>
+    </android.support.constraint.ConstraintLayout>
+</layout>

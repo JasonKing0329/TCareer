@@ -6,14 +6,13 @@ import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.EditText;
-import android.widget.RadioButton;
-import android.widget.Spinner;
 
 import com.king.app.tcareer.R;
 import com.king.app.tcareer.base.IFragmentHolder;
 import com.king.app.tcareer.base.TApplication;
+import com.king.app.tcareer.base.mvvm.BaseViewModel;
 import com.king.app.tcareer.conf.AppConstants;
+import com.king.app.tcareer.databinding.DialogRichPlayerFilterBinding;
 import com.king.app.tcareer.model.db.entity.PlayerAtpBeanDao;
 import com.king.app.tcareer.utils.ConstellationUtil;
 import com.king.app.tcareer.view.dialog.DraggableDialogFragment;
@@ -22,7 +21,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import butterknife.BindView;
 import io.reactivex.Observable;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -69,28 +67,7 @@ public class RichPlayerFilterDialog extends DraggableDialogFragment {
         void onFilterRichPlayer(RichFilterBean bean);
     }
 
-    public static class FilterFragment extends ContentFragment {
-
-        @BindView(R.id.sp_signs)
-        Spinner spSigns;
-        @BindView(R.id.sp_country)
-        Spinner spCountry;
-        @BindView(R.id.rb_forehand_all)
-        RadioButton rbForehandAll;
-        @BindView(R.id.rb_forehand_left)
-        RadioButton rbForehandLeft;
-        @BindView(R.id.rb_forehand_right)
-        RadioButton rbForehandRight;
-        @BindView(R.id.rb_backhand_all)
-        RadioButton rbBackhandAll;
-        @BindView(R.id.rb_backhand_single)
-        RadioButton rbBackhandSingle;
-        @BindView(R.id.rb_backhand_double)
-        RadioButton rbBackhandDouble;
-        @BindView(R.id.et_rank_high)
-        EditText etRankHigh;
-        @BindView(R.id.et_rank_low)
-        EditText etRankLow;
+    public static class FilterFragment extends BindingContentFragment<DialogRichPlayerFilterBinding, BaseViewModel> {
 
         private List<String> signList;
 
@@ -100,6 +77,11 @@ public class RichPlayerFilterDialog extends DraggableDialogFragment {
 
         public void setOnFilterListener(OnFilterListener onFilterListener) {
             this.onFilterListener = onFilterListener;
+        }
+
+        @Override
+        protected BaseViewModel createViewModel() {
+            return null;
         }
 
         @Override
@@ -118,14 +100,14 @@ public class RichPlayerFilterDialog extends DraggableDialogFragment {
             signList.add(AppConstants.FILTER_ALL);
             signList.addAll(Arrays.asList(ConstellationUtil.starArrEng));
             ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(), R.layout.adapter_filter_spinner_item, signList);
-            spSigns.setAdapter(adapter);
-            spSigns.setSelection(0);
+            mBinding.spSigns.setAdapter(adapter);
+            mBinding.spSigns.setSelection(0);
         }
 
         private void initCountries() {
             ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(), R.layout.adapter_filter_spinner_item, countryList);
-            spCountry.setAdapter(adapter);
-            spCountry.setSelection(0);
+            mBinding.spCountry.setAdapter(adapter);
+            mBinding.spCountry.setSelection(0);
         }
 
         private void loadCountries() {
@@ -175,31 +157,31 @@ public class RichPlayerFilterDialog extends DraggableDialogFragment {
 
         public boolean onClickOk() {
             RichFilterBean bean = new RichFilterBean();
-            if (rbForehandLeft.isChecked()) {
+            if (mBinding.rbForehandLeft.isChecked()) {
                 bean.setForehand(1);
             }
-            else if (rbForehandRight.isChecked()) {
+            else if (mBinding.rbForehandRight.isChecked()) {
                 bean.setForehand(2);
             }
             else {
                 bean.setForehand(0);
             }
-            if (rbBackhandSingle.isChecked()) {
+            if (mBinding.rbBackhandSingle.isChecked()) {
                 bean.setBackhand(1);
             }
-            else if (rbBackhandDouble.isChecked()) {
+            else if (mBinding.rbBackhandDouble.isChecked()) {
                 bean.setBackhand(2);
             }
             else {
                 bean.setBackhand(0);
             }
-            bean.setSign(signList.get(spSigns.getSelectedItemPosition()));
-            bean.setCountry(countryList.get(spCountry.getSelectedItemPosition()));
+            bean.setSign(signList.get(mBinding.spSigns.getSelectedItemPosition()));
+            bean.setCountry(countryList.get(mBinding.spCountry.getSelectedItemPosition()));
             try {
-                bean.setRankLow(Integer.parseInt(etRankLow.getText().toString()));
+                bean.setRankLow(Integer.parseInt(mBinding.etRankLow.getText().toString()));
             } catch (Exception e) {}
             try {
-                bean.setRankHigh(Integer.parseInt(etRankHigh.getText().toString()));
+                bean.setRankHigh(Integer.parseInt(mBinding.etRankHigh.getText().toString()));
             } catch (Exception e) {}
 
             if (onFilterListener != null) {

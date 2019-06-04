@@ -5,30 +5,23 @@ import android.support.v4.app.Fragment;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.github.mikephil.charting.charts.HorizontalBarChart;
-import com.github.mikephil.charting.components.AxisBase;
 import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
-import com.github.mikephil.charting.data.Entry;
-import com.github.mikephil.charting.formatter.IAxisValueFormatter;
-import com.github.mikephil.charting.formatter.IValueFormatter;
 import com.github.mikephil.charting.interfaces.datasets.IBarDataSet;
-import com.github.mikephil.charting.utils.ViewPortHandler;
 import com.king.app.tcareer.R;
 import com.king.app.tcareer.base.IFragmentHolder;
+import com.king.app.tcareer.base.mvvm.BaseViewModel;
+import com.king.app.tcareer.databinding.DialogPlayerChartBinding;
 import com.king.app.tcareer.page.player.list.RichPlayerBean;
 import com.king.app.tcareer.utils.ConstellationUtil;
 import com.king.app.tcareer.view.dialog.DraggableDialogFragment;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import butterknife.BindView;
-import butterknife.ButterKnife;
 
 /**
  * @desc
@@ -60,10 +53,7 @@ public class PlayerChartDialog extends DraggableDialogFragment {
         this.playerList = playerList;
     }
 
-    public static class ChartFragment extends ContentFragment {
-
-        @BindView(R.id.chart_constellation)
-        HorizontalBarChart mChart;
+    public static class ChartFragment extends BindingContentFragment<DialogPlayerChartBinding, BaseViewModel> {
 
         private List<RichPlayerBean> playerList;
         /**
@@ -84,9 +74,12 @@ public class PlayerChartDialog extends DraggableDialogFragment {
         }
 
         @Override
-        protected void onCreate(View view) {
-            ButterKnife.bind(this, view);
+        protected BaseViewModel createViewModel() {
+            return null;
+        }
 
+        @Override
+        protected void onCreate(View view) {
             mTfLight = Typeface.createFromAsset(getContext().getAssets(), "OpenSans-Light.ttf");
             // 最后一位是unknown
             arrConstel = new int[13];
@@ -109,27 +102,27 @@ public class PlayerChartDialog extends DraggableDialogFragment {
          */
         private void showChart() {
 
-            mChart.setTouchEnabled(false);
+            mBinding.chartConstellation.setTouchEnabled(false);
 
-            mChart.setDrawBarShadow(false);
+            mBinding.chartConstellation.setDrawBarShadow(false);
 
-            mChart.setDrawValueAboveBar(true);
+            mBinding.chartConstellation.setDrawValueAboveBar(true);
 
-            mChart.getDescription().setEnabled(false);
+            mBinding.chartConstellation.getDescription().setEnabled(false);
 
             // if more than 60 entries are displayed in the chart, no values will be
             // drawn
-//        mChart.setMaxVisibleValueCount(60);
+//        mBinding.chartConstellation.setMaxVisibleValueCount(60);
 
             // scaling can now only be done on x- and y-axis separately
-            mChart.setPinchZoom(false);
+            mBinding.chartConstellation.setPinchZoom(false);
 
             // draw shadows for each bar that show the maximum value
-            // mChart.setDrawBarShadow(true);
+            // mBinding.chartConstellation.setDrawBarShadow(true);
 
-            mChart.setDrawGridBackground(false);
+            mBinding.chartConstellation.setDrawGridBackground(false);
 
-            XAxis xl = mChart.getXAxis();
+            XAxis xl = mBinding.chartConstellation.getXAxis();
             xl.setPosition(XAxis.XAxisPosition.BOTTOM);
             xl.setTypeface(mTfLight);
             xl.setDrawAxisLine(true);
@@ -140,26 +133,23 @@ public class PlayerChartDialog extends DraggableDialogFragment {
             xl.setLabelCount(arrConstel.length);
             // 默认情况下纵坐标只显示SPACE_FOR_BAR偶数倍的值，必须用setLabelCount指明才会全部显示
             // 用formatter的方式转换纵坐标的标注
-            xl.setValueFormatter(new IAxisValueFormatter() {
-                @Override
-                public String getFormattedValue(float value, AxisBase axis) {
-                    // index为以原点开始向顶部伸展的序号
-                    int index = (int) value / (int) SPACE_FOR_BAR;
-                    if (index == 0) {
-                        return "Unknown";
-                    }
-                    return ConstellationUtil.getConstellationChnByIndex(arrConstel.length - 1 - index);
+            xl.setValueFormatter((value, axis) -> {
+                // index为以原点开始向顶部伸展的序号
+                int index = (int) value / (int) SPACE_FOR_BAR;
+                if (index == 0) {
+                    return "Unknown";
                 }
+                return ConstellationUtil.getConstellationChnByIndex(arrConstel.length - 1 - index);
             });
 
-            YAxis yl = mChart.getAxisLeft();
+            YAxis yl = mBinding.chartConstellation.getAxisLeft();
             yl.setTypeface(mTfLight);
             yl.setDrawAxisLine(true);
             yl.setDrawGridLines(true);
             yl.setAxisMinimum(0f); // this replaces setStartAtZero(true)
 //        yl.setInverted(true);
 
-            YAxis yr = mChart.getAxisRight();
+            YAxis yr = mBinding.chartConstellation.getAxisRight();
             yr.setTypeface(mTfLight);
             yr.setDrawAxisLine(true);
             yr.setDrawGridLines(false);
@@ -170,10 +160,10 @@ public class PlayerChartDialog extends DraggableDialogFragment {
             yr.setEnabled(false);
 
             setData();
-            mChart.setFitBars(true);
-            mChart.animateY(2500);
+            mBinding.chartConstellation.setFitBars(true);
+            mBinding.chartConstellation.animateY(2500);
 
-            Legend l = mChart.getLegend();
+            Legend l = mBinding.chartConstellation.getLegend();
             l.setVerticalAlignment(Legend.LegendVerticalAlignment.BOTTOM);
             l.setHorizontalAlignment(Legend.LegendHorizontalAlignment.LEFT);
             l.setOrientation(Legend.LegendOrientation.HORIZONTAL);
@@ -204,33 +194,30 @@ public class PlayerChartDialog extends DraggableDialogFragment {
 
             BarDataSet set1;
 
-            if (mChart.getData() != null &&
-                    mChart.getData().getDataSetCount() > 0) {
-                set1 = (BarDataSet) mChart.getData().getDataSetByIndex(0);
+            if (mBinding.chartConstellation.getData() != null &&
+                    mBinding.chartConstellation.getData().getDataSetCount() > 0) {
+                set1 = (BarDataSet) mBinding.chartConstellation.getData().getDataSetByIndex(0);
                 set1.setValues(yVals1);
-                mChart.getData().notifyDataChanged();
-                mChart.notifyDataSetChanged();
+                mBinding.chartConstellation.getData().notifyDataChanged();
+                mBinding.chartConstellation.notifyDataSetChanged();
             } else {
                 set1 = new BarDataSet(yVals1, "Constellation");
-                set1.setValueFormatter(new IValueFormatter() {
-                    @Override
-                    public String getFormattedValue(float value, Entry entry, int dataSetIndex, ViewPortHandler viewPortHandler) {
-                        // 默认会显示float浮点数，会带".0"，转换成整数
-                        return String.valueOf((int) value);
-                    }
+                set1.setValueFormatter((value, entry, dataSetIndex, viewPortHandler) -> {
+                    // 默认会显示float浮点数，会带".0"，转换成整数
+                    return String.valueOf((int) value);
                 });
 
                 set1.setDrawIcons(false);
                 set1.setColor(getContext().getResources().getColor(R.color.colorAccent));
 
-                ArrayList<IBarDataSet> dataSets = new ArrayList<IBarDataSet>();
+                ArrayList<IBarDataSet> dataSets = new ArrayList<>();
                 dataSets.add(set1);
 
                 BarData data = new BarData(dataSets);
                 data.setValueTextSize(10f);
                 data.setValueTypeface(mTfLight);
                 data.setBarWidth(BAR_WIDTH);
-                mChart.setData(data);
+                mBinding.chartConstellation.setData(data);
             }
         }
 

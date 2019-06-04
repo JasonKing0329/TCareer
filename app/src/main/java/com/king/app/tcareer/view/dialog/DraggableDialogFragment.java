@@ -1,5 +1,6 @@
 package com.king.app.tcareer.view.dialog;
 
+import android.databinding.ViewDataBinding;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.StateListDrawable;
 import android.os.Bundle;
@@ -11,63 +12,28 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.king.app.tcareer.R;
 import com.king.app.tcareer.base.BaseMvpFragment;
 import com.king.app.tcareer.base.BasePresenter;
 import com.king.app.tcareer.base.IFragmentHolder;
+import com.king.app.tcareer.base.mvvm.BaseViewModel;
+import com.king.app.tcareer.base.mvvm.BindingDialogFragment;
+import com.king.app.tcareer.base.mvvm.MvvmFragment;
+import com.king.app.tcareer.databinding.DlgFtCustomBinding;
 import com.king.app.tcareer.utils.DebugLog;
 import com.king.app.tcareer.utils.ScreenUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.OnClick;
-
 /**
  * 描述: 可拖拽移动的base dialog框架
  * <p/>作者：景阳
  * <p/>创建时间: 2017/7/20 11:45
  */
-public abstract class DraggableDialogFragment extends BaseDialogFragment {
-
-    @BindView(R.id.group_dialog)
-    ViewGroup groupDialog;
-    @BindView(R.id.tv_title)
-    TextView tvTitle;
-    @BindView(R.id.group_title)
-    ViewGroup groupTitle;
-    @BindView(R.id.iv_search)
-    ImageView ivSearch;
-    @BindView(R.id.iv_play)
-    ImageView ivPlay;
-    @BindView(R.id.iv_ok)
-    ImageView ivOk;
-    @BindView(R.id.iv_save)
-    ImageView ivSave;
-    @BindView(R.id.iv_close)
-    ImageView ivClose;
-    @BindView(R.id.et_search)
-    EditText etSearch;
-    @BindView(R.id.iv_search_close)
-    ImageView ivSearchClose;
-    @BindView(R.id.group_search)
-    FrameLayout groupSearch;
-    @BindView(R.id.v_divider)
-    View vDivider;
-    @BindView(R.id.tv_null_content)
-    TextView tvNullContent;
-    @BindView(R.id.group_toolbar)
-    ViewGroup groupToolbar;
-    @BindView(R.id.group_ft_content)
-    ViewGroup groupFtContent;
-
+public abstract class DraggableDialogFragment extends BindingDialogFragment<DlgFtCustomBinding> {
 
     //用于记录当前加的所有的icon，更换颜色的时候需要使用
     private List<ImageView> currentButtonList;
@@ -81,26 +47,23 @@ public abstract class DraggableDialogFragment extends BaseDialogFragment {
 
     @Override
     protected void initView(View view) {
-        ButterKnife.bind(this, view);
-
+        
         currentButtonList = new ArrayList<>();
 
         initDragParams();
+        initOnclick();
 
-        View toolbar = getToolbarView(groupToolbar);
+        View toolbar = getToolbarView(mBinding.groupToolbar);
         if (toolbar != null) {
-            groupToolbar.addView(toolbar);
+            mBinding.groupToolbar.addView(toolbar);
         }
 
         Fragment content = getContentViewFragment();
         replaceContentFragment( content, "ContentView");
 
-        groupFtContent.post(new Runnable() {
-            @Override
-            public void run() {
-                DebugLog.e("groupFtContent height=" + groupFtContent.getHeight());
-                limitMaxHeihgt();
-            }
+        mBinding.groupFtContent.post(() -> {
+            DebugLog.e("mBinding.groupFtContent height=" + mBinding.groupFtContent.getHeight());
+            limitMaxHeihgt();
         });
     }
 
@@ -114,10 +77,10 @@ public abstract class DraggableDialogFragment extends BaseDialogFragment {
 
     private void limitMaxHeihgt() {
         int maxContentHeight = getMaxHeight();
-        if (groupFtContent.getHeight() > maxContentHeight) {
-            ViewGroup.LayoutParams params = groupFtContent.getLayoutParams();
+        if (mBinding.groupFtContent.getHeight() > maxContentHeight) {
+            ViewGroup.LayoutParams params = mBinding.groupFtContent.getLayoutParams();
             params.height = maxContentHeight;
-            groupFtContent.setLayoutParams(params);
+            mBinding.groupFtContent.setLayoutParams(params);
         }
     }
 
@@ -129,34 +92,34 @@ public abstract class DraggableDialogFragment extends BaseDialogFragment {
         return ScreenUtils.getScreenHeight(getActivity()) * 3 / 5;
     }
 
-    protected abstract View getToolbarView(ViewGroup groupToolbar);
+    protected abstract View getToolbarView(ViewGroup group);
 
     protected abstract Fragment getContentViewFragment();
 
     private void initDragParams() {
         touchPoint = new Point();
         startPoint = new Point();
-        groupDialog.setOnTouchListener(new DialogTouchListener());
+        mBinding.groupDialog.setOnTouchListener(new DialogTouchListener());
     }
 
     public void setTitle(String text) {
-        tvTitle.setText(text);
+        mBinding.tvTitle.setText(text);
     }
 
     public void setTitle(int resId) {
-        tvTitle.setText(getResources().getString(resId));
+        mBinding.tvTitle.setText(getResources().getString(resId));
     }
 
     public void setTitleColor(int color) {
-        tvTitle.setTextColor(color);
+        mBinding.tvTitle.setTextColor(color);
     }
 
     public void setDividerColor(int color) {
-        vDivider.setBackgroundColor(color);
+        mBinding.vDivider.setBackgroundColor(color);
     }
 
     public void setBackgroundColor(int color) {
-        GradientDrawable drawable = (GradientDrawable) groupDialog.getBackground();
+        GradientDrawable drawable = (GradientDrawable) mBinding.groupDialog.getBackground();
         drawable.setColor(color);
     }
 
@@ -169,77 +132,68 @@ public abstract class DraggableDialogFragment extends BaseDialogFragment {
     }
 
     public void updateTitleBk(int color) {
-        GradientDrawable drawable = (GradientDrawable) groupTitle.getBackground();
+        GradientDrawable drawable = (GradientDrawable) mBinding.groupTitle.getBackground();
         drawable.setColor(color);
     }
 
     public void updateTitleBorderColor(int color) {
-        GradientDrawable drawable = (GradientDrawable) groupTitle.getBackground();
+        GradientDrawable drawable = (GradientDrawable) mBinding.groupTitle.getBackground();
         drawable.setStroke(getContext().getResources()
                         .getDimensionPixelSize(R.dimen.custom_dialog_icon_frame_width)
                 , color);
     }
 
     public void requestOkAction() {
-        ivOk.setVisibility(View.VISIBLE);
-        currentButtonList.add(ivOk);
+        mBinding.ivOk.setVisibility(View.VISIBLE);
+        currentButtonList.add(mBinding.ivOk);
     }
 
     public void requestOkAction(int srcRes) {
         requestOkAction();
-        ivOk.setImageResource(srcRes);
+        mBinding.ivOk.setImageResource(srcRes);
     }
 
     public void requestCloseAction() {
-        ivClose.setVisibility(View.VISIBLE);
-        currentButtonList.add(ivClose);
+        mBinding.ivClose.setVisibility(View.VISIBLE);
+        currentButtonList.add(mBinding.ivClose);
     }
 
     public void requestPlayAction() {
-        ivPlay.setVisibility(View.VISIBLE);
-        currentButtonList.add(ivPlay);
+        mBinding.ivPlay.setVisibility(View.VISIBLE);
+        currentButtonList.add(mBinding.ivPlay);
     }
 
     public void requestSaveAction() {
-        ivSave.setVisibility(View.VISIBLE);
-        currentButtonList.add(ivSave);
+        mBinding.ivSave.setVisibility(View.VISIBLE);
+        currentButtonList.add(mBinding.ivSave);
     }
 
     public void requestSearchAction() {
-        ivSearch.setVisibility(View.VISIBLE);
-        currentButtonList.add(ivSearch);
+        mBinding.ivSearch.setVisibility(View.VISIBLE);
+        currentButtonList.add(mBinding.ivSearch);
     }
 
     public void registTextChangeListener(TextWatcher textWatcher) {
-        etSearch.addTextChangedListener(textWatcher);
+        mBinding.etSearch.addTextChangedListener(textWatcher);
     }
 
-    @OnClick({R.id.iv_search, R.id.iv_play, R.id.iv_ok, R.id.iv_save, R.id.iv_close, R.id.iv_search_close})
-    public void onViewClicked(View view) {
-        switch (view.getId()) {
-            case R.id.iv_search:
-                groupSearch.setVisibility(View.VISIBLE);
-                break;
-            case R.id.iv_search_close:
-                groupSearch.setVisibility(View.GONE);
-                break;
-            case R.id.iv_play:
-                onClickPlay();
-                break;
-            case R.id.iv_ok:
-                if (onClickOk()) {
-                    dismiss();
-                }
-                break;
-            case R.id.iv_save:
-                onClickSave();
-                dismiss();
-                break;
-            case R.id.iv_close:
-                onClickClose();
-                dismiss();
-                break;
-        }
+    private void initOnclick() {
+        mBinding.ivSearch.setOnClickListener(v -> mBinding.groupSearch.setVisibility(View.VISIBLE));
+        mBinding.ivSearchClose.setOnClickListener(v -> mBinding.groupSearch.setVisibility(View.GONE));
+        mBinding.ivPlay.setOnClickListener(v -> onClickPlay());
+        mBinding.ivOk.setOnClickListener(v -> {
+            if (onClickOk()) {
+                dismissAllowingStateLoss();
+            }
+        });
+        mBinding.ivSave.setOnClickListener(v -> {
+            onClickSave();
+            dismissAllowingStateLoss();
+        });
+        mBinding.ivClose.setOnClickListener(v -> {
+            onClickClose();
+            dismissAllowingStateLoss();
+        });
     }
 
     /**
@@ -345,7 +299,7 @@ public abstract class DraggableDialogFragment extends BaseDialogFragment {
         }
     }
 
-    public static abstract class ContentMvpFragment<T extends BasePresenter> extends BaseMvpFragment<T> {
+    public static abstract class BindingContentFragment<T extends ViewDataBinding, VM extends BaseViewModel> extends MvvmFragment<T, VM> {
 
         @Override
         protected void bindFragmentHolder(IFragmentHolder holder) {
@@ -358,6 +312,11 @@ public abstract class DraggableDialogFragment extends BaseDialogFragment {
 
         protected abstract void bindChildFragmentHolder(IFragmentHolder holder);
 
+        @Override
+        protected void onCreateData() {
+
+        }
+
         @Nullable
         @Override
         public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -368,4 +327,5 @@ public abstract class DraggableDialogFragment extends BaseDialogFragment {
             return super.onCreateView(inflater, container, savedInstanceState);
         }
     }
+
 }

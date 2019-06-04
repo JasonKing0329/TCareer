@@ -7,20 +7,17 @@ import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
-import android.widget.TextView;
 
 import com.king.app.tcareer.R;
 import com.king.app.tcareer.base.IFragmentHolder;
 import com.king.app.tcareer.base.TApplication;
+import com.king.app.tcareer.base.mvvm.BaseViewModel;
+import com.king.app.tcareer.databinding.DialogAddAtpBinding;
 import com.king.app.tcareer.model.db.entity.PlayerAtpBean;
 import com.king.app.tcareer.model.db.entity.PlayerAtpBeanDao;
 import com.king.app.tcareer.view.dialog.DraggableDialogFragment;
 
 import java.util.List;
-
-import butterknife.BindView;
-import butterknife.OnClick;
 
 /**
  * Desc:
@@ -75,16 +72,7 @@ public class AtpEditor extends DraggableDialogFragment {
         void onInserted(PlayerAtpBean bean);
     }
 
-    public static class EditFragment extends ContentFragment {
-
-        @BindView(R.id.et_id)
-        EditText etId;
-        @BindView(R.id.et_name)
-        EditText etName;
-        @BindView(R.id.tv_url)
-        TextView tvUrl;
-        @BindView(R.id.tv_details)
-        TextView tvDetails;
+    public static class EditFragment extends BindingContentFragment<DialogAddAtpBinding, BaseViewModel> {
 
         private String atpId;
         private PlayerAtpBean atpBean;
@@ -93,6 +81,11 @@ public class AtpEditor extends DraggableDialogFragment {
 
         public void setOnEditListener(OnEditListener onEditListener) {
             this.onEditListener = onEditListener;
+        }
+
+        @Override
+        protected BaseViewModel createViewModel() {
+            return null;
         }
 
         @Override
@@ -106,14 +99,14 @@ public class AtpEditor extends DraggableDialogFragment {
                 atpBean = new PlayerAtpBean();
             }
             else {
-                etId.setText(atpId);
+                mBinding.etId.setText(atpId);
                 try {
                     atpBean = TApplication.getInstance().getDaoSession().getPlayerAtpBeanDao()
                             .queryBuilder()
                             .where(PlayerAtpBeanDao.Properties.Id.eq(atpId))
                             .build().unique();
-                    etName.setText(atpBean.getName());
-                    tvUrl.setText(atpBean.getOverViewUrl());
+                    mBinding.etName.setText(atpBean.getName());
+                    mBinding.tvUrl.setText(atpBean.getOverViewUrl());
                     updateDetail();
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -121,7 +114,7 @@ public class AtpEditor extends DraggableDialogFragment {
                 }
             }
 
-            etName.addTextChangedListener(new TextWatcher() {
+            mBinding.etName.addTextChangedListener(new TextWatcher() {
                 @Override
                 public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
@@ -137,7 +130,7 @@ public class AtpEditor extends DraggableDialogFragment {
 
                 }
             });
-            etId.addTextChangedListener(new TextWatcher() {
+            mBinding.etId.addTextChangedListener(new TextWatcher() {
                 @Override
                 public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
@@ -156,8 +149,8 @@ public class AtpEditor extends DraggableDialogFragment {
         }
 
         private void onUrlChanged() {
-            String id = etId.getText().toString();
-            String name = etName.getText().toString();
+            String id = mBinding.etId.getText().toString();
+            String name = mBinding.etName.getText().toString();
             String[] nameArray = name.split(" ");
             StringBuffer url = new StringBuffer();
             url.append("/en/players/");
@@ -168,7 +161,7 @@ public class AtpEditor extends DraggableDialogFragment {
                 url.append(nameArray[i].toLowerCase());
             }
             url.append("/").append(id).append("/overview");
-            tvUrl.setText(url);
+            mBinding.tvUrl.setText(url);
         }
 
         private void updateDetail() {
@@ -192,7 +185,7 @@ public class AtpEditor extends DraggableDialogFragment {
                 buffer.append("Career: ").append(atpBean.getCareerWin()).append("-").append(atpBean.getCareerLose()).append(", ").append(atpBean.getCareerPrize()).append("\n");
 
             }
-            tvDetails.setText(buffer.toString());
+            mBinding.tvDetails.setText(buffer.toString());
         }
         @Override
         protected void bindChildFragmentHolder(IFragmentHolder holder) {
@@ -204,32 +197,29 @@ public class AtpEditor extends DraggableDialogFragment {
         }
 
         public boolean onClickOk() {
-            if (TextUtils.isEmpty(etId.getText().toString())) {
+            if (TextUtils.isEmpty(mBinding.etId.getText().toString())) {
                 showMessageShort("ID不能为空");
                 return false;
             }
-            if (TextUtils.isEmpty(etName.getText().toString())) {
+            if (TextUtils.isEmpty(mBinding.etName.getText().toString())) {
                 showMessageShort("Name不能为空");
                 return false;
             }
-            atpId = etId.getText().toString();
+            atpId = mBinding.etId.getText().toString();
             atpBean.setId(atpId);
-            atpBean.setName(etName.getText().toString());
-            atpBean.setOverViewUrl(tvUrl.getText().toString());
+            atpBean.setName(mBinding.etName.getText().toString());
+            atpBean.setOverViewUrl(mBinding.tvUrl.getText().toString());
             PlayerAtpBeanDao dao = TApplication.getInstance().getDaoSession().getPlayerAtpBeanDao();
             List<PlayerAtpBean> list = dao.queryBuilder()
                     .where(PlayerAtpBeanDao.Properties.Id.eq(atpId))
                     .build().list();
             if (list.size() > 0) {
-                showConfirmCancelMessage("目标ID已存在，是否更新现有数据？", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        if (which == DialogInterface.BUTTON_POSITIVE) {
-                            PlayerAtpBeanDao dao = TApplication.getInstance().getDaoSession().getPlayerAtpBeanDao();
-                            dao.update(atpBean);
-                            if (onEditListener != null) {
-                                onEditListener.onUpdated(atpBean);
-                            }
+                showConfirmCancelMessage("目标ID已存在，是否更新现有数据？", (dialog, which) -> {
+                    if (which == DialogInterface.BUTTON_POSITIVE) {
+                        PlayerAtpBeanDao dao1 = TApplication.getInstance().getDaoSession().getPlayerAtpBeanDao();
+                        dao1.update(atpBean);
+                        if (onEditListener != null) {
+                            onEditListener.onUpdated(atpBean);
                         }
                     }
                 });
