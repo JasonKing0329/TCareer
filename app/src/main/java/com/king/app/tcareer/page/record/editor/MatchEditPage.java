@@ -22,12 +22,8 @@ import com.king.app.tcareer.model.bean.CompetitorBean;
 import com.king.app.tcareer.model.db.entity.MatchNameBean;
 import com.king.app.tcareer.model.db.entity.Record;
 import com.king.app.tcareer.model.db.entity.Score;
-import com.king.app.tcareer.page.setting.SettingProperty;
 import com.king.app.tcareer.utils.ListUtil;
-import com.king.app.tcareer.view.adapter.BaseRecyclerAdapter;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.List;
 
 /**
