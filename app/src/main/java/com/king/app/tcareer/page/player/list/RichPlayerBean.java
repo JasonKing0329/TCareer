@@ -1,5 +1,9 @@
 package com.king.app.tcareer.page.player.list;
 
+import android.databinding.BaseObservable;
+import android.databinding.Bindable;
+
+import com.king.app.tcareer.BR;
 import com.king.app.tcareer.model.bean.CompetitorBean;
 
 /**
@@ -8,12 +12,14 @@ import com.king.app.tcareer.model.bean.CompetitorBean;
  * @time 2018/5/19 0019 15:45
  */
 
-public class RichPlayerBean {
+public class RichPlayerBean extends BaseObservable {
     private CompetitorBean competitorBean;
 
     private int win;
 
     private int lose;
+
+    private String imageUrl;
 
     public CompetitorBean getCompetitorBean() {
         return competitorBean;
@@ -37,5 +43,15 @@ public class RichPlayerBean {
 
     public void setLose(int lose) {
         this.lose = lose;
+    }
+
+    @Bindable
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+        notifyPropertyChanged(BR.imageUrl);
     }
 }

@@ -7,11 +7,9 @@ import android.view.View;
 import android.widget.CheckBox;
 import android.widget.ImageView;
 
-import com.bumptech.glide.Glide;
-import com.king.app.tcareer.base.TApplication;
 import com.king.app.tcareer.base.mvvm.BaseBindingAdapter;
-import com.king.app.tcareer.model.GlideOptions;
 import com.king.app.tcareer.model.ImageProvider;
+import com.king.app.tcareer.model.bean.MatchImageBean;
 import com.king.app.tcareer.model.db.entity.MatchNameBean;
 import com.king.app.tcareer.model.http.Command;
 import com.king.app.tcareer.model.http.bean.ImageUrlBean;
@@ -20,24 +18,17 @@ import com.king.app.tcareer.page.imagemanager.ImageManager;
 import com.king.app.tcareer.utils.DebugLog;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * 描述:
  * <p/>作者：景阳
  * <p/>创建时间: 2017/10/18 10:56
  */
-public abstract class MatchManageBaseAdapter<V extends ViewDataBinding> extends BaseBindingAdapter<V, MatchNameBean> {
+public abstract class MatchManageBaseAdapter<V extends ViewDataBinding> extends BaseBindingAdapter<V, MatchImageBean> {
 
     protected boolean selectMode;
     protected SparseBooleanArray mCheckMap;
-
-    /**
-     * 保存首次从文件夹加载的图片序号
-     */
-    protected Map<String, Integer> imageIndexMap;
 
     /**
      * 单击头像位置
@@ -48,7 +39,6 @@ public abstract class MatchManageBaseAdapter<V extends ViewDataBinding> extends 
 
     public MatchManageBaseAdapter() {
         mCheckMap = new SparseBooleanArray();
-        imageIndexMap = new HashMap<>();
     }
 
     public void setSelectMode(boolean selectMode) {
@@ -59,17 +49,6 @@ public abstract class MatchManageBaseAdapter<V extends ViewDataBinding> extends 
     }
 
     protected void onBindImage(ImageView image, int position, MatchNameBean bean) {
-        String filePath;
-        if (imageIndexMap.get(bean.getName()) == null) {
-            filePath = ImageProvider.getMatchHeadPath(bean.getName(), bean.getMatchBean().getCourt(), imageIndexMap);
-        }
-        else {
-            filePath = ImageProvider.getMatchHeadPath(bean.getName(), bean.getMatchBean().getCourt(), imageIndexMap.get(bean.getName()));
-        }
-        Glide.with(TApplication.getInstance())
-                .load("file://" + filePath)
-                .apply(GlideOptions.getDefaultMatchOptions())
-                .into(image);
         image.setOnClickListener(v -> showImageAction(v, position, bean));
     }
 
@@ -80,7 +59,7 @@ public abstract class MatchManageBaseAdapter<V extends ViewDataBinding> extends 
 
     public void notifyItemChanged(MatchNameBean editBean) {
         for (int i = 0; i < getItemCount(); i ++) {
-            if (list.get(i).getId() == editBean.getId()) {
+            if (list.get(i).getBean().getId() == editBean.getId()) {
                 notifyItemChanged(i);
                 break;
             }
@@ -103,7 +82,7 @@ public abstract class MatchManageBaseAdapter<V extends ViewDataBinding> extends 
 
         @Override
         public ImageUrlBean createImageUrlBean(DataController dataController) {
-            ImageUrlBean bean = dataController.getMatchImageUrlBean(list.get(nGroupPosition).getName());
+            ImageUrlBean bean = dataController.getMatchImageUrlBean(list.get(nGroupPosition).getBean().getName());
             return bean;
         }
     };
@@ -111,9 +90,9 @@ public abstract class MatchManageBaseAdapter<V extends ViewDataBinding> extends 
     ImageManager.OnActionListener imageActionListener = new ImageManager.OnActionListener() {
         @Override
         public void onRefresh(int position) {
-            String path = ImageProvider.getMatchHeadPath(list.get(position).getName(), list.get(position).getMatchBean().getCourt(), imageIndexMap);
+            String path = ImageProvider.getMatchHeadPath(list.get(position).getBean().getName(), list.get(position).getBean().getMatchBean().getCourt());
             DebugLog.e(path);
-            notifyDataSetChanged();
+            list.get(position).setImageUrl(path);
         }
 
         @Override
@@ -136,7 +115,7 @@ public abstract class MatchManageBaseAdapter<V extends ViewDataBinding> extends 
         List<MatchNameBean> dlist = new ArrayList<>();
         for (int i = 0; i < list.size(); i ++) {
             if (mCheckMap.get(i)) {
-                dlist.add(list.get(i));
+                dlist.add(list.get(i).getBean());
             }
         }
         return dlist;

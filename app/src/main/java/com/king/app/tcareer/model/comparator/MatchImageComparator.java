@@ -1,6 +1,7 @@
-package com.king.app.tcareer.model;
+package com.king.app.tcareer.model.comparator;
 
 import com.king.app.tcareer.conf.AppConstants;
+import com.king.app.tcareer.model.bean.MatchImageBean;
 import com.king.app.tcareer.model.db.entity.MatchNameBean;
 import com.king.app.tcareer.page.setting.SettingProperty;
 import com.king.app.tcareer.utils.PinyinUtil;
@@ -12,24 +13,24 @@ import java.util.Comparator;
  * <p/>作者：景阳
  * <p/>创建时间: 2018/1/30 16:08
  */
-public class MatchComparator implements Comparator<MatchNameBean> {
+public class MatchImageComparator implements Comparator<MatchImageBean> {
 
     private int sortMode;
 
-    public MatchComparator(int sortMode) {
+    public MatchImageComparator(int sortMode) {
         this.sortMode = sortMode;
     }
 
     @Override
-    public int compare(MatchNameBean lhs, MatchNameBean rhs) {
+    public int compare(MatchImageBean lhs, MatchImageBean rhs) {
         if (sortMode == SettingProperty.VALUE_SORT_MATCH_NAME) {
-            return compareByName(lhs, rhs);
+            return compareByName(lhs.getBean(), rhs.getBean());
         }
         else if (sortMode == SettingProperty.VALUE_SORT_MATCH_LEVEL) {
-            return compareByLevel(lhs, rhs);
+            return compareByLevel(lhs.getBean(), rhs.getBean());
         }
         else {
-            return lhs.getMatchBean().getWeek() - rhs.getMatchBean().getWeek();
+            return lhs.getBean().getMatchBean().getWeek() - rhs.getBean().getMatchBean().getWeek();
         }
     }
 

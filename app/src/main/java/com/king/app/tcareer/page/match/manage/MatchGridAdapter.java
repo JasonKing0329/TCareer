@@ -2,6 +2,7 @@ package com.king.app.tcareer.page.match.manage;
 
 import com.king.app.tcareer.R;
 import com.king.app.tcareer.databinding.AdapterMatchGridBinding;
+import com.king.app.tcareer.model.bean.MatchImageBean;
 import com.king.app.tcareer.model.db.entity.MatchNameBean;
 
 /**
@@ -17,7 +18,9 @@ public class MatchGridAdapter extends MatchManageBaseAdapter<AdapterMatchGridBin
     }
 
     @Override
-    protected void onBindItem(AdapterMatchGridBinding binding, int position, MatchNameBean bean) {
+    protected void onBindItem(AdapterMatchGridBinding binding, int position, MatchImageBean imageBean) {
+        binding.setBean(imageBean);
+        MatchNameBean bean = imageBean.getBean();
         binding.tvName.setText(bean.getName());
         binding.tvCountry.setText(bean.getMatchBean().getCountry() + "/" + bean.getMatchBean().getCity());
         binding.tvLine2.setText(bean.getMatchBean().getLevel() + "/" + bean.getMatchBean().getCourt());

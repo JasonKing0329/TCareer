@@ -17,7 +17,7 @@ import com.king.app.tcareer.base.TApplication;
 import com.king.app.tcareer.base.mvvm.MvvmActivity;
 import com.king.app.tcareer.databinding.ActivityMainHomeBinding;
 import com.king.app.tcareer.model.SeasonManager;
-import com.king.app.tcareer.model.db.entity.MatchNameBean;
+import com.king.app.tcareer.model.bean.MatchImageBean;
 import com.king.app.tcareer.model.db.entity.User;
 import com.king.app.tcareer.page.home.HomeActivity;
 import com.king.app.tcareer.page.match.manage.MatchManageActivity;
@@ -187,7 +187,7 @@ public class MainHomeActivity extends MvvmActivity<ActivityMainHomeBinding, Main
     private void showUsers(List<User> users) {
         UserAdapter adapter = new UserAdapter();
         adapter.setList(users);
-        adapter.setOnItemClickListener((position, data) -> {
+        adapter.setOnItemClickListener((view, position, data) -> {
             Intent intent = new Intent().setClass(MainHomeActivity.this, HomeActivity.class);
             intent.putExtra(HomeActivity.KEY_USER_ID, data.getId());
             startActivity(intent);
@@ -196,12 +196,12 @@ public class MainHomeActivity extends MvvmActivity<ActivityMainHomeBinding, Main
         mBinding.rvUsers.setAdapter(adapter);
     }
 
-    private void showMatches(List<MatchNameBean> list) {
+    private void showMatches(List<MatchImageBean> list) {
         MatchAdapter adapter = new MatchAdapter();
         adapter.setList(list);
         adapter.setOnItemClickListener((view, position, data) -> {
             Intent intent = new Intent().setClass(MainHomeActivity.this, RecentMatchActivity.class);
-            intent.putExtra(RecentMatchActivity.KEY_MATCH_ID, data.getMatchId());
+            intent.putExtra(RecentMatchActivity.KEY_MATCH_ID, data.getBean().getMatchId());
             intent.putExtra(RecentMatchActivity.KEY_YEAR, Calendar.getInstance().get(Calendar.YEAR));
             startActivity(intent);
         });

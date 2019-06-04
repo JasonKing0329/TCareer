@@ -2,14 +2,15 @@ package com.king.app.tcareer.model.db.entity;
 
 import com.king.app.tcareer.model.bean.CompetitorBean;
 
+import org.greenrobot.greendao.DaoException;
 import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.ToMany;
+import org.greenrobot.greendao.annotation.ToOne;
+import org.greenrobot.greendao.annotation.Transient;
 
 import java.util.List;
-import org.greenrobot.greendao.DaoException;
-import org.greenrobot.greendao.annotation.ToOne;
 
 /**
  * 描述:
@@ -33,6 +34,9 @@ public class User implements CompetitorBean {
     private double weight;
 
     private String atpId;
+
+    @Transient
+    private String imageUrl;
 
     @ToOne(joinProperty = "atpId")
     private PlayerAtpBean atpBean;
@@ -221,11 +225,17 @@ public class User implements CompetitorBean {
             atpBean__resolvedKey = atpId;
         }
     }
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
     /** called by internal mechanisms, do not call yourself. */
     @Generated(hash = 2059241980)
     public void __setDaoSession(DaoSession daoSession) {
         this.daoSession = daoSession;
         myDao = daoSession != null ? daoSession.getUserDao() : null;
     }
-
 }

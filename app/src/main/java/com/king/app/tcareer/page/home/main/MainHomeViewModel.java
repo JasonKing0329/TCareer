@@ -11,6 +11,7 @@ import com.king.app.tcareer.conf.AppConstants;
 import com.king.app.tcareer.model.CompetitorParser;
 import com.king.app.tcareer.model.ImageProvider;
 import com.king.app.tcareer.model.bean.CompetitorBean;
+import com.king.app.tcareer.model.bean.MatchImageBean;
 import com.king.app.tcareer.model.db.entity.MatchBean;
 import com.king.app.tcareer.model.db.entity.MatchBeanDao;
 import com.king.app.tcareer.model.db.entity.MatchNameBean;
@@ -53,7 +54,7 @@ public class MainHomeViewModel extends BaseViewModel {
 
     public MutableLiveData<List<User>> usersObserver = new MutableLiveData<>();
 
-    public MutableLiveData<List<MatchNameBean>> matchObserver = new MutableLiveData<>();
+    public MutableLiveData<List<MatchImageBean>> matchObserver = new MutableLiveData<>();
 
     public MutableLiveData<List<ScoreBoardParam>> scoreboardsObserver = new MutableLiveData<>();
 
@@ -188,6 +189,9 @@ public class MainHomeViewModel extends BaseViewModel {
         return Observable.create(e -> {
             List<User> list = getDaoSession().getUserDao().queryBuilder()
                     .build().list();
+            for (User user:list) {
+                user.setImageUrl(ImageProvider.getDetailPlayerPath(user.getNameChn()));
+            }
             e.onNext(list);
         });
     }
@@ -196,14 +200,14 @@ public class MainHomeViewModel extends BaseViewModel {
         queryWeekMatches()
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
-                .subscribe(new Observer<List<MatchNameBean>>() {
+                .subscribe(new Observer<List<MatchImageBean>>() {
                     @Override
                     public void onSubscribe(Disposable d) {
                         addDisposable(d);
                     }
 
                     @Override
-                    public void onNext(List<MatchNameBean> list) {
+                    public void onNext(List<MatchImageBean> list) {
                         matchObserver.setValue(list);
                     }
 
@@ -249,7 +253,7 @@ public class MainHomeViewModel extends BaseViewModel {
                 });
     }
 
-    private Observable<List<MatchNameBean>> queryWeekMatches() {
+    private Observable<List<MatchImageBean>> queryWeekMatches() {
         return Observable.create(e -> {
             int week = Calendar.getInstance().get(Calendar.WEEK_OF_YEAR);
             List<MatchBean> list = getDaoSession().getMatchBeanDao().queryBuilder()
@@ -266,10 +270,15 @@ public class MainHomeViewModel extends BaseViewModel {
                 titleText.set("Week " + week);
             }
 
-            List<MatchNameBean> matches = new ArrayList<>();
+            List<MatchImageBean> matches = new ArrayList<>();
             for (MatchBean bean:list) {
                 // 只取最近的名称
-                matches.add(bean.getNameBeanList().get(bean.getNameBeanList().size() - 1));
+                MatchNameBean nameBean = bean.getNameBeanList().get(bean.getNameBeanList().size() - 1);
+
+                MatchImageBean imageBean = new MatchImageBean();
+                imageBean.setBean(nameBean);
+                imageBean.setImageUrl(ImageProvider.getMatchHeadPath(nameBean.getName(), nameBean.getMatchBean().getCourt()));
+                matches.add(imageBean);
             }
             e.onNext(matches);
         });

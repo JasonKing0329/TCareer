@@ -8,7 +8,8 @@ import android.view.Gravity;
 
 import com.king.app.tcareer.base.TApplication;
 import com.king.app.tcareer.conf.AppConstants;
-import com.king.app.tcareer.model.PlayerComparator;
+import com.king.app.tcareer.model.ImageProvider;
+import com.king.app.tcareer.model.comparator.PlayerComparator;
 import com.king.app.tcareer.model.bean.CompetitorBean;
 import com.king.app.tcareer.model.bean.H2hBean;
 import com.king.app.tcareer.model.dao.H2HDao;
@@ -199,6 +200,7 @@ public class RichPlayerViewModel extends PlayerAtpViewModel {
             List<RichPlayerBean> list = new ArrayList<>();
             for (User user:users) {
                 RichPlayerBean viewBean = new RichPlayerBean();
+                viewBean.setImageUrl(ImageProvider.getPlayerHeadPath(user.getNameChn()));
                 viewBean.setCompetitorBean(user);
 
                 // count records if control rank
@@ -294,6 +296,7 @@ public class RichPlayerViewModel extends PlayerAtpViewModel {
             List<RichPlayerBean> list = new ArrayList<>();
             for (PlayerBean player:players) {
                 RichPlayerBean viewBean = new RichPlayerBean();
+                viewBean.setImageUrl(ImageProvider.getPlayerHeadPath(player.getNameChn()));
                 viewBean.setCompetitorBean(player);
 
                 // count records if control rank

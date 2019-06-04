@@ -7,7 +7,9 @@ import android.text.TextUtils;
 
 import com.king.app.tcareer.base.TApplication;
 import com.king.app.tcareer.base.mvvm.BaseViewModel;
-import com.king.app.tcareer.model.MatchComparator;
+import com.king.app.tcareer.model.ImageProvider;
+import com.king.app.tcareer.model.bean.MatchImageBean;
+import com.king.app.tcareer.model.comparator.MatchImageComparator;
 import com.king.app.tcareer.model.db.entity.MatchBean;
 import com.king.app.tcareer.model.db.entity.MatchBeanDao;
 import com.king.app.tcareer.model.db.entity.MatchNameBean;
@@ -21,6 +23,7 @@ import java.util.Collections;
 import java.util.List;
 
 import io.reactivex.Observable;
+import io.reactivex.ObservableSource;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
@@ -35,11 +38,9 @@ public class MatchManageViewModel extends BaseViewModel {
 
     private int sortType;
 
-    private List<MatchNameBean> matchList;
-
     private String mKeyword;
 
-    public MutableLiveData<List<MatchNameBean>> matchesObserver = new MutableLiveData<>();
+    public MutableLiveData<List<MatchImageBean>> matchesObserver = new MutableLiveData<>();
 
     public MatchManageViewModel(@NonNull Application application) {
         super(application);
@@ -49,24 +50,22 @@ public class MatchManageViewModel extends BaseViewModel {
     public void loadMatches() {
         loadingObserver.setValue(true);
         Observable<List<MatchNameBean>> observable = queryMatches();
-        // week是默认排序
-        if (sortType != SettingProperty.VALUE_SORT_MATCH_WEEK) {
-            observable.flatMap(list -> sortMatchesRx(list, sortType));
-        }
         if (!TextUtils.isEmpty(mKeyword)) {
             observable.flatMap(list -> filterMatch(list));
         }
-        observable.observeOn(AndroidSchedulers.mainThread())
+        observable
+                .flatMap(list -> toImageItems(list))
+                .flatMap(list -> sortMatchesRx(list, sortType))
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
-                .subscribe(new Observer<List<MatchNameBean>>() {
+                .subscribe(new Observer<List<MatchImageBean>>() {
                     @Override
                     public void onSubscribe(Disposable d) {
                         addDisposable(d);
                     }
 
                     @Override
-                    public void onNext(List<MatchNameBean> list) {
-                        matchList = list;
+                    public void onNext(List<MatchImageBean> list) {
                         loadingObserver.setValue(false);
                         matchesObserver.setValue(list);
                     }
@@ -85,6 +84,19 @@ public class MatchManageViewModel extends BaseViewModel {
                 });
     }
 
+    private ObservableSource<List<MatchImageBean>> toImageItems(List<MatchNameBean> list) {
+        return observer -> {
+            List<MatchImageBean> results = new ArrayList<>();
+            for (MatchNameBean bean:list) {
+                MatchImageBean imageBean = new MatchImageBean();
+                imageBean.setBean(bean);
+                imageBean.setImageUrl(ImageProvider.getMatchHeadPath(bean.getName(), bean.getMatchBean().getCourt()));
+                results.add(imageBean);
+            }
+            observer.onNext(results);
+        };
+    }
+
     public Observable<List<MatchNameBean>> queryMatches() {
         return Observable.create(e -> {
             MatchNameBeanDao dao = TApplication.getInstance().getDaoSession().getMatchNameBeanDao();
@@ -99,9 +111,9 @@ public class MatchManageViewModel extends BaseViewModel {
         });
     }
 
-    private Observable<List<MatchNameBean>> sortMatchesRx(final List<MatchNameBean> list, final int sortType) {
+    private Observable<List<MatchImageBean>> sortMatchesRx(List<MatchImageBean> list, int sortType) {
         return Observable.create(e -> {
-            Collections.sort(list, new MatchComparator(sortType));
+            Collections.sort(list, new MatchImageComparator(sortType));
             e.onNext(list);
         });
     }
@@ -141,26 +153,26 @@ public class MatchManageViewModel extends BaseViewModel {
      * sort matches by type
      * @param sortType
      */
-    public void sortMatch(final int sortType) {{
-        if (matchList == null) {
+    public void sortMatch(int sortType) {{
+        if (matchesObserver.getValue() == null) {
             return;
         }
         loadingObserver.setValue(true);
-        sortMatchesRx(matchList, sortType)
+        sortMatchesRx(matchesObserver.getValue(), sortType)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
-                .subscribe(new Observer<Object>() {
+                .subscribe(new Observer<List<MatchImageBean>>() {
                     @Override
                     public void onSubscribe(Disposable d) {
                         addDisposable(d);
                     }
 
                     @Override
-                    public void onNext(Object o) {
+                    public void onNext(List<MatchImageBean> list) {
                         updateSortType(sortType);
                         SettingProperty.setMatchSortMode(sortType);
                         loadingObserver.setValue(false);
-                        matchesObserver.setValue(matchList);
+                        matchesObserver.setValue(list);
                     }
 
                     @Override

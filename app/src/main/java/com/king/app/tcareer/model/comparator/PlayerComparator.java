@@ -1,4 +1,4 @@
-package com.king.app.tcareer.model;
+package com.king.app.tcareer.model.comparator;
 
 import android.text.TextUtils;
 

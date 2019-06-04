@@ -6,7 +6,6 @@ import android.text.TextUtils;
 import android.util.SparseBooleanArray;
 import android.view.View;
 
-import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.king.app.tcareer.R;
 import com.king.app.tcareer.base.mvvm.BaseBindingAdapter;
@@ -27,7 +26,6 @@ import com.king.app.tcareer.utils.FormatUtil;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -56,17 +54,11 @@ public class RichPlayerAdapter extends BaseBindingAdapter<AdapterPlayerRichBindi
      */
     private int nGroupPosition;
 
-    /**
-     * 保存首次从文件夹加载的图片序号
-     */
-    protected Map<String, Integer> playerImageIndexMap;
-
     public RichPlayerAdapter() {
         super();
         checkMap = new SparseBooleanArray();
         playerOptions = GlideOptions.getDefaultPlayerOptions();
         dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        playerImageIndexMap = new HashMap<>();
     }
 
     public void setExpandMap(Map<Long, Boolean> mExpandMap) {
@@ -102,26 +94,9 @@ public class RichPlayerAdapter extends BaseBindingAdapter<AdapterPlayerRichBindi
         return R.layout.adapter_player_rich;
     }
 
-    /**
-     * image path
-     * @param position
-     * @return
-     */
-    protected String getPlayerPath(int position) {
-        String filePath;
-        if (playerImageIndexMap.get(list.get(position).getCompetitorBean().getNameChn()) == null) {
-            filePath = ImageProvider.getPlayerHeadPath(list.get(position).getCompetitorBean().getNameChn(), playerImageIndexMap);
-        }
-        else {
-            filePath = ImageProvider.getPlayerHeadPath(list.get(position).getCompetitorBean().getNameChn()
-                    , playerImageIndexMap.get(list.get(position).getCompetitorBean().getNameChn()));
-        }
-        return filePath;
-    }
-
     @Override
     protected void onBindItem(AdapterPlayerRichBinding binding, int position, RichPlayerBean data) {
-
+        binding.setBean(data);
         CompetitorBean bean = data.getCompetitorBean();
         PlayerAtpBean atpBean = bean.getAtpBean();
 
@@ -172,10 +147,6 @@ public class RichPlayerAdapter extends BaseBindingAdapter<AdapterPlayerRichBindi
             binding.tvBirthday.setText(getBirthdayDetail(bean.getBirthday()));
             binding.tvBody.setText(bean.getNameChn());
         }
-        Glide.with(binding.ivPlayer.getContext())
-                .load(getPlayerPath(position))
-                .apply(playerOptions)
-                .into(binding.ivPlayer);
 
         binding.ivRefresh.setVisibility(bean.getAtpId() == null ? View.INVISIBLE:View.VISIBLE);
         binding.ivRefresh.setTag(position);
@@ -306,8 +277,8 @@ public class RichPlayerAdapter extends BaseBindingAdapter<AdapterPlayerRichBindi
         @Override
         public void onRefresh(int position) {
             String name = list.get(position).getCompetitorBean().getNameChn();
-            ImageProvider.getPlayerHeadPath(name, playerImageIndexMap);
-            notifyDataSetChanged();
+            String path = ImageProvider.getPlayerHeadPath(name);
+            list.get(position).setImageUrl(path);
         }
 
         @Override

@@ -2,6 +2,11 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <data>
+        <variable
+            name="bean"
+            type="com.king.app.tcareer.model.bean.MatchImageBean"/>
+    </data>
     <android.support.v7.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -19,6 +24,7 @@
                 android:layout_width="0dp"
                 android:layout_height="90dp"
                 android:scaleType="fitXY"
+                app:matchUrl="@{bean.imageUrl}"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"/>

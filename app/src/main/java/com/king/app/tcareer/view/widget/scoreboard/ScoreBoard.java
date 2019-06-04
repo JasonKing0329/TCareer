@@ -1,19 +1,15 @@
 package com.king.app.tcareer.view.widget.scoreboard;
 
 import android.content.Context;
-import android.graphics.Color;
+import android.databinding.DataBindingUtil;
 import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
 import com.king.app.tcareer.R;
-import com.king.app.tcareer.model.GlideOptions;
+import com.king.app.tcareer.databinding.LayoutScoreboardBinding;
 import com.king.app.tcareer.model.db.entity.Score;
 import com.king.app.tcareer.utils.ListUtil;
 import com.king.app.tcareer.utils.ScreenUtils;
@@ -23,16 +19,7 @@ import java.util.List;
 
 public class ScoreBoard extends FrameLayout {
 
-    private TextView tvName;
-    private TextView tvRound;
-    private TextView tvPlayer1;
-    private TextView tvPlayer2;
-    private ImageView ivPlayer1;
-    private ImageView ivPlayer2;
-    private LinearLayout llScore1;
-    private LinearLayout llScore2;
-    private TextView tvWO1;
-    private TextView tvWO2;
+    private LayoutScoreboardBinding binding;
 
     private ScoreBoardParam param;
     private BoardStyle boardStyle;
@@ -56,22 +43,13 @@ public class ScoreBoard extends FrameLayout {
     }
 
     private void init(AttributeSet attrs) {
-        View view = LayoutInflater.from(getContext()).inflate(R.layout.layout_scoreboard, null);
-        tvName = view.findViewById(R.id.tv_name);
-        tvRound = view.findViewById(R.id.tv_round);
-        ivPlayer1 = view.findViewById(R.id.iv_player1);
-        ivPlayer2 = view.findViewById(R.id.iv_player2);
-        tvPlayer1 = view.findViewById(R.id.tv_player1);
-        tvPlayer2 = view.findViewById(R.id.tv_player2);
-        llScore1 = view.findViewById(R.id.ll_score1);
-        llScore2 = view.findViewById(R.id.ll_score2);
-        tvWO1 = view.findViewById(R.id.tv_wo1);
-        tvWO2 = view.findViewById(R.id.tv_wo2);
-        addView(view);
+        binding = DataBindingUtil.inflate(LayoutInflater.from(getContext()), R.layout.layout_scoreboard, this, false);
+        addView(binding.getRoot());
     }
 
     public void setParam(ScoreBoardParam param) {
         this.param = param;
+        binding.setBean(param);
         setBoardStyle(param.getBoardStyle());
         initData();
     }
@@ -85,16 +63,16 @@ public class ScoreBoard extends FrameLayout {
         if (boardStyle == null) {
             boardStyle = new BoardStyleProvider().getDefault();
         }
-        tvName.setTextColor(boardStyle.getMatchNameColor());
-        tvRound.setTextColor(boardStyle.getMatchRoundColor());
+        binding.tvName.setTextColor(boardStyle.getMatchNameColor());
+        binding.tvRound.setTextColor(boardStyle.getMatchRoundColor());
     }
 
     private void addScores() {
         scoreViews1 = new ArrayList<>();
         scoreViews2 = new ArrayList<>();
         for (int i = 0; i < 5; i ++) {
-            scoreViews1.add(addScoreView(llScore1));
-            scoreViews2.add(addScoreView(llScore2));
+            scoreViews1.add(addScoreView(binding.llScore1));
+            scoreViews2.add(addScoreView(binding.llScore2));
         }
     }
 
@@ -113,62 +91,50 @@ public class ScoreBoard extends FrameLayout {
     }
 
     private void initData() {
-        llScore1.removeAllViews();
-        llScore2.removeAllViews();
+        binding.llScore1.removeAllViews();
+        binding.llScore2.removeAllViews();
         addScores();
-        tvName.setText(param.getMatchName());
-        tvRound.setText(param.getRound());
-        tvPlayer1.setText(param.getPlayer1());
-        tvPlayer2.setText(param.getPlayer2());
         if (param.getWinnerIndex() == 0) {
-            TextPaint paint1 = tvPlayer1.getPaint();
+            TextPaint paint1 = binding.tvPlayer1.getPaint();
             paint1.setFakeBoldText(true);
-            TextPaint paint2 = tvPlayer2.getPaint();
+            TextPaint paint2 = binding.tvPlayer2.getPaint();
             paint2.setFakeBoldText(false);
-            tvPlayer1.setBackgroundColor(boardStyle.getFocusBgColor());
-            tvPlayer1.setTextColor(boardStyle.getFocusTextColor());
-            tvPlayer2.setBackgroundColor(boardStyle.getNormalBgColor());
-            tvPlayer2.setTextColor(boardStyle.getNormalTextColor());
-            tvWO1.setBackgroundColor(boardStyle.getFocusBgColor());
-            tvWO2.setBackgroundColor(boardStyle.getNormalBgColor());
+            binding.tvPlayer1.setBackgroundColor(boardStyle.getFocusBgColor());
+            binding.tvPlayer1.setTextColor(boardStyle.getFocusTextColor());
+            binding.tvPlayer2.setBackgroundColor(boardStyle.getNormalBgColor());
+            binding.tvPlayer2.setTextColor(boardStyle.getNormalTextColor());
+            binding.tvWo1.setBackgroundColor(boardStyle.getFocusBgColor());
+            binding.tvWo2.setBackgroundColor(boardStyle.getNormalBgColor());
         }
         else {
-            TextPaint paint1 = tvPlayer2.getPaint();
+            TextPaint paint1 = binding.tvPlayer2.getPaint();
             paint1.setFakeBoldText(true);
-            TextPaint paint2 = tvPlayer1.getPaint();
+            TextPaint paint2 = binding.tvPlayer1.getPaint();
             paint2.setFakeBoldText(false);
-            tvPlayer2.setBackgroundColor(boardStyle.getFocusBgColor());
-            tvPlayer2.setTextColor(boardStyle.getFocusTextColor());
-            tvPlayer1.setBackgroundColor(boardStyle.getNormalBgColor());
-            tvPlayer1.setTextColor(boardStyle.getNormalTextColor());
-            tvWO2.setBackgroundColor(boardStyle.getFocusBgColor());
-            tvWO1.setBackgroundColor(boardStyle.getNormalBgColor());
+            binding.tvPlayer2.setBackgroundColor(boardStyle.getFocusBgColor());
+            binding.tvPlayer2.setTextColor(boardStyle.getFocusTextColor());
+            binding.tvPlayer1.setBackgroundColor(boardStyle.getNormalBgColor());
+            binding.tvPlayer1.setTextColor(boardStyle.getNormalTextColor());
+            binding.tvWo2.setBackgroundColor(boardStyle.getFocusBgColor());
+            binding.tvWo1.setBackgroundColor(boardStyle.getNormalBgColor());
         }
-        Glide.with(getContext())
-                .load(param.getPlayerUrl1())
-                .apply(GlideOptions.getDefaultPlayerOptions())
-                .into(ivPlayer1);
-        Glide.with(getContext())
-                .load(param.getPlayerUrl2())
-                .apply(GlideOptions.getDefaultPlayerOptions())
-                .into(ivPlayer2);
         for (int i = 0; i < 5; i ++) {
             setSetScore(i);
         }
         // 没有比分代表有W/0
         if (ListUtil.isEmpty(param.getScoreList())) {
             if (param.getWinnerIndex() == 0) {
-                tvWO1.setVisibility(GONE);
-                tvWO2.setVisibility(VISIBLE);
+                binding.tvWo1.setVisibility(GONE);
+                binding.tvWo2.setVisibility(VISIBLE);
             }
             else {
-                tvWO1.setVisibility(VISIBLE);
-                tvWO2.setVisibility(GONE);
+                binding.tvWo1.setVisibility(VISIBLE);
+                binding.tvWo2.setVisibility(GONE);
             }
         }
         else {
-            tvWO1.setVisibility(GONE);
-            tvWO2.setVisibility(GONE);
+            binding.tvWo1.setVisibility(GONE);
+            binding.tvWo2.setVisibility(GONE);
         }
     }
 

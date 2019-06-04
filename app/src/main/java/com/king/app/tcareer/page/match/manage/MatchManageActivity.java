@@ -15,6 +15,7 @@ import com.king.app.jactionbar.OnConfirmListener;
 import com.king.app.tcareer.R;
 import com.king.app.tcareer.base.mvvm.MvvmActivity;
 import com.king.app.tcareer.databinding.ActivityMatchManageBinding;
+import com.king.app.tcareer.model.bean.MatchImageBean;
 import com.king.app.tcareer.model.db.entity.MatchNameBean;
 import com.king.app.tcareer.page.match.common.MatchCommonActivity;
 import com.king.app.tcareer.page.setting.SettingProperty;
@@ -215,12 +216,12 @@ public class MatchManageActivity extends MvvmActivity<ActivityMatchManageBinding
         mModel.loadMatches();
     }
 
-    public void showMatches(List<MatchNameBean> list) {
+    public void showMatches(List<MatchImageBean> list) {
         if (isGridMode) {
             if (matchGridAdapter == null) {
                 matchGridAdapter = new MatchGridAdapter();
                 matchGridAdapter.setList(list);
-                matchGridAdapter.setOnItemClickListener((view, position, data) -> onMatchItemClick(data));
+                matchGridAdapter.setOnItemClickListener((view, position, data) -> onMatchItemClick(data.getBean()));
                 matchGridAdapter.setFragmentManager(getSupportFragmentManager());
                 mBinding.rvGrid.setAdapter(matchGridAdapter);
             }
@@ -233,7 +234,7 @@ public class MatchManageActivity extends MvvmActivity<ActivityMatchManageBinding
             if (matchItemAdapter == null) {
                 matchItemAdapter = new MatchItemAdapter();
                 matchItemAdapter.setList(list);
-                matchItemAdapter.setOnItemClickListener((view, position, data) -> onMatchItemClick(data));
+                matchItemAdapter.setOnItemClickListener((view, position, data) -> onMatchItemClick(data.getBean()));
                 matchItemAdapter.setFragmentManager(getSupportFragmentManager());
                 mBinding.rvList.setAdapter(matchItemAdapter);
             }

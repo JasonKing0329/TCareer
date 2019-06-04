@@ -2,7 +2,11 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
-
+    <data>
+        <variable
+            name="bean"
+            type="com.king.app.tcareer.model.bean.MatchImageBean"/>
+    </data>
     <android.support.constraint.ConstraintLayout
         android:layout_width="@dimen/home_match_item_width"
         android:layout_height="wrap_content">
@@ -14,7 +18,8 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:round_corner="8dp"/>
+            app:round_corner="8dp"
+            app:matchUrl="@{bean.imageUrl}"/>
 
         <TextView
             android:id="@+id/tv_name"
