@@ -1,62 +1,32 @@
 package com.king.app.tcareer.page.home;
 
+import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
 import com.king.app.tcareer.R;
-import com.king.app.tcareer.base.BaseMvpFragment;
 import com.king.app.tcareer.base.IFragmentHolder;
-import com.king.app.tcareer.model.GlideOptions;
+import com.king.app.tcareer.base.mvvm.MvvmFragment;
+import com.king.app.tcareer.databinding.FragmentHomeHeadBinding;
 import com.king.app.tcareer.model.ImageProvider;
 import com.king.app.tcareer.model.db.entity.Retire;
-import com.king.app.tcareer.model.db.entity.User;
-import com.king.app.tcareer.page.score.IScorePageView;
-import com.king.app.tcareer.page.score.ScorePageData;
-import com.king.app.tcareer.page.score.ScorePresenter;
-import com.king.app.tcareer.utils.FormatUtil;
+import com.king.app.tcareer.model.image.ImageBindingAdapter;
+import com.king.app.tcareer.page.score.ScoreViewModel;
 import com.king.app.tcareer.utils.RetireUtil;
 import com.king.app.tcareer.utils.ScreenUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import butterknife.BindView;
-import butterknife.OnClick;
-
 /**
  * 描述:
  * <p/>作者：景阳
  * <p/>创建时间: 2017/11/14 15:41
  */
-public class HomeHeadFragment extends BaseMvpFragment<ScorePresenter> implements IScorePageView {
+public class HomeHeadFragment extends MvvmFragment<FragmentHomeHeadBinding, ScoreViewModel> {
 
     private static final String BUNDLE_USERID = "userId";
-
-    @BindView(R.id.iv_flag_bg)
-    ImageView ivFlagBg;
-    @BindView(R.id.tv_country)
-    TextView tvCountry;
-    @BindView(R.id.tv_birthday)
-    TextView tvBirthday;
-    @BindView(R.id.tv_height)
-    TextView tvHeight;
-    @BindView(R.id.tv_match_number)
-    TextView tvMatchNumber;
-    @BindView(R.id.tv_total)
-    TextView tvTotal;
-    @BindView(R.id.tv_rank)
-    TextView tvRank;
-    @BindView(R.id.tv_retire)
-    TextView tvRetire;
-    @BindView(R.id.tv_retire_time)
-    TextView tvRetireTime;
-    @BindView(R.id.group_player_basic)
-    ViewGroup groupPlayerBasic;
 
     private IHomeHeaderHolder holder;
 
@@ -82,23 +52,33 @@ public class HomeHeadFragment extends BaseMvpFragment<ScorePresenter> implements
     }
 
     @Override
-    protected void onCreate(View view) {
-        ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) tvRank.getLayoutParams();
-        params.bottomMargin = params.bottomMargin + ScreenUtils.dp2px(20);
+    protected ScoreViewModel createViewModel() {
+        return ViewModelProviders.of(this).get(ScoreViewModel.class);
     }
 
     @Override
-    protected ScorePresenter createPresenter() {
-        return new ScorePresenter();
+    protected void onCreate(View view) {
+        mBinding.setModel(mModel);
+
+        ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) mBinding.tvRank.getLayoutParams();
+        params.bottomMargin = params.bottomMargin + ScreenUtils.dp2px(20);
+
+        mBinding.clBasic.setOnClickListener(v -> holder.onClickScoreHead());
     }
 
     @Override
     protected void onCreateData() {
+
+        mModel.userObserver.observe(this, user -> {
+            String imagePath = ImageProvider.getDetailPlayerPath(user.getNameChn());
+            ImageBindingAdapter.setPlayerDetailUrl(mBinding.ivFlagBg, imagePath);
+            checkRetirement();
+        });
         // retired and in efficient time
         if (RetireUtil.isRetired(getUserId(), new Date(), true)) {
-            tvRank.setVisibility(View.INVISIBLE);
-            tvTotal.setVisibility(View.INVISIBLE);
-            showUser(presenter.queryUserInstant(getUserId()));
+            mBinding.tvRank.setVisibility(View.INVISIBLE);
+            mBinding.tvTotal.setVisibility(View.INVISIBLE);
+            mModel.loadUser(getUserId());
         }
         // count score and rank
         else {
@@ -108,7 +88,7 @@ public class HomeHeadFragment extends BaseMvpFragment<ScorePresenter> implements
 
     private void load52WeekScore() {
 
-        presenter.query52WeekRecords(getUserId());
+        mModel.query52WeekRecords(getUserId());
     }
 
     private long getUserId() {
@@ -116,48 +96,16 @@ public class HomeHeadFragment extends BaseMvpFragment<ScorePresenter> implements
         return userId;
     }
 
-    @Override
-    public void showUser(final User user) {
-        tvCountry.setText(user.getCountry());
-        tvBirthday.setText(user.getBirthday());
-        tvHeight.setText(user.getHeight() + "  " + FormatUtil.formatNumber(user.getWeight()) + "kg");
-
-        String imagePath = ImageProvider.getDetailPlayerPath(user.getNameChn());
-        Glide.with(this)
-                .asBitmap()
-                .load(imagePath)
-                .apply(GlideOptions.getEditorPlayerOptions())
-                .into(ivFlagBg);
-
-        checkRetirement();
-    }
-
-    @Override
-    public void onPageDataLoaded(ScorePageData data) {
-        onScoreLoaded(data.getCountScore(), data.getRank());
-        tvMatchNumber.setText("Match count " + String.valueOf(data.getScoreList().size()));
-    }
-
-    private void onScoreLoaded(int score, int rank) {
-        tvTotal.setText(String.valueOf(score));
-        tvRank.setText(String.valueOf(rank));
-    }
-
-    @OnClick(R.id.group_player_basic)
-    public void onViewClicked() {
-        holder.onClickScoreHead();
-    }
-
     public void onRankChanged() {
-        tvRank.setText(String.valueOf(presenter.getRank()));
+        mBinding.tvRank.setText(String.valueOf(mModel.getRank()));
     }
 
     private void checkRetirement() {
         Retire retire = RetireUtil.getRetired(getUserId(), new Date(), false);
         if (retire != null) {
-            tvRetire.setVisibility(View.VISIBLE);
-            tvRetireTime.setVisibility(View.VISIBLE);
-            tvRetireTime.setText(new SimpleDateFormat("yyyy-MM-dd").format(retire.getDeclareDate()));
+            mBinding.tvRetire.setVisibility(View.VISIBLE);
+            mBinding.tvRetireTime.setVisibility(View.VISIBLE);
+            mBinding.tvRetireTime.setText(new SimpleDateFormat("yyyy-MM-dd").format(retire.getDeclareDate()));
         }
     }
 }

@@ -26,6 +26,8 @@ public class ImageBindingAdapter {
                 .load(url)
                 .placeholder(R.drawable.default_img)
                 .error(R.drawable.default_img)
+//                .transition(DrawableTransitionOptions.withCrossFade())// 很奇怪加上动画后centerCrop()或者scaleType="centerCrop"都会失效
+                .centerCrop()
                 .into(view);
     }
 
@@ -41,6 +43,7 @@ public class ImageBindingAdapter {
                 .load(url)
                 .placeholder(R.drawable.ic_def_player)
                 .error(R.drawable.ic_def_player)
+                .centerCrop()
                 .into(view);
     }
 
@@ -56,6 +59,7 @@ public class ImageBindingAdapter {
                 .load(url)
                 .placeholder(R.drawable.ic_def_player_head)
                 .error(R.drawable.ic_def_player_head)
+                .centerCrop()
                 .into(view);
     }
 

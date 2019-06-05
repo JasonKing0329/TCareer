@@ -16,6 +16,7 @@ import android.widget.ViewSwitcher;
 
 import com.king.app.tcareer.R;
 import com.king.app.tcareer.base.BaseMvpActivity;
+import com.king.app.tcareer.base.mvvm.BaseBindingAdapter;
 import com.king.app.tcareer.model.bean.H2hBean;
 import com.king.app.tcareer.model.db.entity.User;
 import com.king.app.tcareer.page.match.page.MatchPageActivity;
@@ -109,21 +110,13 @@ public class PlayerSlideActivity extends BaseMvpActivity<SlidePresenter> impleme
     }
 
     @Override
-    public void onPlayerLoaded(List<H2hBean> playerList) {
+    public void onPlayerLoaded(List<SlideItem<H2hBean>> playerList) {
 
         if (playerSlideAdapter == null) {
-            playerSlideAdapter = new PlayerSlideAdapter<H2hBean>() {
-                @Override
-                protected String getImageKey(H2hBean item) {
-                    return item.getCompetitor().getNameChn();
-                }
-            };
+            playerSlideAdapter = new PlayerSlideAdapter();
             playerSlideAdapter.setList(playerList);
-            playerSlideAdapter.setOnPlayerItemListener(new PlayerSlideAdapter.OnPlayerItemListener<H2hBean>() {
-                @Override
-                public void onClickPlayer(H2hBean bean, int position) {
-                    clickPlayer(bean, position);
-                }
+            playerSlideAdapter.setOnItemClickListener((BaseBindingAdapter.OnItemClickListener<SlideItem<H2hBean>>) (view, position, bean) -> {
+                clickPlayer(bean.getBean(), position);
             });
             rvPlayers.setAdapter(playerSlideAdapter);
             new CardSnapHelper().attachToRecyclerView(rvPlayers);
@@ -278,7 +271,7 @@ public class PlayerSlideActivity extends BaseMvpActivity<SlidePresenter> impleme
             animV[1] = R.anim.slide_out_top;
         }
 
-        H2hBean bean = presenter.getCompetitorList().get(pos);
+        H2hBean bean = presenter.getCompetitorList().get(pos).getBean();
         setChnName(bean.getCompetitor().getNameChn(), left2right);
 
         tsH2h.setInAnimation(this, animH[0]);

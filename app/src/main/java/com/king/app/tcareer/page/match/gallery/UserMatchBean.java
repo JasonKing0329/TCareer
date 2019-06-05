@@ -18,6 +18,8 @@ public class UserMatchBean {
     private String bestYears;
     private List<Record> recordList;
 
+    private String imageUrl;
+
     public String getBest() {
         return best;
     }
@@ -64,5 +66,13 @@ public class UserMatchBean {
 
     public void setRecordList(List<Record> recordList) {
         this.recordList = recordList;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 }

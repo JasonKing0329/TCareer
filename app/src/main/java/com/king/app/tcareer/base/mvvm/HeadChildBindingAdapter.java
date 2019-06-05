@@ -18,8 +18,8 @@ import java.util.List;
  */
 public abstract class HeadChildBindingAdapter<VH extends ViewDataBinding, VI extends ViewDataBinding, H, I> extends RecyclerView.Adapter {
 
-    private final int TYPE_HEAD = 0;
-    private final int TYPE_ITEM = 1;
+    protected final int TYPE_HEAD = 0;
+    protected final int TYPE_ITEM = 1;
 
     protected List<Object> list;
 

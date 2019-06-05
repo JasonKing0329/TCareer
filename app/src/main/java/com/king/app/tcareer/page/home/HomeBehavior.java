@@ -63,14 +63,14 @@ public class HomeBehavior extends AppBarLayout.ScrollingViewBehavior {
         Toolbar toolbar = (Toolbar) dependency.findViewById(R.id.toolbar);
         // 经测量，在top=scrimTop时开始撤销遮罩
         if (dependency.getTop() > scrimTop) {
-            toolbar.setNavigationIcon(R.drawable.ic_menu_white_24dp);
+            toolbar.setNavigationIcon(R.drawable.ic_home_white_24dp);
             toolbar.setOverflowIcon(dependency.getContext().getResources().getDrawable(R.drawable.ic_more_vert_white_24dp));
             toolbar.setTitleTextColor(Color.WHITE);
             ctl.setExpandedTitleColor(Color.WHITE);
             ctl.setCollapsedTitleTextColor(Color.WHITE);
         }
         else {
-            toolbar.setNavigationIcon(R.drawable.ic_menu_purple_200_24dp);
+            toolbar.setNavigationIcon(R.drawable.ic_home_3f51b5_24dp);
             toolbar.setOverflowIcon(dependency.getContext().getResources().getDrawable(R.drawable.ic_more_vert_purple_200_24dp));
             toolbar.setTitleTextColor(dependency.getContext().getResources().getColor(R.color.colorPrimary));
             ctl.setExpandedTitleColor(dependency.getContext().getResources().getColor(R.color.colorPrimary));

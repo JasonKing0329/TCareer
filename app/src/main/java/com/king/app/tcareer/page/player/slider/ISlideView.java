@@ -11,7 +11,7 @@ import java.util.List;
  * <p/>创建时间: 2017/11/24 14:57
  */
 public interface ISlideView extends BaseView {
-    void onPlayerLoaded(List<H2hBean> playerList);
+    void onPlayerLoaded(List<SlideItem<H2hBean>> playerList);
 
     void onPlayerLoadFailed(String message);
 

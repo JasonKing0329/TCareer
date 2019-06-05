@@ -1,6 +1,10 @@
 package com.king.app.tcareer.page.score;
 
-import com.king.app.tcareer.base.BasePresenter;
+import android.app.Application;
+import android.arch.lifecycle.MutableLiveData;
+import android.support.annotation.NonNull;
+
+import com.king.app.tcareer.base.mvvm.BaseViewModel;
 import com.king.app.tcareer.model.db.entity.User;
 
 import io.reactivex.Observer;
@@ -13,11 +17,12 @@ import io.reactivex.schedulers.Schedulers;
  * <p/>作者：景阳
  * <p/>创建时间: 2018/2/5 10:24
  */
-public class ScoreHolderPresenter extends BasePresenter<ScoreView> {
+public class ScoreHolderViewModel extends BaseViewModel {
 
-    @Override
-    protected void onCreate() {
+    public MutableLiveData<User> userObserver = new MutableLiveData<>();
 
+    public ScoreHolderViewModel(@NonNull Application application) {
+        super(application);
     }
 
     public void loadData(final long userId) {
@@ -31,14 +36,14 @@ public class ScoreHolderPresenter extends BasePresenter<ScoreView> {
                     }
 
                     @Override
-                    public void onNext(User rankCareer) {
-                        view.showRanks();
+                    public void onNext(User user) {
+                        userObserver.setValue(user);
                     }
 
                     @Override
                     public void onError(Throwable e) {
                         e.printStackTrace();
-                        view.showMessage("Load error: " + e.getMessage());
+                        messageObserver.setValue("Load error: " + e.getMessage());
                     }
 
                     @Override

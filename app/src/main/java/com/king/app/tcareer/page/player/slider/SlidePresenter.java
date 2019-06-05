@@ -6,7 +6,6 @@ import com.king.app.tcareer.model.ImageProvider;
 import com.king.app.tcareer.model.bean.H2hBean;
 import com.king.app.tcareer.model.dao.H2HDao;
 import com.king.app.tcareer.model.db.entity.Record;
-import com.king.app.tcareer.model.db.entity.User;
 import com.king.app.tcareer.page.player.page.PageTitleBean;
 
 import java.util.ArrayList;
@@ -32,7 +31,7 @@ import io.reactivex.schedulers.Schedulers;
  */
 public class SlidePresenter extends BasePresenter<ISlideView> {
 
-    private List<H2hBean> h2hList;
+    private List<SlideItem<H2hBean>> h2hList;
 
     private H2HDao h2HDao;
 
@@ -43,22 +42,18 @@ public class SlidePresenter extends BasePresenter<ISlideView> {
 
     public void loadPlayers(final long userId) {
         queryUser(userId)
-                .flatMap(new Function<User, ObservableSource<List<H2hBean>>>() {
-                    @Override
-                    public ObservableSource<List<H2hBean>> apply(User user) throws Exception {
-                        return h2HDao.queryH2HListOrderByInsert(userId);
-                    }
-                })
+                .flatMap(user -> h2HDao.queryH2HListOrderByInsert(userId))
+                .flatMap(list -> toSlideItems(list))
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
-                .subscribe(new Observer<List<H2hBean>>() {
+                .subscribe(new Observer<List<SlideItem<H2hBean>>>() {
                     @Override
                     public void onSubscribe(Disposable d) {
                         addDisposable(d);
                     }
 
                     @Override
-                    public void onNext(List<H2hBean> h2hBeans) {
+                    public void onNext(List<SlideItem<H2hBean>> h2hBeans) {
                         h2hList = h2hBeans;
                         view.onPlayerLoaded(h2hBeans);
                     }
@@ -76,8 +71,21 @@ public class SlidePresenter extends BasePresenter<ISlideView> {
                 });
     }
 
-    public List<H2hBean> getCompetitorList() {
+    public List<SlideItem<H2hBean>> getCompetitorList() {
         return h2hList;
+    }
+
+    private ObservableSource<List<SlideItem<H2hBean>>> toSlideItems(List<H2hBean> list) {
+        return observer -> {
+            List<SlideItem<H2hBean>> result = new ArrayList<>();
+            for (H2hBean bean:list) {
+                SlideItem<H2hBean> item = new SlideItem<>();
+                item.setBean(bean);
+                item.setImageUrl(ImageProvider.getPlayerHeadPath(bean.getCompetitor().getNameChn()));
+                result.add(item);
+            }
+            observer.onNext(result);
+        };
     }
 
     public void loadRecords(H2hBean bean) {

@@ -1,7 +1,12 @@
 package com.king.app.tcareer.page.score;
 
-import com.king.app.tcareer.base.BasePresenter;
+import android.app.Application;
+import android.arch.lifecycle.MutableLiveData;
+import android.databinding.ObservableField;
+import android.support.annotation.NonNull;
+
 import com.king.app.tcareer.base.TApplication;
+import com.king.app.tcareer.base.mvvm.BaseViewModel;
 import com.king.app.tcareer.conf.AppConstants;
 import com.king.app.tcareer.model.db.entity.MatchBean;
 import com.king.app.tcareer.model.db.entity.MatchBeanDao;
@@ -12,6 +17,8 @@ import com.king.app.tcareer.model.db.entity.RankDao;
 import com.king.app.tcareer.model.db.entity.RankWeek;
 import com.king.app.tcareer.model.db.entity.RankWeekDao;
 import com.king.app.tcareer.model.db.entity.User;
+import com.king.app.tcareer.utils.FormatUtil;
+import com.king.app.tcareer.utils.ListUtil;
 
 import org.greenrobot.greendao.DaoException;
 import org.greenrobot.greendao.query.QueryBuilder;
@@ -27,11 +34,9 @@ import java.util.Map;
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
-import io.reactivex.ObservableSource;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 
 /**
@@ -39,7 +44,20 @@ import io.reactivex.schedulers.Schedulers;
  * <p/>作者：景阳
  * <p/>创建时间: 2017/2/21 13:59
  */
-public class ScorePresenter extends BasePresenter<IScorePageView> {
+public class ScoreViewModel extends BaseViewModel {
+
+    public MutableLiveData<User> userObserver = new MutableLiveData<>();
+    public MutableLiveData<ScorePageData> pageDataObserver = new MutableLiveData<>();
+
+    public ObservableField<String> nameText = new ObservableField<>();
+    public ObservableField<String> countryText = new ObservableField<>();
+    public ObservableField<String> birthdayText = new ObservableField<>();
+    public ObservableField<String> heightText = new ObservableField<>();
+
+    public ObservableField<Integer> totalScoreVisibility = new ObservableField<>();
+    public ObservableField<String> totalScoreText = new ObservableField<>();
+    public ObservableField<String> rankText = new ObservableField<>();
+    public ObservableField<String> matchCountText = new ObservableField<>();
 
     private ScoreModel scoreModel;
 
@@ -56,8 +74,8 @@ public class ScorePresenter extends BasePresenter<IScorePageView> {
     private int startWeek, endWeek;
     private int startYear, endYear;
 
-    @Override
-    protected void onCreate() {
+    public ScoreViewModel(@NonNull Application application) {
+        super(application);
         scoreModel = new ScoreModel();
         init();
     }
@@ -79,19 +97,12 @@ public class ScorePresenter extends BasePresenter<IScorePageView> {
         startWeek = 0;
         endWeek = 52;
         queryUser(userId)
-                .flatMap(new Function<User, ObservableSource<List<ScoreBean>>>() {
-                    @Override
-                    public ObservableSource<List<ScoreBean>> apply(User user) throws Exception {
-                        mUser = user;
-                        return scoreModel.queryYearRecords(user.getId(), currentYear);
-                    }
+                .flatMap(user -> {
+                    mUser = user;
+                    userObserver.postValue(user);
+                    return scoreModel.queryYearRecords(user.getId(), currentYear);
                 })
-                .flatMap(new Function<List<ScoreBean>, ObservableSource<ScorePageData>>() {
-                    @Override
-                    public ObservableSource<ScorePageData> apply(List<ScoreBean> list) throws Exception {
-                        return createPageData(list);
-                    }
-                })
+                .flatMap(list -> createPageData(list))
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe(new Observer<ScorePageData>() {
@@ -102,14 +113,15 @@ public class ScorePresenter extends BasePresenter<IScorePageView> {
 
                     @Override
                     public void onNext(ScorePageData data) {
-                        view.showUser(mUser);
-                        view.onPageDataLoaded(data);
+                        updateUserContent(mUser);
+                        updateContent(data);
+                        pageDataObserver.setValue(data);
                     }
 
                     @Override
                     public void onError(Throwable e) {
                         e.printStackTrace();
-                        view.showMessage("Load score failed: " + e.getMessage());
+                        messageObserver.setValue("Load score failed: " + e.getMessage());
                     }
 
                     @Override
@@ -119,6 +131,24 @@ public class ScorePresenter extends BasePresenter<IScorePageView> {
                 });
     }
 
+    private void updateUserContent(User user) {
+        nameText.set(user.getNameEng());
+        countryText.set(user.getCountry());
+        birthdayText.set(user.getBirthday());
+        heightText.set(user.getHeight() + "  " + FormatUtil.formatNumber(user.getWeight()) + "kg");
+    }
+
+    private void updateContent(ScorePageData data) {
+        totalScoreText.set(String.valueOf(data.getCountScore()));
+        if (data.getRank() == 0) {
+            rankText.set("--");
+        }
+        else {
+            rankText.set(String.valueOf(data.getRank()));
+        }
+        matchCountText.set("Match count " + ListUtil.getSize(data.getScoreList()));
+    }
+
     public void query52WeekRecords(long userId) {
         startYear = thisYear - 1;
         endYear = thisYear;
@@ -126,19 +156,12 @@ public class ScorePresenter extends BasePresenter<IScorePageView> {
         endWeek = startWeek - 1;
         startYear--;
         queryUser(userId)
-                .flatMap(new Function<User, ObservableSource<List<ScoreBean>>>() {
-                    @Override
-                    public ObservableSource<List<ScoreBean>> apply(User user) throws Exception {
-                        mUser = user;
-                        return scoreModel.query52WeekRecords(user.getId(), currentYear);
-                    }
+                .flatMap(user -> {
+                    mUser = user;
+                    userObserver.postValue(user);
+                    return scoreModel.query52WeekRecords(user.getId(), currentYear);
                 })
-                .flatMap(new Function<List<ScoreBean>, ObservableSource<ScorePageData>>() {
-                    @Override
-                    public ObservableSource<ScorePageData> apply(List<ScoreBean> list) throws Exception {
-                        return createPageData(list);
-                    }
-                })
+                .flatMap(list -> createPageData(list))
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe(new Observer<ScorePageData>() {
@@ -149,14 +172,15 @@ public class ScorePresenter extends BasePresenter<IScorePageView> {
 
                     @Override
                     public void onNext(ScorePageData data) {
-                        view.showUser(mUser);
-                        view.onPageDataLoaded(data);
+                        updateUserContent(mUser);
+                        updateContent(data);
+                        pageDataObserver.setValue(data);
                     }
 
                     @Override
                     public void onError(Throwable e) {
                         e.printStackTrace();
-                        view.showMessage("Load score failed: " + e.getMessage());
+                        messageObserver.setValue("Load score failed: " + e.getMessage());
                     }
 
                     @Override
@@ -495,8 +519,8 @@ public class ScorePresenter extends BasePresenter<IScorePageView> {
         return scorePageData.getRank();
     }
 
-    public List<ScoreBean> getScoresByLevel() {
-        List<ScoreBean> scoreList = new ArrayList<>();
+    public List<Object> getScoresByLevel() {
+        List<Object> scoreList = new ArrayList<>();
         // 积分、图表
         // gs
         ScoreBean titleBean = new ScoreBean();
@@ -549,8 +573,8 @@ public class ScorePresenter extends BasePresenter<IScorePageView> {
         return scoreList;
     }
 
-    public List<ScoreBean> getScoresByMonth() {
-        List<ScoreBean> scoreList = new ArrayList<>();
+    public List<Object> getScoresByMonth() {
+        List<Object> scoreList = new ArrayList<>();
 
         // 先将计入积分的赛事按week升序排序
         List<ScoreBean> validList = new ArrayList<>();
@@ -613,6 +637,34 @@ public class ScorePresenter extends BasePresenter<IScorePageView> {
         scoreList.add(titleBean);
         scoreList.addAll(scorePageData.getOtherList());
         return scoreList;
+    }
+
+    public void loadUser(long userId) {
+        queryUser(userId)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(new Observer<User>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                        addDisposable(d);
+                    }
+
+                    @Override
+                    public void onNext(User user) {
+                        userObserver.setValue(user);
+                        updateUserContent(user);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        e.printStackTrace();
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
     }
 
     /**

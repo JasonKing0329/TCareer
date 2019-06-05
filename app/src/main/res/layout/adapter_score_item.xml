@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent" android:layout_height="wrap_content">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <LinearLayout
-        android:id="@+id/score_item_group"
+        android:id="@+id/ll_group"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -12,14 +12,14 @@
         android:paddingLeft="5dp"
         android:gravity="center_vertical">
         <TextView
-            android:id="@+id/score_item_name"
+            android:id="@+id/tv_name"
             android:layout_width="120dp"
             android:layout_height="wrap_content"
             android:text="澳大利亚网球公开赛"
             android:textSize="13dp"
             android:textColor="#3c3c3c"/>
         <TextView
-            android:id="@+id/score_item_score"
+            android:id="@+id/tv_score"
             android:layout_width="30dp"
             android:layout_height="wrap_content"
             android:text="2000"
@@ -27,12 +27,12 @@
             android:textSize="13dp"
             android:textColor="#3c3c3c" />
         <ImageView
-            android:id="@+id/score_item_winner"
+            android:id="@+id/iv_winner"
             android:layout_width="18dp"
             android:layout_height="18dp"
             android:src="@drawable/ic_cup"/>
         <TextView
-            android:id="@+id/score_item_complete"
+            android:id="@+id/tv_complete"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="√"
@@ -41,4 +41,4 @@
             android:textColor="#3c3c3c" />
     </LinearLayout>
 
-</RelativeLayout>
+</layout>

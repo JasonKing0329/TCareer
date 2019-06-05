@@ -1,39 +1,23 @@
 package com.king.app.tcareer.page.score;
 
+import android.arch.lifecycle.ViewModelProviders;
 import android.support.v4.app.FragmentTransaction;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.king.app.tcareer.R;
-import com.king.app.tcareer.base.BaseMvpActivity;
-import com.king.app.tcareer.model.db.entity.Rank;
+import com.king.app.tcareer.base.mvvm.MvvmActivity;
+import com.king.app.tcareer.databinding.ActivityScoreBinding;
 import com.king.app.tcareer.page.rank.ScoreEditDialog;
-
-import butterknife.BindView;
-import butterknife.OnClick;
 
 /**
  * 描述:
  * <p/>作者：景阳
  * <p/>创建时间: 2017/2/20 16:21
  */
-public class ScoreActivity extends BaseMvpActivity<ScoreHolderPresenter> implements IScoreHolder, ScoreView {
+public class ScoreActivity extends MvvmActivity<ActivityScoreBinding, ScoreHolderViewModel> implements IScoreHolder {
 
     public static final String KEY_USER_ID = "key_user_id";
-
-    @BindView(R.id.score_actionbar_year)
-    TextView tvYear;
-    @BindView(R.id.score_actionbar_week)
-    TextView tvWeeks;
-
-    @BindView(R.id.score_actionbar_year_divider)
-    View vDividerYear;
-    @BindView(R.id.score_actionbar_week_divider)
-    View vDividerWeeks;
-
-    @BindView(R.id.score_actionbar_date)
-    ImageView ivDate;
 
     private ScoreFragment ftYear;
     private ScoreFragment ft52Week;
@@ -46,43 +30,24 @@ public class ScoreActivity extends BaseMvpActivity<ScoreHolderPresenter> impleme
     }
 
     @Override
-    protected void initView() {
+    protected ScoreHolderViewModel createViewModel() {
+        return ViewModelProviders.of(this).get(ScoreHolderViewModel.class);
     }
 
     @Override
-    protected ScoreHolderPresenter createPresenter() {
-        return new ScoreHolderPresenter();
+    protected void initView() {
+        setFocusTab(mBinding.tvWeek);
+        mBinding.ivBack.setOnClickListener(v -> onBackPressed());
+        mBinding.tvYear.setOnClickListener(v -> showYearScores());
+        mBinding.tvWeek.setOnClickListener(v -> show52WeekScores());
+        mBinding.ivEdit.setOnClickListener(v -> showScoreEditDialog());
+        mBinding.ivDate.setOnClickListener(v -> showDateGroup());
     }
 
     @Override
     protected void initData() {
-        presenter.loadData(getIntent().getLongExtra(KEY_USER_ID, -1));
-    }
-
-    @Override
-    public void showRanks() {
-        show52WeekScores();
-    }
-
-    @OnClick({R.id.score_actionbar_year, R.id.score_actionbar_week, R.id.score_actionbar_edit, R.id.score_actionbar_back, R.id.score_actionbar_date})
-    public void onClickView(View v) {
-        switch (v.getId()) {
-            case R.id.score_actionbar_year:
-                showYearScores();
-                break;
-            case R.id.score_actionbar_week:
-                show52WeekScores();
-                break;
-            case R.id.score_actionbar_edit:
-                showScoreEditDialog();
-                break;
-            case R.id.score_actionbar_back:
-                onBackPressed();
-                break;
-            case R.id.score_actionbar_date:
-                showDateGroup();
-                break;
-        }
+        mModel.userObserver.observe(this, user -> show52WeekScores());
+        mModel.loadData(getIntent().getLongExtra(KEY_USER_ID, -1));
     }
 
     private void showDateGroup() {
@@ -92,22 +57,19 @@ public class ScoreActivity extends BaseMvpActivity<ScoreHolderPresenter> impleme
     private void showScoreEditDialog() {
         editDialog = new ScoreEditDialog();
         editDialog.setMode(ScoreEditDialog.MODE_COUNT_RANK);
-        editDialog.setUser(presenter.getUser());
-        editDialog.setOnRankListener(new ScoreEditDialog.OnRankListener() {
-            @Override
-            public void onSaveYearRank(Rank rank) {
-            }
+        editDialog.setUser(mModel.getUser());
+        editDialog.setOnRankListener(rank -> {
         });
         editDialog.show(getSupportFragmentManager(), "ScoreEditDialog");
     }
 
     private void show52WeekScores() {
-        setFocusTab(tvWeeks);
+        setFocusTab(mBinding.tvWeek);
         show52WeekFragment();
     }
 
     private void showYearScores() {
-        setFocusTab(tvYear);
+        setFocusTab(mBinding.tvYear);
         showYearFragment();
     }
 
@@ -115,7 +77,7 @@ public class ScoreActivity extends BaseMvpActivity<ScoreHolderPresenter> impleme
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         if (ft52Week == null) {
             ft52Week = ScoreFragment.newInstance(getIntent().getLongExtra(KEY_USER_ID, -1), ScoreFragment.FLAG_52WEEK);
-            ft.add(R.id.score_ft_container, ft52Week, "ScoreFragment_52Week");
+            ft.add(R.id.rl_ft_container, ft52Week, "ScoreFragment_52Week");
         }
         else {
             ft.show(ft52Week).hide(ftYear);
@@ -127,7 +89,7 @@ public class ScoreActivity extends BaseMvpActivity<ScoreHolderPresenter> impleme
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         if (ftYear == null) {
             ftYear = ScoreFragment.newInstance(getIntent().getLongExtra(KEY_USER_ID, -1), ScoreFragment.FLAG_YEAR);
-            ft.add(R.id.score_ft_container, ftYear, "ScoreFragment_Year").hide(ft52Week);
+            ft.add(R.id.rl_ft_container, ftYear, "ScoreFragment_Year").hide(ft52Week);
         }
         else {
             ft.show(ftYear).hide(ft52Week);
@@ -136,7 +98,7 @@ public class ScoreActivity extends BaseMvpActivity<ScoreHolderPresenter> impleme
     }
 
     private ScoreFragment getFocusFragment() {
-        if (tvYear.isSelected()) {
+        if (mBinding.tvYear.isSelected()) {
             return ftYear;
         }
         else {
@@ -145,19 +107,19 @@ public class ScoreActivity extends BaseMvpActivity<ScoreHolderPresenter> impleme
     }
 
     public void setFocusTab(TextView focusTab) {
-        if (focusTab == tvYear) {
-            tvYear.setSelected(true);
-            tvWeeks.setSelected(false);
-            vDividerYear.setVisibility(View.VISIBLE);
-            vDividerWeeks.setVisibility(View.INVISIBLE);
-            ivDate.setVisibility(View.VISIBLE);
+        if (focusTab == mBinding.tvYear) {
+            mBinding.tvYear.setSelected(true);
+            mBinding.tvWeek.setSelected(false);
+            mBinding.dividerYear.setVisibility(View.VISIBLE);
+            mBinding.dividerWeek.setVisibility(View.INVISIBLE);
+            mBinding.ivDate.setVisibility(View.VISIBLE);
         }
         else {
-            tvYear.setSelected(false);
-            tvWeeks.setSelected(true);
-            vDividerYear.setVisibility(View.INVISIBLE);
-            vDividerWeeks.setVisibility(View.VISIBLE);
-            ivDate.setVisibility(View.GONE);
+            mBinding.tvYear.setSelected(false);
+            mBinding.tvWeek.setSelected(true);
+            mBinding.dividerYear.setVisibility(View.INVISIBLE);
+            mBinding.dividerWeek.setVisibility(View.VISIBLE);
+            mBinding.ivDate.setVisibility(View.GONE);
         }
     }
 

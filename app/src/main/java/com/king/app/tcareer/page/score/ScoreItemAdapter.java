@@ -1,142 +1,83 @@
 package com.king.app.tcareer.page.score;
 
-import android.support.v7.widget.RecyclerView;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.king.app.tcareer.R;
+import com.king.app.tcareer.base.mvvm.HeadChildBindingAdapter;
 import com.king.app.tcareer.conf.AppConstants;
-
-import java.util.List;
+import com.king.app.tcareer.databinding.AdapterScoreItemBinding;
+import com.king.app.tcareer.databinding.AdapterScoreTitleBinding;
+import com.king.app.tcareer.view.widget.scoreboard.ScoreBoard;
 
 /**
- * TODO 描述: v2.4.4 score界面的详细赛事积分记录设计为可点击item，预备adapter，在数据库模型完成后继续完成该部分
+ *
  * <p/>作者：景阳
  * <p/>创建时间: 2017/2/23 15:22
  */
-public class ScoreItemAdapter extends RecyclerView.Adapter implements View.OnClickListener {
-
-    private final int TITLE = 0;
-    private final int ITEM = 1;
-
-    private List<ScoreBean> list;
-
-    private OnScoreItemClickListener onScoreItemClickListener;
-
-    public ScoreItemAdapter(List<ScoreBean> list) {
-        this.list = list;
-    }
-
-    public void setList(List<ScoreBean> list) {
-        this.list = list;
-    }
+public class ScoreItemAdapter extends HeadChildBindingAdapter<AdapterScoreTitleBinding, AdapterScoreItemBinding, ScoreBean, ScoreBean> {
 
     @Override
     public int getItemViewType(int position) {
-        return list.get(position).isTitle() ? TITLE:ITEM;
+        return ((ScoreBean) list.get(position)).isTitle() ? TYPE_HEAD:TYPE_ITEM;
     }
 
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        if (viewType == TITLE) {
-            return new TitleHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.adapter_score_title, parent, false));
-        }
-        else {
-            return new ScoreItemHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.adapter_score_item, parent, false));
-        }
+    protected int getHeaderRes() {
+        return R.layout.adapter_score_title;
     }
 
     @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder vHolder, int position) {
-        ScoreBean bean = list.get(position);
-        if (vHolder instanceof TitleHolder) {
-            TitleHolder holder = (TitleHolder) vHolder;
-            holder.tvTitle.setText(bean.getTitle());
+    protected int getItemRes() {
+        return R.layout.adapter_score_item;
+    }
+
+    @Override
+    protected Class getItemClass() {
+        return ScoreBoard.class;
+    }
+
+    @Override
+    protected void onBindHead(AdapterScoreTitleBinding binding, int position, ScoreBean bean) {
+        binding.tvTitle.setText(bean.getTitle());
+    }
+
+    @Override
+    protected void onBindItem(AdapterScoreItemBinding binding, int position, ScoreBean bean) {
+        if (bean.getMatchBean() == null) {// 500 赛罚分
+            binding.ivWinner.setVisibility(View.INVISIBLE);
+            binding.tvName.setText("500赛罚分");
+            binding.tvName.setTextColor(binding.tvName.getResources().getColor(R.color.text_normal));
+            binding.tvScore.setText("0");
+            binding.tvComplete.setVisibility(View.INVISIBLE);
         }
         else {
-            ScoreItemHolder holder = (ScoreItemHolder) vHolder;
-            if (bean.getMatchBean() == null) {// 500 赛罚分
-                holder.cup.setVisibility(View.INVISIBLE);
-                holder.name.setText("500赛罚分");
-                holder.name.setTextColor(holder.name.getResources().getColor(R.color.text_normal));
-                holder.score.setText("0");
-                holder.complete.setVisibility(View.INVISIBLE);
-                holder.group.setOnClickListener(null);
+            String court = bean.getMatchBean().getMatchBean().getCourt();
+            if (AppConstants.RECORD_MATCH_COURTS[1].equals(court)) {
+                binding.tvName.setTextColor(binding.tvName.getResources().getColor(R.color.normal_court_clay));
+            }
+            else if (AppConstants.RECORD_MATCH_COURTS[2].equals(court)) {
+                binding.tvName.setTextColor(binding.tvName.getResources().getColor(R.color.normal_court_grass));
+            }
+            else if (AppConstants.RECORD_MATCH_COURTS[3].equals(court)) {
+                binding.tvName.setTextColor(binding.tvName.getResources().getColor(R.color.normal_court_inhard));
             }
             else {
-                String court = bean.getMatchBean().getMatchBean().getCourt();
-                if (AppConstants.RECORD_MATCH_COURTS[1].equals(court)) {
-                    holder.name.setTextColor(holder.name.getResources().getColor(R.color.normal_court_clay));
-                }
-                else if (AppConstants.RECORD_MATCH_COURTS[2].equals(court)) {
-                    holder.name.setTextColor(holder.name.getResources().getColor(R.color.normal_court_grass));
-                }
-                else if (AppConstants.RECORD_MATCH_COURTS[3].equals(court)) {
-                    holder.name.setTextColor(holder.name.getResources().getColor(R.color.normal_court_inhard));
-                }
-                else {
-                    holder.name.setTextColor(holder.name.getResources().getColor(R.color.text_normal));
-                }
-                holder.cup.setVisibility(bean.isChampion() ? View.VISIBLE:View.INVISIBLE);
-                holder.name.setText(bean.getMatchBean().getName());
-                holder.score.setText(String.valueOf(bean.getScore()));
-                holder.complete.setVisibility(bean.isCompleted() ? View.VISIBLE:View.INVISIBLE);
-                holder.group.setTag(position);
-                holder.group.setOnClickListener(this);
+                binding.tvName.setTextColor(binding.tvName.getResources().getColor(R.color.text_normal));
             }
+            binding.ivWinner.setVisibility(bean.isChampion() ? View.VISIBLE:View.INVISIBLE);
+            binding.tvName.setText(bean.getMatchBean().getName());
+            binding.tvScore.setText(String.valueOf(bean.getScore()));
+            binding.tvComplete.setVisibility(bean.isCompleted() ? View.VISIBLE:View.INVISIBLE);
         }
     }
 
     @Override
-    public int getItemCount() {
-        return list.size();
-    }
-
-    @Override
-    public void onClick(View v) {
-        if (onScoreItemClickListener != null) {
-            int positin = (int) v.getTag();
-            if (!list.get(positin).isTitle()) {
-                onScoreItemClickListener.onScoreItemClick(list.get(positin));
-            }
+    protected void onClickItem(View view, int position, ScoreBean data) {
+        if (data.getMatchBean() == null) {// 500赛罚分
+            return;
         }
-    }
-
-    public void setOnScoreItemClickListener(OnScoreItemClickListener onScoreItemClickListener) {
-        this.onScoreItemClickListener = onScoreItemClickListener;
-    }
-
-    public interface OnScoreItemClickListener {
-        void onScoreItemClick(ScoreBean bean);
-    }
-
-    public static class TitleHolder extends RecyclerView.ViewHolder {
-
-        private TextView tvTitle;
-
-        public TitleHolder(View itemView) {
-            super(itemView);
-            tvTitle = (TextView) itemView.findViewById(R.id.tv_title);
-        }
-    }
-
-    public static class ScoreItemHolder extends RecyclerView.ViewHolder {
-
-        ViewGroup group;
-        TextView name;
-        TextView score;
-        TextView complete;
-        ImageView cup;
-        public ScoreItemHolder(View itemView) {
-            super(itemView);
-            group = (ViewGroup) itemView.findViewById(R.id.score_item_group);
-            name = (TextView) itemView.findViewById(R.id.score_item_name);
-            score = (TextView) itemView.findViewById(R.id.score_item_score);
-            complete = (TextView) itemView.findViewById(R.id.score_item_complete);
-            cup = (ImageView) itemView.findViewById(R.id.score_item_winner);
+        else {
+            super.onClickItem(view, position, data);
         }
     }
 }
