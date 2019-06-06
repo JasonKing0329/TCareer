@@ -1,138 +1,140 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/white">
-    <com.king.app.tcareer.view.widget.GradientBkView
-        android:id="@+id/match_bk"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
-    <LinearLayout
+    xmlns:tools="http://schemas.android.com/tools">
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
-
-        <ImageView
-            android:id="@+id/match_back"
-            style="@style/ClickableImageView"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginTop="15dp"
-            android:layout_marginLeft="15dp"
-            android:padding="8dp"
-            android:src="@drawable/ic_arrow_back_black_24dp"/>
-
-        <Space
-            android:layout_width="wrap_content"
-            android:layout_height="30dp" />
-
-        <TextView
-            android:id="@+id/match_name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:textColor="@color/white"
-            android:textSize="22dp"
-            android:textStyle="bold"
-            tools:text="Stoneware + Porcelain Plate" />
-
-        <Space
-            android:layout_width="wrap_content"
-            android:layout_height="4dp" />
-
-        <TextView
-            android:id="@+id/match_place"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:textColor="@color/white"
-            android:textStyle="bold"
-            android:textSize="14dp"/>
-
-        <Space
-            android:layout_width="wrap_content"
-            android:layout_height="16dp" />
-
-        <com.king.app.tcareer.view.widget.discrete.DiscreteScrollView
-            android:id="@+id/match_gallery"
+        android:background="@color/white">
+        <com.king.app.tcareer.view.widget.GradientBkView
+            android:id="@+id/match_bk"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-
-        <Space
-            android:layout_width="wrap_content"
-            android:layout_height="10dp" />
-
+            android:layout_height="match_parent"/>
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:orientation="horizontal">
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
             <ImageView
-                android:id="@+id/match_refresh"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/ic_refresh_black_24dp"
+                android:id="@+id/iv_back"
                 style="@style/ClickableImageView"
-                android:padding="8dp"/>
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginTop="15dp"
+                android:layout_marginLeft="15dp"
+                android:padding="8dp"
+                android:src="@drawable/ic_arrow_back_black_24dp"/>
 
             <Space
-                android:layout_width="16dp"
-                android:layout_height="wrap_content" />
+                android:layout_width="wrap_content"
+                android:layout_height="30dp" />
 
-            <android.support.design.widget.FloatingActionButton
-                android:id="@+id/match_download"
+            <TextView
+                android:id="@+id/tv_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/ic_file_download_black_24dp"
-                android:tint="@android:color/white"
-                app:borderWidth="0dp"
-                app:rippleColor="@color/user_match_download_ripple"
-                app:useCompatPadding="true" />
+                android:layout_gravity="center_horizontal"
+                android:textColor="@color/white"
+                android:textSize="22dp"
+                android:textStyle="bold"
+                tools:text="Stoneware + Porcelain Plate" />
 
             <Space
-                android:layout_width="16dp"
-                android:layout_height="wrap_content" />
+                android:layout_width="wrap_content"
+                android:layout_height="4dp" />
 
-            <ImageView
-                android:id="@+id/match_delete"
+            <TextView
+                android:id="@+id/tv_place"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/ic_delete_black_24dp"
-                style="@style/ClickableImageView"
-                android:padding="8dp"/>
+                android:layout_gravity="center_horizontal"
+                android:textColor="@color/white"
+                android:textStyle="bold"
+                android:textSize="14dp"/>
+
+            <Space
+                android:layout_width="wrap_content"
+                android:layout_height="16dp" />
+
+            <com.king.app.tcareer.view.widget.discrete.DiscreteScrollView
+                android:id="@+id/sv_gallery"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <Space
+                android:layout_width="wrap_content"
+                android:layout_height="10dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:id="@+id/iv_refresh"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_refresh_black_24dp"
+                    style="@style/ClickableImageView"
+                    android:padding="8dp"/>
+
+                <Space
+                    android:layout_width="16dp"
+                    android:layout_height="wrap_content" />
+
+                <android.support.design.widget.FloatingActionButton
+                    android:id="@+id/btn_download"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_file_download_black_24dp"
+                    android:tint="@android:color/white"
+                    app:borderWidth="0dp"
+                    app:rippleColor="@color/user_match_download_ripple"
+                    app:useCompatPadding="true" />
+
+                <Space
+                    android:layout_width="16dp"
+                    android:layout_height="wrap_content" />
+
+                <ImageView
+                    android:id="@+id/iv_delete"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_delete_black_24dp"
+                    style="@style/ClickableImageView"
+                    android:padding="8dp"/>
+
+            </LinearLayout>
 
         </LinearLayout>
 
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:gravity="center"
-        android:layout_alignParentRight="true"
-        android:layout_marginRight="30dp"
-        android:layout_marginTop="30dp">
-        <TextView
-            android:id="@+id/match_month"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@color/white"
-            android:textSize="15dp"
-            android:textStyle="italic|bold"
-            android:text="January" />
-        <TextView
-            android:id="@+id/match_week"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/white"
-            android:textSize="12dp"
-            android:textStyle="italic"
+            android:orientation="vertical"
             android:gravity="center"
-            android:text="week 12" />
-    </LinearLayout>
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="30dp"
+            android:layout_marginTop="30dp">
+            <TextView
+                android:id="@+id/tv_month"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/white"
+                android:textSize="15dp"
+                android:textStyle="italic|bold"
+                android:text="January" />
+            <TextView
+                android:id="@+id/tv_week"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/white"
+                android:textSize="12dp"
+                android:textStyle="italic"
+                android:gravity="center"
+                android:text="week 12" />
+        </LinearLayout>
 
-</RelativeLayout>
+    </RelativeLayout>
+</layout>

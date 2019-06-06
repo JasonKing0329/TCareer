@@ -1,6 +1,10 @@
 package com.king.app.tcareer.page.match.gallery;
 
-import com.king.app.tcareer.base.BasePresenter;
+import android.app.Application;
+import android.arch.lifecycle.MutableLiveData;
+import android.support.annotation.NonNull;
+
+import com.king.app.tcareer.base.mvvm.BaseViewModel;
 import com.king.app.tcareer.repository.MatchRepository;
 
 import java.util.List;
@@ -15,14 +19,14 @@ import io.reactivex.schedulers.Schedulers;
  * <p/>作者：景阳
  * <p/>创建时间: 2017/3/15 10:12
  */
-public class UserMatchPresenter extends BasePresenter<UserMatchView> {
+public class UserMatchViewModel extends BaseViewModel {
 
-    private List<UserMatchBean> matchList;
+    public MutableLiveData<List<UserMatchBean>> matchesObserver = new MutableLiveData<>();
 
     private MatchRepository repository;
 
-    @Override
-    protected void onCreate() {
+    public UserMatchViewModel(@NonNull Application application) {
+        super(application);
         repository = new MatchRepository();
     }
 
@@ -39,14 +43,13 @@ public class UserMatchPresenter extends BasePresenter<UserMatchView> {
 
                     @Override
                     public void onNext(List<UserMatchBean> list) {
-                        matchList = list;
-                        view.showMatches(list);
+                        matchesObserver.setValue(list);
                     }
 
                     @Override
                     public void onError(Throwable e) {
                         e.printStackTrace();
-                        view.showMessage("Load matches failed: " + e.getMessage());
+                        messageObserver.setValue("Load matches failed: " + e.getMessage());
                     }
 
                     @Override
@@ -62,11 +65,11 @@ public class UserMatchPresenter extends BasePresenter<UserMatchView> {
      * @return
      */
     public int findLatestWeekItem() {
-        return repository.findLatestWeekItem(matchList);
+        return repository.findLatestWeekItem(matchesObserver.getValue());
     }
 
     public UserMatchBean getUserMatchBean(int position) {
-        return matchList.get(position);
+        return matchesObserver.getValue().get(position);
     }
 
 }

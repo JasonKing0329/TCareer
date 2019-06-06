@@ -1,5 +1,9 @@
 package com.king.app.tcareer.page.match.gallery;
 
+import android.databinding.BaseObservable;
+import android.databinding.Bindable;
+
+import com.king.app.tcareer.BR;
 import com.king.app.tcareer.model.db.entity.MatchNameBean;
 import com.king.app.tcareer.model.db.entity.Record;
 
@@ -10,7 +14,7 @@ import java.util.List;
  * <p/>作者：景阳
  * <p/>创建时间: 2017/3/15 10:17
  */
-public class UserMatchBean {
+public class UserMatchBean extends BaseObservable {
     private MatchNameBean nameBean;
     private int win;
     private int lose;
@@ -68,11 +72,13 @@ public class UserMatchBean {
         this.recordList = recordList;
     }
 
+    @Bindable
     public String getImageUrl() {
         return imageUrl;
     }
 
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
+        notifyPropertyChanged(BR.imageUrl);
     }
 }

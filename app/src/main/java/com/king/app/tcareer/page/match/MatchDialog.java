@@ -22,15 +22,12 @@ import com.king.app.tcareer.model.db.entity.Record;
 import com.king.app.tcareer.model.db.entity.RecordDao;
 import com.king.app.tcareer.model.db.entity.User;
 import com.king.app.tcareer.page.match.page.MatchPageActivity;
-import com.king.app.tcareer.page.player.slider.PlayerSlideActivity;
 import com.king.app.tcareer.utils.ScreenUtils;
 import com.king.app.tcareer.view.dialog.DraggableDialogFragment;
 
 import java.util.List;
 
 import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.Unbinder;
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
@@ -246,7 +243,8 @@ public class MatchDialog extends DraggableDialogFragment {
                 tvAchieve.setText(record.getRound());
             }
 
-            itemAdapter = new MatchItemAdapter(recordList);
+            itemAdapter = new MatchItemAdapter();
+            itemAdapter.setList(recordList);
             rvList.setAdapter(itemAdapter);
         }
 
