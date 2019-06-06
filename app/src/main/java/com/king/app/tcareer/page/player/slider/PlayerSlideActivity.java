@@ -2,7 +2,7 @@ package com.king.app.tcareer.page.player.slider;
 
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
-import android.content.DialogInterface;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.os.Build;
 import android.support.annotation.StyleRes;
@@ -10,13 +10,13 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.Gravity;
 import android.view.View;
-import android.widget.TextSwitcher;
 import android.widget.TextView;
 import android.widget.ViewSwitcher;
 
 import com.king.app.tcareer.R;
-import com.king.app.tcareer.base.BaseMvpActivity;
 import com.king.app.tcareer.base.mvvm.BaseBindingAdapter;
+import com.king.app.tcareer.base.mvvm.MvvmActivity;
+import com.king.app.tcareer.databinding.ActivityPlayerSlideBinding;
 import com.king.app.tcareer.model.bean.H2hBean;
 import com.king.app.tcareer.model.db.entity.User;
 import com.king.app.tcareer.page.match.page.MatchPageActivity;
@@ -28,7 +28,6 @@ import com.king.app.tcareer.view.widget.cardslider.CardSnapHelper;
 
 import java.util.List;
 
-import butterknife.BindView;
 import butterknife.OnClick;
 
 /**
@@ -36,26 +35,9 @@ import butterknife.OnClick;
  * <p/>作者：景阳
  * <p/>创建时间: 2017/11/24 14:53
  */
-public class PlayerSlideActivity extends BaseMvpActivity<SlidePresenter> implements ISlideView {
+public class PlayerSlideActivity extends MvvmActivity<ActivityPlayerSlideBinding, SlideViewModel> {
 
     public static final String KEY_USER_ID = "key_user_id";
-
-    @BindView(R.id.tv_name_chn1)
-    TextView tvNameChn1;
-    @BindView(R.id.tv_name_chn2)
-    TextView tvNameChn2;
-    @BindView(R.id.ts_h2h)
-    TextSwitcher tsH2h;
-    @BindView(R.id.rv_players)
-    RecyclerView rvPlayers;
-    @BindView(R.id.rv_records)
-    RecyclerView rvRecords;
-    @BindView(R.id.ts_name_eng)
-    TextSwitcher tsNameEng;
-    @BindView(R.id.ts_place)
-    TextSwitcher tsPlace;
-    @BindView(R.id.ts_birthday)
-    TextSwitcher tsBirthday;
 
     private PlayerSlideAdapter playerSlideAdapter;
 
@@ -72,6 +54,11 @@ public class PlayerSlideActivity extends BaseMvpActivity<SlidePresenter> impleme
     }
 
     @Override
+    protected SlideViewModel createViewModel() {
+        return ViewModelProviders.of(this).get(SlideViewModel.class);
+    }
+
+    @Override
     protected void initView() {
         initRecyclerView();
         initCountryText();
@@ -79,18 +66,16 @@ public class PlayerSlideActivity extends BaseMvpActivity<SlidePresenter> impleme
     }
 
     @Override
-    protected SlidePresenter createPresenter() {
-        return new SlidePresenter();
-    }
-
-    @Override
     protected void initData() {
         long userId = getIntent().getLongExtra(KEY_USER_ID, -1);
-        presenter.loadPlayers(userId);
+        
+        mModel.playersObserver.observe(this, list -> onPlayerLoaded(list));
+        mModel.recordsObserver.observe(this, list -> onRecordLoaded(list));
+        mModel.loadPlayers(userId);
     }
 
     private void initRecyclerView() {
-        rvPlayers.addOnScrollListener(new RecyclerView.OnScrollListener() {
+        mBinding.rvPlayers.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
                 if (newState == RecyclerView.SCROLL_STATE_IDLE) {
@@ -106,20 +91,18 @@ public class PlayerSlideActivity extends BaseMvpActivity<SlidePresenter> impleme
 
         LinearLayoutManager manager = new LinearLayoutManager(this);
         manager.setOrientation(LinearLayoutManager.VERTICAL);
-        rvRecords.setLayoutManager(manager);
+        mBinding.rvRecords.setLayoutManager(manager);
     }
 
-    @Override
-    public void onPlayerLoaded(List<SlideItem<H2hBean>> playerList) {
-
+    private void onPlayerLoaded(List<SlideItem<H2hBean>> playerList) {
         if (playerSlideAdapter == null) {
             playerSlideAdapter = new PlayerSlideAdapter();
             playerSlideAdapter.setList(playerList);
             playerSlideAdapter.setOnItemClickListener((BaseBindingAdapter.OnItemClickListener<SlideItem<H2hBean>>) (view, position, bean) -> {
                 clickPlayer(bean.getBean(), position);
             });
-            rvPlayers.setAdapter(playerSlideAdapter);
-            new CardSnapHelper().attachToRecyclerView(rvPlayers);
+            mBinding.rvPlayers.setAdapter(playerSlideAdapter);
+            new CardSnapHelper().attachToRecyclerView(mBinding.rvPlayers);
             onActiveCardChange(0);
         }
         else {
@@ -129,7 +112,7 @@ public class PlayerSlideActivity extends BaseMvpActivity<SlidePresenter> impleme
     }
 
     private void clickPlayer(H2hBean bean, int position) {
-        CardSliderLayoutManager lm =  (CardSliderLayoutManager) rvPlayers.getLayoutManager();
+        CardSliderLayoutManager lm =  (CardSliderLayoutManager) mBinding.rvPlayers.getLayoutManager();
 
         if (lm.isSmoothScrolling()) {
             return;
@@ -142,47 +125,36 @@ public class PlayerSlideActivity extends BaseMvpActivity<SlidePresenter> impleme
 
         if (position == activeCardPosition) {
             Intent intent = new Intent(PlayerSlideActivity.this, PlayerPageActivity.class);
-            intent.putExtra(PlayerPageActivity.KEY_USER_ID, presenter.getUser().getId());
+            intent.putExtra(PlayerPageActivity.KEY_USER_ID, mModel.getUser().getId());
             intent.putExtra(PlayerPageActivity.KEY_COMPETITOR_ID, bean.getCompetitor().getId());
             if (bean.getCompetitor() instanceof User) {
                 intent.putExtra(PlayerPageActivity.KEY_COMPETITOR_IS_USER, true);
             }
             startActivity(intent);
         } else if (position > activeCardPosition) {
-            rvPlayers.smoothScrollToPosition(position);
+            mBinding.rvPlayers.smoothScrollToPosition(position);
             onActiveCardChange(position);
         }
     }
 
-    @Override
-    public void onPlayerLoadFailed(String message) {
-        showConfirmMessage(message, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                finish();
-            }
-        });
-    }
-
-    @Override
-    public void onRecordLoaded(List<Object> list) {
+    private void onRecordLoaded(List<Object> list) {
         if (recordAdapter == null) {
             recordAdapter = new PageRecordAdapter();
-            recordAdapter.setUser(presenter.getUser());
+            recordAdapter.setUser(mModel.getUser());
             recordAdapter.setList(list);
             recordAdapter.setOnItemClickListener((view, position, data) -> {
                 Intent intent = new Intent(PlayerSlideActivity.this, MatchPageActivity.class);
-                intent.putExtra(MatchPageActivity.KEY_USER_ID, presenter.getUser().getId());
+                intent.putExtra(MatchPageActivity.KEY_USER_ID, mModel.getUser().getId());
                 intent.putExtra(MatchPageActivity.KEY_MATCH_NAME_ID, data.getMatchNameId());
                 startActivity(intent);
             });
-            rvRecords.setAdapter(recordAdapter);
+            mBinding.rvRecords.setAdapter(recordAdapter);
         }
         else {
             recordAdapter.setList(list);
             recordAdapter.notifyDataSetChanged();
         }
-        rvRecords.scrollToPosition(0);
+        mBinding.rvRecords.scrollToPosition(0);
     }
 
     @OnClick({R.id.iv_back})
@@ -191,15 +163,15 @@ public class PlayerSlideActivity extends BaseMvpActivity<SlidePresenter> impleme
     }
 
     private void initSwitchers() {
-        tsH2h.setFactory(new TextViewFactory(R.style.TemperatureTextView, true));
-        
-        tsNameEng.setFactory(new TextViewFactory(R.style.PlaceTextView, false));
+        mBinding.tsH2h.setFactory(new TextViewFactory(R.style.TemperatureTextView, true));
 
-        tsBirthday.setFactory(new TextViewFactory(R.style.ClockTextView, false));
+        mBinding.tsNameEng.setFactory(new TextViewFactory(R.style.PlaceTextView, false));
 
-        tsPlace.setInAnimation(this, android.R.anim.fade_in);
-        tsPlace.setOutAnimation(this, android.R.anim.fade_out);
-        tsPlace.setFactory(new TextViewFactory(R.style.DescriptionTextView, false));
+        mBinding.tsBirthday.setFactory(new TextViewFactory(R.style.ClockTextView, false));
+
+        mBinding.tsPlace.setInAnimation(this, android.R.anim.fade_in);
+        mBinding.tsPlace.setOutAnimation(this, android.R.anim.fade_out);
+        mBinding.tsPlace.setFactory(new TextViewFactory(R.style.DescriptionTextView, false));
 
     }
 
@@ -208,9 +180,9 @@ public class PlayerSlideActivity extends BaseMvpActivity<SlidePresenter> impleme
         countryOffset1 = getResources().getDimensionPixelSize(R.dimen.player_slide_left_offset);
         countryOffset2 = getResources().getDimensionPixelSize(R.dimen.player_slide_left_offset2);
 
-        tvNameChn1.setX(countryOffset1);
-        tvNameChn2.setX(countryOffset2);
-        tvNameChn2.setAlpha(0f);
+        mBinding.tvNameChn1.setX(countryOffset1);
+        mBinding.tvNameChn2.setX(countryOffset2);
+        mBinding.tvNameChn2.setAlpha(0f);
 
 //        tvNameChn1.setTypeface(Typeface.createFromAsset(getAssets(), "open-sans-extrabold.ttf"));
 //        tvNameChn2.setTypeface(Typeface.createFromAsset(getAssets(), "open-sans-extrabold.ttf"));
@@ -219,12 +191,12 @@ public class PlayerSlideActivity extends BaseMvpActivity<SlidePresenter> impleme
     private void setChnName(String text, boolean left2right) {
         final TextView invisibleText;
         final TextView visibleText;
-        if (tvNameChn1.getAlpha() > tvNameChn2.getAlpha()) {
-            visibleText = tvNameChn1;
-            invisibleText = tvNameChn2;
+        if (mBinding.tvNameChn1.getAlpha() > mBinding.tvNameChn2.getAlpha()) {
+            visibleText = mBinding.tvNameChn1;
+            invisibleText = mBinding.tvNameChn2;
         } else {
-            visibleText = tvNameChn2;
-            invisibleText = tvNameChn1;
+            visibleText = mBinding.tvNameChn2;
+            invisibleText = mBinding.tvNameChn1;
         }
 
         final int vOffset;
@@ -250,7 +222,7 @@ public class PlayerSlideActivity extends BaseMvpActivity<SlidePresenter> impleme
     }
 
     private void onActiveCardChange() {
-        final int pos = ((CardSliderLayoutManager) rvPlayers.getLayoutManager()).getActiveCardPosition();
+        final int pos = ((CardSliderLayoutManager) mBinding.rvPlayers.getLayoutManager()).getActiveCardPosition();
         if (pos == RecyclerView.NO_POSITION || pos == currentPosition) {
             return;
         }
@@ -271,31 +243,31 @@ public class PlayerSlideActivity extends BaseMvpActivity<SlidePresenter> impleme
             animV[1] = R.anim.slide_out_top;
         }
 
-        H2hBean bean = presenter.getCompetitorList().get(pos).getBean();
+        H2hBean bean = mModel.getCompetitorList().get(pos).getBean();
         setChnName(bean.getCompetitor().getNameChn(), left2right);
 
-        tsH2h.setInAnimation(this, animH[0]);
-        tsH2h.setOutAnimation(this, animH[1]);
-        tsH2h.setText(bean.getWin() + " - " + bean.getLose());
+        mBinding.tsH2h.setInAnimation(this, animH[0]);
+        mBinding.tsH2h.setOutAnimation(this, animH[1]);
+        mBinding.tsH2h.setText(bean.getWin() + " - " + bean.getLose());
 
-        tsNameEng.setInAnimation(this, animV[0]);
-        tsNameEng.setOutAnimation(this, animV[1]);
-        tsNameEng.setText(bean.getCompetitor().getNameEng());
+        mBinding.tsNameEng.setInAnimation(this, animV[0]);
+        mBinding.tsNameEng.setOutAnimation(this, animV[1]);
+        mBinding.tsNameEng.setText(bean.getCompetitor().getNameEng());
 
-        tsBirthday.setInAnimation(this, animV[0]);
-        tsBirthday.setOutAnimation(this, animV[1]);
+        mBinding.tsBirthday.setInAnimation(this, animV[0]);
+        mBinding.tsBirthday.setOutAnimation(this, animV[1]);
         try {
-            tsBirthday.setText(bean.getCompetitor().getBirthday() + "   " + ConstellationUtil.getConstellationChn(bean.getCompetitor().getBirthday()));
+            mBinding.tsBirthday.setText(bean.getCompetitor().getBirthday() + "   " + ConstellationUtil.getConstellationChn(bean.getCompetitor().getBirthday()));
         } catch (ConstellationUtil.ConstellationParseException e) {
             e.printStackTrace();
-            tsBirthday.setText(bean.getCompetitor().getBirthday());
+            mBinding.tsBirthday.setText(bean.getCompetitor().getBirthday());
         }
 
-        tsPlace.setText(bean.getCompetitor().getCountry());
+        mBinding.tsPlace.setText(bean.getCompetitor().getCountry());
 
         currentPosition = pos;
 
-        presenter.loadRecords(bean);
+        mModel.loadRecords(bean);
     }
 
     private class TextViewFactory implements  ViewSwitcher.ViewFactory {

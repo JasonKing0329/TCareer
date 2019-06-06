@@ -1,6 +1,10 @@
 package com.king.app.tcareer.page.player.slider;
 
-import com.king.app.tcareer.base.BasePresenter;
+import android.app.Application;
+import android.arch.lifecycle.MutableLiveData;
+import android.support.annotation.NonNull;
+
+import com.king.app.tcareer.base.mvvm.BaseViewModel;
 import com.king.app.tcareer.conf.AppConstants;
 import com.king.app.tcareer.model.ImageProvider;
 import com.king.app.tcareer.model.bean.H2hBean;
@@ -20,7 +24,6 @@ import io.reactivex.ObservableSource;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 
@@ -29,14 +32,18 @@ import io.reactivex.schedulers.Schedulers;
  * <p/>作者：景阳
  * <p/>创建时间: 2017/11/24 14:56
  */
-public class SlidePresenter extends BasePresenter<ISlideView> {
+public class SlideViewModel extends BaseViewModel {
+
+    public MutableLiveData<List<SlideItem<H2hBean>>> playersObserver = new MutableLiveData<>();
+
+    public MutableLiveData<List<Object>> recordsObserver = new MutableLiveData<>();
 
     private List<SlideItem<H2hBean>> h2hList;
 
     private H2HDao h2HDao;
 
-    @Override
-    protected void onCreate() {
+    public SlideViewModel(@NonNull Application application) {
+        super(application);
         h2HDao = new H2HDao();
     }
 
@@ -55,13 +62,13 @@ public class SlidePresenter extends BasePresenter<ISlideView> {
                     @Override
                     public void onNext(List<SlideItem<H2hBean>> h2hBeans) {
                         h2hList = h2hBeans;
-                        view.onPlayerLoaded(h2hBeans);
+                        playersObserver.setValue(h2hBeans);
                     }
 
                     @Override
                     public void onError(Throwable throwable) {
                         throwable.printStackTrace();
-                        view.onPlayerLoadFailed("Load h2h beans failed: " + throwable.getMessage());
+                        messageObserver.setValue("Load h2h beans failed: " + throwable.getMessage());
                     }
 
                     @Override
@@ -90,23 +97,28 @@ public class SlidePresenter extends BasePresenter<ISlideView> {
 
     public void loadRecords(H2hBean bean) {
         h2HDao.queryH2HRecords(mUser.getId(), bean)
-                .flatMap(new Function<List<Record>, ObservableSource<List<Object>>>() {
-                    @Override
-                    public ObservableSource<List<Object>> apply(List<Record> records) throws Exception {
-                        return parseRecords(records);
-                    }
-                })
+                .flatMap((Function<List<Record>, ObservableSource<List<Object>>>) records -> parseRecords(records))
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
-                .subscribe(new Consumer<List<Object>>() {
+                .subscribe(new Observer<List<Object>>() {
                     @Override
-                    public void accept(List<Object> list) throws Exception {
-                        view.onRecordLoaded(list);
+                    public void onSubscribe(Disposable d) {
+                        addDisposable(d);
                     }
-                }, new Consumer<Throwable>() {
+
                     @Override
-                    public void accept(Throwable throwable) throws Exception {
-                        throwable.printStackTrace();
+                    public void onNext(List<Object> list) {
+                        recordsObserver.setValue(list);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        e.printStackTrace();
+                    }
+
+                    @Override
+                    public void onComplete() {
+
                     }
                 });
     }

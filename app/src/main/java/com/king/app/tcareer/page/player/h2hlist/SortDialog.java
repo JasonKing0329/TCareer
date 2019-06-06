@@ -4,16 +4,13 @@ import android.support.v4.app.Fragment;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.Spinner;
 
 import com.king.app.tcareer.R;
 import com.king.app.tcareer.base.IFragmentHolder;
+import com.king.app.tcareer.base.mvvm.BaseViewModel;
+import com.king.app.tcareer.databinding.DialogH2hlistSortBinding;
 import com.king.app.tcareer.page.setting.SettingProperty;
 import com.king.app.tcareer.view.dialog.DraggableDialogFragment;
-
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.Unbinder;
 
 /**
  * 描述:
@@ -56,13 +53,7 @@ public class SortDialog extends DraggableDialogFragment {
         return sortFragment.onSave();
     }
 
-    public static class SortFragment extends ContentFragment {
-
-        @BindView(R.id.sp_type)
-        Spinner spType;
-        @BindView(R.id.sp_order)
-        Spinner spOrder;
-        Unbinder unbinder;
+    public static class SortFragment extends BindingContentFragment<DialogH2hlistSortBinding, BaseViewModel> {
 
         private String[] arrType, arrOrder;
 
@@ -74,29 +65,27 @@ public class SortDialog extends DraggableDialogFragment {
         }
 
         @Override
+        protected BaseViewModel createViewModel() {
+            return null;
+        }
+
+        @Override
         protected void onCreate(View view) {
-            unbinder = ButterKnife.bind(this, view);
             arrOrder = getContext().getResources().getStringArray(R.array.sort_order);
             arrType = getContext().getResources().getStringArray(R.array.h2hlist_sort_type);
 
             ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_dropdown_item_1line, arrType);
-            spType.setAdapter(adapter);
-            spType.setSelection(0);
+            mBinding.spType.setAdapter(adapter);
+            mBinding.spType.setSelection(0);
 
             adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_dropdown_item_1line, arrOrder);
-            spOrder.setAdapter(adapter);
-            spOrder.setSelection(0);
+            mBinding.spOrder.setAdapter(adapter);
+            mBinding.spOrder.setSelection(0);
         }
 
         @Override
         protected void bindChildFragmentHolder(IFragmentHolder holder) {
 
-        }
-
-        @Override
-        public void onDestroyView() {
-            super.onDestroyView();
-            unbinder.unbind();
         }
 
         public void setOnSortListener(OnSortListener onSortListener) {
@@ -105,7 +94,7 @@ public class SortDialog extends DraggableDialogFragment {
 
         public boolean onSave() {
             if (onSortListener != null) {
-                onSortListener.onSort(getSortType(spType.getSelectedItemPosition()), spOrder.getSelectedItemPosition());
+                onSortListener.onSort(getSortType(mBinding.spType.getSelectedItemPosition()), mBinding. spOrder.getSelectedItemPosition());
             }
             return true;
         }

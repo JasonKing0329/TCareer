@@ -29,7 +29,6 @@ import com.king.app.tcareer.R;
 import com.king.app.tcareer.base.mvvm.MvvmActivity;
 import com.king.app.tcareer.databinding.ActivityPlayerPageBinding;
 import com.king.app.tcareer.model.GlideOptions;
-import com.king.app.tcareer.model.bean.CompetitorBean;
 import com.king.app.tcareer.model.db.entity.PlayerAtpBean;
 import com.king.app.tcareer.model.http.Command;
 import com.king.app.tcareer.model.palette.PaletteCallback;
@@ -53,7 +52,7 @@ import java.util.List;
  * <p/>作者：景阳
  * <p/>创建时间: 2017/11/20 14:11
  */
-public class PlayerPageActivity extends MvvmActivity<ActivityPlayerPageBinding, PageViewModel> implements IPageHolder {
+public class PlayerPageActivity extends MvvmActivity<ActivityPlayerPageBinding, PageViewModel> {
 
     public static final String KEY_USER_ID = "key_user_id";
     public static final String KEY_COMPETITOR_ID = "key_competitor_id";
@@ -445,11 +444,6 @@ public class PlayerPageActivity extends MvvmActivity<ActivityPlayerPageBinding, 
         mBinding.tabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(mBinding.viewpager));
 
         mBinding.viewpager.setAdapter(pageAdapter);
-    }
-
-    @Override
-    public CompetitorBean getCompetitor() {
-        return mModel.getCompetitor();
     }
 
     private void animTags(boolean isRight) {

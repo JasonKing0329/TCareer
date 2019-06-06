@@ -34,8 +34,6 @@ public class PageFragment extends MvvmFragment<FragmentPlayerPageBinding, SubPag
     private PageRecordAdapter cardAdapter;
     private FullRecordAdapter fullAdapter;
 
-    private IPageHolder holder;
-
     private int mFirstPosition;
 
     private boolean initialYearTitle;
@@ -54,7 +52,7 @@ public class PageFragment extends MvvmFragment<FragmentPlayerPageBinding, SubPag
 
     @Override
     protected void bindFragmentHolder(IFragmentHolder holder) {
-        this.holder = (IPageHolder) holder;
+
     }
 
     @Override
@@ -74,9 +72,13 @@ public class PageFragment extends MvvmFragment<FragmentPlayerPageBinding, SubPag
         mBinding.rvRecords.setLayoutManager(manager);
     }
 
+    private PageViewModel getMainViewModel() {
+        return ViewModelProviders.of(getActivity()).get(PageViewModel.class);
+    }
+
     @Override
     protected void onCreateData() {
-        mModel.setCompetitor(holder.getCompetitor());
+        mModel.setCompetitor(getMainViewModel().getCompetitor());
 
         long userId = getArguments().getLong(KEY_USER_ID);
         String court = getArguments().getString(KEY_COURT);

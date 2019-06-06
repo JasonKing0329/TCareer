@@ -1,22 +1,14 @@
 package com.king.app.tcareer.page.player.h2hlist;
 
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.graphics.PorterDuff;
-import android.support.design.widget.CollapsingToolbarLayout;
-import android.support.v7.widget.Toolbar;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
-import com.github.mikephil.charting.charts.PieChart;
 import com.king.app.tcareer.R;
-import com.king.app.tcareer.base.BaseMvpActivity;
-import com.king.app.tcareer.model.GlideOptions;
-import com.king.app.tcareer.model.ImageProvider;
+import com.king.app.tcareer.base.mvvm.MvvmActivity;
+import com.king.app.tcareer.databinding.ActivityH2hListBinding;
 import com.king.app.tcareer.model.bean.CompetitorBean;
-import com.king.app.tcareer.model.bean.H2hBean;
 import com.king.app.tcareer.model.db.entity.User;
 import com.king.app.tcareer.page.glory.chart.ChartManager;
 import com.king.app.tcareer.page.player.list.RichPlayerFilterDialog;
@@ -30,63 +22,21 @@ import com.nightonke.boommenu.BoomButtons.ButtonPlaceAlignmentEnum;
 import com.nightonke.boommenu.BoomButtons.ButtonPlaceEnum;
 import com.nightonke.boommenu.BoomButtons.OnBMClickListener;
 import com.nightonke.boommenu.BoomButtons.SimpleCircleButton;
-import com.nightonke.boommenu.BoomMenuButton;
 import com.nightonke.boommenu.ButtonEnum;
 import com.nightonke.boommenu.Piece.PiecePlaceEnum;
-
-import java.util.List;
-
-import butterknife.BindView;
-import butterknife.OnClick;
 
 /**
  * Created by Administrator on 2017/4/30 0030.
  */
 
-public class H2hListActivity extends BaseMvpActivity<H2hPresenter> implements IH2hListView
-        , OnBMClickListener, RichPlayerHolder {
+public class H2hListActivity extends MvvmActivity<ActivityH2hListBinding, H2hViewModel> implements 
+        OnBMClickListener, RichPlayerHolder {
 
     public static final String KEY_USER_ID = "key_user_id";
-
-    @BindView(R.id.group_root)
-    ViewGroup groupRoot;
-    @BindView(R.id.iv_head)
-    ImageView ivHead;
-    @BindView(R.id.tv_total_player)
-    TextView tvTotalPlayer;
-    @BindView(R.id.toolbar)
-    Toolbar toolbar;
-    @BindView(R.id.bmb_menu)
-    BoomMenuButton bmbMenu;
-    @BindView(R.id.piechart)
-    PieChart pieChart;
-    @BindView(R.id.tv_career)
-    TextView tvCareer;
-    @BindView(R.id.tv_win)
-    TextView tvWin;
-    @BindView(R.id.tv_season)
-    TextView tvSeason;
-    @BindView(R.id.tv_lose)
-    TextView tvLose;
-    @BindView(R.id.tv_win_lose)
-    TextView tvWinLose;
-    @BindView(R.id.tv_sort)
-    TextView tvSort;
-    @BindView(R.id.tv_filter)
-    TextView tvFilter;
-    @BindView(R.id.ctl_toolbar)
-    CollapsingToolbarLayout ctlToolbar;
-    @BindView(R.id.iv_collapse_all)
-    ImageView ivCollapseAll;
-    @BindView(R.id.iv_expand_all)
-    ImageView ivExpandAll;
-    @BindView(R.id.iv_side)
-    ImageView ivSide;
 
     private SortDialog sortDialog;
 
     private ChartManager chartManager;
-    private H2hListPageData pageData;
 
     private RichPlayerFragment ftRich;
 
@@ -96,7 +46,14 @@ public class H2hListActivity extends BaseMvpActivity<H2hPresenter> implements IH
     }
 
     @Override
+    protected H2hViewModel createViewModel() {
+        return ViewModelProviders.of(this).get(H2hViewModel.class);
+    }
+
+    @Override
     protected void initView() {
+        mBinding.setModel(mModel);
+
         initToolbar();
         initBoomButton();
 
@@ -107,51 +64,63 @@ public class H2hListActivity extends BaseMvpActivity<H2hPresenter> implements IH
                 .replace(R.id.group_ft, ftRich, "RichPlayerFragment")
                 .commit();
 
-        ivSide.setOnClickListener(v -> ftRich.toggleSidebar());
-        ivCollapseAll.setOnClickListener(v -> ftRich.setExpandAll(false));
-        ivExpandAll.setOnClickListener(v -> ftRich.setExpandAll(true));
+        mBinding.tvCareer.setOnClickListener(v -> {
+            mBinding.tvCareer.setSelected(true);
+            mBinding.tvSeason.setSelected(false);
+            showChart();
+        });
+        mBinding.tvWin.setOnClickListener(v -> {
+            mBinding.tvWin.setSelected(true);
+            mBinding.tvLose.setSelected(false);
+            showChart();
+        });
+        mBinding.tvSeason.setOnClickListener(v -> {
+            mBinding.tvCareer.setSelected(false);
+            mBinding.tvSeason.setSelected(true);
+            showChart();
+        });
+        mBinding.tvLose.setOnClickListener(v -> {
+            mBinding.tvWin.setSelected(false);
+            mBinding.tvLose.setSelected(true);
+            showChart();
+        });
+        mBinding.tvCareer.setSelected(true);
+        mBinding.tvWin.setSelected(true);
 
-        ivSide.setColorFilter(getResources().getColor(R.color.colorPrimary), PorterDuff.Mode.SRC_IN);
-        ivCollapseAll.setColorFilter(getResources().getColor(R.color.colorPrimary), PorterDuff.Mode.SRC_IN);
-        ivExpandAll.setColorFilter(getResources().getColor(R.color.colorPrimary), PorterDuff.Mode.SRC_IN);
-    }
+        mBinding.ivSide.setOnClickListener(v -> ftRich.toggleSidebar());
+        mBinding.ivCollapseAll.setOnClickListener(v -> ftRich.setExpandAll(false));
+        mBinding.ivExpandAll.setOnClickListener(v -> ftRich.setExpandAll(true));
 
-    @Override
-    protected H2hPresenter createPresenter() {
-        return new H2hPresenter();
-    }
-
-    @Override
-    protected void initData() {
-        chartManager = new ChartManager(this);
-        presenter.loadPlayers(getIntent().getLongExtra(KEY_USER_ID, -1));
+        mBinding.ivSide.setColorFilter(getResources().getColor(R.color.colorPrimary), PorterDuff.Mode.SRC_IN);
+        mBinding.ivCollapseAll.setColorFilter(getResources().getColor(R.color.colorPrimary), PorterDuff.Mode.SRC_IN);
+        mBinding.ivExpandAll.setColorFilter(getResources().getColor(R.color.colorPrimary), PorterDuff.Mode.SRC_IN);
     }
 
     private void initToolbar() {
-        setSupportActionBar(toolbar);
-        toolbar.setNavigationOnClickListener(view -> finish());
+        setSupportActionBar(mBinding.toolbar);
+        mBinding.toolbar.setNavigationOnClickListener(view -> finish());
 
     }
 
     private void initBoomButton() {
         int radius = getResources().getDimensionPixelSize(R.dimen.boom_menu_btn_radius);
-        bmbMenu.setButtonEnum(ButtonEnum.SimpleCircle);
-        bmbMenu.setButtonRadius(radius);
-        bmbMenu.setPiecePlaceEnum(PiecePlaceEnum.DOT_3_1);
-        bmbMenu.setButtonPlaceEnum(ButtonPlaceEnum.Vertical);
-        bmbMenu.setButtonPlaceAlignmentEnum(ButtonPlaceAlignmentEnum.BL);
-        bmbMenu.setButtonLeftMargin(getResources().getDimensionPixelSize(R.dimen.home_pop_menu_right));
-        bmbMenu.setButtonBottomMargin(getResources().getDimensionPixelSize(R.dimen.home_pop_menu_bottom));
-        bmbMenu.setButtonVerticalMargin(getResources().getDimensionPixelSize(R.dimen.boom_menu_btn_margin_ver));
-        bmbMenu.addBuilder(new SimpleCircleButton.Builder()
+        mBinding.bmbMenu.setButtonEnum(ButtonEnum.SimpleCircle);
+        mBinding.bmbMenu.setButtonRadius(radius);
+        mBinding.bmbMenu.setPiecePlaceEnum(PiecePlaceEnum.DOT_3_1);
+        mBinding.bmbMenu.setButtonPlaceEnum(ButtonPlaceEnum.Vertical);
+        mBinding.bmbMenu.setButtonPlaceAlignmentEnum(ButtonPlaceAlignmentEnum.BL);
+        mBinding.bmbMenu.setButtonLeftMargin(getResources().getDimensionPixelSize(R.dimen.home_pop_menu_right));
+        mBinding.bmbMenu.setButtonBottomMargin(getResources().getDimensionPixelSize(R.dimen.home_pop_menu_bottom));
+        mBinding.bmbMenu.setButtonVerticalMargin(getResources().getDimensionPixelSize(R.dimen.boom_menu_btn_margin_ver));
+        mBinding.bmbMenu.addBuilder(new SimpleCircleButton.Builder()
                 .normalImageRes(R.drawable.ic_sort_white_24dp)
                 .buttonRadius(radius)
                 .listener(this));
-        bmbMenu.addBuilder(new SimpleCircleButton.Builder()
+        mBinding.bmbMenu.addBuilder(new SimpleCircleButton.Builder()
                 .normalImageRes(R.drawable.ic_filter_list_white_24dp)
                 .buttonRadius(radius)
                 .listener(this));
-        bmbMenu.addBuilder(new SimpleCircleButton.Builder()
+        mBinding.bmbMenu.addBuilder(new SimpleCircleButton.Builder()
                 .normalImageRes(R.drawable.ic_refresh_white_24dp)
                 .buttonRadius(radius)
                 .listener(this));
@@ -159,36 +128,11 @@ public class H2hListActivity extends BaseMvpActivity<H2hPresenter> implements IH
     }
 
     @Override
-    public void postShowUser(final User user) {
-        runOnUiThread(() -> {
-            ctlToolbar.setTitle(user.getNameChn());
-            String imagePath = ImageProvider.getDetailPlayerPath(user.getNameChn());
-            Glide.with(this)
-                    .asBitmap()
-                    .load(imagePath)
-                    .apply(GlideOptions.getEditorPlayerOptions())
-                    .into(ivHead);
-        });
-    }
+    protected void initData() {
+        chartManager = new ChartManager(this);
 
-    @Override
-    public void onDataLoaded(H2hListPageData data) {
-
-        this.pageData = data;
-
-        tvCareer.setSelected(true);
-        tvWin.setSelected(true);
-        showChart();
-    }
-
-    @Override
-    public void onSortFinished(List<H2hBean> list) {
-
-    }
-
-    @Override
-    public void onFilterFinished(List<H2hBean> list) {
-
+        mModel.pageDataObserver.observe(this, data -> showChart());
+        mModel.loadPlayers(getIntent().getLongExtra(KEY_USER_ID, -1));
     }
 
     @Override
@@ -202,7 +146,7 @@ public class H2hListActivity extends BaseMvpActivity<H2hPresenter> implements IH
                 showFilterDialog();
                 break;
             case 2:
-                presenter.loadPlayers(getIntent().getLongExtra(KEY_USER_ID, -1));
+                mModel.loadPlayers(getIntent().getLongExtra(KEY_USER_ID, -1));
                 ftRich.reload();
                 break;
         }
@@ -220,59 +164,17 @@ public class H2hListActivity extends BaseMvpActivity<H2hPresenter> implements IH
         dialog.show(getSupportFragmentManager(), "RichPlayerFilterDialog");
     }
 
-    @OnClick({R.id.tv_career, R.id.tv_win, R.id.tv_season, R.id.tv_lose})
-    public void onViewClicked(View view) {
-        switch (view.getId()) {
-            case R.id.tv_career:
-                tvCareer.setSelected(true);
-                tvSeason.setSelected(false);
-                showChart();
-                break;
-            case R.id.tv_win:
-                tvWin.setSelected(true);
-                tvLose.setSelected(false);
-                showChart();
-                break;
-            case R.id.tv_season:
-                tvCareer.setSelected(false);
-                tvSeason.setSelected(true);
-                showChart();
-                break;
-            case R.id.tv_lose:
-                tvWin.setSelected(false);
-                tvLose.setSelected(true);
-                showChart();
-                break;
-        }
-    }
-
     private void showChart() {
-        float[] values = new float[pageData.getChartContents().length];
-        Integer[] targetValues;
-        if (tvCareer.isSelected()) {
-            if (tvWin.isSelected()) {
-                targetValues = pageData.getCareerChartWinValues();
-            } else {
-                targetValues = pageData.getCareerChartLoseValues();
-            }
-        } else {
-            if (tvWin.isSelected()) {
-                targetValues = pageData.getSeasonChartWinValues();
-            } else {
-                targetValues = pageData.getSeasonChartLoseValues();
-            }
-        }
-        for (int i = 0; i < values.length; i++) {
-            values[i] = targetValues[i];
-        }
-        chartManager.showH2hChart(pieChart, pageData.getChartContents(), values);
+        String[] contentValues = mModel.getChartContents();
+        float[] values = mModel.getTargetValues(mBinding.tvCareer.isSelected(), mBinding.tvWin.isSelected());
+        chartManager.showH2hChart(mBinding.piechart, contentValues, values);
     }
 
     @Override
     public void onSelectPlayer(CompetitorBean bean) {
         Intent intent = new Intent();
         intent.setClass(this, PlayerPageActivity.class);
-        intent.putExtra(PlayerPageActivity.KEY_USER_ID, presenter.getUser().getId());
+        intent.putExtra(PlayerPageActivity.KEY_USER_ID, mModel.getUser().getId());
         if (bean instanceof User) {
             intent.putExtra(PlayerPageActivity.KEY_COMPETITOR_IS_USER, true);
         }
@@ -347,16 +249,16 @@ public class H2hListActivity extends BaseMvpActivity<H2hPresenter> implements IH
                 sort = getString(R.string.menu_sort_name);
                 break;
         }
-        tvSort.setText(sort + "排序");
+        mBinding.tvSort.setText(sort + "排序");
 
         int[] winLose = ftRich.getWinLoseOfList();
         StringBuffer buffer = new StringBuffer();
         buffer.append(winLose[0]).append("胜").append(winLose[1]).append("负");
-        tvWinLose.setText(buffer.toString());
+        mBinding.tvWinLose.setText(buffer.toString());
 
         buffer = new StringBuffer("过滤条件：");
         if (ListUtil.isEmpty(ftRich.getFilterTexts())) {
-            tvFilter.setVisibility(View.GONE);
+            mBinding.tvFilter.setVisibility(View.GONE);
         }
         else {
             for (int i = 0; i < ftRich.getFilterTexts().size(); i ++) {
@@ -365,11 +267,11 @@ public class H2hListActivity extends BaseMvpActivity<H2hPresenter> implements IH
                 }
                 buffer.append(ftRich.getFilterTexts().get(i));
             }
-            tvFilter.setText(buffer.toString());
-            tvFilter.setVisibility(View.VISIBLE);
+            mBinding.tvFilter.setText(buffer.toString());
+            mBinding.tvFilter.setVisibility(View.VISIBLE);
         }
 
-        tvTotalPlayer.setText(String.valueOf(ftRich.getTotalPlayers()));
+        mBinding.tvTotalPlayer.setText(String.valueOf(ftRich.getTotalPlayers()));
     }
 
 }
