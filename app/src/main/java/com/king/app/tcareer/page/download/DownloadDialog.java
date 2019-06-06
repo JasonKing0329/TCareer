@@ -7,23 +7,19 @@ import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import com.king.app.tcareer.R;
 import com.king.app.tcareer.base.IFragmentHolder;
+import com.king.app.tcareer.base.mvvm.BaseViewModel;
+import com.king.app.tcareer.databinding.DialogDownloadBinding;
 import com.king.app.tcareer.model.http.progress.ProgressListener;
 import com.king.app.tcareer.utils.ScreenUtils;
 import com.king.app.tcareer.view.dialog.DraggableDialogFragment;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.Unbinder;
 
 /**
  * @desc
@@ -88,13 +84,7 @@ public class DownloadDialog extends DraggableDialogFragment implements IDownload
         dismissAllowingStateLoss();
     }
 
-    public static class DownloadFragment extends ContentFragment {
-
-        @BindView(R.id.download_empty)
-        TextView tvEmpty;
-        @BindView(R.id.download_list)
-        RecyclerView rvDownload;
-        Unbinder unbinder;
+    public static class DownloadFragment extends BindingContentFragment<DialogDownloadBinding, BaseViewModel> {
 
         private IDownloadHolder holder;
 
@@ -128,12 +118,15 @@ public class DownloadDialog extends DraggableDialogFragment implements IDownload
         }
 
         @Override
-        protected void onCreate(View view) {
-            unbinder = ButterKnife.bind(this, view);
+        protected BaseViewModel createViewModel() {
+            return null;
+        }
 
+        @Override
+        protected void onCreate(View view) {
             LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
             layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
-            rvDownload.setLayoutManager(layoutManager);
+            mBinding.rvList.setLayoutManager(layoutManager);
 
             itemList = new ArrayList<>();
             downloadManager = new DownloadManager(downloadCallback, 1);
@@ -159,12 +152,6 @@ public class DownloadDialog extends DraggableDialogFragment implements IDownload
             }
         }
 
-        @Override
-        public void onDestroyView() {
-            super.onDestroyView();
-            unbinder.unbind();
-        }
-
         public void setDownloadList(List<DownloadItem> downloadList) {
             this.downloadList = downloadList;
         }
@@ -187,8 +174,8 @@ public class DownloadDialog extends DraggableDialogFragment implements IDownload
 
         private void updateDownloadList() {
             if (itemList.size() == 0) {
-                tvEmpty.setVisibility(View.VISIBLE);
-                rvDownload.setVisibility(View.INVISIBLE);
+                mBinding.tvEmpty.setVisibility(View.VISIBLE);
+                mBinding.rvList.setVisibility(View.INVISIBLE);
             }
             else {
                 if (startNoOption) {
@@ -215,8 +202,9 @@ public class DownloadDialog extends DraggableDialogFragment implements IDownload
         }
 
         private void showListAndStartDownload() {
-            adapter = new DownloadAdapter(getContext(), itemList);
-            rvDownload.setAdapter(adapter);
+            adapter = new DownloadAdapter();
+            adapter.setList(itemList);
+            mBinding.rvList.setAdapter(adapter);
             startDownload();
         }
 

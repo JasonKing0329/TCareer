@@ -5,17 +5,13 @@ import android.support.v4.app.FragmentTransaction;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
-import android.widget.FrameLayout;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.king.app.tcareer.R;
+import com.king.app.tcareer.base.mvvm.BindingDialogFragment;
+import com.king.app.tcareer.databinding.DlgFtCustomBinding;
 import com.king.app.tcareer.utils.DebugLog;
 import com.king.app.tcareer.utils.ScreenUtils;
-import com.king.app.tcareer.view.dialog.BaseDialogFragment;
 
-import butterknife.BindView;
 import butterknife.ButterKnife;
 
 /**
@@ -24,38 +20,7 @@ import butterknife.ButterKnife;
  * @author：Jing Yang
  * @date: 2018/9/30 9:19
  */
-public class FrameDialogFragment extends BaseDialogFragment implements FrameHolder {
-
-    @BindView(R.id.group_dialog)
-    ViewGroup groupDialog;
-    @BindView(R.id.tv_title)
-    TextView tvTitle;
-    @BindView(R.id.group_title)
-    ViewGroup groupTitle;
-    @BindView(R.id.iv_search)
-    ImageView ivSearch;
-    @BindView(R.id.iv_play)
-    ImageView ivPlay;
-    @BindView(R.id.iv_ok)
-    ImageView ivOk;
-    @BindView(R.id.iv_save)
-    ImageView ivSave;
-    @BindView(R.id.iv_close)
-    ImageView ivClose;
-    @BindView(R.id.et_search)
-    EditText etSearch;
-    @BindView(R.id.iv_search_close)
-    ImageView ivSearchClose;
-    @BindView(R.id.group_search)
-    FrameLayout groupSearch;
-    @BindView(R.id.v_divider)
-    View vDivider;
-    @BindView(R.id.tv_null_content)
-    TextView tvNullContent;
-    @BindView(R.id.group_toolbar)
-    ViewGroup groupToolbar;
-    @BindView(R.id.group_ft_content)
-    ViewGroup groupFtContent;
+public class FrameDialogFragment extends BindingDialogFragment<DlgFtCustomBinding> implements FrameHolder {
 
     private Point startPoint, touchPoint;
 
@@ -80,16 +45,16 @@ public class FrameDialogFragment extends BaseDialogFragment implements FrameHold
     protected void initView(View view) {
         ButterKnife.bind(this, view);
         if (title != null) {
-            tvTitle.setText(title);
+            mBinding.tvTitle.setText(title);
         }
         if (backgroundColor != 0) {
-            groupDialog.setBackgroundColor(backgroundColor);
+            mBinding.groupDialog.setBackgroundColor(backgroundColor);
         }
         if (hideClose) {
-            ivClose.setVisibility(View.GONE);
+            mBinding.ivClose.setVisibility(View.GONE);
         }
         else {
-            ivClose.setVisibility(View.VISIBLE);
+            mBinding.ivClose.setVisibility(View.VISIBLE);
         }
 
         initDragParams();
@@ -99,12 +64,12 @@ public class FrameDialogFragment extends BaseDialogFragment implements FrameHold
             replaceContentFragment(contentFragment, "ContentView");
         }
 
-        groupFtContent.post(() -> {
-            DebugLog.e("groupFtContent height=" + groupFtContent.getHeight());
+        mBinding.groupFtContent.post(() -> {
+            DebugLog.e("mBinding.groupFtContent height=" + mBinding.groupFtContent.getHeight());
             limitMaxHeight();
         });
 
-        ivClose.setOnClickListener(v -> dismissAllowingStateLoss());
+        mBinding.ivClose.setOnClickListener(v -> dismissAllowingStateLoss());
     }
 
     protected void replaceContentFragment(FrameContentFragment target, String tag) {
@@ -149,10 +114,10 @@ public class FrameDialogFragment extends BaseDialogFragment implements FrameHold
 
     private void limitMaxHeight() {
         int maxContentHeight = getMaxHeight();
-        if (groupFtContent.getHeight() > maxContentHeight) {
-            ViewGroup.LayoutParams params = groupFtContent.getLayoutParams();
+        if (mBinding.groupFtContent.getHeight() > maxContentHeight) {
+            ViewGroup.LayoutParams params = mBinding.groupFtContent.getLayoutParams();
             params.height = maxContentHeight;
-            groupFtContent.setLayoutParams(params);
+            mBinding.groupFtContent.setLayoutParams(params);
         }
     }
 
@@ -172,7 +137,7 @@ public class FrameDialogFragment extends BaseDialogFragment implements FrameHold
     private void initDragParams() {
         touchPoint = new FrameDialogFragment.Point();
         startPoint = new FrameDialogFragment.Point();
-        groupDialog.setOnTouchListener(new FrameDialogFragment.DialogTouchListener());
+        mBinding.groupDialog.setOnTouchListener(new FrameDialogFragment.DialogTouchListener());
     }
 
     private class Point {

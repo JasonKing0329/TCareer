@@ -2,9 +2,12 @@ package com.king.app.tcareer.page.imagemanager;
 
 import android.view.View;
 
+import com.king.app.tcareer.conf.AppConfig;
+import com.king.app.tcareer.model.http.Command;
 import com.king.app.tcareer.model.http.bean.ImageItemBean;
 import com.king.app.tcareer.page.download.DownloadItem;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,12 +19,33 @@ import java.util.List;
 
 public class ImageSelectorHttp extends ImageSelector {
 
-    protected ImageSelectorAdapter mAdapter;
-
     @Override
-    public ImageSelectorAdapter initAdapter() {
-        mAdapter = new HttpSelectorAdapter(getContext(), imageUrlBean);
-        return mAdapter;
+    protected void initItemBean(ItemBean item, ImageItemBean bean) {
+        item.setBean(bean);
+        item.setUrl(bean.getUrl());
+        item.setCheck(false);
+
+        item.setNew(true);
+        File file = null;
+        if (bean.getKey().equals(Command.TYPE_IMG_PLAYER)) {
+            file = new File(AppConfig.IMG_PLAYER_BASE + imageUrlBean.getKey());
+        }
+        else if (bean.getKey().equals(Command.TYPE_IMG_MATCH)) {
+            file = new File(AppConfig.IMG_MATCH_BASE + imageUrlBean.getKey());
+        }
+        else if (bean.getKey().equals(Command.TYPE_IMG_PLAYER_HEAD)) {
+            file = new File(AppConfig.IMG_PLAYER_HEAD + imageUrlBean.getKey());
+        }
+        // 如果本地已存在，不显示new角标
+        if (file != null && file.exists() && file.isDirectory()) {
+            File files[] = file.listFiles();
+            for (File f:files) {
+                if (bean.getUrl().endsWith(f.getName())) {
+                    item.setNew(false);
+                    break;
+                }
+            }
+        }
     }
 
     @Override

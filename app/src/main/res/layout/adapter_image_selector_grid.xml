@@ -1,10 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:padding="@dimen/dialog_bg_selector_item_padding">
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/rv_grid"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <data>
+        <import type="android.view.View"/>
+        <variable
+            name="bean"
+            type="com.king.app.tcareer.page.imagemanager.ItemBean"/>
+    </data>
+    <android.support.constraint.ConstraintLayout
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
-</RelativeLayout>
+        android:layout_height="wrap_content"
+        android:padding="@dimen/dialog_bg_selector_item_padding">
+        <ImageView
+            android:id="@+id/iv_image"
+            android:layout_width="90dp"
+            android:layout_height="90dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:playerHeadUrl="@{bean.url}"/>
+        <CheckBox
+            android:id="@+id/cb_check"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:scaleX="0.75"
+            android:scaleY="0.75"
+            android:clickable="false"
+            android:checked="@{bean.check}"
+            app:layout_constraintEnd_toEndOf="@id/iv_image"
+            app:layout_constraintTop_toTopOf="@id/iv_image"/>
+        <ImageView
+            android:id="@+id/iv_new"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/mark_new"
+            android:visibility="@{bean.new ? View.VISIBLE:View.GONE}"
+            app:layout_constraintEnd_toEndOf="@id/iv_image"
+            app:layout_constraintBottom_toBottomOf="@id/iv_image"/>
+    </android.support.constraint.ConstraintLayout>
+</layout>

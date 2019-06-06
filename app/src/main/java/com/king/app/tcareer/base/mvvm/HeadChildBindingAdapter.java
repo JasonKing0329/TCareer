@@ -49,6 +49,14 @@ public abstract class HeadChildBindingAdapter<VH extends ViewDataBinding, VI ext
         return TYPE_HEAD;
     }
 
+    public boolean isHead(int position) {
+        return getItemViewType(position) == TYPE_HEAD;
+    }
+
+    public boolean isItem(int position) {
+        return getItemViewType(position) == TYPE_ITEM;
+    }
+
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {

@@ -16,12 +16,12 @@ import java.util.List;
 
 public class ImageSelectorLocal extends ImageSelector {
 
-    protected ImageSelectorAdapter mAdapter;
-
     @Override
-    public ImageSelectorAdapter initAdapter() {
-        mAdapter = new LocalSelectorAdapter(getContext(), imageUrlBean);
-        return mAdapter;
+    protected void initItemBean(ItemBean item, ImageItemBean bean) {
+        item.setBean(bean);
+        item.setUrl(bean.getUrl());
+        item.setNew(false);
+        item.setCheck(false);
     }
 
     @Override

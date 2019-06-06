@@ -1,17 +1,13 @@
 package com.king.app.tcareer.page.home;
 
 import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.view.View;
-import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.Spinner;
-import android.widget.TextView;
 
 import com.king.app.tcareer.R;
-import com.king.app.tcareer.base.BasePresenter;
 import com.king.app.tcareer.base.IFragmentHolder;
 import com.king.app.tcareer.base.TApplication;
+import com.king.app.tcareer.base.mvvm.BaseViewModel;
+import com.king.app.tcareer.databinding.DialogRetireBinding;
 import com.king.app.tcareer.model.DateManager;
 import com.king.app.tcareer.model.db.entity.Retire;
 import com.king.app.tcareer.model.db.entity.RetireDao;
@@ -19,35 +15,14 @@ import com.king.app.tcareer.view.dialog.frame.FrameContentFragment;
 
 import java.util.List;
 
-import butterknife.BindView;
-
 /**
  * Desc:
  *
  * @author：Jing Yang
  * @date: 2018/9/29 18:21
  */
-public class RetireDialog extends FrameContentFragment {
-
-    @BindView(R.id.rv_items)
-    RecyclerView rvItems;
-    @BindView(R.id.sp_type)
-    Spinner spType;
-    @BindView(R.id.iv_add)
-    ImageView ivAdd;
-    @BindView(R.id.tv_new_title)
-    TextView tvNewTitle;
-    @BindView(R.id.btn_declare)
-    Button btnDeclare;
-    @BindView(R.id.btn_effect)
-    Button btnEffect;
-    @BindView(R.id.tv_relieve_title)
-    TextView tvRelieveTitle;
-    @BindView(R.id.tv_relieve)
-    TextView tvRelieve;
-    @BindView(R.id.tv_confirm)
-    TextView tvConfirm;
-
+public class RetireDialog extends FrameContentFragment<DialogRetireBinding, BaseViewModel> {
+    
     private long userId;
 
     private long relieveId;
@@ -75,28 +50,28 @@ public class RetireDialog extends FrameContentFragment {
     }
 
     @Override
+    protected BaseViewModel createViewModel() {
+        return null;
+    }
+
+    @Override
     protected void onCreate(View view) {
 
         declareDateManager = new DateManager();
         effectDateManager = new DateManager();
 
-        tvNewTitle.setVisibility(View.INVISIBLE);
-        tvRelieveTitle.setVisibility(View.INVISIBLE);
-        tvRelieve.setVisibility(View.INVISIBLE);
-        btnDeclare.setVisibility(View.INVISIBLE);
-        btnEffect.setVisibility(View.INVISIBLE);
-        rvItems.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
-        tvConfirm.setOnClickListener(v -> onConfirm());
-        btnEffect.setOnClickListener(v -> effectDateManager.pickDate(getActivity()
-                , () -> btnEffect.setText(effectDateManager.getDateStr())));
-        btnDeclare.setOnClickListener(v -> declareDateManager.pickDate(getActivity()
-                , () -> btnDeclare.setText(declareDateManager.getDateStr())));
-        ivAdd.setOnClickListener(v -> onAdd());
-    }
-
-    @Override
-    protected BasePresenter createPresenter() {
-        return null;
+        mBinding.tvNewTitle.setVisibility(View.INVISIBLE);
+        mBinding.tvRelieveTitle.setVisibility(View.INVISIBLE);
+        mBinding.tvRelieve.setVisibility(View.INVISIBLE);
+        mBinding.btnDeclare.setVisibility(View.INVISIBLE);
+        mBinding.btnEffect.setVisibility(View.INVISIBLE);
+        mBinding.rvItems.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
+        mBinding.tvConfirm.setOnClickListener(v -> onConfirm());
+        mBinding.btnEffect.setOnClickListener(v -> effectDateManager.pickDate(getActivity()
+                , () -> mBinding.btnEffect.setText(effectDateManager.getDateStr())));
+        mBinding.btnDeclare.setOnClickListener(v -> declareDateManager.pickDate(getActivity()
+                , () -> mBinding.btnDeclare.setText(declareDateManager.getDateStr())));
+        mBinding.ivAdd.setOnClickListener(v -> onAdd());
     }
 
     @Override
@@ -105,8 +80,8 @@ public class RetireDialog extends FrameContentFragment {
     }
 
     private void onAdd() {
-        ivAdd.setVisibility(View.INVISIBLE);
-        spType.setEnabled(false);
+        mBinding.ivAdd.setVisibility(View.INVISIBLE);
+        mBinding.spType.setEnabled(false);
         mRetire = null;
         declareDateManager.reset();
         effectDateManager.reset();
@@ -120,44 +95,44 @@ public class RetireDialog extends FrameContentFragment {
     }
 
     private void relieveStatus() {
-        tvNewTitle.setText("New relive");
-        tvNewTitle.setVisibility(View.VISIBLE);
-        btnDeclare.setText("Declare Date");
-        btnEffect.setText("Effective Date");
-        btnDeclare.setVisibility(View.VISIBLE);
-        btnEffect.setVisibility(View.VISIBLE);
+        mBinding.tvNewTitle.setText("New relive");
+        mBinding.tvNewTitle.setVisibility(View.VISIBLE);
+        mBinding.btnDeclare.setText("Declare Date");
+        mBinding.btnEffect.setText("Effective Date");
+        mBinding.btnDeclare.setVisibility(View.VISIBLE);
+        mBinding.btnEffect.setVisibility(View.VISIBLE);
 
-        tvRelieveTitle.setVisibility(View.VISIBLE);
-        tvRelieve.setVisibility(View.VISIBLE);
-        tvConfirm.setText("Confirm Relieve");
+        mBinding.tvRelieveTitle.setVisibility(View.VISIBLE);
+        mBinding.tvRelieve.setVisibility(View.VISIBLE);
+        mBinding.tvConfirm.setText("Confirm Relieve");
     }
 
     private void retireStatus() {
-        tvNewTitle.setText("New retire");
-        tvNewTitle.setVisibility(View.VISIBLE);
-        btnDeclare.setText("Declare Date");
-        btnEffect.setText("Effective Date");
-        btnDeclare.setVisibility(View.VISIBLE);
-        btnEffect.setVisibility(View.VISIBLE);
+        mBinding.tvNewTitle.setText("New retire");
+        mBinding.tvNewTitle.setVisibility(View.VISIBLE);
+        mBinding.btnDeclare.setText("Declare Date");
+        mBinding.btnEffect.setText("Effective Date");
+        mBinding.btnDeclare.setVisibility(View.VISIBLE);
+        mBinding.btnEffect.setVisibility(View.VISIBLE);
 
         relieveId = 0;
-        tvRelieveTitle.setVisibility(View.INVISIBLE);
-        tvRelieve.setVisibility(View.INVISIBLE);
-        tvConfirm.setText("Confirm Retire");
+        mBinding.tvRelieveTitle.setVisibility(View.INVISIBLE);
+        mBinding.tvRelieve.setVisibility(View.INVISIBLE);
+        mBinding.tvConfirm.setText("Confirm Retire");
     }
 
     private void onConfirm() {
         if (declareDateManager.getDate() == null) {
-            showMessage("Declare date can't be null");
+            showMessageShort("Declare date can't be null");
             return;
         }
         if (effectDateManager.getDate() == null) {
-            showMessage("Effective date can't be null");
+            showMessageShort("Effective date can't be null");
             return;
         }
         if (isRelive()) {
             if (relieveId == 0) {
-                showMessage("You didn't select retirement to relive");
+                showMessageShort("You didn't select retirement to relive");
                 return;
             }
         }
@@ -194,7 +169,7 @@ public class RetireDialog extends FrameContentFragment {
                 .build().list();
         adapter = new RetireAdapter();
         adapter.setList(list);
-        adapter.setOnItemClickListener((position, data) -> {
+        adapter.setOnItemClickListener((view, position, data) -> {
             // select as data to relieve
             if (isRelive()) {
                 relieveId = data.getId();
@@ -207,26 +182,26 @@ public class RetireDialog extends FrameContentFragment {
                 mRetire = data;
                 if (data.getRelieveId() == 0) {
                     retireStatus();
-                    tvNewTitle.setText("Update retire");
+                    mBinding.tvNewTitle.setText("Update retire");
                 }
                 else {
                     relieveStatus();
-                    tvNewTitle.setText("Update relieve");
+                    mBinding.tvNewTitle.setText("Update relieve");
                     setRelieveText(data.getRelieveRetire());
                 }
                 declareDateManager.setDate(data.getDeclareDate());
                 effectDateManager.setDate(data.getEffectDate());
-                btnDeclare.setText(declareDateManager.getDateStr());
-                btnEffect.setText(effectDateManager.getDateStr());
-                tvConfirm.setText("Update");
+                mBinding.btnDeclare.setText(declareDateManager.getDateStr());
+                mBinding.btnEffect.setText(effectDateManager.getDateStr());
+                mBinding.tvConfirm.setText("Update");
             }
         });
         adapter.setOnRetireListener(retire -> deleteItem(retire));
-        rvItems.setAdapter(adapter);
+        mBinding.rvItems.setAdapter(adapter);
     }
 
     private void setRelieveText(Retire data) {
-        tvRelieve.setText("Declare date: " + declareDateManager.getDateFormat().format(data.getDeclareDate())
+        mBinding.tvRelieve.setText("Declare date: " + declareDateManager.getDateFormat().format(data.getDeclareDate())
             + ", Effective date: " + effectDateManager.getDateFormat().format(data.getEffectDate()));
     }
 
@@ -237,6 +212,6 @@ public class RetireDialog extends FrameContentFragment {
     }
 
     private boolean isRelive() {
-        return spType.getSelectedItemPosition() == 1;
+        return mBinding.spType.getSelectedItemPosition() == 1;
     }
 }

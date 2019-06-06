@@ -9,5 +9,5 @@ import com.king.app.tcareer.base.IFragmentHolder;
  */
 
 public interface ISelectorHolder extends IFragmentHolder {
-    ImageSelectorAdapter initAdapter();
+    ImageAdapter getAdapter();
 }

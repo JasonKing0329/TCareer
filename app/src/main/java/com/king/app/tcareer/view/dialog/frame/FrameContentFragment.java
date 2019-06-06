@@ -1,7 +1,9 @@
 package com.king.app.tcareer.view.dialog.frame;
 
-import com.king.app.tcareer.base.BaseMvpFragment;
-import com.king.app.tcareer.base.BasePresenter;
+import android.databinding.ViewDataBinding;
+
+import com.king.app.tcareer.base.mvvm.BaseViewModel;
+import com.king.app.tcareer.base.mvvm.MvvmFragment;
 
 /**
  * Desc:
@@ -9,7 +11,7 @@ import com.king.app.tcareer.base.BasePresenter;
  * @author：Jing Yang
  * @date: 2018/9/30 9:16
  */
-public abstract class FrameContentFragment<T extends BasePresenter> extends BaseMvpFragment<T> {
+public abstract class FrameContentFragment<T extends ViewDataBinding, VM extends BaseViewModel> extends MvvmFragment<T, VM> {
 
     private FrameHolder dialogHolder;
 
