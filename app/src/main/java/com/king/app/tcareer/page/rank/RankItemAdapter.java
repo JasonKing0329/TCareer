@@ -1,61 +1,38 @@
 package com.king.app.tcareer.page.rank;
 
-import android.support.v7.widget.RecyclerView;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.king.app.tcareer.R;
+import com.king.app.tcareer.base.mvvm.BaseBindingAdapter;
+import com.king.app.tcareer.databinding.AdapterRankManageItemBinding;
 import com.king.app.tcareer.model.db.entity.Rank;
-
-import java.util.List;
-
-import butterknife.BindView;
-import butterknife.ButterKnife;
 
 /**
  * 描述:
  * <p/>作者：景阳
  * <p/>创建时间: 2017/4/5 11:45
  */
-public class RankItemAdapter extends RecyclerView.Adapter<RankItemAdapter.RankItemHolder> implements View.OnClickListener {
+public class RankItemAdapter extends BaseBindingAdapter<AdapterRankManageItemBinding, Rank> implements View.OnClickListener {
 
-    private List<Rank> list;
     private OnRankActionListener onRankActionListener;
-
-    public RankItemAdapter(List<Rank> list) {
-        this.list = list;
-    }
-
-    public void setList(List<Rank> list) {
-        this.list = list;
-    }
 
     public void setOnRankActionListener(OnRankActionListener onRankActionListener) {
         this.onRankActionListener = onRankActionListener;
     }
 
     @Override
-    public RankItemHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return new RankItemHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.adapter_rank_manage_item, parent, false));
+    protected int getItemLayoutRes() {
+        return R.layout.adapter_rank_manage_item;
     }
 
     @Override
-    public void onBindViewHolder(RankItemHolder holder, int position) {
-        Rank bean = list.get(position);
-        holder.tvYear.setText(String.valueOf(bean.getYear()));
-        holder.tvRank.setText(String.valueOf(bean.getRank()));
-        holder.ivDelete.setTag(position);
-        holder.ivEdit.setTag(position);
-        holder.ivDelete.setOnClickListener(this);
-        holder.ivEdit.setOnClickListener(this);
-    }
-
-    @Override
-    public int getItemCount() {
-        return list == null ? 0:list.size();
+    protected void onBindItem(AdapterRankManageItemBinding binding, int position, Rank bean) {
+        binding.tvYear.setText(String.valueOf(bean.getYear()));
+        binding.tvRank.setText(String.valueOf(bean.getRank()));
+        binding.ivDelete.setTag(position);
+        binding.ivEdit.setTag(position);
+        binding.ivDelete.setOnClickListener(this);
+        binding.ivEdit.setOnClickListener(this);
     }
 
     @Override
@@ -68,23 +45,6 @@ public class RankItemAdapter extends RecyclerView.Adapter<RankItemAdapter.RankIt
             case R.id.iv_edit:
                 onRankActionListener.onEditRank(position);
                 break;
-        }
-    }
-
-    public static class RankItemHolder extends RecyclerView.ViewHolder {
-
-        @BindView(R.id.tv_year)
-        TextView tvYear;
-        @BindView(R.id.iv_edit)
-        ImageView ivEdit;
-        @BindView(R.id.iv_delete)
-        ImageView ivDelete;
-        @BindView(R.id.tv_rank)
-        TextView tvRank;
-
-        public RankItemHolder(View itemView) {
-            super(itemView);
-            ButterKnife.bind(this, itemView);
         }
     }
 

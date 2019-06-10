@@ -1,33 +1,29 @@
 package com.king.app.tcareer.page.rank;
 
+import android.arch.lifecycle.ViewModelProviders;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.View;
 
 import com.king.app.tcareer.R;
-import com.king.app.tcareer.base.BaseMvpFragment;
 import com.king.app.tcareer.base.IFragmentHolder;
+import com.king.app.tcareer.base.mvvm.MvvmFragment;
+import com.king.app.tcareer.databinding.FragmentRankYearEndBinding;
 import com.king.app.tcareer.model.db.entity.Rank;
-import com.king.app.tcareer.view.widget.chart.BarChart;
 import com.king.app.tcareer.view.widget.chart.adapter.BarChartAdapter;
 import com.king.app.tcareer.view.widget.chart.adapter.IAxis;
 
 import java.util.List;
-
-import butterknife.BindView;
 
 /**
  * 描述:
  * <p/>作者：景阳
  * <p/>创建时间: 2017/4/5 10:29
  */
-public class RankYearEndFragment extends BaseMvpFragment<RankPresenter> implements RankView {
+public class RankYearEndFragment extends MvvmFragment<FragmentRankYearEndBinding, RankYearViewModel> {
 
     private static final String KEY_USER_ID = "user_id";
-
-    @BindView(R.id.bar_chart_rank)
-    BarChart barChartRank;
 
     private View.OnClickListener onChartClickListener;
 
@@ -58,13 +54,13 @@ public class RankYearEndFragment extends BaseMvpFragment<RankPresenter> implemen
     }
 
     @Override
-    protected void onCreate(View view) {
-        barChartRank.setOnClickListener(onChartClickListener);
+    protected RankYearViewModel createViewModel() {
+        return ViewModelProviders.of(this).get(RankYearViewModel.class);
     }
 
     @Override
-    protected RankPresenter createPresenter() {
-        return new RankPresenter();
+    protected void onCreate(View view) {
+        mBinding.barChartRank.setOnClickListener(onChartClickListener);
     }
 
     @Override
@@ -75,17 +71,9 @@ public class RankYearEndFragment extends BaseMvpFragment<RankPresenter> implemen
     @Override
     protected void onCreateData() {
         userId = getArguments().getLong(KEY_USER_ID);
-        presenter.loadYearRanks(userId);
-    }
 
-    @Override
-    public void postShowUser(String nameEng) {
-
-    }
-
-    @Override
-    public void showRanks(final List<Rank> list) {
-        initChart(list);
+        mModel.ranksObserver.observe(this, list -> initChart(list));
+        mModel.loadYearRanks(userId);
     }
 
     /**
@@ -94,7 +82,7 @@ public class RankYearEndFragment extends BaseMvpFragment<RankPresenter> implemen
      */
     public void onUserChanged(long userId) {
         this.userId = userId;
-        presenter.loadYearRanks(userId);
+        mModel.loadYearRanks(userId);
     }
 
     /**
@@ -102,7 +90,7 @@ public class RankYearEndFragment extends BaseMvpFragment<RankPresenter> implemen
      *
      */
     public void refreshRanks() {
-        presenter.loadYearRanks(userId);
+        mModel.loadYearRanks(userId);
     }
 
     private void initChart(List<Rank> rankList) {
@@ -110,10 +98,10 @@ public class RankYearEndFragment extends BaseMvpFragment<RankPresenter> implemen
             return;
         }
 
-        barChartRank.setDrawValueText(true);
-        barChartRank.setDrawDashGrid(false);
-        barChartRank.setDrawAxisY(false);
-        barChartRank.setAxisX(new IAxis() {
+        mBinding.barChartRank.setDrawValueText(true);
+        mBinding.barChartRank.setDrawDashGrid(false);
+        mBinding.barChartRank.setDrawAxisY(false);
+        mBinding.barChartRank.setAxisX(new IAxis() {
             @Override
             public int getDegreeCount() {
                 return rankList.size();
@@ -139,7 +127,7 @@ public class RankYearEndFragment extends BaseMvpFragment<RankPresenter> implemen
                 return false;
             }
         });
-        barChartRank.setAxisY(new IAxis() {
+        mBinding.barChartRank.setAxisY(new IAxis() {
             @Override
             public int getDegreeCount() {
                 return DEGREE_AREA * (DEGREE_POINT.length - 1) + 1;
@@ -171,7 +159,7 @@ public class RankYearEndFragment extends BaseMvpFragment<RankPresenter> implemen
                 return false;
             }
         });
-        barChartRank.setAdapter(new BarChartAdapter() {
+        mBinding.barChartRank.setAdapter(new BarChartAdapter() {
             @Override
             public int getXCount() {
                 return rankList.size();

@@ -1,6 +1,10 @@
 package com.king.app.tcareer.page.rank;
 
-import com.king.app.tcareer.base.BasePresenter;
+import android.app.Application;
+import android.arch.lifecycle.MutableLiveData;
+import android.support.annotation.NonNull;
+
+import com.king.app.tcareer.base.mvvm.BaseViewModel;
 import com.king.app.tcareer.model.bean.LineChartData;
 import com.king.app.tcareer.repository.RankRepository;
 
@@ -14,21 +18,20 @@ import io.reactivex.schedulers.Schedulers;
  * <p/>作者：景阳
  * <p/>创建时间: 2018/3/8 14:03
  */
-public class RankWeekPresenter extends BasePresenter<RankWeekView> {
+public class RankWeekViewModel extends BaseViewModel {
+
+    public MutableLiveData<LineChartData> chartObserver = new MutableLiveData<>();
 
     private RankRepository repository;
 
-    @Override
-    protected void onCreate() {
+    public RankWeekViewModel(@NonNull Application application) {
+        super(application);
         repository = new RankRepository();
     }
 
-    public void loadRanks(final long userId, final boolean desc) {
+    public void loadRanks(long userId) {
         queryUser(userId)
-                .flatMap(user -> {
-                    view.postShowUser(user.getNameEng());
-                    return repository.loadUserWeekRankChart(userId);
-                })
+                .flatMap(user -> repository.loadUserWeekRankChart(userId))
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe(new Observer<LineChartData>() {
@@ -39,13 +42,13 @@ public class RankWeekPresenter extends BasePresenter<RankWeekView> {
 
                     @Override
                     public void onNext(LineChartData data) {
-                        view.showChart(data);
+                        chartObserver.setValue(data);
                     }
 
                     @Override
                     public void onError(Throwable e) {
                         e.printStackTrace();
-                        view.showMessage("Load error: " + e.getMessage());
+                        messageObserver.setValue("Load error: " + e.getMessage());
                     }
 
                     @Override

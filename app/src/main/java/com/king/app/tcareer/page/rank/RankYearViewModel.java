@@ -1,7 +1,11 @@
 package com.king.app.tcareer.page.rank;
 
-import com.king.app.tcareer.base.BasePresenter;
+import android.app.Application;
+import android.arch.lifecycle.MutableLiveData;
+import android.support.annotation.NonNull;
+
 import com.king.app.tcareer.base.TApplication;
+import com.king.app.tcareer.base.mvvm.BaseViewModel;
 import com.king.app.tcareer.model.db.entity.Rank;
 import com.king.app.tcareer.model.db.entity.RankDao;
 import com.king.app.tcareer.model.db.entity.User;
@@ -9,13 +13,9 @@ import com.king.app.tcareer.model.db.entity.User;
 import java.util.List;
 
 import io.reactivex.Observable;
-import io.reactivex.ObservableEmitter;
-import io.reactivex.ObservableOnSubscribe;
-import io.reactivex.ObservableSource;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 
 /**
@@ -23,17 +23,19 @@ import io.reactivex.schedulers.Schedulers;
  * <p/>作者：景阳
  * <p/>创建时间: 2017/4/5 11:20
  */
-public class RankPresenter extends BasePresenter<RankView> {
+public class RankYearViewModel extends BaseViewModel {
 
-    @Override
-    protected void onCreate() {
+    public MutableLiveData<User> userObserver = new MutableLiveData<>();
+    public MutableLiveData<List<Rank>> ranksObserver = new MutableLiveData<>();
 
+    public RankYearViewModel(@NonNull Application application) {
+        super(application);
     }
 
-    public void loadYearRanks(final long userId) {
+    public void loadYearRanks(long userId) {
         queryUser(userId)
                 .flatMap(user -> {
-                    view.postShowUser(user.getNameEng());
+                    userObserver.postValue(user);
                     return queryYearRank(userId);
                 })
                 .observeOn(AndroidSchedulers.mainThread())
@@ -46,13 +48,13 @@ public class RankPresenter extends BasePresenter<RankView> {
 
                     @Override
                     public void onNext(List<Rank> ranks) {
-                        view.showRanks(ranks);
+                        ranksObserver.setValue(ranks);
                     }
 
                     @Override
                     public void onError(Throwable e) {
                         e.printStackTrace();
-                        view.showMessage("Load rank error: " + e.getMessage());
+                        messageObserver.setValue("Load rank error: " + e.getMessage());
                     }
 
                     @Override

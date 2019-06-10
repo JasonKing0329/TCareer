@@ -1,120 +1,123 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical" 
-    android:paddingBottom="20dp">
-
-	<LinearLayout
-		android:id="@+id/group_rank_year"
+<layout>
+	<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
 		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:visibility="gone"
-		android:orientation="vertical">
+		android:layout_height="match_parent"
+		android:orientation="vertical"
+		android:paddingBottom="20dp">
+
 		<LinearLayout
+			android:id="@+id/group_rank_year"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			android:orientation="horizontal"
-			android:gravity="center_vertical"
-			android:layout_marginTop="10dp">
-			<TextView
-				android:gravity="center"
-				android:layout_width="100dp"
+			android:visibility="gone"
+			android:orientation="vertical">
+			<LinearLayout
+				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
-				android:text="year"/>
-			<EditText
-				style="@style/etEditScore"
-				android:gravity="left"
-				android:id="@+id/et_year"
-				android:layout_width="100dp"
+				android:orientation="horizontal"
+				android:gravity="center_vertical"
+				android:layout_marginTop="10dp">
+				<TextView
+					android:gravity="center"
+					android:layout_width="100dp"
+					android:layout_height="wrap_content"
+					android:text="year"/>
+				<EditText
+					style="@style/etEditScore"
+					android:gravity="left"
+					android:id="@+id/et_year"
+					android:layout_width="100dp"
+					android:layout_height="wrap_content"
+					android:inputType="number"/>
+			</LinearLayout>
+			<LinearLayout
+				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
-				android:inputType="number"/>
+				android:orientation="horizontal"
+				android:gravity="center_vertical"
+				android:layout_marginTop="10dp">
+				<TextView
+					android:gravity="center"
+					android:layout_width="100dp"
+					android:layout_height="wrap_content"
+					android:text="rank"/>
+				<EditText
+					style="@style/etEditScore"
+					android:gravity="left"
+					android:id="@+id/et_rank"
+					android:layout_width="100dp"
+					android:layout_height="wrap_content"
+					android:inputType="number"/>
+			</LinearLayout>
 		</LinearLayout>
+
 		<LinearLayout
+			android:id="@+id/group_earlier"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			android:orientation="horizontal"
-			android:gravity="center_vertical"
-			android:layout_marginTop="10dp">
-			<TextView
-				android:gravity="center"
-				android:layout_width="100dp"
+			android:visibility="gone"
+			android:orientation="vertical">
+			<LinearLayout
+				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
-				android:text="rank"/>
-			<EditText
-				style="@style/etEditScore"
-				android:gravity="left"
-				android:id="@+id/et_rank"
-				android:layout_width="100dp"
+				android:orientation="horizontal"
+				android:gravity="center_vertical"
+				android:layout_marginTop="10dp">
+				<TextView
+					android:gravity="center"
+					android:layout_width="100dp"
+					android:layout_height="wrap_content"
+					android:text="Challenge"/>
+				<EditText
+					style="@style/etEditScore"
+					android:gravity="left"
+					android:id="@+id/et_challenge_win"
+					android:layout_width="50dp"
+					android:layout_height="wrap_content"
+					android:hint="win"
+					android:inputType="number"/>
+				<EditText
+					style="@style/etEditScore"
+					android:gravity="left"
+					android:id="@+id/et_challenge_lose"
+					android:layout_marginLeft="@dimen/margin_10"
+					android:layout_width="50dp"
+					android:hint="lose"
+					android:layout_height="wrap_content"
+					android:inputType="number"/>
+			</LinearLayout>
+			<LinearLayout
+				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
-				android:inputType="number"/>
+				android:orientation="horizontal"
+				android:gravity="center_vertical"
+				android:layout_marginTop="10dp">
+				<TextView
+					android:gravity="center"
+					android:layout_width="100dp"
+					android:layout_height="wrap_content"
+					android:text="Qualify"/>
+				<EditText
+					style="@style/etEditScore"
+					android:gravity="left"
+					android:id="@+id/et_qualify_win"
+					android:layout_width="50dp"
+					android:layout_height="wrap_content"
+					android:hint="win"
+					android:inputType="number"/>
+				<EditText
+					style="@style/etEditScore"
+					android:gravity="left"
+					android:id="@+id/et_qualify_lose"
+					android:layout_marginLeft="@dimen/margin_10"
+					android:layout_width="50dp"
+					android:hint="lose"
+					android:layout_height="wrap_content"
+					android:inputType="number"/>
+			</LinearLayout>
 		</LinearLayout>
+
 	</LinearLayout>
 
-	<LinearLayout
-		android:id="@+id/group_earlier"
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:visibility="gone"
-		android:orientation="vertical">
-		<LinearLayout
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:orientation="horizontal"
-			android:gravity="center_vertical"
-			android:layout_marginTop="10dp">
-			<TextView
-				android:gravity="center"
-				android:layout_width="100dp"
-				android:layout_height="wrap_content"
-				android:text="Challenge"/>
-			<EditText
-				style="@style/etEditScore"
-				android:gravity="left"
-				android:id="@+id/et_challenge_win"
-				android:layout_width="50dp"
-				android:layout_height="wrap_content"
-				android:hint="win"
-				android:inputType="number"/>
-			<EditText
-				style="@style/etEditScore"
-				android:gravity="left"
-				android:id="@+id/et_challenge_lose"
-				android:layout_marginLeft="@dimen/margin_10"
-				android:layout_width="50dp"
-				android:hint="lose"
-				android:layout_height="wrap_content"
-				android:inputType="number"/>
-		</LinearLayout>
-		<LinearLayout
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:orientation="horizontal"
-			android:gravity="center_vertical"
-			android:layout_marginTop="10dp">
-			<TextView
-				android:gravity="center"
-				android:layout_width="100dp"
-				android:layout_height="wrap_content"
-				android:text="Qualify"/>
-			<EditText
-				style="@style/etEditScore"
-				android:gravity="left"
-				android:id="@+id/et_qualify_win"
-				android:layout_width="50dp"
-				android:layout_height="wrap_content"
-				android:hint="win"
-				android:inputType="number"/>
-			<EditText
-				style="@style/etEditScore"
-				android:gravity="left"
-				android:id="@+id/et_qualify_lose"
-				android:layout_marginLeft="@dimen/margin_10"
-				android:layout_width="50dp"
-				android:hint="lose"
-				android:layout_height="wrap_content"
-				android:inputType="number"/>
-		</LinearLayout>
-	</LinearLayout>
-
-</LinearLayout>
+</layout>

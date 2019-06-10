@@ -4,13 +4,13 @@ import android.support.v4.app.Fragment;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
-import android.widget.LinearLayout;
 
 import com.king.app.tcareer.R;
 import com.king.app.tcareer.base.IFragmentHolder;
 import com.king.app.tcareer.base.TApplication;
+import com.king.app.tcareer.base.mvvm.BaseViewModel;
 import com.king.app.tcareer.conf.AppConstants;
+import com.king.app.tcareer.databinding.DialogScoreManageBinding;
 import com.king.app.tcareer.model.db.entity.EarlierAchieve;
 import com.king.app.tcareer.model.db.entity.EarlierAchieveDao;
 import com.king.app.tcareer.model.db.entity.Rank;
@@ -18,10 +18,6 @@ import com.king.app.tcareer.model.db.entity.User;
 import com.king.app.tcareer.utils.ListUtil;
 import com.king.app.tcareer.utils.ScreenUtils;
 import com.king.app.tcareer.view.dialog.DraggableDialogFragment;
-
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.Unbinder;
 
 /**
  * @desc
@@ -100,26 +96,7 @@ public class ScoreEditDialog extends DraggableDialogFragment {
         this.mUser = mUser;
     }
 
-    public static class EditFragment extends ContentFragment {
-
-        @BindView(R.id.et_year)
-        EditText etYear;
-        @BindView(R.id.et_rank)
-        EditText etRank;
-        @BindView(R.id.group_rank_year)
-        LinearLayout groupRankYear;
-        @BindView(R.id.group_earlier)
-        LinearLayout groupEarlier;
-        @BindView(R.id.et_challenge_win)
-        EditText etChallengeWin;
-        @BindView(R.id.et_challenge_lose)
-        EditText etChallengeLose;
-        @BindView(R.id.et_qualify_win)
-        EditText etQualifyWin;
-        @BindView(R.id.et_qualify_lose)
-        EditText etQualifyLose;
-
-        Unbinder unbinder;
+    public static class EditFragment extends BindingContentFragment<DialogScoreManageBinding, BaseViewModel> {
 
         private int mode;
 
@@ -134,14 +111,17 @@ public class ScoreEditDialog extends DraggableDialogFragment {
             return R.layout.dialog_score_manage;
         }
 
+        @Override
+        protected BaseViewModel createViewModel() {
+            return null;
+        }
+
         public void setUser(User mUser) {
             this.mUser = mUser;
         }
 
         @Override
         protected void onCreate(View view) {
-            unbinder = ButterKnife.bind(this, view);
-
             if (mode == MODE_YEAR_RANK) {
                 showYearRank();
             } else {
@@ -153,26 +133,26 @@ public class ScoreEditDialog extends DraggableDialogFragment {
             if (mRank == null) {
                 mRank = new Rank();
             }
-            groupRankYear.setVisibility(View.VISIBLE);
+            mBinding.groupRankYear.setVisibility(View.VISIBLE);
             if (mRank.getYear() != 0) {
-                etYear.setText(String.valueOf(mRank.getYear()));
+                mBinding.etYear.setText(String.valueOf(mRank.getYear()));
             }
             if (mRank.getRank() != 0) {
-                etRank.setText(String.valueOf(mRank.getRank()));
+                mBinding.etRank.setText(String.valueOf(mRank.getRank()));
             }
         }
 
         private void showPlayerRank() {
-            groupEarlier.setVisibility(View.VISIBLE);
+            mBinding.groupEarlier.setVisibility(View.VISIBLE);
             if (!ListUtil.isEmpty(mUser.getEarlierAchieves())) {
                 for (EarlierAchieve achieve:mUser.getEarlierAchieves()) {
                     if (achieve.getType() == AppConstants.ACHIEVE_CHALLENGE) {
-                        etChallengeWin.setText(String.valueOf(achieve.getWin()));
-                        etChallengeLose.setText(String.valueOf(achieve.getLose()));
+                        mBinding.etChallengeWin.setText(String.valueOf(achieve.getWin()));
+                        mBinding.etChallengeLose.setText(String.valueOf(achieve.getLose()));
                     }
                     else if (achieve.getType() == AppConstants.ACHIEVE_QUALIFY) {
-                        etQualifyWin.setText(String.valueOf(achieve.getWin()));
-                        etQualifyLose.setText(String.valueOf(achieve.getLose()));
+                        mBinding.etQualifyWin.setText(String.valueOf(achieve.getWin()));
+                        mBinding.etQualifyLose.setText(String.valueOf(achieve.getLose()));
                     }
                 }
             }
@@ -185,12 +165,6 @@ public class ScoreEditDialog extends DraggableDialogFragment {
         @Override
         protected void bindChildFragmentHolder(IFragmentHolder holder) {
 
-        }
-
-        @Override
-        public void onDestroyView() {
-            super.onDestroyView();
-            unbinder.unbind();
         }
 
         public void setMode(int mode) {
@@ -206,24 +180,24 @@ public class ScoreEditDialog extends DraggableDialogFragment {
         }
 
         private boolean savePlayerRank() {
-            String cWin = etChallengeWin.getText().toString();
+            String cWin = mBinding.etChallengeWin.getText().toString();
             if (TextUtils.isEmpty(cWin)) {
-                etChallengeWin.setError("challenge win can't be null");
+                mBinding.etChallengeWin.setError("challenge win can't be null");
                 return false;
             }
-            String cLose = etChallengeLose.getText().toString();
+            String cLose = mBinding.etChallengeLose.getText().toString();
             if (TextUtils.isEmpty(cLose)) {
-                etChallengeLose.setError("challenge lose can't be null");
+                mBinding.etChallengeLose.setError("challenge lose can't be null");
                 return false;
             }
-            String qWin = etQualifyWin.getText().toString();
+            String qWin = mBinding.etQualifyWin.getText().toString();
             if (TextUtils.isEmpty(qWin)) {
-                etQualifyWin.setError("qualify win can't be null");
+                mBinding.etQualifyWin.setError("qualify win can't be null");
                 return false;
             }
-            String qLose = etQualifyLose.getText().toString();
+            String qLose = mBinding.etQualifyLose.getText().toString();
             if (TextUtils.isEmpty(qLose)) {
-                etQualifyLose.setError("qualify lose can't be null");
+                mBinding.etQualifyLose.setError("qualify lose can't be null");
                 return false;
             }
 
@@ -270,15 +244,15 @@ public class ScoreEditDialog extends DraggableDialogFragment {
             if (mRank == null) {
                 mRank = new Rank();
             }
-            String year = etYear.getText().toString();
+            String year = mBinding.etYear.getText().toString();
             if (TextUtils.isEmpty(year)) {
-                etYear.setError("year can't be null");
+                mBinding.etYear.setError("year can't be null");
                 return false;
             }
             mRank.setYear(Integer.parseInt(year));
-            String rank = etRank.getText().toString();
+            String rank = mBinding.etRank.getText().toString();
             if (TextUtils.isEmpty(rank)) {
-                etRank.setError("rank can't be null");
+                mBinding.etRank.setError("rank can't be null");
                 return false;
             }
             mRank.setRank(Integer.parseInt(rank));

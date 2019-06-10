@@ -1,54 +1,57 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-	xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/main_bg" >
+<layout>
 
-	<com.king.app.jactionbar.JActionbar
-		android:id="@+id/actionbar"
-		android:layout_width="match_parent"
-		android:layout_height="?android:attr/actionBarSize"
-		android:background="@color/colorPrimary"
-		app:iconSize="@dimen/actionbar_icon_size"
-		app:iconPadding="@dimen/actionbar_icon_padding"
-		app:showIconBack="true"
-		app:rippleColor="@color/ripple_actionbar_icon"/>
-
-	<ScrollView
+	<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+		xmlns:app="http://schemas.android.com/apk/res-auto"
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"
-		android:layout_below="@id/actionbar">
-		<LinearLayout
+		android:background="@color/main_bg" >
+
+		<com.king.app.jactionbar.JActionbar
+			android:id="@+id/actionbar"
 			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:paddingLeft="@dimen/activity_horizontal_margin"
-			android:paddingRight="@dimen/activity_horizontal_margin"
-			android:paddingBottom="@dimen/activity_horizontal_margin"
-			android:orientation="vertical">
+			android:layout_height="?android:attr/actionBarSize"
+			android:background="@color/colorPrimary"
+			app:iconSize="@dimen/actionbar_icon_size"
+			app:iconPadding="@dimen/actionbar_icon_padding"
+			app:showIconBack="true"
+			app:rippleColor="@color/ripple_actionbar_icon"/>
 
-            <RelativeLayout
-                android:id="@+id/group_chart_container"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/rank_chart_height"/>
-
-			<android.support.v7.widget.RecyclerView
-				android:id="@+id/rank_manage_list"
+		<ScrollView
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			android:layout_below="@id/actionbar">
+			<LinearLayout
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
-				android:layout_marginTop="@dimen/activity_horizontal_margin"/>
+				android:paddingLeft="@dimen/activity_horizontal_margin"
+				android:paddingRight="@dimen/activity_horizontal_margin"
+				android:paddingBottom="@dimen/activity_horizontal_margin"
+				android:orientation="vertical">
 
-			<ImageView
-				android:id="@+id/iv_add"
-				android:layout_width="55dp"
-				android:layout_height="55dp"
-				android:padding="10dp"
-				android:layout_marginTop="10dp"
-				android:layout_marginBottom="20dp"
-				android:layout_gravity="center_horizontal"
-				android:background="?android:attr/selectableItemBackgroundBorderless"
-				android:src="@drawable/ic_add"/>
+				<RelativeLayout
+					android:id="@+id/group_chart_container"
+					android:layout_width="match_parent"
+					android:layout_height="@dimen/rank_chart_height"/>
 
-		</LinearLayout>
-	</ScrollView>
-</RelativeLayout>
+				<android.support.v7.widget.RecyclerView
+					android:id="@+id/rv_rank_list"
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:layout_marginTop="@dimen/activity_horizontal_margin"/>
+
+				<ImageView
+					android:id="@+id/iv_add"
+					android:layout_width="55dp"
+					android:layout_height="55dp"
+					android:padding="10dp"
+					android:layout_marginTop="10dp"
+					android:layout_marginBottom="20dp"
+					android:layout_gravity="center_horizontal"
+					android:background="?android:attr/selectableItemBackgroundBorderless"
+					android:src="@drawable/ic_add"/>
+
+			</LinearLayout>
+		</ScrollView>
+	</RelativeLayout>
+</layout>

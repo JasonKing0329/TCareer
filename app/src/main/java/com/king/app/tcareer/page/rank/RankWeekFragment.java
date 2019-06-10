@@ -1,30 +1,26 @@
 package com.king.app.tcareer.page.rank;
 
+import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
 import android.view.View;
 
 import com.king.app.tcareer.R;
-import com.king.app.tcareer.base.BaseMvpFragment;
 import com.king.app.tcareer.base.IFragmentHolder;
+import com.king.app.tcareer.base.mvvm.MvvmFragment;
+import com.king.app.tcareer.databinding.FragmentRankWeekBinding;
 import com.king.app.tcareer.model.bean.LineChartData;
-import com.king.app.tcareer.view.widget.chart.LineChart;
 import com.king.app.tcareer.view.widget.chart.adapter.IAxis;
 import com.king.app.tcareer.view.widget.chart.adapter.LineChartAdapter;
 import com.king.app.tcareer.view.widget.chart.adapter.LineData;
-
-import butterknife.BindView;
 
 /**
  * 描述: 替换RankDetailFragment，采用自定义LineChart，支持退役期间的数据及第二段职业生涯
  * <p/>作者：景阳
  * <p/>创建时间: 2018/3/9 9:52
  */
-public class RankWeekFragment extends BaseMvpFragment<RankWeekPresenter> implements RankWeekView {
+public class RankWeekFragment extends MvvmFragment<FragmentRankWeekBinding, RankWeekViewModel> {
 
     private static final String KEY_USER_ID = "user_id";
-
-    @BindView(R.id.chart_week)
-    LineChart chartWeek;
 
     private View.OnClickListener onChartClickListener;
 
@@ -47,13 +43,13 @@ public class RankWeekFragment extends BaseMvpFragment<RankWeekPresenter> impleme
     }
 
     @Override
-    protected void onCreate(View view) {
-        chartWeek.setOnClickListener(onChartClickListener);
+    protected RankWeekViewModel createViewModel() {
+        return ViewModelProviders.of(this).get(RankWeekViewModel.class);
     }
 
     @Override
-    protected RankWeekPresenter createPresenter() {
-        return new RankWeekPresenter();
+    protected void onCreate(View view) {
+        mBinding.chartWeek.setOnClickListener(onChartClickListener);
     }
 
     public void setOnChartClickListener(View.OnClickListener onChartClickListener) {
@@ -63,23 +59,18 @@ public class RankWeekFragment extends BaseMvpFragment<RankWeekPresenter> impleme
     @Override
     protected void onCreateData() {
         long userId = getArguments().getLong(KEY_USER_ID);
-        presenter.loadRanks(userId, false);
-    }
-
-    @Override
-    public void postShowUser(String nameEng) {
-
+        mModel.chartObserver.observe(this, data -> showChart(data));
+        mModel.loadRanks(userId);
     }
 
     public void refresh() {
-        presenter.loadRanks(presenter.getUser().getId(), false);
+        mModel.loadRanks(mModel.getUser().getId());
     }
 
-    @Override
-    public void showChart(LineChartData data) {
-        chartWeek.setDegreeCombine(8);
-        chartWeek.setDrawAxisY(true);
-        chartWeek.setAxisX(new IAxis() {
+    private void showChart(LineChartData data) {
+        mBinding.chartWeek.setDegreeCombine(8);
+        mBinding.chartWeek.setDrawAxisY(true);
+        mBinding.chartWeek.setAxisX(new IAxis() {
             @Override
             public int getDegreeCount() {
                 return data.getAxisXCount();
@@ -105,7 +96,7 @@ public class RankWeekFragment extends BaseMvpFragment<RankWeekPresenter> impleme
                 return data.getAxisXDegreeList().get(position).isNotDraw();
             }
         });
-        chartWeek.setAxisY(new IAxis() {
+        mBinding.chartWeek.setAxisY(new IAxis() {
             @Override
             public int getDegreeCount() {
                 return data.getAxisYCount();
@@ -131,7 +122,7 @@ public class RankWeekFragment extends BaseMvpFragment<RankWeekPresenter> impleme
                 return data.getAxisYDegreeList().get(position).isNotDraw();
             }
         });
-        chartWeek.setAdapter(new LineChartAdapter() {
+        mBinding.chartWeek.setAdapter(new LineChartAdapter() {
             @Override
             public int getLineCount() {
                 return data.getLineList() == null ? 0:data.getLineList().size();
@@ -142,6 +133,6 @@ public class RankWeekFragment extends BaseMvpFragment<RankWeekPresenter> impleme
                 return data.getLineList().get(lineIndex);
             }
         });
-        chartWeek.scrollToEnd();
+        mBinding.chartWeek.scrollToEnd();
     }
 }

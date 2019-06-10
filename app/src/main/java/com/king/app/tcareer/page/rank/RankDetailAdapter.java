@@ -1,29 +1,20 @@
 package com.king.app.tcareer.page.rank;
 
-import android.support.v7.widget.RecyclerView;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.king.app.tcareer.R;
+import com.king.app.tcareer.base.mvvm.BaseBindingAdapter;
+import com.king.app.tcareer.databinding.AdapterRankWeekDetailBinding;
 import com.king.app.tcareer.model.db.entity.RankWeek;
 
 import java.text.SimpleDateFormat;
-import java.util.List;
-
-import butterknife.BindView;
-import butterknife.ButterKnife;
 
 /**
  * 描述:
  * <p/>作者：景阳
  * <p/>创建时间: 2018/3/8 14:14
  */
-public class RankDetailAdapter extends RecyclerView.Adapter<RankDetailAdapter.RankHolder> {
-
-    private List<RankWeek> list;
+public class RankDetailAdapter extends BaseBindingAdapter<AdapterRankWeekDetailBinding, RankWeek> {
 
     private OnRankItemListener onRankItemListener;
 
@@ -34,31 +25,21 @@ public class RankDetailAdapter extends RecyclerView.Adapter<RankDetailAdapter.Ra
     }
 
     @Override
-    public RankHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return new RankHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.adapter_rank_week_detail, parent, false));
+    protected int getItemLayoutRes() {
+        return R.layout.adapter_rank_week_detail;
     }
 
     @Override
-    public void onBindViewHolder(RankHolder holder, int position) {
-        RankWeek rank = list.get(position);
-        holder.tvDate.setText(dateFormat.format(rank.getDate()));
-        holder.tvRank.setText(String.valueOf(rank.getRank()));
-        holder.tvScore.setText(String.valueOf(rank.getScore()));
-        holder.tvWeek.setText("W" + rank.getWeek());
+    protected void onBindItem(AdapterRankWeekDetailBinding binding, int position, RankWeek rank) {
+        binding.tvDate.setText(dateFormat.format(rank.getDate()));
+        binding.tvRank.setText(String.valueOf(rank.getRank()));
+        binding.tvScore.setText(String.valueOf(rank.getScore()));
+        binding.tvWeek.setText("W" + rank.getWeek());
 
-        holder.ivDelete.setTag(position);
-        holder.ivDelete.setOnClickListener(deleteListener);
-        holder.ivUpdate.setTag(position);
-        holder.ivUpdate.setOnClickListener(updateListener);
-    }
-
-    @Override
-    public int getItemCount() {
-        return list == null ? 0 : list.size();
-    }
-
-    public void setList(List<RankWeek> list) {
-        this.list = list;
+        binding.ivDelete.setTag(position);
+        binding.ivDelete.setOnClickListener(deleteListener);
+        binding.ivUpdate.setTag(position);
+        binding.ivUpdate.setOnClickListener(updateListener);
     }
 
     public void setOnRankItemListener(OnRankItemListener onRankItemListener) {
@@ -87,27 +68,6 @@ public class RankDetailAdapter extends RecyclerView.Adapter<RankDetailAdapter.Ra
 
     public void removeItem(int position) {
         list.remove(position);
-    }
-
-    public static class RankHolder extends RecyclerView.ViewHolder {
-
-        @BindView(R.id.tv_date)
-        TextView tvDate;
-        @BindView(R.id.tv_week)
-        TextView tvWeek;
-        @BindView(R.id.tv_score)
-        TextView tvScore;
-        @BindView(R.id.tv_rank)
-        TextView tvRank;
-        @BindView(R.id.iv_update)
-        ImageView ivUpdate;
-        @BindView(R.id.iv_delete)
-        ImageView ivDelete;
-
-        public RankHolder(View itemView) {
-            super(itemView);
-            ButterKnife.bind(this, itemView);
-        }
     }
 
     public interface OnRankItemListener {
