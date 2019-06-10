@@ -1,13 +1,22 @@
 package com.king.app.tcareer.page.record.list;
 
-import com.king.app.tcareer.base.BasePresenter;
+import android.app.Application;
+import android.arch.lifecycle.MutableLiveData;
+import android.databinding.ObservableField;
+import android.databinding.ObservableInt;
+import android.support.annotation.NonNull;
+import android.text.TextUtils;
+import android.view.View;
+
 import com.king.app.tcareer.base.TApplication;
+import com.king.app.tcareer.base.mvvm.BaseViewModel;
 import com.king.app.tcareer.conf.AppConstants;
+import com.king.app.tcareer.model.ImageProvider;
 import com.king.app.tcareer.model.db.entity.EarlierAchieve;
 import com.king.app.tcareer.model.db.entity.Record;
 import com.king.app.tcareer.model.db.entity.RecordDao;
 import com.king.app.tcareer.model.db.entity.ScoreDao;
-import com.king.app.tcareer.model.db.entity.User;
+import com.king.app.tcareer.utils.ListUtil;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -18,13 +27,10 @@ import java.util.List;
 import java.util.Map;
 
 import io.reactivex.Observable;
-import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
-import io.reactivex.ObservableSource;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 
 /**
@@ -32,13 +38,25 @@ import io.reactivex.schedulers.Schedulers;
  * <p/>作者：景阳
  * <p/>创建时间: 2017/4/21 17:05
  */
-public class RecordPresenter extends BasePresenter<IRecordView> {
+public class RecordViewModel extends BaseViewModel {
+
+    public ObservableField<String> userNameText = new ObservableField<>();
+    public ObservableInt careerRateVisibility = new ObservableInt();
+    public ObservableField<String> careerRateText = new ObservableField<>();
+    public ObservableField<String> careerWinLoseText = new ObservableField<>();
+    public ObservableInt yearRateVisibility = new ObservableInt();
+    public ObservableField<String> yearRateText = new ObservableField<>();
+    public ObservableField<String> yearText = new ObservableField<>();
+    public ObservableField<String> yearWinLoseText = new ObservableField<>();
+    public ObservableField<String> matchImageUrl = new ObservableField<>();
+
+    public MutableLiveData<List<YearItem>> listObserver = new MutableLiveData<>();
+    public MutableLiveData<Integer> deletePosition = new MutableLiveData<>();
 
     private List<Record> recordList;
 
-    @Override
-    protected void onCreate() {
-
+    public RecordViewModel(@NonNull Application application) {
+        super(application);
     }
 
     public List<Record> getRecordList() {
@@ -49,7 +67,7 @@ public class RecordPresenter extends BasePresenter<IRecordView> {
      * 按照当前的recordList组装3级数据
      * @param recordList
      */
-    public void loadRecordDatas(List<Record> recordList) {
+    public void loadRecordData(List<Record> recordList) {
         this.recordList = recordList;
         parseRecords()
                 .observeOn(AndroidSchedulers.mainThread())
@@ -62,13 +80,14 @@ public class RecordPresenter extends BasePresenter<IRecordView> {
 
                     @Override
                     public void onNext(RecordPageData recordPageData) {
-                        view.onRecordDataLoaded(recordPageData);
+                        bindContent(recordPageData);
+                        listObserver.setValue(recordPageData.getYearList());
                     }
 
                     @Override
                     public void onError(Throwable e) {
                         e.printStackTrace();
-                        view.showMessage("Load records failed: " + e.getMessage());
+                        messageObserver.setValue("Load records failed: " + e.getMessage());
                     }
 
                     @Override
@@ -78,19 +97,43 @@ public class RecordPresenter extends BasePresenter<IRecordView> {
                 });
     }
 
+    private void bindContent(RecordPageData data) {
+        if (TextUtils.isEmpty(data.getCareerRate())) {
+            careerRateVisibility.set(View.GONE);
+        }
+        else {
+            careerRateVisibility.set(View.VISIBLE);
+            careerRateText.set(data.getCareerRate());
+        }
+        careerWinLoseText.set("Win " + data.getCareerWin() + "   Lose " + data.getCareerLose());
+        yearText.set(String.valueOf(Calendar.getInstance().get(Calendar.YEAR)));
+
+        if (TextUtils.isEmpty(data.getYearRate())) {
+            yearRateVisibility.set(View.GONE);
+        }
+        else {
+            yearRateVisibility.set(View.VISIBLE);
+            yearRateText.set(data.getYearRate());
+        }
+        yearWinLoseText.set("Win " + data.getYearWin() + "   Lose " + data.getYearLose());
+
+        if (!ListUtil.isEmpty(data.getYearList())) {
+            Record record = data.getYearList().get(0).getChildItemList().get(0).getRecord();
+            String path = ImageProvider.getMatchHeadPath(record.getMatch().getName(), record.getMatch().getMatchBean().getCourt());
+            matchImageUrl.set(path);
+        }
+    }
+
     /**
      * 加载全部的record，并组装3级数据
      */
-    public void loadRecordDatas(long userId) {
+    public void loadRecordData(long userId) {
         recordList = null;
-        view.showLoading();
+        loadingObserver.setValue(true);
         queryUser(userId)
-                .flatMap(new Function<User, ObservableSource<RecordPageData>>() {
-                    @Override
-                    public ObservableSource<RecordPageData> apply(User user) throws Exception {
-                        view.postShowUser();
-                        return queryRecords();
-                    }
+                .flatMap(user -> {
+                    userNameText.set(user.getNameEng());
+                    return queryRecords();
                 })
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
@@ -102,15 +145,16 @@ public class RecordPresenter extends BasePresenter<IRecordView> {
 
                     @Override
                     public void onNext(RecordPageData recordPageData) {
-                        view.dismissLoading();
-                        view.onRecordDataLoaded(recordPageData);
+                        loadingObserver.setValue(false);
+                        bindContent(recordPageData);
+                        listObserver.setValue(recordPageData.getYearList());
                     }
 
                     @Override
                     public void onError(Throwable e) {
                         e.printStackTrace();
-                        view.dismissLoading();
-                        view.showMessage("Load records failed: " + e.getMessage());
+                        loadingObserver.setValue(false);
+                        messageObserver.setValue("Load records failed: " + e.getMessage());
                     }
 
                     @Override
@@ -125,24 +169,16 @@ public class RecordPresenter extends BasePresenter<IRecordView> {
      * @return
      */
     private Observable<RecordPageData> queryRecords() {
-        return Observable.create(new ObservableOnSubscribe<List<Record>>() {
-            @Override
-            public void subscribe(ObservableEmitter<List<Record>> e) throws Exception {
-                if (recordList == null) {
-                    recordList = TApplication.getInstance().getDaoSession().getRecordDao()
-                            .queryBuilder()
-                            .where(RecordDao.Properties.UserId.eq(mUser.getId()))
-                            .build().list();
-                    Collections.reverse(recordList);
-                }
-                e.onNext(recordList);
+        return Observable.create((ObservableOnSubscribe<List<Record>>) e -> {
+            if (recordList == null) {
+                recordList = TApplication.getInstance().getDaoSession().getRecordDao()
+                        .queryBuilder()
+                        .where(RecordDao.Properties.UserId.eq(mUser.getId()))
+                        .build().list();
+                Collections.reverse(recordList);
             }
-        }).flatMap(new Function<List<Record>, ObservableSource<RecordPageData>>() {
-            @Override
-            public ObservableSource<RecordPageData> apply(List<Record> records) throws Exception {
-                return parseRecords();
-            }
-        });
+            e.onNext(recordList);
+        }).flatMap(records -> parseRecords());
     }
 
     /**
@@ -150,12 +186,16 @@ public class RecordPresenter extends BasePresenter<IRecordView> {
      * @return
      */
     private Observable parseRecords() {
-        return Observable.create(new ObservableOnSubscribe<RecordPageData>() {
-            @Override
-            public void subscribe(ObservableEmitter<RecordPageData> e) throws Exception {
-                RecordPageData headerList = createHeaderList();
-                e.onNext(headerList);
+        return Observable.create((ObservableOnSubscribe<RecordPageData>) e -> {
+            RecordPageData headerList = createHeaderList();
+            // year默认展开
+            List<YearItem> yearList = headerList.getYearList();
+            if (yearList != null) {
+                for (YearItem item:yearList) {
+                    item.setExpanded(true);
+                }
             }
+            e.onNext(headerList);
         });
     }
 
@@ -241,30 +281,29 @@ public class RecordPresenter extends BasePresenter<IRecordView> {
         return  data;
     }
 
-    public void delete(final Record record, final int viewPosition) {
-        Observable.create(new ObservableOnSubscribe<Object>() {
-            @Override
-            public void subscribe(ObservableEmitter<Object> e) throws Exception {
-                // control in transaction
-                TApplication.getInstance().getDaoSession().runInTx(new Runnable() {
-                    @Override
-                    public void run() {
-                        // delete from match_records
-                        RecordDao dao = TApplication.getInstance().getDaoSession().getRecordDao();
-                        dao.queryBuilder()
-                                .where(RecordDao.Properties.Id.eq(record.getId()))
-                                .buildDelete()
-                                .executeDeleteWithoutDetachingEntities();
-                        // delete from scores
-                        ScoreDao scoreDao = TApplication.getInstance().getDaoSession().getScoreDao();
-                        scoreDao.queryBuilder()
-                                .where(ScoreDao.Properties.RecordId.eq(record.getId()))
-                                .buildDelete()
-                                .executeDeleteWithoutDetachingEntities();
-                    }
-                });
-                e.onNext(new Object());
-            }
+    public void delete(Record record, int viewPosition) {
+        Observable.create(e -> {
+            // control in transaction
+            TApplication.getInstance().getDaoSession().runInTx(() -> {
+                try {
+                    // delete from match_records
+                    RecordDao dao = TApplication.getInstance().getDaoSession().getRecordDao();
+                    dao.queryBuilder()
+                            .where(RecordDao.Properties.Id.eq(record.getId()))
+                            .buildDelete()
+                            .executeDeleteWithoutDetachingEntities();
+                    // delete from scores
+                    ScoreDao scoreDao = TApplication.getInstance().getDaoSession().getScoreDao();
+                    scoreDao.queryBuilder()
+                            .where(ScoreDao.Properties.RecordId.eq(record.getId()))
+                            .buildDelete()
+                            .executeDeleteWithoutDetachingEntities();
+                } catch (Exception exp) {
+                    exp.printStackTrace();
+                } finally {
+                    e.onNext(new Object());
+                }
+            });
         }).observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe(new Observer<Object>() {
@@ -275,13 +314,13 @@ public class RecordPresenter extends BasePresenter<IRecordView> {
 
                     @Override
                     public void onNext(Object object) {
-                        view.deleteSuccess(viewPosition);
+                        deletePosition.setValue(viewPosition);
                     }
 
                     @Override
                     public void onError(Throwable e) {
                         e.printStackTrace();
-                        view.showMessage("Delete record failed: " + e.getMessage());
+                        messageObserver.setValue("Delete record failed: " + e.getMessage());
                     }
 
                     @Override

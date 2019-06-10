@@ -1,6 +1,10 @@
 package com.king.app.tcareer.page.record.search;
 
-import com.king.app.tcareer.base.BasePresenter;
+import android.app.Application;
+import android.arch.lifecycle.MutableLiveData;
+import android.support.annotation.NonNull;
+
+import com.king.app.tcareer.base.mvvm.BaseViewModel;
 import com.king.app.tcareer.conf.AppConstants;
 import com.king.app.tcareer.model.CompetitorParser;
 import com.king.app.tcareer.model.bean.CompetitorBean;
@@ -11,7 +15,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.Observable;
-import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -23,21 +26,19 @@ import io.reactivex.schedulers.Schedulers;
  * <p/>作者：景阳
  * <p/>创建时间: 2018/2/7 14:23
  */
-public class SearchPresenter extends BasePresenter<SearchView> {
+public class SearchViewModel extends BaseViewModel {
 
-    @Override
-    protected void onCreate() {
+    public MutableLiveData<List<Record>> searchResultObserver = new MutableLiveData<>();
 
+    public SearchViewModel(@NonNull Application application) {
+        super(application);
     }
 
-    public void searchFrom(final List<Record> list, final SearchBean searchBean) {
-        view.showLoading();
-        Observable.create(new ObservableOnSubscribe<List<Record>>() {
-            @Override
-            public void subscribe(ObservableEmitter<List<Record>> e) throws Exception {
-                List<Record> result = filterList(list, searchBean);
-                e.onNext(result);
-            }
+    public void searchFrom(List<Record> list, SearchBean searchBean) {
+        loadingObserver.setValue(true);
+        Observable.create((ObservableOnSubscribe<List<Record>>) e -> {
+            List<Record> result = filterList(list, searchBean);
+            e.onNext(result);
         }).observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe(new Observer<List<Record>>() {
@@ -48,15 +49,15 @@ public class SearchPresenter extends BasePresenter<SearchView> {
 
                     @Override
                     public void onNext(List<Record> records) {
-                        view.dismissLoading();
-                        view.searchResult(records);
+                        loadingObserver.setValue(false);
+                        searchResultObserver.setValue(records);
                     }
 
                     @Override
                     public void onError(Throwable e) {
                         e.printStackTrace();
-                        view.dismissLoading();
-                        view.showMessage("Search failed: " + e.getMessage());
+                        loadingObserver.setValue(false);
+                        messageObserver.setValue("Search failed: " + e.getMessage());
                     }
 
                     @Override

@@ -1,24 +1,19 @@
 package com.king.app.tcareer.page.record.complex;
 
+import android.arch.lifecycle.ViewModelProviders;
 import android.graphics.PorterDuff;
-import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
-import android.widget.TextView;
 
 import com.king.app.tcareer.R;
-import com.king.app.tcareer.base.BaseMvpActivity;
+import com.king.app.tcareer.base.mvvm.MvvmActivity;
 import com.king.app.tcareer.conf.AppConstants;
+import com.king.app.tcareer.databinding.ActivityCareerCompareBinding;
 import com.king.app.tcareer.model.bean.LineChartData;
-import com.king.app.tcareer.view.widget.chart.LineChart;
 import com.king.app.tcareer.view.widget.chart.adapter.IAxis;
 import com.king.app.tcareer.view.widget.chart.adapter.LineChartAdapter;
 import com.king.app.tcareer.view.widget.chart.adapter.LineData;
 
 import java.util.List;
-
-import butterknife.BindView;
 
 /**
  * Desc:
@@ -26,24 +21,7 @@ import butterknife.BindView;
  * @author：Jing Yang
  * @date: 2018/10/23 15:12
  */
-public class CareerCompareActivity extends BaseMvpActivity<CareerComparePresenter> implements CareerCompareView {
-
-    @BindView(R.id.chart_week)
-    LineChart chartWeek;
-    @BindView(R.id.toolbar)
-    Toolbar toolbar;
-    @BindView(R.id.ctl_toolbar)
-    CollapsingToolbarLayout ctlToolbar;
-    @BindView(R.id.rv_data)
-    RecyclerView rvData;
-    @BindView(R.id.tv_title_king)
-    TextView tvTitleKing;
-    @BindView(R.id.tv_title_fla)
-    TextView tvTitleFla;
-    @BindView(R.id.tv_title_hen)
-    TextView tvTitleHen;
-    @BindView(R.id.tv_title_qi)
-    TextView tvTitleQi;
+public class CareerCompareActivity extends MvvmActivity<ActivityCareerCompareBinding, CareerCompareViewModel> {
 
     private CareerCompareAdapter adapter;
 
@@ -53,44 +31,44 @@ public class CareerCompareActivity extends BaseMvpActivity<CareerComparePresente
     }
 
     @Override
-    protected void initView() {
-        toolbar.setNavigationIcon(R.drawable.ic_arrow_back_filterrable);
-        toolbar.getNavigationIcon().setColorFilter(getResources().getColor(R.color.dark_grey), PorterDuff.Mode.SRC_ATOP);
-        toolbar.setNavigationOnClickListener(v -> finish());
-
-        tvTitleKing.setTextColor(AppConstants.USER_KING_LINE_COLOR);
-        tvTitleFla.setTextColor(AppConstants.USER_FLAMENCO_LINE_COLOR);
-        tvTitleHen.setTextColor(AppConstants.USER_HENRY_LINE_COLOR);
-        tvTitleQi.setTextColor(AppConstants.USER_QI_LINE_COLOR);
-
-        LinearLayoutManager manager = new LinearLayoutManager(this);
-        manager.setOrientation(LinearLayoutManager.VERTICAL);
-        rvData.setLayoutManager(manager);
+    protected CareerCompareViewModel createViewModel() {
+        return ViewModelProviders.of(this).get(CareerCompareViewModel.class);
     }
 
     @Override
-    protected CareerComparePresenter createPresenter() {
-        return new CareerComparePresenter();
+    protected void initView() {
+        mBinding.toolbar.setNavigationIcon(R.drawable.ic_arrow_back_filterrable);
+        mBinding.toolbar.getNavigationIcon().setColorFilter(getResources().getColor(R.color.dark_grey), PorterDuff.Mode.SRC_ATOP);
+        mBinding.toolbar.setNavigationOnClickListener(v -> finish());
+
+        mBinding.tvTitleKing.setTextColor(AppConstants.USER_KING_LINE_COLOR);
+        mBinding.tvTitleFla.setTextColor(AppConstants.USER_FLAMENCO_LINE_COLOR);
+        mBinding.tvTitleHen.setTextColor(AppConstants.USER_HENRY_LINE_COLOR);
+        mBinding.tvTitleQi.setTextColor(AppConstants.USER_QI_LINE_COLOR);
+
+        LinearLayoutManager manager = new LinearLayoutManager(this);
+        manager.setOrientation(LinearLayoutManager.VERTICAL);
+        mBinding.rvData.setLayoutManager(manager);
     }
 
     @Override
     protected void initData() {
-        presenter.loadData();
-        presenter.loadRankCompares();
+        mModel.compareItemsObserver.observe(this, list -> showData(list));
+        mModel.chartObserver.observe(this, data -> showChart(data));
+        mModel.loadData();
+        mModel.loadRankCompares();
     }
 
-    @Override
-    public void showData(List<CompareItem> list) {
+    private void showData(List<CompareItem> list) {
         adapter = new CareerCompareAdapter();
         adapter.setList(list);
-        rvData.setAdapter(adapter);
+        mBinding.rvData.setAdapter(adapter);
     }
 
-    @Override
-    public void showChart(LineChartData data) {
-        chartWeek.setDegreeCombine(8);
-        chartWeek.setDrawAxisY(true);
-        chartWeek.setAxisX(new IAxis() {
+    private void showChart(LineChartData data) {
+        mBinding.chartWeek.setDegreeCombine(8);
+        mBinding.chartWeek.setDrawAxisY(true);
+        mBinding.chartWeek.setAxisX(new IAxis() {
             @Override
             public int getDegreeCount() {
                 return data.getAxisXCount();
@@ -116,7 +94,7 @@ public class CareerCompareActivity extends BaseMvpActivity<CareerComparePresente
                 return data.getAxisXDegreeList().get(position).isNotDraw();
             }
         });
-        chartWeek.setAxisY(new IAxis() {
+        mBinding.chartWeek.setAxisY(new IAxis() {
             @Override
             public int getDegreeCount() {
                 return data.getAxisYCount();
@@ -142,7 +120,7 @@ public class CareerCompareActivity extends BaseMvpActivity<CareerComparePresente
                 return data.getAxisYDegreeList().get(position).isNotDraw();
             }
         });
-        chartWeek.setAdapter(new LineChartAdapter() {
+        mBinding.chartWeek.setAdapter(new LineChartAdapter() {
             @Override
             public int getLineCount() {
                 return data.getLineList().size();
@@ -153,7 +131,7 @@ public class CareerCompareActivity extends BaseMvpActivity<CareerComparePresente
                 return data.getLineList().get(lineIndex);
             }
         });
-        chartWeek.scrollToEnd();
+        mBinding.chartWeek.scrollToEnd();
     }
 
 }

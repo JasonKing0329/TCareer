@@ -1,376 +1,398 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content">
-
-    <ScrollView
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="400dp"
-        android:scrollbars="vertical">
+        android:layout_height="wrap_content">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="10dp">
+        <ScrollView
+            android:id="@+id/scroll_view"
+            android:layout_width="0dp"
+            android:layout_height="400dp"
+            android:scrollbars="vertical"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
-            <RelativeLayout
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/record_filter_item_height">
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="10dp">
 
-                <CheckBox
-                    android:id="@+id/cbox_court"
-                    style="@style/TvRecordFilterTitle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:text="@string/search_court" />
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/record_filter_item_height">
 
-                <Spinner
-                    android:id="@+id/insert_spinner_court"
-                    android:layout_width="@dimen/record_filter_spinner_width_large"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentRight="true"
-                    android:layout_centerVertical="true"
-                    android:visibility="invisible" />
-            </RelativeLayout>
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/record_filter_item_height">
-
-                <CheckBox
-                    android:id="@+id/cbox_level"
-                    style="@style/TvRecordFilterTitle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:text="@string/search_level" />
-
-                <Spinner
-                    android:id="@+id/insert_spinner_level"
-                    android:layout_width="@dimen/record_filter_spinner_width_large"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentRight="true"
-                    android:layout_centerVertical="true"
-                    android:visibility="invisible" />
-            </RelativeLayout>
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/record_filter_item_height">
-
-                <CheckBox
-                    android:id="@+id/cbox_match"
-                    style="@style/TvRecordFilterTitle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:text="@string/search_match" />
-
-                <EditText
-                    android:id="@+id/search_et_match"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentRight="true"
-                    android:layout_centerVertical="true"
-                    android:minWidth="@dimen/record_filter_spinner_input_large"
-                    android:visibility="invisible" />
-            </RelativeLayout>
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/record_filter_item_height">
-
-                <CheckBox
-                    android:id="@+id/cbox_round"
-                    style="@style/TvRecordFilterTitle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:text="@string/search_round" />
-
-                <Spinner
-                    android:id="@+id/insert_spinner_round"
-                    android:layout_width="@dimen/record_filter_spinner_width_large"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentRight="true"
-                    android:layout_centerVertical="true"
-                    android:visibility="invisible" />
-            </RelativeLayout>
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/record_filter_item_height">
-
-                <CheckBox
-                    android:id="@+id/cbox_region"
-                    style="@style/TvRecordFilterTitle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:text="@string/search_region" />
-
-                <Spinner
-                    android:id="@+id/insert_spinner_region"
-                    android:layout_width="@dimen/record_filter_spinner_width_large"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentRight="true"
-                    android:layout_centerVertical="true"
-                    android:visibility="invisible" />
-            </RelativeLayout>
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/record_filter_item_height">
-
-                <CheckBox
-                    android:id="@+id/cbox_matchcountry"
-                    style="@style/TvRecordFilterTitle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:text="@string/search_match_country" />
-
-                <EditText
-                    android:id="@+id/search_et_matchcountry"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentRight="true"
-                    android:layout_centerVertical="true"
-                    android:minWidth="@dimen/record_filter_spinner_input_large"
-                    android:visibility="invisible" />
-            </RelativeLayout>
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/record_filter_item_height">
-
-                <CheckBox
-                    android:id="@+id/cbox_compname"
-                    style="@style/TvRecordFilterTitle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:text="@string/search_compname" />
-
-                <EditText
-                    android:id="@+id/search_et_comp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentRight="true"
-                    android:layout_centerVertical="true"
-                    android:minWidth="@dimen/record_filter_spinner_input_large"
-                    android:visibility="invisible" />
-            </RelativeLayout>
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/record_filter_item_height">
-
-                <CheckBox
-                    android:id="@+id/cbox_compcountry"
-                    style="@style/TvRecordFilterTitle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:text="@string/search_player_country" />
-
-                <EditText
-                    android:id="@+id/search_et_compcountry"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentRight="true"
-                    android:layout_centerVertical="true"
-                    android:minWidth="@dimen/record_filter_spinner_input_large"
-                    android:visibility="invisible" />
-            </RelativeLayout>
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/record_filter_item_height">
-
-                <CheckBox
-                    android:id="@+id/cbox_comprank"
-                    style="@style/TvRecordFilterTitle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:text="@string/rank" />
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentRight="true"
-                    android:layout_centerVertical="true"
-                    android:orientation="horizontal">
-
-                    <EditText
-                        android:id="@+id/search_rank_min"
-                        android:layout_width="@dimen/record_filter_spinner_input_short"
-                        android:layout_height="wrap_content"
-                        android:hint="@string/search_rank_min"
-                        android:visibility="invisible" />
-
-                    <EditText
-                        android:id="@+id/search_rank_max"
-                        android:layout_width="@dimen/record_filter_spinner_input_short"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="20dp"
-                        android:hint="@string/search_rank_max"
-                        android:visibility="invisible" />
-                </LinearLayout>
-            </RelativeLayout>
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/record_filter_item_height">
-
-                <CheckBox
-                    android:id="@+id/cbox_date"
-                    style="@style/TvRecordFilterTitle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:text="@string/search_date" />
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentRight="true"
-                    android:layout_centerVertical="true"
-                    android:orientation="horizontal">
-
-                    <Button
-                        android:id="@+id/button_date_start"
-                        android:layout_width="90dp"
-                        android:layout_height="wrap_content"
-                        android:text="@string/search_date_start"
-                        android:visibility="invisible" />
-
-                    <Button
-                        android:id="@+id/button_date_end"
-                        android:layout_width="90dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="10dp"
-                        android:text="@string/search_date_end"
-                        android:visibility="invisible" />
-                </LinearLayout>
-            </RelativeLayout>
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/record_filter_item_height">
-
-                <CheckBox
-                    android:id="@+id/cbox_score"
-                    style="@style/TvRecordFilterTitle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:text="@string/search_score" />
-
-                <CheckBox
-                    android:id="@+id/cb_score_each"
-                    style="@style/TvRecordFilterTitle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:layout_alignParentRight="true"
-                    android:text="each other"
-                    android:visibility="invisible" />
-                <EditText
-                    android:id="@+id/et_score_cpt"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_toLeftOf="@id/cb_score_each"
-                    android:layout_centerVertical="true"
-                    android:layout_marginRight="10dp"
-                    android:hint="cpt"
-                    android:inputType="number"
-                    android:minWidth="@dimen/record_filter_spinner_input_short"
-                    android:visibility="invisible" />
-                <EditText
-                    android:id="@+id/et_score_user"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginRight="20dp"
-                    android:layout_toLeftOf="@id/et_score_cpt"
-                    android:layout_centerVertical="true"
-                    android:hint="user"
-                    android:inputType="number"
-                    android:minWidth="@dimen/record_filter_spinner_input_short"
-                    android:visibility="invisible" />
-            </RelativeLayout>
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/record_filter_item_height">
-
-                <CheckBox
-                    android:id="@+id/cbox_winorlose"
-                    style="@style/TvRecordFilterTitle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:text="@string/search_winlose" />
-
-                <RadioGroup
-                    android:id="@+id/radioGroup_winlose"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentRight="true"
-                    android:layout_centerVertical="true"
-                    android:contentDescription="@string/search_winlose"
-                    android:orientation="horizontal">
-
-                    <RadioButton
-                        android:id="@+id/radio_win"
+                    <CheckBox
+                        android:id="@+id/cb_court"
+                        style="@style/TvRecordFilterTitle"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:checked="true"
-                        android:text="@string/search_win"
-                        android:visibility="invisible"></RadioButton>
+                        android:layout_centerVertical="true"
+                        android:text="@string/search_court" />
 
-                    <RadioButton
-                        android:id="@+id/radio_lose"
+                    <Spinner
+                        android:id="@+id/sp_court"
+                        android:layout_width="@dimen/record_filter_spinner_width_large"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:layout_centerVertical="true"
+                        android:visibility="invisible" />
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/record_filter_item_height">
+
+                    <CheckBox
+                        android:id="@+id/cb_level"
+                        style="@style/TvRecordFilterTitle"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginLeft="20dp"
-                        android:text="@string/search_lose"
-                        android:visibility="invisible"></RadioButton>
-                </RadioGroup>
-            </RelativeLayout>
+                        android:layout_centerVertical="true"
+                        android:text="@string/search_level" />
 
-            <CheckBox
-                android:id="@+id/cbox_sql"
-                style="@style/TvRecordFilterTitle"
-                android:layout_width="wrap_content"
-                android:layout_height="@dimen/record_filter_item_height"
-                android:gravity="center_vertical"
-                android:text="@string/search_sql" />
+                    <Spinner
+                        android:id="@+id/sp_level"
+                        android:layout_width="@dimen/record_filter_spinner_width_large"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:layout_centerVertical="true"
+                        android:visibility="invisible" />
+                </RelativeLayout>
 
-            <EditText
-                android:id="@+id/search_et_sql1"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/search_where_hint"
-                android:visibility="gone" />
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/record_filter_item_height">
 
-            <EditText
-                android:id="@+id/search_et_sql2"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/search_wherevalue_hint"
-                android:visibility="gone" />
+                    <CheckBox
+                        android:id="@+id/cb_match"
+                        style="@style/TvRecordFilterTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:text="@string/search_match" />
 
-            <TextView
-                android:id="@+id/search_tv_hint_table"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textColor="#3c3c3c"
-                android:visibility="gone" />
+                    <EditText
+                        android:id="@+id/et_match"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:layout_centerVertical="true"
+                        android:minWidth="@dimen/record_filter_spinner_input_large"
+                        android:visibility="invisible" />
+                </RelativeLayout>
 
-        </LinearLayout>
-    </ScrollView>
-</RelativeLayout>
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/record_filter_item_height">
+
+                    <CheckBox
+                        android:id="@+id/cb_round"
+                        style="@style/TvRecordFilterTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:text="@string/search_round" />
+
+                    <Spinner
+                        android:id="@+id/sp_round"
+                        android:layout_width="@dimen/record_filter_spinner_width_large"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:layout_centerVertical="true"
+                        android:visibility="invisible" />
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/record_filter_item_height">
+
+                    <CheckBox
+                        android:id="@+id/cb_region"
+                        style="@style/TvRecordFilterTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:text="@string/search_region" />
+
+                    <Spinner
+                        android:id="@+id/sp_region"
+                        android:layout_width="@dimen/record_filter_spinner_width_large"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:layout_centerVertical="true"
+                        android:visibility="invisible" />
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/record_filter_item_height">
+
+                    <CheckBox
+                        android:id="@+id/cb_match_country"
+                        style="@style/TvRecordFilterTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:text="@string/search_match_country" />
+
+                    <EditText
+                        android:id="@+id/et_match_country"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:layout_centerVertical="true"
+                        android:minWidth="@dimen/record_filter_spinner_input_large"
+                        android:visibility="invisible" />
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/record_filter_item_height">
+
+                    <CheckBox
+                        android:id="@+id/cb_player"
+                        style="@style/TvRecordFilterTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:text="@string/search_compname" />
+
+                    <EditText
+                        android:id="@+id/et_player"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:layout_centerVertical="true"
+                        android:minWidth="@dimen/record_filter_spinner_input_large"
+                        android:visibility="invisible" />
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/record_filter_item_height">
+
+                    <CheckBox
+                        android:id="@+id/cb_player_country"
+                        style="@style/TvRecordFilterTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:text="@string/search_player_country" />
+
+                    <EditText
+                        android:id="@+id/et_player_country"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:layout_centerVertical="true"
+                        android:minWidth="@dimen/record_filter_spinner_input_large"
+                        android:visibility="invisible" />
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/record_filter_item_height">
+
+                    <CheckBox
+                        android:id="@+id/cb_player_rank"
+                        style="@style/TvRecordFilterTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:text="@string/rank" />
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:layout_centerVertical="true"
+                        android:orientation="horizontal">
+
+                        <EditText
+                            android:id="@+id/et_rank_min"
+                            android:layout_width="@dimen/record_filter_spinner_input_short"
+                            android:layout_height="wrap_content"
+                            android:hint="@string/search_rank_min"
+                            android:visibility="invisible" />
+
+                        <EditText
+                            android:id="@+id/et_rank_max"
+                            android:layout_width="@dimen/record_filter_spinner_input_short"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="20dp"
+                            android:hint="@string/search_rank_max"
+                            android:visibility="invisible" />
+                    </LinearLayout>
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/record_filter_item_height">
+
+                    <CheckBox
+                        android:id="@+id/cb_date"
+                        style="@style/TvRecordFilterTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:text="@string/search_date" />
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:layout_centerVertical="true"
+                        android:orientation="horizontal">
+
+                        <Button
+                            android:id="@+id/btn_date_start"
+                            android:layout_width="90dp"
+                            android:layout_height="wrap_content"
+                            android:text="@string/search_date_start"
+                            android:visibility="invisible" />
+
+                        <Button
+                            android:id="@+id/btn_date_end"
+                            android:layout_width="90dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="10dp"
+                            android:text="@string/search_date_end"
+                            android:visibility="invisible" />
+                    </LinearLayout>
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/record_filter_item_height">
+
+                    <CheckBox
+                        android:id="@+id/cb_score"
+                        style="@style/TvRecordFilterTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:text="@string/search_score" />
+
+                    <CheckBox
+                        android:id="@+id/cb_score_each"
+                        style="@style/TvRecordFilterTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_alignParentRight="true"
+                        android:text="each other"
+                        android:visibility="invisible" />
+                    <EditText
+                        android:id="@+id/et_score_cpt"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_toLeftOf="@id/cb_score_each"
+                        android:layout_centerVertical="true"
+                        android:layout_marginRight="10dp"
+                        android:hint="cpt"
+                        android:inputType="number"
+                        android:minWidth="@dimen/record_filter_spinner_input_short"
+                        android:visibility="invisible" />
+                    <EditText
+                        android:id="@+id/et_score_user"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginRight="20dp"
+                        android:layout_toLeftOf="@id/et_score_cpt"
+                        android:layout_centerVertical="true"
+                        android:hint="user"
+                        android:inputType="number"
+                        android:minWidth="@dimen/record_filter_spinner_input_short"
+                        android:visibility="invisible" />
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/record_filter_item_height">
+
+                    <CheckBox
+                        android:id="@+id/cb_win_lose"
+                        style="@style/TvRecordFilterTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:text="@string/search_winlose" />
+
+                    <RadioGroup
+                        android:id="@+id/rg_win_lose"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:layout_centerVertical="true"
+                        android:contentDescription="@string/search_winlose"
+                        android:orientation="horizontal">
+
+                        <RadioButton
+                            android:id="@+id/radio_win"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:checked="true"
+                            android:text="@string/search_win"
+                            android:visibility="invisible"></RadioButton>
+
+                        <RadioButton
+                            android:id="@+id/radio_lose"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="20dp"
+                            android:text="@string/search_lose"
+                            android:visibility="invisible"></RadioButton>
+                    </RadioGroup>
+                </RelativeLayout>
+
+                <CheckBox
+                    android:id="@+id/cb_sql"
+                    style="@style/TvRecordFilterTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="@dimen/record_filter_item_height"
+                    android:gravity="center_vertical"
+                    android:text="@string/search_sql" />
+
+                <EditText
+                    android:id="@+id/et_where"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/search_where_hint"
+                    android:visibility="gone" />
+
+                <EditText
+                    android:id="@+id/et_where_value"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/search_wherevalue_hint"
+                    android:visibility="gone" />
+
+                <TextView
+                    android:id="@+id/tv_hint_table"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="#3c3c3c"
+                    android:visibility="gone" />
+
+            </LinearLayout>
+        </ScrollView>
+
+        <TextView
+            android:id="@+id/tv_search"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:text="Search"
+            android:textColor="@color/text_normal"
+            android:textSize="20dp"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:background="?android:attr/selectableItemBackground"
+            app:layout_constraintTop_toBottomOf="@id/scroll_view"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+    </android.support.constraint.ConstraintLayout>
+</layout>

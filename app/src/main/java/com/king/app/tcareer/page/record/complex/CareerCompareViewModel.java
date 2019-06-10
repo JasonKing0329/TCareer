@@ -1,6 +1,10 @@
 package com.king.app.tcareer.page.record.complex;
 
-import com.king.app.tcareer.base.BasePresenter;
+import android.app.Application;
+import android.arch.lifecycle.MutableLiveData;
+import android.support.annotation.NonNull;
+
+import com.king.app.tcareer.base.mvvm.BaseViewModel;
 import com.king.app.tcareer.model.bean.LineChartData;
 import com.king.app.tcareer.model.dao.CareerCompareDao;
 import com.king.app.tcareer.repository.RankRepository;
@@ -19,19 +23,22 @@ import io.reactivex.schedulers.Schedulers;
  * <p/>作者：景阳
  * <p/>创建时间: 2018/3/20 13:49
  */
-public class CareerComparePresenter extends BasePresenter<CareerCompareView> {
+public class CareerCompareViewModel extends BaseViewModel {
+
+    public MutableLiveData<List<CompareItem>> compareItemsObserver = new MutableLiveData<>();
+    public MutableLiveData<LineChartData> chartObserver = new MutableLiveData<>();
 
     private CareerCompareDao dao;
     private RankRepository repository;
 
-    @Override
-    protected void onCreate() {
+    public CareerCompareViewModel(@NonNull Application application) {
+        super(application);
         dao = new CareerCompareDao();
         repository = new RankRepository();
     }
 
     public void loadData() {
-        view.showLoading();
+        loadingObserver.setValue(true);
         queryData()
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
@@ -43,15 +50,15 @@ public class CareerComparePresenter extends BasePresenter<CareerCompareView> {
 
                     @Override
                     public void onNext(List<CompareItem> compareItems) {
-                        view.dismissLoading();
-                        view.showData(compareItems);
+                        loadingObserver.setValue(false);
+                        compareItemsObserver.setValue(compareItems);
                     }
 
                     @Override
                     public void onError(Throwable e) {
                         e.printStackTrace();
-                        view.dismissLoading();
-                        view.showMessage("Load error: " + e.getMessage());
+                        loadingObserver.setValue(false);
+                        messageObserver.setValue("Load error: " + e.getMessage());
                     }
 
                     @Override
@@ -146,7 +153,7 @@ public class CareerComparePresenter extends BasePresenter<CareerCompareView> {
 
                     @Override
                     public void onNext(LineChartData data) {
-                        view.showChart(data);
+                        chartObserver.setValue(data);
                     }
 
                     @Override
