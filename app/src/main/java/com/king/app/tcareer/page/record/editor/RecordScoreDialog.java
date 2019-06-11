@@ -11,7 +11,9 @@ import android.widget.TextView;
 
 import com.king.app.tcareer.R;
 import com.king.app.tcareer.base.IFragmentHolder;
+import com.king.app.tcareer.base.mvvm.BaseViewModel;
 import com.king.app.tcareer.conf.AppConstants;
+import com.king.app.tcareer.databinding.DialogInputScoreBinding;
 import com.king.app.tcareer.model.bean.CompetitorBean;
 import com.king.app.tcareer.model.db.entity.Record;
 import com.king.app.tcareer.model.db.entity.Score;
@@ -84,20 +86,11 @@ public class RecordScoreDialog extends DraggableDialogFragment {
         this.scoreList = scoreList;
     }
 
-    public static class EditFragment extends ContentFragment implements View.OnClickListener {
+    public static class EditFragment extends BindingContentFragment<DialogInputScoreBinding, BaseViewModel> implements View.OnClickListener {
 
-        private ViewGroup groupSet;
         private Stack<ViewGroup> stackSet;
-        private TextView tvPlayer1, tvPlayer2;
-        private ViewGroup groupAdd;
-
-        private CheckBox cbRetire1, cbRetire2;
-        private CheckBox cbWO1, cbWO2;
         // 退赛情况只能勾选一种，也可以全都不勾选
         private CheckBox[] checkBoxes;
-
-        private String competitor;
-        private String winner;
 
         private User mUser;
         private CompetitorBean mCompetitor;
@@ -111,10 +104,15 @@ public class RecordScoreDialog extends DraggableDialogFragment {
         }
 
         @Override
+        protected BaseViewModel createViewModel() {
+            return null;
+        }
+
+        @Override
         protected void onCreate(View view) {
             initViewParams(view);
-            tvPlayer1.setText(mUser.getNameShort());
-            tvPlayer2.setText(mCompetitor.getNameChn());
+            mBinding.tvPlayer1.setText(mUser.getNameShort());
+            mBinding.tvPlayer2.setText(mCompetitor.getNameChn());
             initScore();
         }
 
@@ -125,20 +123,20 @@ public class RecordScoreDialog extends DraggableDialogFragment {
             // W/O
             if (mRecord.getRetireFlag() == AppConstants.RETIRE_WO) {
                 if (mRecord.getWinnerFlag() == AppConstants.WINNER_COMPETITOR) {
-                    cbWO1.setChecked(true);
+                    mBinding.cbWo1.setChecked(true);
                 }
                 else {
-                    cbWO2.setChecked(true);
+                    mBinding.cbWo2.setChecked(true);
                 }
                 return;
             }
             // retire with score
             if (mRecord.getRetireFlag() == AppConstants.RETIRE_WITH_SCORE) {
                 if (mRecord.getWinnerFlag() == AppConstants.WINNER_COMPETITOR) {
-                    cbRetire1.setChecked(true);
+                    mBinding.cbRetire1.setChecked(true);
                 }
                 else {
-                    cbRetire2.setChecked(true);
+                    mBinding.cbRetire2.setChecked(true);
                 }
             }
 
@@ -154,23 +152,15 @@ public class RecordScoreDialog extends DraggableDialogFragment {
         }
 
         private void initViewParams(View view) {
-            groupAdd = (ViewGroup) view.findViewById(R.id.input_add_set);
-            groupAdd.setOnClickListener(this);
-            tvPlayer1 = (TextView) view.findViewById(R.id.input_title_player1);
-            tvPlayer2 = (TextView) view.findViewById(R.id.input_title_player2);
-            cbRetire1 = (CheckBox) view.findViewById(R.id.input_retire1);
-            cbRetire2 = (CheckBox) view.findViewById(R.id.input_retire2);
-            cbWO1 = (CheckBox) view.findViewById(R.id.input_wo1);
-            cbWO2 = (CheckBox) view.findViewById(R.id.input_wo2);
+            mBinding.llAddSet.setOnClickListener(v -> addSet(null));
             checkBoxes = new CheckBox[4];
-            checkBoxes[0] = cbRetire1;
-            checkBoxes[1] = cbRetire2;
-            checkBoxes[2] = cbWO1;
-            checkBoxes[3] = cbWO2;
+            checkBoxes[0] = mBinding.cbRetire1;
+            checkBoxes[1] = mBinding.cbRetire2;
+            checkBoxes[2] = mBinding.cbWo1;
+            checkBoxes[3] = mBinding.cbWo2;
             for (int i = 0 ; i < 4; i ++) {
                 checkBoxes[i].setOnClickListener(this);
             }
-            groupSet = (ViewGroup) view.findViewById(R.id.group_set);
             stackSet = new Stack<>();
         }
 
@@ -193,11 +183,8 @@ public class RecordScoreDialog extends DraggableDialogFragment {
 
         @Override
         public void onClick(View view) {
-            if (view.getId() == R.id.input_add_set) {
-                addSet(null);
-            }
             // 各种退赛情况只能有一种，或者都没有
-            else if (view instanceof CheckBox) {
+            if (view instanceof CheckBox) {
                 CheckBox cb = (CheckBox) view;
                 checkRetire(cb);
             }
@@ -230,23 +217,15 @@ public class RecordScoreDialog extends DraggableDialogFragment {
             final EditText etTie = group.findViewById(R.id.et_tie);
             final EditText etTieCpt = group.findViewById(R.id.et_tie_cpt);
             tvSet.setText("Set" + (stackSet.size() + 1));
-            group.findViewById(R.id.tv_tie).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    etTie.setVisibility(etTie.getVisibility() == View.VISIBLE ? View.GONE:View.VISIBLE);
-                    etTieCpt.setVisibility(etTieCpt.getVisibility() == View.VISIBLE ? View.GONE:View.VISIBLE);
-                }
+            group.findViewById(R.id.tv_tie).setOnClickListener(view -> {
+                etTie.setVisibility(etTie.getVisibility() == View.VISIBLE ? View.GONE:View.VISIBLE);
+                etTieCpt.setVisibility(etTieCpt.getVisibility() == View.VISIBLE ? View.GONE:View.VISIBLE);
             });
             ImageView ivDelete = group.findViewById(R.id.iv_delete);
             if (stackSet.empty()) {
                 ivDelete.setVisibility(View.GONE);
             }
-            ivDelete.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    deleteSet();
-                }
-            });
+            ivDelete.setOnClickListener(view -> deleteSet());
 
             if (score != null) {
                 etScoreUser.setText(String.valueOf(score.getUserPoint()));
@@ -261,10 +240,10 @@ public class RecordScoreDialog extends DraggableDialogFragment {
 
             stackSet.push(group);
 
-            groupSet.addView(group);
+            mBinding.llSet.addView(group);
 
             if (stackSet.size() == 5) {
-                groupAdd.setVisibility(View.GONE);
+                mBinding.llAddSet.setVisibility(View.GONE);
             }
         }
 
@@ -273,24 +252,24 @@ public class RecordScoreDialog extends DraggableDialogFragment {
          */
         private void deleteSet() {
             ViewGroup group = stackSet.pop();
-            groupSet.removeView(group);
+            mBinding.llSet.removeView(group);
             ViewGroup top = stackSet.peek();
             // 第一盘不允许删除
             if (stackSet.size() != 1) {
                 top.findViewById(R.id.iv_delete).setVisibility(View.VISIBLE);
             }
-            groupAdd.setVisibility(View.VISIBLE);
+            mBinding.llAddSet.setVisibility(View.VISIBLE);
         }
 
         public boolean onSave() {
             int retireFlag = AppConstants.RETIRE_NONE;
             int winnerFlag = AppConstants.WINNER_USER;
             List<Score> scoreList = new ArrayList<>();
-            if (cbWO1.isChecked()) {
+            if (mBinding.cbWo1.isChecked()) {
                 retireFlag = AppConstants.RETIRE_WO;
                 winnerFlag = AppConstants.WINNER_COMPETITOR;
             }
-            else if (cbWO2.isChecked()) {
+            else if (mBinding.cbWo2.isChecked()) {
                 retireFlag = AppConstants.RETIRE_WO;
             }
             else {
@@ -308,11 +287,11 @@ public class RecordScoreDialog extends DraggableDialogFragment {
                     }
                 }
                 Collections.reverse(scoreList);
-                if (cbRetire1.isChecked()) {
+                if (mBinding.cbRetire1.isChecked()) {
                     retireFlag = AppConstants.RETIRE_WITH_SCORE;
                     winnerFlag = AppConstants.WINNER_COMPETITOR;
                 }
-                else if (cbRetire2.isChecked()) {
+                else if (mBinding.cbRetire2.isChecked()) {
                     retireFlag = AppConstants.RETIRE_WITH_SCORE;
                 }
                 else {

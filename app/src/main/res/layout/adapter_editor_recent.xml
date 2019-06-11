@@ -1,19 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:gravity="center">
-    <com.king.app.tcareer.view.widget.CircleImageView
-        android:id="@+id/iv_match"
-        android:layout_width="50dp"
-        android:layout_height="50dp" />
-    <TextView
-        android:id="@+id/tv_match"
-        android:layout_width="70dp"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <data>
+        <variable
+            name="bean"
+            type="com.king.app.tcareer.model.db.entity.MatchNameBean"/>
+        <variable
+            name="imageUrl"
+            type="String"/>
+    </data>
+    <LinearLayout
+        android:orientation="vertical" android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:maxLines="1"
-        android:ellipsize="end"
-        android:textSize="10dp"
-        android:textColor="@color/text_sub"/>
-</LinearLayout>
+        android:gravity="center">
+        <com.king.app.tcareer.view.widget.CircleImageView
+            android:id="@+id/iv_match"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            app:matchUrl="@{imageUrl}"/>
+        <TextView
+            android:id="@+id/tv_match"
+            android:layout_width="70dp"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:text="@{bean.name}"
+            android:textSize="10dp"
+            android:textColor="@color/text_sub"/>
+    </LinearLayout>
+</layout>
