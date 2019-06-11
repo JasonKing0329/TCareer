@@ -1,17 +1,16 @@
 package com.king.app.tcareer.page;
 
 import android.graphics.Color;
-import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
 import com.king.app.tcareer.R;
 import com.king.app.tcareer.base.TApplication;
+import com.king.app.tcareer.base.mvvm.BaseViewModel;
+import com.king.app.tcareer.base.mvvm.MvvmActivity;
 import com.king.app.tcareer.conf.AppConstants;
+import com.king.app.tcareer.databinding.ActivityTestBinding;
 import com.king.app.tcareer.model.db.entity.RankWeek;
 import com.king.app.tcareer.model.db.entity.RankWeekDao;
-import com.king.app.tcareer.view.widget.chart.BarChart;
-import com.king.app.tcareer.view.widget.chart.LineChart;
 import com.king.app.tcareer.view.widget.chart.adapter.BarChartAdapter;
 import com.king.app.tcareer.view.widget.chart.adapter.IAxis;
 import com.king.app.tcareer.view.widget.chart.adapter.LineChartAdapter;
@@ -21,15 +20,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
-
-public class TestActivity extends AppCompatActivity {
-
-    @BindView(R.id.bar_chart)
-    BarChart barChart;
-    @BindView(R.id.line_chart)
-    LineChart lineChart;
+public class TestActivity extends MvvmActivity<ActivityTestBinding, BaseViewModel> {
 
     Integer[] ranks = {0, 600, 95, 12, 7, 3, 1, 1};
     int[] colorBars = {
@@ -48,13 +39,24 @@ public class TestActivity extends AppCompatActivity {
     private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_test);
-        ButterKnife.bind(this);
+    protected int getContentView() {
+        return R.layout.activity_test;
+    }
 
+    @Override
+    protected BaseViewModel createViewModel() {
+        return null;
+    }
+
+    @Override
+    protected void initView() {
         initLineChart();
 //        initBarChart();
+    }
+
+    @Override
+    protected void initData() {
+        
     }
 
     private void initLineChart() {
@@ -71,12 +73,12 @@ public class TestActivity extends AppCompatActivity {
         createLineData();
         final int totalCount = getTotalLineXCount();
 
-        lineChart.setVisibility(View.VISIBLE);
-        lineChart.setDegreeCombine(8);
-        lineChart.setDrawAxisY(true);
-        lineChart.setDrawDashGrid(false);
+        mBinding.lineChart.setVisibility(View.VISIBLE);
+        mBinding.lineChart.setDegreeCombine(8);
+        mBinding.lineChart.setDrawAxisY(true);
+        mBinding.lineChart.setDrawDashGrid(false);
 
-        lineChart.setAxisX(new IAxis() {
+        mBinding.lineChart.setAxisX(new IAxis() {
             @Override
             public int getDegreeCount() {
                 return totalCount;
@@ -108,7 +110,7 @@ public class TestActivity extends AppCompatActivity {
                 return false;
             }
         });
-        lineChart.setAxisY(new IAxis() {
+        mBinding.lineChart.setAxisY(new IAxis() {
             @Override
             public int getDegreeCount() {
                 return DEGREE_AREA * (DEGREE_POINT_LINE.length - 1) + 1;
@@ -136,7 +138,7 @@ public class TestActivity extends AppCompatActivity {
                 return !isKeyDegree(rank);
             }
         });
-        lineChart.setAdapter(new LineChartAdapter() {
+        mBinding.lineChart.setAdapter(new LineChartAdapter() {
             @Override
             public int getLineCount() {
                 return lineData.size();
@@ -147,7 +149,7 @@ public class TestActivity extends AppCompatActivity {
                 return lineData.get(lineIndex);
             }
         });
-        lineChart.scrollToEnd();
+        mBinding.lineChart.scrollToEnd();
     }
 
     public int getTotalLineXCount() {
@@ -221,11 +223,11 @@ public class TestActivity extends AppCompatActivity {
     }
 
     private void initBarChart() {
-        barChart.setVisibility(View.VISIBLE);
-        barChart.setDrawAxisY(true);
-        barChart.setDrawValueText(true);
-        barChart.setDrawDashGrid(true);
-        barChart.setAxisX(new IAxis() {
+        mBinding.barChart.setVisibility(View.VISIBLE);
+        mBinding.barChart.setDrawAxisY(true);
+        mBinding.barChart.setDrawValueText(true);
+        mBinding.barChart.setDrawDashGrid(true);
+        mBinding.barChart.setAxisX(new IAxis() {
             @Override
             public int getDegreeCount() {
                 return ranks.length;
@@ -251,7 +253,7 @@ public class TestActivity extends AppCompatActivity {
                 return false;
             }
         });
-        barChart.setAxisY(new IAxis() {
+        mBinding.barChart.setAxisY(new IAxis() {
             @Override
             public int getDegreeCount() {
                 return DEGREE_AREA * (DEGREE_POINT_BAR.length - 1) + 1;
@@ -283,7 +285,7 @@ public class TestActivity extends AppCompatActivity {
                 return false;
             }
         });
-        barChart.setAdapter(new BarChartAdapter() {
+        mBinding.barChart.setAdapter(new BarChartAdapter() {
             @Override
             public int getXCount() {
                 return ranks.length;

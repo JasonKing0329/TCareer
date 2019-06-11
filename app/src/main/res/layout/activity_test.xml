@@ -1,42 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context="com.king.app.tcareer.page.TestActivity">
+<layout>
+    <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context="com.king.app.tcareer.page.TestActivity">
 
-    <HorizontalScrollView
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:scrollbars="none">
-        <FrameLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
-            <com.king.app.tcareer.view.widget.chart.BarChart
-                android:id="@+id/bar_chart"
+        <HorizontalScrollView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:scrollbars="none">
+            <FrameLayout
                 android:layout_width="wrap_content"
-                android:layout_height="360dp"
-                android:paddingTop="10dp"
-                app:barWidth="30dp"
-                app:axisXExtendLineWidth="20dp"/>
-        </FrameLayout>
-    </HorizontalScrollView>
-    <com.king.app.tcareer.view.widget.chart.LineChart
-        android:id="@+id/line_chart"
-        android:layout_width="wrap_content"
-        android:layout_height="360dp"
-        android:paddingTop="10dp"
-        android:paddingRight="30dp"
-        app:axisXTextSize="8dp"
-        app:axisYTextSize="8dp"
-        app:axisYTextWidth="30dp"
-        app:axisXExtendLineWidth="10dp"
-        app:minXCellWidth="5dp"
-        app:valueTextSize="8dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
-</android.support.constraint.ConstraintLayout>
+                android:layout_height="wrap_content">
+                <com.king.app.tcareer.view.widget.chart.BarChart
+                    android:id="@+id/bar_chart"
+                    android:layout_width="wrap_content"
+                    android:layout_height="360dp"
+                    android:paddingTop="10dp"
+                    app:barWidth="30dp"
+                    app:axisXExtendLineWidth="20dp"/>
+            </FrameLayout>
+        </HorizontalScrollView>
+        <com.king.app.tcareer.view.widget.chart.LineChart
+            android:id="@+id/line_chart"
+            android:layout_width="wrap_content"
+            android:layout_height="360dp"
+            android:paddingTop="10dp"
+            android:paddingRight="30dp"
+            app:axisXTextSize="8dp"
+            app:axisYTextSize="8dp"
+            app:axisYTextWidth="30dp"
+            app:axisXExtendLineWidth="10dp"
+            app:minXCellWidth="5dp"
+            app:valueTextSize="8dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
+    </android.support.constraint.ConstraintLayout>
+
+</layout>

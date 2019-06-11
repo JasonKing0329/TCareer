@@ -1,6 +1,5 @@
 package com.king.app.tcareer.page.glory.bean;
 
-import com.king.app.tcareer.model.db.entity.Record;
 import com.king.app.tcareer.page.glory.gs.GloryGsItem;
 import com.king.app.tcareer.page.glory.gs.GloryMasterItem;
 
@@ -12,10 +11,10 @@ import java.util.List;
 
 public class GloryTitle {
     
-    private List<Record> championList;
-    private List<Record> runnerUpList;
-    private List<Record> targetList;
-    private List<Record> targetWinList;
+    private List<GloryRecordItem> championList;
+    private List<GloryRecordItem> runnerUpList;
+    private List<GloryRecordItem> targetList;
+    private List<GloryRecordItem> targetWinList;
 
     private int careerMatch;
     private int careerWin;
@@ -35,19 +34,19 @@ public class GloryTitle {
     private List<GloryGsItem> gsItemList;
     private List<GloryMasterItem> masterItemList;
 
-    public List<Record> getChampionList() {
+    public List<GloryRecordItem> getChampionList() {
         return championList;
     }
 
-    public void setChampionList(List<Record> championList) {
+    public void setChampionList(List<GloryRecordItem> championList) {
         this.championList = championList;
     }
 
-    public List<Record> getRunnerUpList() {
+    public List<GloryRecordItem> getRunnerUpList() {
         return runnerUpList;
     }
 
-    public void setRunnerUpList(List<Record> runnerUpList) {
+    public void setRunnerUpList(List<GloryRecordItem> runnerUpList) {
         this.runnerUpList = runnerUpList;
     }
 
@@ -67,19 +66,19 @@ public class GloryTitle {
         this.masterItemList = masterItemList;
     }
 
-    public List<Record> getTargetList() {
+    public List<GloryRecordItem> getTargetList() {
         return targetList;
     }
 
-    public void setTargetList(List<Record> targetList) {
+    public void setTargetList(List<GloryRecordItem> targetList) {
         this.targetList = targetList;
     }
 
-    public List<Record> getTargetWinList() {
+    public List<GloryRecordItem> getTargetWinList() {
         return targetWinList;
     }
 
-    public void setTargetWinList(List<Record> targetWinList) {
+    public void setTargetWinList(List<GloryRecordItem> targetWinList) {
         this.targetWinList = targetWinList;
     }
 

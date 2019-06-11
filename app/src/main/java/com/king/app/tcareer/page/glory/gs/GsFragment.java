@@ -38,7 +38,8 @@ public class GsFragment extends BaseGloryPageFragment implements OnRecordItemLis
         manager.setOrientation(LinearLayoutManager.VERTICAL);
         rvGsList.setLayoutManager(manager);
 
-        GsYearAdapter adapter = new GsYearAdapter(gloryHolder.getGloryTitle().getGsItemList());
+        GsYearAdapter adapter = new GsYearAdapter();
+        adapter.setList(gloryHolder.getGloryTitle().getGsItemList());
         adapter.setOnRecordItemListener(this);
         rvGsList.setAdapter(adapter);
     }

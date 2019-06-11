@@ -38,7 +38,8 @@ public class MasterFragment extends BaseGloryPageFragment implements OnRecordIte
         manager.setOrientation(LinearLayoutManager.VERTICAL);
         rvGsList.setLayoutManager(manager);
 
-        MasterYearAdapter adapter = new MasterYearAdapter(gloryHolder.getGloryTitle().getMasterItemList());
+        MasterYearAdapter adapter = new MasterYearAdapter();
+        adapter.setList(gloryHolder.getGloryTitle().getMasterItemList());
         adapter.setOnRecordItemListener(this);
         rvGsList.setAdapter(adapter);
     }

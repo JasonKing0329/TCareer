@@ -1,14 +1,20 @@
 package com.king.app.tcareer.model.dao;
 
 import android.database.Cursor;
+import android.view.View;
 
 import com.king.app.tcareer.base.TApplication;
 import com.king.app.tcareer.conf.AppConstants;
+import com.king.app.tcareer.model.CompetitorParser;
+import com.king.app.tcareer.model.ImageProvider;
+import com.king.app.tcareer.model.ScoreParser;
+import com.king.app.tcareer.model.bean.CompetitorBean;
 import com.king.app.tcareer.model.bean.KeyValueCountBean;
 import com.king.app.tcareer.model.bean.MatchResultBean;
 import com.king.app.tcareer.model.db.Sqls;
 import com.king.app.tcareer.model.db.entity.Record;
 import com.king.app.tcareer.model.db.entity.RecordDao;
+import com.king.app.tcareer.page.glory.bean.GloryRecordItem;
 
 import org.greenrobot.greendao.query.QueryBuilder;
 
@@ -25,7 +31,7 @@ import java.util.Map;
  */
 public class GloryDao extends CursorDao {
 
-    public List<Record> getChampionRecords(long userId) {
+    public List<GloryRecordItem> getChampionRecords(long userId) {
         RecordDao dao = TApplication.getInstance().getDaoSession().getRecordDao();
         List<Record> list = dao.queryBuilder()
                 .where(RecordDao.Properties.UserId.eq(userId)
@@ -33,10 +39,10 @@ public class GloryDao extends CursorDao {
                     , RecordDao.Properties.WinnerFlag.eq(0))
                 .orderDesc(RecordDao.Properties.Id)
                 .build().list();
-        return list;
+        return toTitleRecordItem(list);
     }
 
-    public List<Record> getRunnerupRecords(long userId) {
+    public List<GloryRecordItem> getRunnerupRecords(long userId) {
         RecordDao dao = TApplication.getInstance().getDaoSession().getRecordDao();
         List<Record> list = dao.queryBuilder()
                 .where(RecordDao.Properties.UserId.eq(userId)
@@ -44,6 +50,22 @@ public class GloryDao extends CursorDao {
                         , RecordDao.Properties.WinnerFlag.eq(1))
                 .orderDesc(RecordDao.Properties.Id)
                 .build().list();
+        return toTitleRecordItem(list);
+    }
+
+    private List<GloryRecordItem> toTitleRecordItem(List<Record> records) {
+        List<GloryRecordItem> list = new ArrayList<>();
+        for (int i = 0; i < records.size(); i ++) {
+            Record record = records.get(i);
+            GloryRecordItem item = new GloryRecordItem();
+            convertRecordBase(record, item);
+
+            item.setIndexVisibility(View.VISIBLE);
+            item.setIndex(String.valueOf(records.size() - i));
+            item.setTitleVisibility(View.GONE);
+            item.setLoseVisibility(View.GONE);
+            list.add(item);
+        }
         return list;
     }
 
@@ -55,7 +77,7 @@ public class GloryDao extends CursorDao {
      * @param earlierWin
      *@param earlierLose @return
      */
-    public List<Record> getTargetRecords(long userId, int factor, boolean isWinner, int earlierWin, int earlierLose) {
+    public List<GloryRecordItem> getTargetRecords(long userId, int factor, boolean isWinner, int earlierWin, int earlierLose) {
         RecordDao dao = TApplication.getInstance().getDaoSession().getRecordDao();
         QueryBuilder<Record> builder = dao.queryBuilder();
         builder.where(RecordDao.Properties.UserId.eq(userId));
@@ -79,6 +101,46 @@ public class GloryDao extends CursorDao {
             list.add(record);
 
             count += factor;
+        }
+        return toTargetRecordItem(list);
+    }
+
+    private void convertRecordBase(Record record, GloryRecordItem item) {
+        // match
+        item.setRecord(record);
+        item.setMatchName(record.getMatch().getName());
+        item.setDate(record.getDateStr());
+        item.setLevel(record.getMatch().getMatchBean().getLevel());
+        item.setDate(record.getDateStr());
+        item.setPlace(record.getMatch().getMatchBean().getCountry() + "/" + record.getMatch().getMatchBean().getCity());
+        item.setMatchImageUrl(ImageProvider.getMatchHeadPath(record.getMatch().getName(), record.getMatch().getMatchBean().getCourt()));
+
+        // competitor
+        CompetitorBean competitor = CompetitorParser.getCompetitorFrom(record);
+        item.setPlayerName(competitor.getNameChn() + "(" + competitor.getCountry() + ")");
+        item.setPlayerImageUrl(ImageProvider.getPlayerHeadPath(competitor.getNameChn()));
+
+        // score
+        item.setScore(ScoreParser.getScoreText(record.getScoreList(), record.getWinnerFlag(), record.getRetireFlag()));
+        if (record.getWinnerFlag() == AppConstants.WINNER_COMPETITOR) {
+            item.setLoseVisibility(View.VISIBLE);
+        }
+        else {
+            item.setLoseVisibility(View.GONE);
+        }
+    }
+
+    private List<GloryRecordItem> toTargetRecordItem(List<Record> records) {
+        List<GloryRecordItem> list = new ArrayList<>();
+        for (int i = 0; i < records.size(); i ++) {
+            Record record = records.get(i);
+            GloryRecordItem item = new GloryRecordItem();
+            convertRecordBase(record, item);
+
+            item.setIndexVisibility(View.GONE);
+            item.setTitleVisibility(View.VISIBLE);
+            item.setTitle(AppConstants.GLORY_TARGET_FACTOR * (i + 1) + "th");
+            list.add(item);
         }
         return list;
     }

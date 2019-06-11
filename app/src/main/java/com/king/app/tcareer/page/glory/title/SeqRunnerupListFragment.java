@@ -2,7 +2,8 @@ package com.king.app.tcareer.page.glory.title;
 
 import android.support.v7.widget.RecyclerView;
 
-import com.king.app.tcareer.model.db.entity.Record;
+import com.king.app.tcareer.page.glory.GloryRecordAdapter;
+import com.king.app.tcareer.page.glory.bean.GloryRecordItem;
 
 import java.util.List;
 
@@ -14,16 +15,10 @@ import java.util.List;
 public class SeqRunnerupListFragment extends AbsGloryListFragment {
     @Override
     protected RecyclerView.Adapter getListAdapter() {
-        List<Record> recordList = gloryHolder.getGloryTitle().getRunnerUpList();
-        SeqListAdapter adapter = new SeqListAdapter(recordList);
-        adapter.setShowCompetitor(true);
-        adapter.setOnRecordItemListener(new OnRecordItemListener() {
-            @Override
-            public void onClickRecord(Record record) {
-                showGloryMatchDialog(record);
-            }
-
-        });
+        List<GloryRecordItem> recordList = gloryHolder.getGloryTitle().getRunnerUpList();
+        GloryRecordAdapter adapter = new GloryRecordAdapter();
+        adapter.setList(recordList);
+        adapter.setOnItemClickListener((view, position, data) -> showGloryMatchDialog(data.getRecord()));
         return adapter;
     }
 }

@@ -3,13 +3,14 @@ package com.king.app.tcareer.page.glory;
 import com.king.app.tcareer.base.BasePresenter;
 import com.king.app.tcareer.base.TApplication;
 import com.king.app.tcareer.conf.AppConstants;
-import com.king.app.tcareer.model.dao.GloryDao;
 import com.king.app.tcareer.model.bean.KeyValueCountBean;
 import com.king.app.tcareer.model.bean.MatchResultBean;
+import com.king.app.tcareer.model.dao.GloryDao;
 import com.king.app.tcareer.model.db.entity.EarlierAchieve;
 import com.king.app.tcareer.model.db.entity.Record;
 import com.king.app.tcareer.model.db.entity.RecordDao;
 import com.king.app.tcareer.model.db.entity.User;
+import com.king.app.tcareer.page.glory.bean.GloryRecordItem;
 import com.king.app.tcareer.page.glory.bean.GloryTitle;
 import com.king.app.tcareer.page.glory.gs.GloryGsItem;
 import com.king.app.tcareer.page.glory.gs.GloryMasterItem;
@@ -434,19 +435,19 @@ public class GloryPresenter extends BasePresenter<IGloryView> {
      * @param groupMode AppConstants.GROUP_BY_XX
      * @return
      */
-    public List<HeaderItem> getHeaderList(List<Record> recordList, int groupMode) {
+    public List<HeaderItem> getHeaderList(List<GloryRecordItem> recordList, int groupMode) {
         List<HeaderItem> list = new ArrayList<>();
         Map<String, List<SubItem>> keyMap = new HashMap<>();
-        for (Record record:recordList) {
+        for (GloryRecordItem recordItem:recordList) {
             String key;
             if (groupMode == AppConstants.GROUP_BY_COURT) {
-                key = record.getMatch().getMatchBean().getCourt();
+                key = recordItem.getRecord().getMatch().getMatchBean().getCourt();
             }
             else if (groupMode == AppConstants.GROUP_BY_LEVEL) {
-                key = record.getMatch().getMatchBean().getLevel();
+                key = recordItem.getRecord().getMatch().getMatchBean().getLevel();
             }
             else {
-                key = record.getDateStr().split("-")[0];
+                key = recordItem.getRecord().getDateStr().split("-")[0];
             }
             List<SubItem> subList = keyMap.get(key);
             if (subList == null) {
@@ -461,7 +462,7 @@ public class GloryPresenter extends BasePresenter<IGloryView> {
             }
             SubItem item = new SubItem();
             item.setItemPosition(subList.size());
-            item.setRecord(record);
+            item.setRecord(recordItem.getRecord());
             subList.add(item);
         }
 

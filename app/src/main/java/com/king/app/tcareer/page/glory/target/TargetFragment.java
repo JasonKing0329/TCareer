@@ -6,11 +6,9 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.king.app.tcareer.R;
-import com.king.app.tcareer.conf.AppConstants;
-import com.king.app.tcareer.model.db.entity.Record;
 import com.king.app.tcareer.page.glory.BaseGloryPageFragment;
-import com.king.app.tcareer.page.glory.title.OnRecordItemListener;
-import com.king.app.tcareer.page.glory.title.SeqListAdapter;
+import com.king.app.tcareer.page.glory.GloryRecordAdapter;
+import com.king.app.tcareer.page.glory.bean.GloryRecordItem;
 import com.king.app.tcareer.page.setting.SettingProperty;
 
 import java.util.ArrayList;
@@ -27,7 +25,7 @@ import butterknife.Unbinder;
  * <p/>作者：景阳
  * <p/>创建时间: 2017/6/19 10:09
  */
-public class TargetFragment extends BaseGloryPageFragment implements OnRecordItemListener {
+public class TargetFragment extends BaseGloryPageFragment {
 
     @BindView(R.id.tv_all)
     TextView tvAll;
@@ -37,7 +35,7 @@ public class TargetFragment extends BaseGloryPageFragment implements OnRecordIte
     RecyclerView rvList;
     Unbinder unbinder;
 
-    private SeqListAdapter adapter;
+    private GloryRecordAdapter adapter;
 
     @Override
     protected int getContentLayoutRes() {
@@ -96,45 +94,23 @@ public class TargetFragment extends BaseGloryPageFragment implements OnRecordIte
      * 倒序显示，不改变原数据顺序
      * @param targetList
      */
-    private void initList(List<Record> targetList) {
-        List<String> titleList = new ArrayList<>();
-        for (int i = 0; i < targetList.size(); i ++) {
-            titleList.add(AppConstants.GLORY_TARGET_FACTOR * (i + 1) + "th");
-        }
-        Collections.reverse(titleList);
-
-        List<Record> newList = new ArrayList<>();
+    private void initList(List<GloryRecordItem> targetList) {
+        List<GloryRecordItem> newList = new ArrayList<>();
         newList.addAll(targetList);
         Collections.reverse(newList);
 
-        adapter = new SeqListAdapter(newList);
-        adapter.setShowTitle(true);
-        adapter.setShowCompetitor(true);
-        adapter.setHideSequence(true);
-        adapter.setShowLose(true);
-        adapter.setTitleList(titleList);
-        adapter.setOnRecordItemListener(this);
+        adapter = new GloryRecordAdapter();
+        adapter.setList(newList);
+        adapter.setOnItemClickListener((view, position, data) -> showGloryMatchDialog(data.getRecord()));
         rvList.setAdapter(adapter);
     }
 
-    private void refreshList(List<Record> targetList) {
-        List<String> titleList = new ArrayList<>();
-        for (int i = 0; i < targetList.size(); i ++) {
-            titleList.add(AppConstants.GLORY_TARGET_FACTOR * (i + 1) + "th");
-        }
-        Collections.reverse(titleList);
-
-        List<Record> newList = new ArrayList<>();
+    private void refreshList(List<GloryRecordItem> targetList) {
+        List<GloryRecordItem> newList = new ArrayList<>();
         newList.addAll(targetList);
         Collections.reverse(newList);
 
-        adapter.setTitleList(titleList);
-        adapter.setRecordList(newList);
+        adapter.setList(newList);
         adapter.notifyDataSetChanged();
-    }
-
-    @Override
-    public void onClickRecord(Record record) {
-        showGloryMatchDialog(record);
     }
 }

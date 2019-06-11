@@ -382,7 +382,7 @@ public class EditorViewModel extends BaseViewModel {
     private void bindPlayer(CompetitorBean bean) {
         playerNameText.set(bean.getNameEng());
         playerBirthday.set(bean.getBirthday());
-        playerImageUrl.set(ImageProvider.getPlayerHeadPath(bean.getNameChn()));
+        playerImageUrl.set(ImageProvider.getDetailPlayerPath(bean.getNameChn()));
         playerVisibility.set(View.VISIBLE);
     }
 

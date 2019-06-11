@@ -3,17 +3,17 @@ package com.king.app.tcareer.page.match;
 import android.content.Intent;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.king.app.tcareer.R;
 import com.king.app.tcareer.base.IFragmentHolder;
 import com.king.app.tcareer.base.TApplication;
+import com.king.app.tcareer.base.mvvm.BaseViewModel;
 import com.king.app.tcareer.conf.AppConstants;
+import com.king.app.tcareer.databinding.DialogMatchBinding;
+import com.king.app.tcareer.model.CompetitorParser;
 import com.king.app.tcareer.model.GlideOptions;
 import com.king.app.tcareer.model.ImageProvider;
 import com.king.app.tcareer.model.db.entity.MatchNameBean;
@@ -27,10 +27,7 @@ import com.king.app.tcareer.view.dialog.DraggableDialogFragment;
 
 import java.util.List;
 
-import butterknife.BindView;
 import io.reactivex.Observable;
-import io.reactivex.ObservableEmitter;
-import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
@@ -81,24 +78,7 @@ public class MatchDialog extends DraggableDialogFragment {
         this.user = user;
     }
 
-    public static class MatchFragment extends ContentFragment {
-
-        @BindView(R.id.iv_match)
-        ImageView ivMatch;
-        @BindView(R.id.tv_place)
-        TextView tvPlace;
-        @BindView(R.id.tv_level)
-        TextView tvLevel;
-        @BindView(R.id.tv_date)
-        TextView tvDate;
-        @BindView(R.id.tv_rank)
-        TextView tvRank;
-        @BindView(R.id.tv_seed)
-        TextView tvSeed;
-        @BindView(R.id.tv_achieve)
-        TextView tvAchieve;
-        @BindView(R.id.rv_list)
-        RecyclerView rvList;
+    public static class MatchFragment extends BindingContentFragment<DialogMatchBinding, BaseViewModel> {
 
         private MatchItemAdapter itemAdapter;
         private CompositeDisposable compositeDisposable;
@@ -113,13 +93,18 @@ public class MatchDialog extends DraggableDialogFragment {
         }
 
         @Override
+        protected BaseViewModel createViewModel() {
+            return null;
+        }
+
+        @Override
         protected void onCreate(View view) {
 
             LinearLayoutManager manager = new LinearLayoutManager(getActivity());
             manager.setOrientation(LinearLayoutManager.VERTICAL);
-            rvList.setLayoutManager(manager);
+            mBinding.rvList.setLayoutManager(manager);
 
-            ivMatch.setOnClickListener(v -> goToMatchPage());
+            mBinding.ivMatch.setOnClickListener(v -> goToMatchPage());
 
             compositeDisposable = new CompositeDisposable();
             loadData();
@@ -151,28 +136,29 @@ public class MatchDialog extends DraggableDialogFragment {
         }
 
         private void loadData() {
-            Observable.create(new ObservableOnSubscribe<Object>() {
-                @Override
-                public void subscribe(ObservableEmitter<Object> e) throws Exception {
-                    // 查询match
-                    MatchNameBeanDao dao = TApplication.getInstance().getDaoSession().getMatchNameBeanDao();
-                    MatchNameBean bean = dao.queryBuilder()
-                            .where(MatchNameBeanDao.Properties.Id.eq(matchNameId))
-                            .build().unique();
-                    bean.getMatchBean();
-                    e.onNext(bean);
+            Observable.create(e -> {
+                // 查询match
+                MatchNameBeanDao dao = TApplication.getInstance().getDaoSession().getMatchNameBeanDao();
+                MatchNameBean bean = dao.queryBuilder()
+                        .where(MatchNameBeanDao.Properties.Id.eq(matchNameId))
+                        .build().unique();
+                bean.getMatchBean();
+                e.onNext(bean);
 
-                    // 查询records，按自然顺序降序
-                    RecordDao recordDao = TApplication.getInstance().getDaoSession().getRecordDao();
-                    List<Record> recordList = recordDao.queryBuilder()
-                            .where(RecordDao.Properties.MatchNameId.eq(matchNameId)
-                                , RecordDao.Properties.DateStr.eq(date)
-                                , RecordDao.Properties.UserId.eq(user.getId()))
-                            .orderDesc(RecordDao.Properties.Id)
-                            .build().list();
-                    e.onNext(recordList);
-                    e.onComplete();
+                // 查询records，按自然顺序降序
+                RecordDao recordDao = TApplication.getInstance().getDaoSession().getRecordDao();
+                List<Record> recordList = recordDao.queryBuilder()
+                        .where(RecordDao.Properties.MatchNameId.eq(matchNameId)
+                            , RecordDao.Properties.DateStr.eq(date)
+                            , RecordDao.Properties.UserId.eq(user.getId()))
+                        .orderDesc(RecordDao.Properties.Id)
+                        .build().list();
+                for (Record record:recordList) {
+                    String name = CompetitorParser.getCompetitorFrom(record).getNameChn();
+                    record.setImageUrl(ImageProvider.getPlayerHeadPath(name));
                 }
+                e.onNext(recordList);
+                e.onComplete();
             }).observeOn(AndroidSchedulers.mainThread())
                     .subscribeOn(Schedulers.io())
                     .subscribe(new Observer<Object>() {
@@ -207,14 +193,14 @@ public class MatchDialog extends DraggableDialogFragment {
         }
 
         private void showMatch(MatchNameBean bean) {
-            tvDate.setText(date);
-            tvLevel.setText(bean.getMatchBean().getLevel() + "/" + bean.getMatchBean().getCourt());
-            tvPlace.setText(bean.getMatchBean().getCountry() + "/" + bean.getMatchBean().getCity());
+            mBinding.tvDate.setText(date);
+            mBinding.tvLevel.setText(bean.getMatchBean().getLevel() + "/" + bean.getMatchBean().getCourt());
+            mBinding.tvPlace.setText(bean.getMatchBean().getCountry() + "/" + bean.getMatchBean().getCity());
 
             Glide.with(getActivity())
                     .load(ImageProvider.getMatchHeadPath(bean.getName(), bean.getMatchBean().getCourt()))
                     .apply(GlideOptions.getDefaultMatchOptions())
-                    .into(ivMatch);
+                    .into(mBinding.ivMatch);
         }
 
         private void showRecords(List<Record> recordList) {
@@ -223,29 +209,29 @@ public class MatchDialog extends DraggableDialogFragment {
             }
             // 已按降序排列
             Record record = recordList.get(0);
-            tvRank.setText("Rank(" + record.getRank() + ")");
+            mBinding.tvRank.setText("Rank(" + record.getRank() + ")");
             if (record.getSeed() > 0) {
-                tvSeed.setText("/Seed(" + record.getSeed() + ")");
-                tvSeed.setVisibility(View.VISIBLE);
+                mBinding.tvSeed.setText("/Seed(" + record.getSeed() + ")");
+                mBinding.tvSeed.setVisibility(View.VISIBLE);
             }
             else {
-                tvSeed.setVisibility(View.GONE);
+                mBinding.tvSeed.setVisibility(View.GONE);
             }
             if (record.getRound().equals(AppConstants.RECORD_MATCH_ROUNDS[0])) {
                 if (record.getWinnerFlag() == AppConstants.WINNER_USER) {
-                    tvAchieve.setText(AppConstants.CHAMPOION);
+                    mBinding.tvAchieve.setText(AppConstants.CHAMPOION);
                 }
                 else {
-                    tvAchieve.setText(AppConstants.RUNNERUP);
+                    mBinding.tvAchieve.setText(AppConstants.RUNNERUP);
                 }
             }
             else {
-                tvAchieve.setText(record.getRound());
+                mBinding.tvAchieve.setText(record.getRound());
             }
 
             itemAdapter = new MatchItemAdapter();
             itemAdapter.setList(recordList);
-            rvList.setAdapter(itemAdapter);
+            mBinding.rvList.setAdapter(itemAdapter);
         }
 
         public void setUser(User user) {
