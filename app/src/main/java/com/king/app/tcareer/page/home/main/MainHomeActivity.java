@@ -29,7 +29,7 @@ import com.king.app.tcareer.page.record.editor.RecordEditorActivity;
 import com.king.app.tcareer.page.setting.SettingActivity;
 import com.king.app.tcareer.utils.ScreenUtils;
 import com.king.app.tcareer.view.content.LoadFromContent;
-import com.king.app.tcareer.view.dialog.CommonDialog;
+import com.king.app.tcareer.view.dialog.frame.FrameDialogFragment;
 import com.king.app.tcareer.view.widget.scoreboard.ScoreBoardParam;
 
 import java.util.Calendar;
@@ -253,9 +253,11 @@ public class MainHomeActivity extends MvvmActivity<ActivityMainHomeBinding, Main
             TApplication.getInstance().reCreateGreenDao();
             mModel.loadData();
         });
-        CommonDialog<LoadFromContent> dialog = new CommonDialog<>();
-        dialog.setContentFragment(content);
-        dialog.show(getSupportFragmentManager(), "LoadFromContent");
+        FrameDialogFragment dialogFragment = new FrameDialogFragment();
+        dialogFragment.setContentFragment(content);
+        dialogFragment.setTitle("Load From");
+        dialogFragment.setMaxHeight(ScreenUtils.getScreenHeight() * 4 / 5);
+        dialogFragment.show(getSupportFragmentManager(), "FrameDialogFragment");
     }
 
     private void startPlayerManageActivity() {

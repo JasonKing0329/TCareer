@@ -53,18 +53,21 @@ public class GloryDao extends CursorDao {
         return toTitleRecordItem(list);
     }
 
+    public GloryRecordItem convertTitleRecordItem(Record record, int index) {
+        GloryRecordItem item = new GloryRecordItem();
+        convertRecordBase(record, item);
+        item.setIndexVisibility(View.VISIBLE);
+        item.setIndex(String.valueOf(index));
+        item.setTitleVisibility(View.GONE);
+        item.setLoseVisibility(View.GONE);
+        return item;
+    }
+
     private List<GloryRecordItem> toTitleRecordItem(List<Record> records) {
         List<GloryRecordItem> list = new ArrayList<>();
         for (int i = 0; i < records.size(); i ++) {
             Record record = records.get(i);
-            GloryRecordItem item = new GloryRecordItem();
-            convertRecordBase(record, item);
-
-            item.setIndexVisibility(View.VISIBLE);
-            item.setIndex(String.valueOf(records.size() - i));
-            item.setTitleVisibility(View.GONE);
-            item.setLoseVisibility(View.GONE);
-            list.add(item);
+            list.add(convertTitleRecordItem(record, records.size() - i));
         }
         return list;
     }
@@ -134,15 +137,18 @@ public class GloryDao extends CursorDao {
         List<GloryRecordItem> list = new ArrayList<>();
         for (int i = 0; i < records.size(); i ++) {
             Record record = records.get(i);
-            GloryRecordItem item = new GloryRecordItem();
-            convertRecordBase(record, item);
-
-            item.setIndexVisibility(View.GONE);
-            item.setTitleVisibility(View.VISIBLE);
-            item.setTitle(AppConstants.GLORY_TARGET_FACTOR * (i + 1) + "th");
-            list.add(item);
+            list.add(convertTargetRecordItem(record, i));
         }
         return list;
+    }
+
+    private GloryRecordItem convertTargetRecordItem(Record record, int index) {
+        GloryRecordItem item = new GloryRecordItem();
+        convertRecordBase(record, item);
+        item.setIndexVisibility(View.GONE);
+        item.setTitleVisibility(View.VISIBLE);
+        item.setTitle(AppConstants.GLORY_TARGET_FACTOR * (index + 1) + "th");
+        return item;
     }
 
     public int getCareerRecordNumber(long userId, boolean isWinner) {

@@ -1,37 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent" android:layout_height="wrap_content"
-    android:orientation="horizontal"
-    android:gravity="center_vertical"
-    android:paddingTop="15dp"
-    android:paddingBottom="15dp">
+<layout>
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingTop="15dp"
+        android:paddingBottom="15dp">
 
-    <TextView
-        android:id="@+id/tv_tag"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:gravity="center"
-        android:textStyle="bold"
-        android:textSize="20dp"
-        android:textColor="@color/white"
-        android:layout_marginLeft="15dp"
-        android:background="@drawable/shape_oval_clay"/>
+        <TextView
+            android:id="@+id/tv_tag"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:gravity="center"
+            android:textStyle="bold"
+            android:textSize="20dp"
+            android:textColor="@color/white"
+            android:layout_marginLeft="15dp"
+            android:background="@drawable/shape_oval_clay"/>
 
-    <TextView
-        android:id="@+id/tv_key"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="22dp"
-        android:textColor="@color/colorPrimary"
-        android:layout_marginLeft="10dp"/>
+        <TextView
+            android:id="@+id/tv_key"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="22dp"
+            android:textColor="@color/colorPrimary"
+            android:layout_marginLeft="10dp"/>
 
-    <TextView
-        android:id="@+id/tv_content"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_toRightOf="@id/tv_year"
-        android:textSize="16dp"
-        android:textColor="@color/record_item_text_gray"
-        android:layout_marginLeft="20dp"/>
+        <TextView
+            android:id="@+id/tv_content"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@id/tv_year"
+            android:textSize="16dp"
+            android:textColor="@color/record_item_text_gray"
+            android:layout_marginLeft="20dp"/>
 
-</LinearLayout>
+    </LinearLayout>
+</layout>

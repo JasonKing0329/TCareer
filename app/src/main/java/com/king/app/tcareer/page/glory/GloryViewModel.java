@@ -563,7 +563,7 @@ public class GloryViewModel extends BaseViewModel {
             }
             SubItem item = new SubItem();
             item.setItemPosition(subList.size());
-            item.setRecord(recordItem.getRecord());
+            item.setRecord(gloryModel.convertTitleRecordItem(recordItem.getRecord(), 0));
             subList.add(item);
         }
 
@@ -579,8 +579,11 @@ public class GloryViewModel extends BaseViewModel {
 
         for (HeaderItem item:list) {
             item.getHeaderBean().setContent(String.valueOf(item.getHeaderBean().getItemList().size()));
-            for (SubItem sub:item.getHeaderBean().getItemList()) {
+            for (int i = 0; i < item.getHeaderBean().getItemList().size(); i ++) {
+                SubItem sub = item.getHeaderBean().getItemList().get(i);
                 sub.setGroupCount(item.getHeaderBean().getItemList().size());
+                // 重置正确的序号。组内倒序
+                sub.getRecord().setIndex(String.valueOf(sub.getGroupCount() - sub.getItemPosition()));
             }
         }
         return list;

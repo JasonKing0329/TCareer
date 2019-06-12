@@ -28,8 +28,6 @@ import com.king.app.tcareer.view.widget.cardslider.CardSnapHelper;
 
 import java.util.List;
 
-import butterknife.OnClick;
-
 /**
  * 描述: slider page, show players and h2h records order by insert sequence of latest record
  * <p/>作者：景阳
@@ -60,6 +58,7 @@ public class PlayerSlideActivity extends MvvmActivity<ActivityPlayerSlideBinding
 
     @Override
     protected void initView() {
+        mBinding.ivBack.setOnClickListener(v -> onBackPressed());
         initRecyclerView();
         initCountryText();
         initSwitchers();
@@ -155,11 +154,6 @@ public class PlayerSlideActivity extends MvvmActivity<ActivityPlayerSlideBinding
             recordAdapter.notifyDataSetChanged();
         }
         mBinding.rvRecords.scrollToPosition(0);
-    }
-
-    @OnClick({R.id.iv_back})
-    public void onBack() {
-        onBackPressed();
     }
 
     private void initSwitchers() {

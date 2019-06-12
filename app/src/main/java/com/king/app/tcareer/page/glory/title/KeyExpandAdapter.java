@@ -18,25 +18,15 @@ public class KeyExpandAdapter extends BaseExpandableAdapter {
     private final int ITEM_TYPE_ITEM = 2;
 
     private OnRecordItemListener onRecordItemListener;
-    private boolean showCompetitor;
-    private boolean hideSequence;
-    private boolean showLose;
 
     /**
      *
      * @param data
      * @param onRecordItemListener
-     * @param showCompetitor 显示决赛对手
-     * @param hideSequence 不显示编号
-     * @param showLose 显示记录结果为lose
      */
-    protected KeyExpandAdapter(List<HeaderItem> data, OnRecordItemListener onRecordItemListener
-            , boolean showCompetitor, boolean hideSequence, boolean showLose) {
+    protected KeyExpandAdapter(List<HeaderItem> data, OnRecordItemListener onRecordItemListener) {
         super(data);
         this.onRecordItemListener = onRecordItemListener;
-        this.showCompetitor = showCompetitor;
-        this.hideSequence = hideSequence;
-        this.showLose = showLose;
     }
 
     @NonNull
@@ -47,7 +37,7 @@ public class KeyExpandAdapter extends BaseExpandableAdapter {
             case ITEM_TYPE_HEAD:
                 return new HeaderAdapter();
             case ITEM_TYPE_ITEM:
-                return new SubItemAdapter(showCompetitor, hideSequence, showLose, onRecordItemListener);
+                return new SubItemAdapter(onRecordItemListener);
         }
         return null;
     }

@@ -43,8 +43,6 @@ public class RecordActivity extends MvvmActivity<ActivityRecordBinding, RecordVi
 
     private RecordAdapter recordAdapter;
 
-    private FrameDialogFragment dialogSearch;
-
     /**
      * the item view position to update
      */
@@ -137,12 +135,10 @@ public class RecordActivity extends MvvmActivity<ActivityRecordBinding, RecordVi
         searchDialog.setRecordList(mModel.getRecordList());
         searchDialog.setOnRecordFilterListener(list -> {
             mModel.loadRecordData(list);
-            dialogSearch.dismissAllowingStateLoss();
         });
-        dialogSearch = new FrameDialogFragment();
+        FrameDialogFragment dialogSearch = new FrameDialogFragment();
         dialogSearch.setContentFragment(searchDialog);
         dialogSearch.setTitle("Search");
-        dialogSearch.setOnDismissListener(dialogInterface -> dialogSearch = null);
         dialogSearch.setMaxHeight(ScreenUtils.getScreenHeight() * 4 / 5);
         dialogSearch.show(getSupportFragmentManager(), "SearchDialog");
     }

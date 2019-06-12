@@ -1,6 +1,10 @@
 package com.king.app.tcareer.page.match.manage;
 
+import android.app.Application;
+import android.support.annotation.NonNull;
+
 import com.king.app.tcareer.base.TApplication;
+import com.king.app.tcareer.base.mvvm.BaseViewModel;
 import com.king.app.tcareer.model.db.entity.MatchBean;
 import com.king.app.tcareer.model.db.entity.MatchBeanDao;
 import com.king.app.tcareer.model.db.entity.MatchNameBean;
@@ -11,7 +15,11 @@ import com.king.app.tcareer.model.db.entity.MatchNameBeanDao;
  * <p/>作者：景阳
  * <p/>创建时间: 2018/1/30 17:33
  */
-public class EditPresenter {
+public class EditViewModel extends BaseViewModel {
+
+    public EditViewModel(@NonNull Application application) {
+        super(application);
+    }
 
     public void insertFullMatch(MatchNameBean bean, MatchBean matchBean) {
         MatchBeanDao matchDao = TApplication.getInstance().getDaoSession().getMatchBeanDao();

@@ -12,8 +12,6 @@ import com.king.app.tcareer.databinding.DlgFtCustomBinding;
 import com.king.app.tcareer.utils.DebugLog;
 import com.king.app.tcareer.utils.ScreenUtils;
 
-import butterknife.ButterKnife;
-
 /**
  * Desc:
  *
@@ -43,7 +41,6 @@ public class FrameDialogFragment extends BindingDialogFragment<DlgFtCustomBindin
 
     @Override
     protected void initView(View view) {
-        ButterKnife.bind(this, view);
         if (title != null) {
             mBinding.tvTitle.setText(title);
         }

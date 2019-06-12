@@ -15,8 +15,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.king.app.tcareer.R;
-import com.king.app.tcareer.base.BaseMvpFragment;
-import com.king.app.tcareer.base.BasePresenter;
 import com.king.app.tcareer.base.IFragmentHolder;
 import com.king.app.tcareer.base.mvvm.BaseViewModel;
 import com.king.app.tcareer.base.mvvm.BindingDialogFragment;
@@ -262,40 +260,6 @@ public abstract class DraggableDialogFragment extends BindingDialogFragment<DlgF
                     break;
             }
             return true;
-        }
-    }
-
-    public static abstract class ContentFragment extends BaseMvpFragment<BasePresenter> {
-
-        @Override
-        protected void bindFragmentHolder(IFragmentHolder holder) {
-            // ContentFragment是嵌入到Fragment中的，而onAttach是把activity的context通知到bindFragmentHolder了
-            // 而这里的ContentFragment的holder是DialogFragment，所以要把正确的holder以getParentFragment()的形式绑定
-            if (getParentFragment() instanceof IFragmentHolder) {
-                bindChildFragmentHolder((IFragmentHolder) getParentFragment());
-            }
-        }
-
-        protected abstract void bindChildFragmentHolder(IFragmentHolder holder);
-
-        @Override
-        protected BasePresenter createPresenter() {
-            return null;
-        }
-
-        @Override
-        protected void onCreateData() {
-
-        }
-
-        @Nullable
-        @Override
-        public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-            // 从LoginActivity启动的DownloadDialogFragment不知为何sub fragment没有第二次onAttach就执行onCreateView了，导致holder为null
-            if (getParentFragment() instanceof IFragmentHolder) {
-                bindChildFragmentHolder((IFragmentHolder) getParentFragment());
-            }
-            return super.onCreateView(inflater, container, savedInstanceState);
         }
     }
 

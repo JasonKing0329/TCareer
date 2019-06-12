@@ -7,10 +7,15 @@ import android.support.v7.graphics.Palette;
 
 import com.king.app.tcareer.base.mvvm.BaseViewModel;
 import com.king.app.tcareer.conf.AppConstants;
+import com.king.app.tcareer.model.CompetitorParser;
+import com.king.app.tcareer.model.ImageProvider;
+import com.king.app.tcareer.model.ScoreParser;
+import com.king.app.tcareer.model.bean.CompetitorBean;
 import com.king.app.tcareer.model.db.entity.MatchNameBean;
 import com.king.app.tcareer.model.db.entity.MatchNameBeanDao;
 import com.king.app.tcareer.model.db.entity.Record;
 import com.king.app.tcareer.model.db.entity.RecordDao;
+import com.king.app.tcareer.model.db.entity.User;
 import com.king.app.tcareer.utils.ListUtil;
 
 import java.util.ArrayList;
@@ -147,14 +152,33 @@ public class RecentViewModel extends BaseViewModel {
             List<Object> list = new ArrayList<>();
             List<String> rounds = new ArrayList<>();
             List<Record> records = yearMap.get(yearsObserver.getValue().get(yearIndex));
-            Map<String, List<Record>> map = new HashMap<>();
+            Map<String, List<RecentItem>> map = new HashMap<>();
             for (Record record:records) {
                 String round = record.getRound();
                 if (map.get(round) == null) {
                     rounds.add(round);
                     map.put(round, new ArrayList<>());
                 }
-                map.get(round).add(record);
+
+                RecentItem item = new RecentItem();
+                item.setRecord(record);
+                item.setUserImageUrl(ImageProvider.getPlayerHeadPath(record.getUser().getNameChn()));
+                CompetitorBean competitor = CompetitorParser.getCompetitorFrom(record);
+                item.setPlayerImageUrl(ImageProvider.getPlayerHeadPath(competitor.getNameChn()));
+                item.setPlayerName(competitor.getNameChn());
+                item.setRankSeed("(".concat(String.valueOf(record.getRankCpt())).concat("/")
+                        .concat(String.valueOf(record.getSeedpCpt()).concat(")")));
+                String score = ScoreParser.getScoreText(record.getScoreList(), record.getWinnerFlag(), record.getRetireFlag());
+                if (AppConstants.WINNER_USER == record.getWinnerFlag()) {
+                    String winner = record.getUser().getNameShort();
+                    item.setScore(winner + "  " + score);
+                }
+                else {
+                    String winner = competitor instanceof User ? ((User) competitor).getNameShort():competitor.getNameChn();
+                    item.setScore(winner + "  " + score);
+                }
+
+                map.get(round).add(item);
             }
 
             Collections.sort(rounds, new RoundComparator());

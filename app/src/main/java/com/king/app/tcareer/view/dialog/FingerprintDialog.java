@@ -4,15 +4,11 @@ import android.hardware.fingerprint.FingerprintManager;
 import android.support.v4.hardware.fingerprint.FingerprintManagerCompat;
 import android.support.v4.os.CancellationSignal;
 import android.view.View;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.king.app.tcareer.R;
+import com.king.app.tcareer.base.mvvm.BindingDialogFragment;
+import com.king.app.tcareer.databinding.DialogFingerprintBinding;
 import com.king.app.tcareer.utils.DebugLog;
-
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.Unbinder;
 
 /**
  * Desc:
@@ -20,14 +16,7 @@ import butterknife.Unbinder;
  * @author：Jing Yang
  * @date: 2019/3/1 14:30
  */
-public class FingerprintDialog extends BaseDialogFragment {
-
-    @BindView(R.id.iv_fingerprint)
-    ImageView ivFingerprint;
-    @BindView(R.id.tv_msg)
-    TextView tvMsg;
-
-    Unbinder unbind;
+public class FingerprintDialog extends BindingDialogFragment<DialogFingerprintBinding> {
 
     private OnFingerPrintListener onFingerPrintListener;
 
@@ -50,7 +39,6 @@ public class FingerprintDialog extends BaseDialogFragment {
 
     @Override
     protected void initView(View view) {
-        unbind = ButterKnife.bind(this, view);
         FingerprintManagerCompat fingerprint = FingerprintManagerCompat.from(getActivity());
         fingerprint.authenticate(null, 0, new CancellationSignal()
                 , new FingerprintManagerCompat.AuthenticationCallback() {
@@ -65,7 +53,7 @@ public class FingerprintDialog extends BaseDialogFragment {
                     public void onAuthenticationHelp(int helpMsgId, CharSequence helpString) {
                         super.onAuthenticationHelp(helpMsgId, helpString);
                         DebugLog.e("helpMsgId=" + helpMsgId + " msg=" + helpString.toString());
-                        tvMsg.setText(helpString.toString());
+                        mBinding.tvMsg.setText(helpString.toString());
                     }
 
                     @Override
@@ -78,7 +66,7 @@ public class FingerprintDialog extends BaseDialogFragment {
                     @Override
                     public void onAuthenticationFailed() {
                         super.onAuthenticationFailed();
-                        tvMsg.setText("识别错误，请重试");
+                        mBinding.tvMsg.setText("识别错误，请重试");
                     }
                 }
                 , null);
@@ -92,31 +80,25 @@ public class FingerprintDialog extends BaseDialogFragment {
                 break;
             case FingerprintManager.FINGERPRINT_ERROR_HW_UNAVAILABLE:
                 // 当前设备不可用，请稍后再试
-                tvMsg.setText(msg);
+                mBinding.tvMsg.setText(msg);
                 break;
             case FingerprintManager.FINGERPRINT_ERROR_LOCKOUT:
                 // 由于太多次尝试失败导致被锁，该操作被取消
-                tvMsg.setText(msg);
+                mBinding.tvMsg.setText(msg);
                 break;
             case FingerprintManager.FINGERPRINT_ERROR_NO_SPACE:
                 // 没有足够的存储空间保存这次操作，该操作不能完成
-                tvMsg.setText(msg);
+                mBinding.tvMsg.setText(msg);
                 break;
             case FingerprintManager.FINGERPRINT_ERROR_TIMEOUT:
                 // 操作时间太长，一般为30秒
-                tvMsg.setText(msg);
+                mBinding.tvMsg.setText(msg);
                 break;
             case FingerprintManager.FINGERPRINT_ERROR_UNABLE_TO_PROCESS:
                 // 传感器不能处理当前指纹图片
-                tvMsg.setText(msg);
+                mBinding.tvMsg.setText(msg);
                 break;
         }
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        unbind.unbind();
     }
 
     public interface OnFingerPrintListener {

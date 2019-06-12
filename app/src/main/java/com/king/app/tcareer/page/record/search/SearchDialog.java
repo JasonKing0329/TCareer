@@ -73,6 +73,7 @@ public class SearchDialog extends FrameContentFragment<DialogRecordFilterBinding
             if (onRecordFilterListener != null) {
                 onRecordFilterListener.recordFiltered(list);
             }
+            dismissAllowingStateLoss();
         });
     }
 

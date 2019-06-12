@@ -15,9 +15,6 @@ import android.widget.Toast;
 import com.king.app.tcareer.R;
 import com.king.app.tcareer.view.dialog.ProgressDialogFragmentApp;
 
-import butterknife.ButterKnife;
-import butterknife.Unbinder;
-
 /**
  * 描述:
  * <p/>作者：景阳
@@ -26,8 +23,6 @@ import butterknife.Unbinder;
 public abstract class BaseFragmentApp extends Fragment {
 
     private ProgressDialogFragmentApp progressDialogFragment;
-
-    private Unbinder unbinder;
 
     @Override
     public void onAttach(Context context) {
@@ -43,7 +38,6 @@ public abstract class BaseFragmentApp extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(getContentLayoutRes(), container, false);
-        unbinder = ButterKnife.bind(this, view);
         onCreate(view);
         return view;
     }
@@ -51,14 +45,6 @@ public abstract class BaseFragmentApp extends Fragment {
     protected abstract int getContentLayoutRes();
 
     protected abstract void onCreate(View view);
-
-    @Override
-    public void onDestroyView() {
-        if (unbinder != null) {
-            unbinder.unbind();
-        }
-        super.onDestroyView();
-    }
 
     public void showProgress(String msg) {
         progressDialogFragment = new ProgressDialogFragmentApp();

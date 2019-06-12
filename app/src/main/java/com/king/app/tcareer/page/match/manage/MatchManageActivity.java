@@ -19,6 +19,7 @@ import com.king.app.tcareer.model.bean.MatchImageBean;
 import com.king.app.tcareer.model.db.entity.MatchNameBean;
 import com.king.app.tcareer.page.match.common.MatchCommonActivity;
 import com.king.app.tcareer.page.setting.SettingProperty;
+import com.king.app.tcareer.view.dialog.frame.FrameDialogFragment;
 
 import java.util.List;
 
@@ -271,10 +272,10 @@ public class MatchManageActivity extends MvvmActivity<ActivityMatchManageBinding
     }
 
     private void openMatchEditDialog(MatchNameBean bean) {
-        MatchEditDialog dialog = new MatchEditDialog();
-        dialog.setOnlyAddName(isOnlyAddName);
-        dialog.setEditBean(bean);
-        dialog.setOnMatchEditListener(new MatchEditDialog.OnMatchEditListener() {
+        MatchEditDialog content = new MatchEditDialog();
+        content.setIsOnlyAddName(isOnlyAddName);
+        content.setEditBean(bean);
+        content.setOnMatchEditListener(new MatchEditDialog.OnMatchEditListener() {
 
             @Override
             public void onMatchAdded() {
@@ -286,6 +287,14 @@ public class MatchManageActivity extends MvvmActivity<ActivityMatchManageBinding
                 getCurrentAdapter().notifyItemChanged(editBean);
             }
         });
+        FrameDialogFragment dialog = new FrameDialogFragment();
+        dialog.setContentFragment(content);
+        if (bean == null) {
+            dialog.setTitle("New Match");
+        }
+        else {
+            dialog.setTitle(bean.getName());
+        }
         dialog.show(getSupportFragmentManager(), "MatchEditDialog");
     }
 

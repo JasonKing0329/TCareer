@@ -1,6 +1,6 @@
 package com.king.app.tcareer.page.glory.title;
 
-import com.king.app.tcareer.model.db.entity.Record;
+import com.king.app.tcareer.page.glory.bean.GloryRecordItem;
 
 /**
  * 描述:
@@ -12,7 +12,7 @@ public class SubItem {
     private int itemPosition;
     private int groupCount;
 
-    private Record record;
+    private GloryRecordItem record;
 
     public int getHeaderPosition() {
         return headerPosition;
@@ -30,11 +30,11 @@ public class SubItem {
         this.itemPosition = itemPosition;
     }
 
-    public Record getRecord() {
+    public GloryRecordItem getRecord() {
         return record;
     }
 
-    public void setRecord(Record record) {
+    public void setRecord(GloryRecordItem record) {
         this.record = record;
     }
 

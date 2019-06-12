@@ -17,7 +17,7 @@ public class ExpandChampionListFragment extends AbsGloryListFragment {
     protected RecyclerView.Adapter getListAdapter() {
         List<GloryRecordItem> recordList = getMainViewModel().getGloryTitle().getChampionList();
         List<HeaderItem> headerList = getMainViewModel().getHeaderList(recordList, groupMode);
-        KeyExpandAdapter adapter = new KeyExpandAdapter(headerList, this, false, false, false);
+        KeyExpandAdapter adapter = new KeyExpandAdapter(headerList, this);
         return adapter;
     }
 
