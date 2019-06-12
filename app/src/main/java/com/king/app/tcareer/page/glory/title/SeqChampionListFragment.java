@@ -16,7 +16,7 @@ public class SeqChampionListFragment extends AbsGloryListFragment {
 
     @Override
     protected RecyclerView.Adapter getListAdapter() {
-        List<GloryRecordItem> recordList = gloryHolder.getGloryTitle().getChampionList();
+        List<GloryRecordItem> recordList = getMainViewModel().getGloryTitle().getChampionList();
         GloryRecordAdapter adapter = new GloryRecordAdapter();
         adapter.setList(recordList);
         adapter.setOnItemClickListener((view, position, data) -> showGloryMatchDialog(data.getRecord()));

@@ -15,7 +15,7 @@ import java.util.List;
 public class SeqRunnerupListFragment extends AbsGloryListFragment {
     @Override
     protected RecyclerView.Adapter getListAdapter() {
-        List<GloryRecordItem> recordList = gloryHolder.getGloryTitle().getRunnerUpList();
+        List<GloryRecordItem> recordList = getMainViewModel().getGloryTitle().getRunnerUpList();
         GloryRecordAdapter adapter = new GloryRecordAdapter();
         adapter.setList(recordList);
         adapter.setOnItemClickListener((view, position, data) -> showGloryMatchDialog(data.getRecord()));

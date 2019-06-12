@@ -6,6 +6,7 @@ import android.view.View;
 
 import com.king.app.tcareer.R;
 import com.king.app.tcareer.conf.AppConstants;
+import com.king.app.tcareer.databinding.FragmentParentContainerBinding;
 import com.king.app.tcareer.page.glory.BaseGloryPageFragment;
 import com.king.app.tcareer.page.setting.SettingProperty;
 
@@ -14,7 +15,7 @@ import com.king.app.tcareer.page.setting.SettingProperty;
  * <p/>作者：景阳
  * <p/>创建时间: 2017/6/21 11:10
  */
-public class RunnerUpFragment extends BaseGloryPageFragment {
+public class RunnerUpFragment extends BaseGloryPageFragment<FragmentParentContainerBinding> {
 
     private int groupMode;
 

@@ -14,8 +14,8 @@ import java.util.List;
 public class ExpandRunnerupListFragment extends AbsGloryListFragment {
     @Override
     protected RecyclerView.Adapter getListAdapter() {
-        List<GloryRecordItem> recordList = gloryHolder.getGloryTitle().getRunnerUpList();
-        List<HeaderItem> headerList = gloryHolder.getPresenter().getHeaderList(recordList, groupMode);
+        List<GloryRecordItem> recordList = getMainViewModel().getGloryTitle().getRunnerUpList();
+        List<HeaderItem> headerList = getMainViewModel().getHeaderList(recordList, groupMode);
         KeyExpandAdapter adapter = new KeyExpandAdapter(headerList, this, true, false, false);
         return adapter;
     }

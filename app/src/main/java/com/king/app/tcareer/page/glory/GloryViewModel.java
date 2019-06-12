@@ -1,7 +1,14 @@
 package com.king.app.tcareer.page.glory;
 
-import com.king.app.tcareer.base.BasePresenter;
+import android.app.Application;
+import android.arch.lifecycle.MutableLiveData;
+import android.databinding.ObservableField;
+import android.databinding.ObservableInt;
+import android.support.annotation.NonNull;
+import android.view.View;
+
 import com.king.app.tcareer.base.TApplication;
+import com.king.app.tcareer.base.mvvm.BaseViewModel;
 import com.king.app.tcareer.conf.AppConstants;
 import com.king.app.tcareer.model.bean.KeyValueCountBean;
 import com.king.app.tcareer.model.bean.MatchResultBean;
@@ -9,7 +16,6 @@ import com.king.app.tcareer.model.dao.GloryDao;
 import com.king.app.tcareer.model.db.entity.EarlierAchieve;
 import com.king.app.tcareer.model.db.entity.Record;
 import com.king.app.tcareer.model.db.entity.RecordDao;
-import com.king.app.tcareer.model.db.entity.User;
 import com.king.app.tcareer.page.glory.bean.GloryRecordItem;
 import com.king.app.tcareer.page.glory.bean.GloryTitle;
 import com.king.app.tcareer.page.glory.gs.GloryGsItem;
@@ -17,6 +23,7 @@ import com.king.app.tcareer.page.glory.gs.GloryMasterItem;
 import com.king.app.tcareer.page.glory.title.HeaderBean;
 import com.king.app.tcareer.page.glory.title.HeaderItem;
 import com.king.app.tcareer.page.glory.title.SubItem;
+import com.king.app.tcareer.page.setting.SettingProperty;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -28,52 +35,146 @@ import java.util.Map;
 import io.reactivex.ObservableSource;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.functions.Consumer;
-import io.reactivex.functions.Function;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
 /**
  * Created by Administrator on 2017/6/5 0005.
  */
 
-public class GloryPresenter extends BasePresenter<IGloryView> {
-    
+public class GloryViewModel extends BaseViewModel {
+
+    public ObservableField<String> careerTotalText = new ObservableField<>();
+    public ObservableField<String> seasonTotalText = new ObservableField<>();
+    public ObservableInt titleVisibility = new ObservableInt(View.GONE);
+
+    public ObservableField<String> careerGsText = new ObservableField<>();
+    public ObservableField<String> seasonGsText = new ObservableField<>();
+    public ObservableField<String> careerAoText = new ObservableField<>();
+    public ObservableField<String> careerWoText = new ObservableField<>();
+    public ObservableField<String> careerFoText = new ObservableField<>();
+    public ObservableField<String> careerUoText = new ObservableField<>();
+    public ObservableInt gsVisibility = new ObservableInt(View.GONE);
+
+    public ObservableField<String> careerMasterText = new ObservableField<>();
+    public ObservableField<String> seasonMasterText = new ObservableField<>();
+    public ObservableInt masterVisibility = new ObservableInt(View.GONE);
+
+    public MutableLiveData<GloryTitle> gloryTitleObserver = new MutableLiveData<>();
     private GloryDao gloryModel;
 
-    @Override
-    protected void onCreate() {
+    public GloryViewModel(@NonNull Application application) {
+        super(application);
         gloryModel = new GloryDao();
     }
 
+    public void bindPageContent(int position) {
+        if (position >= PageEnum.values().length) {
+            position = 0;
+        }
+        PageEnum pageEnum = PageEnum.values()[position];
+        switch (pageEnum) {
+            case CHAMPION:
+                bindChampionContent();
+                break;
+            case RUNNERUP:
+                bindRunnerUpContent();
+                break;
+            case GS:
+                bindGsContent();
+                break;
+            case ATP1000:
+                bindMasterContent();
+                break;
+            case TARGET:
+                bindTargetContent();
+                break;
+        }
+    }
+
+    private void bindChampionContent() {
+        gsVisibility.set(View.GONE);
+        masterVisibility.set(View.GONE);
+        titleVisibility.set(View.VISIBLE);
+        careerTotalText.set(String.valueOf(gloryTitleObserver.getValue().getChampionTitle().getCareerTotal()));
+        seasonTotalText.set(String.valueOf(gloryTitleObserver.getValue().getChampionTitle().getYearTotal()));
+    }
+
+    private void bindRunnerUpContent() {
+        gsVisibility.set(View.GONE);
+        masterVisibility.set(View.GONE);
+        titleVisibility.set(View.VISIBLE);
+        careerTotalText.set(String.valueOf(gloryTitleObserver.getValue().getRunnerupTitle().getCareerTotal()));
+        seasonTotalText.set(String.valueOf(gloryTitleObserver.getValue().getRunnerupTitle().getYearTotal()));
+    }
+
+    private void bindGsContent() {
+        GloryTitle gloryTitle = gloryTitleObserver.getValue();
+        gsVisibility.set(View.VISIBLE);
+        masterVisibility.set(View.GONE);
+        titleVisibility.set(View.GONE);
+        careerGsText.set("Win " + gloryTitle.getGs().getCareerWin() + "  Lose " + gloryTitle.getGs().getCareerLose());
+        seasonGsText.set("Win " + gloryTitle.getGs().getSeasonWin() + "  Lose " + gloryTitle.getGs().getSeasonLose());
+        careerAoText.set("澳网 Win " + gloryTitle.getGs().getAoWin() + "  Lose " + gloryTitle.getGs().getAoLose());
+        careerFoText.set("法网 Win " + gloryTitle.getGs().getFoWin() + "  Lose " + gloryTitle.getGs().getFoLose());
+        careerWoText.set("温网 Win " + gloryTitle.getGs().getWoWin() + "  Lose " + gloryTitle.getGs().getWoLose());
+        careerUoText.set("美网 Win " + gloryTitle.getGs().getUoWin() + "  Lose " + gloryTitle.getGs().getUoLose());
+    }
+
+    private void bindMasterContent() {
+        GloryTitle gloryTitle = gloryTitleObserver.getValue();
+        masterVisibility.set(View.VISIBLE);
+        titleVisibility.set(View.GONE);
+        gsVisibility.set(View.GONE);
+        careerMasterText.set("Win " + gloryTitle.getMaster1000().getCareerWin() + "  Lose " + gloryTitle.getMaster1000().getCareerLose());
+        seasonMasterText.set("Win " + gloryTitle.getMaster1000().getSeasonWin() + "  Lose " + gloryTitle.getMaster1000().getSeasonLose());
+    }
+
+    private void bindTargetContent() {
+        GloryTitle gloryTitle = gloryTitleObserver.getValue();
+        masterVisibility.set(View.VISIBLE);
+        careerMasterText.set("Win " + gloryTitle.getCareerWin() + "  Lose " + (gloryTitle.getCareerMatch() - gloryTitle.getCareerWin()));
+        seasonMasterText.set("Win " + gloryTitle.getYearWin() + "  Lose " + (gloryTitle.getYearMatch() - gloryTitle.getYearWin()));
+    }
+
     public void loadData(long userId) {
+        loadingObserver.setValue(true);
         queryUser(userId)
-                .flatMap(new Function<User, ObservableSource<GloryTitle>>() {
-                    @Override
-                    public ObservableSource<GloryTitle> apply(User user) throws Exception {
-                        return new ObservableSource<GloryTitle>() {
-                            @Override
-                            public void subscribe(Observer<? super GloryTitle> observer) {
-                                observer.onNext(loadGloryDatas());
-                            }
-                        };
-                    }
-                })
+                .flatMap(user -> getGloryData())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<GloryTitle>() {
+                .subscribe(new Observer<GloryTitle>() {
                     @Override
-                    public void accept(GloryTitle gloryTitle) throws Exception {
-                        view.onGloryTitleLoaded(gloryTitle);
+                    public void onSubscribe(Disposable d) {
+                        addDisposable(d);
                     }
-                }, new Consumer<Throwable>() {
+
                     @Override
-                    public void accept(Throwable throwable) throws Exception {
-                        throwable.printStackTrace();
+                    public void onNext(GloryTitle gloryTitle) {
+                        loadingObserver.setValue(false);
+                        gloryTitleObserver.setValue(gloryTitle);
+                        bindPageContent(SettingProperty.getGloryPageIndex());
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        e.printStackTrace();
+                        loadingObserver.setValue(false);
+                        messageObserver.setValue(e.getMessage());
+                    }
+
+                    @Override
+                    public void onComplete() {
+
                     }
                 });
     }
 
-    private GloryTitle loadGloryDatas() {
+    private ObservableSource<GloryTitle> getGloryData() {
+        return observer -> observer.onNext(loadGloryData());
+    }
+
+    private GloryTitle loadGloryData() {
         GloryTitle data = new GloryTitle();
         int earlierWin = 0;
         int earlierLose = 0;
@@ -483,6 +584,10 @@ public class GloryPresenter extends BasePresenter<IGloryView> {
             }
         }
         return list;
+    }
+
+    public GloryTitle getGloryTitle() {
+        return gloryTitleObserver.getValue();
     }
 
     private class LevelComparotor implements Comparator<HeaderItem> {

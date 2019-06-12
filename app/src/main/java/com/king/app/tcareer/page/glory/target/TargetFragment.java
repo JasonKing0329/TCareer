@@ -1,11 +1,10 @@
 package com.king.app.tcareer.page.glory.target;
 
 import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.view.View;
-import android.widget.TextView;
 
 import com.king.app.tcareer.R;
+import com.king.app.tcareer.databinding.FragmentGloryTargetBinding;
 import com.king.app.tcareer.page.glory.BaseGloryPageFragment;
 import com.king.app.tcareer.page.glory.GloryRecordAdapter;
 import com.king.app.tcareer.page.glory.bean.GloryRecordItem;
@@ -15,25 +14,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.OnClick;
-import butterknife.Unbinder;
-
 /**
  * 描述:
  * <p/>作者：景阳
  * <p/>创建时间: 2017/6/19 10:09
  */
-public class TargetFragment extends BaseGloryPageFragment {
-
-    @BindView(R.id.tv_all)
-    TextView tvAll;
-    @BindView(R.id.tv_win)
-    TextView tvWin;
-    @BindView(R.id.rv_list)
-    RecyclerView rvList;
-    Unbinder unbinder;
+public class TargetFragment extends BaseGloryPageFragment<FragmentGloryTargetBinding> {
 
     private GloryRecordAdapter adapter;
 
@@ -44,50 +30,38 @@ public class TargetFragment extends BaseGloryPageFragment {
 
     @Override
     protected void onCreate(View view) {
-        unbinder = ButterKnife.bind(this, view);
-        tvAll.setSelected(true);
+        mBinding.tvAll.setSelected(true);
         LinearLayoutManager manager = new LinearLayoutManager(getActivity());
         manager.setOrientation(LinearLayoutManager.VERTICAL);
-        rvList.setLayoutManager(manager);
+        mBinding.rvList.setLayoutManager(manager);
 
-        tvAll.setText("All(" + gloryHolder.getGloryTitle().getCareerMatch() + ")");
-        tvWin.setText("Win(" + gloryHolder.getGloryTitle().getCareerWin() + ")");
+        mBinding.tvAll.setText("All(" + getMainViewModel().getGloryTitle().getCareerMatch() + ")");
+        mBinding.tvWin.setText("Win(" + getMainViewModel().getGloryTitle().getCareerWin() + ")");
         if (SettingProperty.isGloryTargetWin()) {
-            tvWin.setSelected(true);
-            tvAll.setSelected(false);
-            initList(gloryHolder.getGloryTitle().getTargetWinList());
+            mBinding.tvWin.setSelected(true);
+            mBinding.tvAll.setSelected(false);
+            initList(getMainViewModel().getGloryTitle().getTargetWinList());
         }
         else {
-            tvWin.setSelected(false);
-            tvAll.setSelected(true);
-            initList(gloryHolder.getGloryTitle().getTargetList());
+            mBinding.tvWin.setSelected(false);
+            mBinding.tvAll.setSelected(true);
+            initList(getMainViewModel().getGloryTitle().getTargetList());
         }
-    }
 
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        unbinder.unbind();
-    }
+        mBinding.tvAll.setOnClickListener(v -> {
+            SettingProperty.setGloryTargetWin(false);
+            mBinding.tvAll.setSelected(true);
+            mBinding.tvWin.setSelected(false);
 
-    @OnClick({R.id.tv_all, R.id.tv_win})
-    public void onViewClicked(View view) {
-        switch (view.getId()) {
-            case R.id.tv_all:
-                SettingProperty.setGloryTargetWin(false);
-                tvAll.setSelected(true);
-                tvWin.setSelected(false);
+            refreshList(getMainViewModel().getGloryTitle().getTargetList());
+        });
+        mBinding.tvAll.setOnClickListener(v -> {
+            SettingProperty.setGloryTargetWin(true);
+            mBinding.tvAll.setSelected(false);
+            mBinding.tvWin.setSelected(true);
 
-                refreshList(gloryHolder.getGloryTitle().getTargetList());
-                break;
-            case R.id.tv_win:
-                SettingProperty.setGloryTargetWin(true);
-                tvAll.setSelected(false);
-                tvWin.setSelected(true);
-
-                refreshList(gloryHolder.getGloryTitle().getTargetWinList());
-                break;
-        }
+            refreshList(getMainViewModel().getGloryTitle().getTargetWinList());
+        });
     }
 
     /**
@@ -102,7 +76,7 @@ public class TargetFragment extends BaseGloryPageFragment {
         adapter = new GloryRecordAdapter();
         adapter.setList(newList);
         adapter.setOnItemClickListener((view, position, data) -> showGloryMatchDialog(data.getRecord()));
-        rvList.setAdapter(adapter);
+        mBinding.rvList.setAdapter(adapter);
     }
 
     private void refreshList(List<GloryRecordItem> targetList) {

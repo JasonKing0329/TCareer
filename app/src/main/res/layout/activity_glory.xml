@@ -1,54 +1,65 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/group_root"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    xmlns:bind="http://schemas.android.com/apk/res-auto">
 
-    <android.support.design.widget.AppBarLayout
+    <data>
+        <variable
+            name="model"
+            type="com.king.app.tcareer.page.glory.GloryViewModel"/>
+    </data>
+    <android.support.design.widget.CoordinatorLayout
+        android:id="@+id/group_root"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:elevation="0dp"
-        app:elevation="0dp"
-        android:theme="@style/RecordTheme.AppBarOverlay">
+        android:layout_height="match_parent">
 
-        <android.support.design.widget.CollapsingToolbarLayout
-            android:id="@+id/ctl_toolbar"
+        <android.support.design.widget.AppBarLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:contentScrim="@color/colorPrimary"
-            app:scrimVisibleHeightTrigger="@dimen/home_scrim_visible_height"
-            app:layout_scrollFlags="scroll|exitUntilCollapsed">
+            android:elevation="0dp"
+            app:elevation="0dp"
+            android:theme="@style/RecordTheme.AppBarOverlay">
 
-            <include layout="@layout/layout_glory_head"/>
-
-            <android.support.v7.widget.Toolbar
-                android:id="@+id/toolbar"
+            <android.support.design.widget.CollapsingToolbarLayout
+                android:id="@+id/ctl_toolbar"
                 android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                app:title="Glory"
-                app:layout_collapseMode="pin"
-                app:navigationIcon="@drawable/ic_arrow_back_white_24dp"
-                app:popupTheme="@style/RecordTheme.PopupOverlay" />
-        </android.support.design.widget.CollapsingToolbarLayout>
+                android:layout_height="wrap_content"
+                app:contentScrim="@color/colorPrimary"
+                app:scrimVisibleHeightTrigger="@dimen/home_scrim_visible_height"
+                app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
-        <android.support.design.widget.TabLayout
-            android:id="@+id/tabLayout"
+                <include layout="@layout/layout_glory_head"
+                    android:id="@+id/include_head"
+                    bind:model="@{model}"/>
+
+                <android.support.v7.widget.Toolbar
+                    android:id="@+id/toolbar"
+                    android:layout_width="match_parent"
+                    android:layout_height="?attr/actionBarSize"
+                    app:title="Glory"
+                    app:layout_collapseMode="pin"
+                    app:navigationIcon="@drawable/ic_arrow_back_white_24dp"
+                    app:popupTheme="@style/RecordTheme.PopupOverlay" />
+            </android.support.design.widget.CollapsingToolbarLayout>
+
+            <android.support.design.widget.TabLayout
+                android:id="@+id/tabLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/colorPrimary"
+                app:tabGravity="fill"
+                app:tabMode="scrollable"
+                app:tabSelectedTextColor="@color/tab_actionbar_text_focus"
+                app:tabTextColor="@color/white"
+                app:tabIndicatorColor="@color/tab_actionbar_text_focus"/>
+
+        </android.support.design.widget.AppBarLayout>
+
+        <android.support.v4.view.ViewPager
+            android:id="@+id/viewpager"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/colorPrimary"
-            app:tabGravity="fill"
-            app:tabMode="scrollable"
-            app:tabSelectedTextColor="@color/tab_actionbar_text_focus"
-            app:tabTextColor="@color/white"
-            app:tabIndicatorColor="@color/tab_actionbar_text_focus"/>
+            android:layout_height="match_parent"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
-    </android.support.design.widget.AppBarLayout>
-
-    <android.support.v4.view.ViewPager
-        android:id="@+id/viewpager"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
-
-</android.support.design.widget.CoordinatorLayout>
+    </android.support.design.widget.CoordinatorLayout>
+</layout>

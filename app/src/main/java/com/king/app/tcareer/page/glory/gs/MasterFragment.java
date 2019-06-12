@@ -1,29 +1,20 @@
 package com.king.app.tcareer.page.glory.gs;
 
 import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
 import com.king.app.tcareer.R;
+import com.king.app.tcareer.databinding.FragmentGloryAtp1000Binding;
 import com.king.app.tcareer.model.db.entity.Record;
 import com.king.app.tcareer.page.glory.BaseGloryPageFragment;
 import com.king.app.tcareer.page.glory.title.OnRecordItemListener;
-
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.Unbinder;
 
 /**
  * 描述:
  * <p/>作者：景阳
  * <p/>创建时间: 2017/6/1 18:45
  */
-public class MasterFragment extends BaseGloryPageFragment implements OnRecordItemListener {
-
-    @BindView(R.id.rv_gs_list)
-    RecyclerView rvGsList;
-
-    Unbinder unbinder;
+public class MasterFragment extends BaseGloryPageFragment<FragmentGloryAtp1000Binding> implements OnRecordItemListener {
 
     @Override
     protected int getContentLayoutRes() {
@@ -32,22 +23,14 @@ public class MasterFragment extends BaseGloryPageFragment implements OnRecordIte
 
     @Override
     protected void onCreate(View view) {
-        unbinder = ButterKnife.bind(this, view);
-
         LinearLayoutManager manager = new LinearLayoutManager(getActivity());
         manager.setOrientation(LinearLayoutManager.VERTICAL);
-        rvGsList.setLayoutManager(manager);
+        mBinding.rvGsList.setLayoutManager(manager);
 
         MasterYearAdapter adapter = new MasterYearAdapter();
-        adapter.setList(gloryHolder.getGloryTitle().getMasterItemList());
+        adapter.setList(getMainViewModel().getGloryTitle().getMasterItemList());
         adapter.setOnRecordItemListener(this);
-        rvGsList.setAdapter(adapter);
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        unbinder.unbind();
+        mBinding.rvGsList.setAdapter(adapter);
     }
 
     @Override

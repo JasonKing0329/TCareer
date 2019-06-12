@@ -1,21 +1,15 @@
 package com.king.app.tcareer.page.glory;
 
-import android.support.design.widget.TabLayout;
+import android.arch.lifecycle.ViewModelProviders;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
 
-import com.github.mikephil.charting.charts.PieChart;
 import com.king.app.tcareer.R;
-import com.king.app.tcareer.base.BaseMvpActivity;
+import com.king.app.tcareer.base.mvvm.MvvmActivity;
 import com.king.app.tcareer.conf.AppConstants;
+import com.king.app.tcareer.databinding.ActivityGloryBinding;
 import com.king.app.tcareer.model.SeasonManager;
 import com.king.app.tcareer.page.glory.bean.GloryTitle;
 import com.king.app.tcareer.page.glory.chart.ChartManager;
@@ -26,15 +20,12 @@ import com.king.app.tcareer.page.glory.title.ChampionFragment;
 import com.king.app.tcareer.page.glory.title.RunnerUpFragment;
 import com.king.app.tcareer.page.setting.SettingProperty;
 
-import butterknife.BindView;
-import butterknife.OnClick;
-
 /**
  * 描述:
  * <p/>作者：景阳
  * <p/>创建时间: 2017/5/25 16:42
  */
-public class GloryActivity extends BaseMvpActivity<GloryPresenter> implements IGloryHolder, IGloryView, Toolbar.OnMenuItemClickListener {
+public class GloryActivity extends MvvmActivity<ActivityGloryBinding, GloryViewModel> implements Toolbar.OnMenuItemClickListener {
 
     public static final String KEY_USER_ID = "key_user_id";
 
@@ -47,57 +38,7 @@ public class GloryActivity extends BaseMvpActivity<GloryPresenter> implements IG
     private final int PAGE_ATP1000 = 3;
     private final int PAGE_TARGET = 4;
 
-    @BindView(R.id.group_root)
-    ViewGroup groupRoot;
-    @BindView(R.id.toolbar)
-    Toolbar toolbar;
-    @BindView(R.id.iv_head)
-    ImageView ivHead;
-    @BindView(R.id.viewpager)
-    ViewPager viewpager;
-    @BindView(R.id.tabLayout)
-    TabLayout tabLayout;
-    @BindView(R.id.tv_career_total)
-    TextView tvCareerTotal;
-    @BindView(R.id.tv_season_total)
-    TextView tvSeasonTotal;
-    @BindView(R.id.group_title)
-    ViewGroup groupTitle;
-    @BindView(R.id.piechart)
-    PieChart piechart;
-    @BindView(R.id.tv_career)
-    TextView tvCareer;
-    @BindView(R.id.tv_season)
-    TextView tvSeason;
-    @BindView(R.id.group_career)
-    LinearLayout groupCareer;
-    @BindView(R.id.group_season)
-    LinearLayout groupSeason;
-    @BindView(R.id.tv_career_gs)
-    TextView tvCareerGs;
-    @BindView(R.id.tv_season_gs)
-    TextView tvSeasonGs;
-    @BindView(R.id.tv_career_ao)
-    TextView tvCareerAo;
-    @BindView(R.id.tv_career_fo)
-    TextView tvCareerFo;
-    @BindView(R.id.tv_career_wo)
-    TextView tvCareerWo;
-    @BindView(R.id.tv_career_uo)
-    TextView tvCareerUo;
-    @BindView(R.id.group_gs)
-    RelativeLayout groupGs;
-    @BindView(R.id.tv_career_master)
-    TextView tvCareerMaster;
-    @BindView(R.id.tv_season_master)
-    TextView tvSeasonMaster;
-    @BindView(R.id.group_master)
-    RelativeLayout groupMaster;
-
-    private ViewGroup groupCurHead;
-
     private GloryPageAdapter pagerAdapter;
-    private GloryTitle gloryTitle;
 
     private ChartManager chartManager;
 
@@ -109,38 +50,56 @@ public class GloryActivity extends BaseMvpActivity<GloryPresenter> implements IG
     }
 
     @Override
+    protected GloryViewModel createViewModel() {
+        return ViewModelProviders.of(this).get(GloryViewModel.class);
+    }
+
+    @Override
     protected void initView() {
+        mBinding.setModel(mModel);
         // top head image
         updateSeasonStyle();
 
-        toolbar.setOverflowIcon(getResources().getDrawable(R.drawable.ic_more_vert_white_24dp));
-        toolbar.setOnMenuItemClickListener(this);
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
+        mBinding.toolbar.setOverflowIcon(getResources().getDrawable(R.drawable.ic_more_vert_white_24dp));
+        mBinding.toolbar.setOnMenuItemClickListener(this);
+        mBinding.toolbar.setNavigationOnClickListener(v -> finish());
+
+        mBinding.includeHead.groupCareer.setOnClickListener(v -> {
+            if (isLevelChart) {
+                chartManager.showLevelChart(mBinding.includeHead.piechart, mModel.gloryTitleObserver.getValue()
+                        , pagerAdapter.getItem(mBinding.viewpager.getCurrentItem()) instanceof ChampionFragment
+                        , false);
+            } else {
+                chartManager.showCourtChart(mBinding.includeHead.piechart, mModel.gloryTitleObserver.getValue()
+                        , pagerAdapter.getItem(mBinding.viewpager.getCurrentItem()) instanceof ChampionFragment
+                        , false);
             }
+            setCareerFocus(true);
+        });
+        mBinding.includeHead.groupSeason.setOnClickListener(v -> {
+            if (isLevelChart) {
+                chartManager.showLevelChart(mBinding.includeHead.piechart, mModel.gloryTitleObserver.getValue()
+                        , pagerAdapter.getItem(mBinding.viewpager.getCurrentItem()) instanceof ChampionFragment
+                        , true);
+            } else {
+                chartManager.showCourtChart(mBinding.includeHead.piechart, mModel.gloryTitleObserver.getValue()
+                        , pagerAdapter.getItem(mBinding.viewpager.getCurrentItem()) instanceof ChampionFragment
+                        , true);
+            }
+            setCareerFocus(false);
         });
 
         setCareerFocus(true);
     }
 
     @Override
-    protected GloryPresenter createPresenter() {
-        return new GloryPresenter();
-    }
-
-    @Override
     protected void initData() {
         chartManager = new ChartManager(this);
-        presenter.loadData(getIntent().getLongExtra(KEY_USER_ID, -1));
-
-//        groupRoot.post(new Runnable() {
-//            @Override
-//            public void run() {
-//                AnimUtil.startFullCircleRevealAnimation(GloryActivity.this, groupRoot, null);
-//            }
-//        });
+        mModel.gloryTitleObserver.observe(this, title -> {
+            updatePubPage(SettingProperty.getGloryPageIndex(), title);
+            initFragments();
+        });
+        mModel.loadData(getIntent().getLongExtra(KEY_USER_ID, -1));
     }
 
     private void initFragments() {
@@ -150,16 +109,16 @@ public class GloryActivity extends BaseMvpActivity<GloryPresenter> implements IG
         pagerAdapter.addFragment(new GsFragment(), titles[PAGE_GS]);
         pagerAdapter.addFragment(new MasterFragment(), titles[PAGE_ATP1000]);
         pagerAdapter.addFragment(new TargetFragment(), titles[PAGE_TARGET]);
-        viewpager.setAdapter(pagerAdapter);
+        mBinding.viewpager.setAdapter(pagerAdapter);
 
-        tabLayout.addTab(tabLayout.newTab().setText(titles[PAGE_CHAMPION]));
-        tabLayout.addTab(tabLayout.newTab().setText(titles[PAGE_RUNNERUP]));
-        tabLayout.addTab(tabLayout.newTab().setText(titles[PAGE_GS]));
-        tabLayout.addTab(tabLayout.newTab().setText(titles[PAGE_ATP1000]));
-        tabLayout.addTab(tabLayout.newTab().setText(titles[PAGE_TARGET]));
-        tabLayout.setupWithViewPager(viewpager);
+        mBinding.tabLayout.addTab(mBinding.tabLayout.newTab().setText(titles[PAGE_CHAMPION]));
+        mBinding.tabLayout.addTab(mBinding.tabLayout.newTab().setText(titles[PAGE_RUNNERUP]));
+        mBinding.tabLayout.addTab(mBinding.tabLayout.newTab().setText(titles[PAGE_GS]));
+        mBinding.tabLayout.addTab(mBinding.tabLayout.newTab().setText(titles[PAGE_ATP1000]));
+        mBinding.tabLayout.addTab(mBinding.tabLayout.newTab().setText(titles[PAGE_TARGET]));
+        mBinding.tabLayout.setupWithViewPager(mBinding.viewpager);
 
-        viewpager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+        mBinding.viewpager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
 
@@ -168,7 +127,8 @@ public class GloryActivity extends BaseMvpActivity<GloryPresenter> implements IG
             @Override
             public void onPageSelected(int position) {
                 SettingProperty.setGloryPageIndex(position);
-                updatePubPage(position);
+                mModel.bindPageContent(position);
+                updatePubPage(position, mModel.gloryTitleObserver.getValue());
             }
 
             @Override
@@ -178,20 +138,17 @@ public class GloryActivity extends BaseMvpActivity<GloryPresenter> implements IG
         });
         int page = SettingProperty.getGloryPageIndex();
         if (page < pagerAdapter.getCount()) {
-            viewpager.setCurrentItem(page);
+            mBinding.viewpager.setCurrentItem(page);
         }
     }
 
-    private void updatePubPage(int position) {
-        if (groupCurHead != null) {
-            groupCurHead.setVisibility(View.GONE);
-        }
+    private void updatePubPage(int position, GloryTitle gloryTitle) {
         switch (position) {
             case PAGE_CHAMPION:
-                onShowChampionPage();
+                onShowChampionPage(gloryTitle);
                 break;
             case PAGE_RUNNERUP:
-                onShowRunnerUpPage();
+                onShowRunnerUpPage(gloryTitle);
                 break;
             case PAGE_GS:
                 onShowGsPage();
@@ -206,107 +163,62 @@ public class GloryActivity extends BaseMvpActivity<GloryPresenter> implements IG
     }
 
     private void onShowTargetPage() {
-        groupCurHead = groupMaster;
-        groupMaster.setVisibility(View.VISIBLE);
-        toolbar.getMenu().clear();
-        toolbar.inflateMenu(R.menu.glory_none);
-        tvCareerMaster.setText("Win " + gloryTitle.getCareerWin() + "  Lose " + (gloryTitle.getCareerMatch() - gloryTitle.getCareerWin()));
-        tvSeasonMaster.setText("Win " + gloryTitle.getYearWin() + "  Lose " + (gloryTitle.getYearMatch() - gloryTitle.getYearWin()));
+        mBinding.toolbar.getMenu().clear();
+        mBinding.toolbar.inflateMenu(R.menu.glory_none);
     }
 
     private void onShowAtp1000Page() {
-        groupCurHead = groupMaster;
-        groupMaster.setVisibility(View.VISIBLE);
-        toolbar.getMenu().clear();
-        toolbar.inflateMenu(R.menu.glory_none);
-        tvCareerMaster.setText("Win " + gloryTitle.getMaster1000().getCareerWin() + "  Lose " + gloryTitle.getMaster1000().getCareerLose());
-        tvSeasonMaster.setText("Win " + gloryTitle.getMaster1000().getSeasonWin() + "  Lose " + gloryTitle.getMaster1000().getSeasonLose());
+        mBinding.toolbar.getMenu().clear();
+        mBinding.toolbar.inflateMenu(R.menu.glory_none);
     }
 
     private void onShowGsPage() {
-        groupCurHead = groupGs;
-        groupGs.setVisibility(View.VISIBLE);
-        toolbar.getMenu().clear();
-        toolbar.inflateMenu(R.menu.glory_none);
-        tvCareerGs.setText("Win " + gloryTitle.getGs().getCareerWin() + "  Lose " + gloryTitle.getGs().getCareerLose());
-        tvSeasonGs.setText("Win " + gloryTitle.getGs().getSeasonWin() + "  Lose " + gloryTitle.getGs().getSeasonLose());
-        tvCareerAo.setText("澳网 Win " + gloryTitle.getGs().getAoWin() + "  Lose " + gloryTitle.getGs().getAoLose());
-        tvCareerFo.setText("法网 Win " + gloryTitle.getGs().getFoWin() + "  Lose " + gloryTitle.getGs().getFoLose());
-        tvCareerWo.setText("温网 Win " + gloryTitle.getGs().getWoWin() + "  Lose " + gloryTitle.getGs().getWoLose());
-        tvCareerUo.setText("美网 Win " + gloryTitle.getGs().getUoWin() + "  Lose " + gloryTitle.getGs().getUoLose());
+        mBinding.toolbar.getMenu().clear();
+        mBinding.toolbar.inflateMenu(R.menu.glory_none);
     }
 
-    private void onShowRunnerUpPage() {
-        groupCurHead = groupTitle;
-        groupTitle.setVisibility(View.VISIBLE);
-        toolbar.getMenu().clear();
-        toolbar.inflateMenu(R.menu.glory_list);
-        tvCareerTotal.setText(String.valueOf(getGloryTitle().getRunnerupTitle().getCareerTotal()));
-        tvSeasonTotal.setText(String.valueOf(getGloryTitle().getRunnerupTitle().getYearTotal()));
+    private void onShowRunnerUpPage(GloryTitle gloryTitle) {
+        mBinding.toolbar.getMenu().clear();
+        mBinding.toolbar.inflateMenu(R.menu.glory_list);
         if (AppConstants.GROUP_BY_COURT == SettingProperty.getGloryRunnerupGroupMode()) {
-            chartManager.showCourtChart(piechart, gloryTitle, false, false);
+            chartManager.showCourtChart(mBinding.includeHead.piechart, gloryTitle, false, false);
             isLevelChart = false;
         } else {
-            chartManager.showLevelChart(piechart, gloryTitle, false, false);
+            chartManager.showLevelChart(mBinding.includeHead.piechart, gloryTitle, false, false);
             isLevelChart = true;
         }
         setCareerFocus(true);
     }
 
-    private void onShowChampionPage() {
-        groupCurHead = groupTitle;
-        groupTitle.setVisibility(View.VISIBLE);
-        toolbar.getMenu().clear();
-        toolbar.inflateMenu(R.menu.glory_list);
-        tvCareerTotal.setText(String.valueOf(getGloryTitle().getChampionTitle().getCareerTotal()));
-        tvSeasonTotal.setText(String.valueOf(getGloryTitle().getChampionTitle().getYearTotal()));
+    private void onShowChampionPage(GloryTitle gloryTitle) {
+        mBinding.toolbar.getMenu().clear();
+        mBinding.toolbar.inflateMenu(R.menu.glory_list);
         if (AppConstants.GROUP_BY_COURT == SettingProperty.getGloryChampionGroupMode()) {
-            chartManager.showCourtChart(piechart, gloryTitle, true, false);
+            chartManager.showCourtChart(mBinding.includeHead.piechart, gloryTitle, true, false);
             isLevelChart = false;
         } else {
-            chartManager.showLevelChart(piechart, gloryTitle, true, false);
+            chartManager.showLevelChart(mBinding.includeHead.piechart, gloryTitle, true, false);
             isLevelChart = true;
         }
         setCareerFocus(true);
-    }
-
-    @Override
-    public void onGloryTitleLoaded(GloryTitle data) {
-
-        gloryTitle = data;
-        updatePubPage(SettingProperty.getGloryPageIndex());
-
-        initFragments();
-
-        dismissProgress();
-    }
-
-    @Override
-    public GloryTitle getGloryTitle() {
-        return gloryTitle;
-    }
-
-    @Override
-    public GloryPresenter getPresenter() {
-        return presenter;
     }
 
     private void updateSeasonStyle() {
         SeasonManager.SeasonEnum type = SeasonManager.getSeasonType();
         if (type == SeasonManager.SeasonEnum.CLAY) {
-            ivHead.setImageResource(R.drawable.nav_header_mon);
+            mBinding.includeHead.ivHead.setImageResource(R.drawable.nav_header_mon);
         } else if (type == SeasonManager.SeasonEnum.GRASS) {
-            ivHead.setImageResource(R.drawable.nav_header_win);
+            mBinding.includeHead.ivHead.setImageResource(R.drawable.nav_header_win);
         } else if (type == SeasonManager.SeasonEnum.INHARD) {
-            ivHead.setImageResource(R.drawable.nav_header_sydney);
+            mBinding.includeHead.ivHead.setImageResource(R.drawable.nav_header_sydney);
         } else {
-            ivHead.setImageResource(R.drawable.nav_header_iw);
+            mBinding.includeHead.ivHead.setImageResource(R.drawable.nav_header_iw);
         }
     }
 
     @Override
     public boolean onMenuItemClick(MenuItem item) {
-        Fragment fragment = pagerAdapter.getItem(viewpager.getCurrentItem());
+        Fragment fragment = pagerAdapter.getItem(mBinding.viewpager.getCurrentItem());
         switch (item.getItemId()) {
             case R.id.menu_group_by_all:
                 if (fragment instanceof ChampionFragment) {
@@ -318,20 +230,20 @@ public class GloryActivity extends BaseMvpActivity<GloryPresenter> implements IG
             case R.id.menu_group_by_court:
                 if (fragment instanceof ChampionFragment) {
                     ((ChampionFragment) fragment).groupBy(AppConstants.GROUP_BY_COURT);
-                    chartManager.showCourtChart(piechart, gloryTitle, true, false);
+                    chartManager.showCourtChart(mBinding.includeHead.piechart, mModel.gloryTitleObserver.getValue(), true, false);
                 } else if (fragment instanceof RunnerUpFragment) {
                     ((RunnerUpFragment) fragment).groupBy(AppConstants.GROUP_BY_COURT);
-                    chartManager.showCourtChart(piechart, gloryTitle, false, false);
+                    chartManager.showCourtChart(mBinding.includeHead.piechart, mModel.gloryTitleObserver.getValue(), false, false);
                 }
                 isLevelChart = false;
                 break;
             case R.id.menu_group_by_level:
                 if (fragment instanceof ChampionFragment) {
                     ((ChampionFragment) fragment).groupBy(AppConstants.GROUP_BY_LEVEL);
-                    chartManager.showLevelChart(piechart, gloryTitle, true, false);
+                    chartManager.showLevelChart(mBinding.includeHead.piechart, mModel.gloryTitleObserver.getValue(), true, false);
                 } else if (fragment instanceof RunnerUpFragment) {
                     ((RunnerUpFragment) fragment).groupBy(AppConstants.GROUP_BY_LEVEL);
-                    chartManager.showLevelChart(piechart, gloryTitle, false, false);
+                    chartManager.showLevelChart(mBinding.includeHead.piechart, mModel.gloryTitleObserver.getValue(), false, false);
                 }
                 isLevelChart = true;
                 break;
@@ -346,47 +258,17 @@ public class GloryActivity extends BaseMvpActivity<GloryPresenter> implements IG
         return true;
     }
 
-    @OnClick({R.id.group_career, R.id.group_season})
-    public void onViewClicked(View view) {
-        switch (view.getId()) {
-            case R.id.group_career:
-                if (isLevelChart) {
-                    chartManager.showLevelChart(piechart, gloryTitle
-                            , pagerAdapter.getItem(viewpager.getCurrentItem()) instanceof ChampionFragment
-                            , false);
-                } else {
-                    chartManager.showCourtChart(piechart, gloryTitle
-                            , pagerAdapter.getItem(viewpager.getCurrentItem()) instanceof ChampionFragment
-                            , false);
-                }
-                setCareerFocus(true);
-                break;
-            case R.id.group_season:
-                if (isLevelChart) {
-                    chartManager.showLevelChart(piechart, gloryTitle
-                            , pagerAdapter.getItem(viewpager.getCurrentItem()) instanceof ChampionFragment
-                            , true);
-                } else {
-                    chartManager.showCourtChart(piechart, gloryTitle
-                            , pagerAdapter.getItem(viewpager.getCurrentItem()) instanceof ChampionFragment
-                            , true);
-                }
-                setCareerFocus(false);
-                break;
-        }
-    }
-
     private void setCareerFocus(boolean isFocus) {
         if (isFocus) {
-            tvCareer.setTextColor(getResources().getColor(R.color.tab_actionbar_text_focus));
-            tvCareerTotal.setTextColor(getResources().getColor(R.color.tab_actionbar_text_focus));
-            tvSeason.setTextColor(getResources().getColor(R.color.white));
-            tvSeasonTotal.setTextColor(getResources().getColor(R.color.white));
+            mBinding.includeHead.tvCareer.setTextColor(getResources().getColor(R.color.tab_actionbar_text_focus));
+            mBinding.includeHead.tvCareerTotal.setTextColor(getResources().getColor(R.color.tab_actionbar_text_focus));
+            mBinding.includeHead.tvSeason.setTextColor(getResources().getColor(R.color.white));
+            mBinding.includeHead.tvSeasonTotal.setTextColor(getResources().getColor(R.color.white));
         } else {
-            tvSeason.setTextColor(getResources().getColor(R.color.tab_actionbar_text_focus));
-            tvSeasonTotal.setTextColor(getResources().getColor(R.color.tab_actionbar_text_focus));
-            tvCareer.setTextColor(getResources().getColor(R.color.white));
-            tvCareerTotal.setTextColor(getResources().getColor(R.color.white));
+            mBinding.includeHead.tvSeason.setTextColor(getResources().getColor(R.color.tab_actionbar_text_focus));
+            mBinding.includeHead.tvSeasonTotal.setTextColor(getResources().getColor(R.color.tab_actionbar_text_focus));
+            mBinding.includeHead.tvCareer.setTextColor(getResources().getColor(R.color.white));
+            mBinding.includeHead.tvCareerTotal.setTextColor(getResources().getColor(R.color.white));
         }
     }
 }
