@@ -7,8 +7,8 @@ android {
         applicationId "com.king.app.tcareer"
         minSdkVersion 23
         targetSdkVersion 28
-        versionCode 102
-        versionName "5.1"
+        versionCode 103
+        versionName "5.1.1"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
         sourceSets.main {
@@ -100,7 +100,7 @@ dependencies {
 
     /*轮播视图*/
     implementation 'com.youth.banner:banner:1.4.10'
-    implementation 'com.king.lib:jactionbar:1.0.8'
+    implementation 'com.king.lib:jactionbar:1.1.0'
     implementation 'com.guo.android_extend:android-extend:1.0.1'
 
     /*html解析*/

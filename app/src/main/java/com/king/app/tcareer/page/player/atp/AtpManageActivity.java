@@ -4,7 +4,6 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.support.v7.widget.LinearLayoutManager;
 
-import com.king.app.jactionbar.OnConfirmListener;
 import com.king.app.tcareer.R;
 import com.king.app.tcareer.base.mvvm.MvvmActivity;
 import com.king.app.tcareer.databinding.ActivityAtpManageBinding;
@@ -57,7 +56,7 @@ public class AtpManageActivity extends MvvmActivity<ActivityAtpManageBinding, At
                             , (dialogInterface, i) -> mModel.fetchData(), null);
                     break;
                 case R.id.menu_atp_edit:
-                    mBinding.actionbar.showConfirmStatus(R.id.menu_atp_edit);
+                    mBinding.actionbar.showConfirmStatus(R.id.menu_atp_edit, true, "Cancel");
                     isEditing = true;
                     break;
                 case R.id.menu_atp_delete:
@@ -68,55 +67,40 @@ public class AtpManageActivity extends MvvmActivity<ActivityAtpManageBinding, At
                     break;
             }
         });
-        mBinding.actionbar.setOnConfirmListener(new OnConfirmListener() {
-            @Override
-            public boolean disableInstantDismissConfirm() {
-                return false;
-            }
-
-            @Override
-            public boolean disableInstantDismissCancel() {
-                return false;
-            }
-
-            @Override
-            public boolean onConfirm(int actionId) {
-                switch (actionId) {
-                    case R.id.menu_atp_edit:
+        mBinding.actionbar.setOnConfirmListener(actionId -> {
+            switch (actionId) {
+                case R.id.menu_atp_edit:
+                    isEditing = false;
+                    mBinding.actionbar.cancelConfirmStatus();
+                    break;
+                case R.id.menu_atp_delete:
+                    final List<PlayerAtpBean> list = adapter.getSelectedList();
+                    if (list.size() > 0) {
+                        showConfirmCancelMessage("确认删除？"
+                                , (dialog, which) -> {
+                                    mModel.deleteData(list);
+                                    isEditing = false;
+                                    mBinding.actionbar.cancelConfirmStatus();
+                                    adapter.setSelectionMode(false);
+                                    mModel.loadData();
+                                }, null);
+                    }
+                    else {
                         isEditing = false;
                         mBinding.actionbar.cancelConfirmStatus();
-                        break;
-                    case R.id.menu_atp_delete:
-                        final List<PlayerAtpBean> list = adapter.getSelectedList();
-                        if (list.size() > 0) {
-                            showConfirmCancelMessage("确认删除？"
-                                    , (dialog, which) -> {
-                                        mModel.deleteData(list);
-                                        isEditing = false;
-                                        mBinding.actionbar.cancelConfirmStatus();
-                                        adapter.setSelectionMode(false);
-                                        mModel.loadData();
-                                    }, null);
-                        }
-                        else {
-                            isEditing = false;
-                            mBinding.actionbar.cancelConfirmStatus();
-                            adapter.setSelectionMode(false);
-                            adapter.notifyDataSetChanged();
-                        }
-                        break;
-                }
-                return false;
+                        adapter.setSelectionMode(false);
+                        adapter.notifyDataSetChanged();
+                    }
+                    break;
             }
-
-            @Override
-            public boolean onCancel(int actionId) {
-                isEditing = false;
-                adapter.setSelectionMode(false);
-                adapter.notifyDataSetChanged();
-                mBinding.actionbar.cancelConfirmStatus();
-                return false;
-            }
+            return false;
+        });
+        mBinding.actionbar.setOnCancelListener(actionId -> {
+            isEditing = false;
+            adapter.setSelectionMode(false);
+            adapter.notifyDataSetChanged();
+            mBinding.actionbar.cancelConfirmStatus();
+            return false;
         });
 
         LinearLayoutManager manager = new LinearLayoutManager(this);

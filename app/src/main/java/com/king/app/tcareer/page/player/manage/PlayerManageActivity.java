@@ -6,7 +6,6 @@ import android.graphics.PorterDuff;
 import android.view.View;
 import android.widget.PopupMenu;
 
-import com.king.app.jactionbar.OnConfirmListener;
 import com.king.app.tcareer.R;
 import com.king.app.tcareer.base.mvvm.MvvmActivity;
 import com.king.app.tcareer.databinding.ActivityPlayerManageBinding;
@@ -97,7 +96,7 @@ public class PlayerManageActivity extends MvvmActivity<ActivityPlayerManageBindi
                     ftRich.setDeleteMode(true);
                     break;
                 case R.id.menu_manage_edit:
-                    mBinding.actionbar.showConfirmStatus(menuId);
+                    mBinding.actionbar.showConfirmStatus(menuId, true, "Cancel");
                     ftRich.setEditMode(true);
                     break;
                 case R.id.menu_manage_expand:
@@ -111,39 +110,24 @@ public class PlayerManageActivity extends MvvmActivity<ActivityPlayerManageBindi
                     break;
             }
         });
-        mBinding.actionbar.setOnConfirmListener(new OnConfirmListener() {
-            @Override
-            public boolean disableInstantDismissConfirm() {
-                return false;
+        mBinding.actionbar.setOnConfirmListener(actionId -> {
+            switch (actionId) {
+                case R.id.menu_manage_delete:
+                    ftRich.confirmDelete();
+                    break;
+                case R.id.menu_manage_edit:
+                    ftRich.setEditMode(false);
+                    break;
             }
-
-            @Override
-            public boolean disableInstantDismissCancel() {
-                return false;
+            return true;
+        });
+        mBinding.actionbar.setOnCancelListener(actionId -> {
+            switch (actionId) {
+                case R.id.menu_manage_delete:
+                    ftRich.setDeleteMode(false);
+                    break;
             }
-
-            @Override
-            public boolean onConfirm(int actionId) {
-                switch (actionId) {
-                    case R.id.menu_manage_delete:
-                        ftRich.confirmDelete();
-                        break;
-                }
-                return true;
-            }
-
-            @Override
-            public boolean onCancel(int actionId) {
-                switch (actionId) {
-                    case R.id.menu_manage_delete:
-                        ftRich.setDeleteMode(false);
-                        break;
-                    case R.id.menu_manage_edit:
-                        ftRich.setEditMode(false);
-                        break;
-                }
-                return true;
-            }
+            return true;
         });
         mBinding.actionbar.registerPopupMenu(R.id.menu_manage_sort);
         mBinding.actionbar.setPopupMenuProvider((iconMenuId, anchorView) -> {

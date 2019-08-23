@@ -11,7 +11,6 @@ import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.widget.PopupMenu;
 
-import com.king.app.jactionbar.OnConfirmListener;
 import com.king.app.tcareer.R;
 import com.king.app.tcareer.base.mvvm.MvvmActivity;
 import com.king.app.tcareer.databinding.ActivityMatchManageBinding;
@@ -125,7 +124,7 @@ public class MatchManageActivity extends MvvmActivity<ActivityMatchManageBinding
                     break;
                 case R.id.menu_manage_edit:
                     isEditMode = true;
-                    mBinding.actionbar.showConfirmStatus(menuId);
+                    mBinding.actionbar.showConfirmStatus(menuId, true, "Cancel");
                     break;
                 case R.id.menu_manage_view:
                     if (isGridMode) {
@@ -144,55 +143,40 @@ public class MatchManageActivity extends MvvmActivity<ActivityMatchManageBinding
                     break;
             }
         });
-        mBinding.actionbar.setOnConfirmListener(new OnConfirmListener() {
-            @Override
-            public boolean disableInstantDismissConfirm() {
-                return false;
+        mBinding.actionbar.setOnConfirmListener(actionId -> {
+            switch (actionId) {
+                case R.id.menu_manage_delete:
+                    deleteMatchItems();
+                    if (matchItemAdapter != null) {
+                        matchItemAdapter.setSelectMode(false);
+                        matchItemAdapter.notifyDataSetChanged();
+                    }
+                    if (matchGridAdapter != null) {
+                        matchGridAdapter.setSelectMode(false);
+                        matchGridAdapter.notifyDataSetChanged();
+                    }
+                    break;
             }
-
-            @Override
-            public boolean disableInstantDismissCancel() {
-                return false;
+            isEditMode = false;
+            isOnlyAddName = false;
+            return true;
+        });
+        mBinding.actionbar.setOnCancelListener(actionId -> {
+            switch (actionId) {
+                case R.id.menu_manage_delete:
+                    if (matchItemAdapter != null) {
+                        matchItemAdapter.setSelectMode(false);
+                        matchItemAdapter.notifyDataSetChanged();
+                    }
+                    if (matchGridAdapter != null) {
+                        matchGridAdapter.setSelectMode(false);
+                        matchGridAdapter.notifyDataSetChanged();
+                    }
+                    break;
             }
-
-            @Override
-            public boolean onConfirm(int actionId) {
-                switch (actionId) {
-                    case R.id.menu_manage_delete:
-                        deleteMatchItems();
-                        if (matchItemAdapter != null) {
-                            matchItemAdapter.setSelectMode(false);
-                            matchItemAdapter.notifyDataSetChanged();
-                        }
-                        if (matchGridAdapter != null) {
-                            matchGridAdapter.setSelectMode(false);
-                            matchGridAdapter.notifyDataSetChanged();
-                        }
-                        break;
-                }
-                isEditMode = false;
-                isOnlyAddName = false;
-                return true;
-            }
-
-            @Override
-            public boolean onCancel(int actionId) {
-                switch (actionId) {
-                    case R.id.menu_manage_delete:
-                        if (matchItemAdapter != null) {
-                            matchItemAdapter.setSelectMode(false);
-                            matchItemAdapter.notifyDataSetChanged();
-                        }
-                        if (matchGridAdapter != null) {
-                            matchGridAdapter.setSelectMode(false);
-                            matchGridAdapter.notifyDataSetChanged();
-                        }
-                        break;
-                }
-                isEditMode = false;
-                isOnlyAddName = false;
-                return true;
-            }
+            isEditMode = false;
+            isOnlyAddName = false;
+            return true;
         });
         mBinding.actionbar.registerPopupMenu(R.id.menu_manage_sort);
         mBinding.actionbar.setPopupMenuProvider((iconMenuId, anchorView) -> {
