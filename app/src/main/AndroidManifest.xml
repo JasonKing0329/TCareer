@@ -141,6 +141,10 @@
             android:name=".page.record.complex.CareerCompareActivity"
             android:screenOrientation="portrait"
             android:theme="@style/RecordTheme" />
+        <activity
+            android:name=".page.compare.PlayerCompActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoActionBarTheme" />
 
         <provider
             android:name="android.support.v4.content.FileProvider"

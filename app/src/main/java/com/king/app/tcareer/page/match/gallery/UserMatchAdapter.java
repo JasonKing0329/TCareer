@@ -38,7 +38,7 @@ public class UserMatchAdapter extends BaseBindingAdapter<AdapterUserMatchItemBin
     @Override
     protected void onBindItem(AdapterUserMatchItemBinding binding, int position, UserMatchBean bean) {
         binding.setBean(bean);
-        binding.tvTotal.setText("总胜负  " + bean.getWin() + "胜" + bean.getLose() + "负");
+//        binding.tvTotal.setText("总胜负  " + bean.getWin() + "胜" + bean.getLose() + "负");
         String best = "最佳战绩  " + bean.getBest();
         if (bean.getBestYears().length() > 0) {
             best = best + "(" + bean.getBestYears() + ")";

@@ -77,7 +77,7 @@ public class HomeHeadFragment extends MvvmFragment<FragmentHomeHeadBinding, Scor
         // retired and in efficient time
         if (RetireUtil.isRetired(getUserId(), new Date(), true)) {
             mBinding.tvRank.setVisibility(View.INVISIBLE);
-            mBinding.tvTotal.setVisibility(View.INVISIBLE);
+//            mBinding.tvTotal.setVisibility(View.INVISIBLE);
             mModel.loadUser(getUserId());
         }
         // count score and rank
