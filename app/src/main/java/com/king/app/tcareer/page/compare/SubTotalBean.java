@@ -14,6 +14,8 @@ public class SubTotalBean {
 
     private String total;
 
+    private String under;
+
     public String getImageUrl() {
         return imageUrl;
     }
@@ -36,5 +38,13 @@ public class SubTotalBean {
 
     public void setTotal(String total) {
         this.total = total;
+    }
+
+    public String getUnder() {
+        return under;
+    }
+
+    public void setUnder(String under) {
+        this.under = under;
     }
 }

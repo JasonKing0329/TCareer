@@ -1,7 +1,7 @@
-package com.king.app.tcareer.page.record.complex;
+package com.king.app.tcareer.page.compare;
 
 import android.arch.lifecycle.ViewModelProviders;
-import android.graphics.PorterDuff;
+import android.content.Intent;
 import android.support.v7.widget.LinearLayoutManager;
 
 import com.king.app.tcareer.R;
@@ -37,9 +37,14 @@ public class CareerCompareActivity extends MvvmActivity<ActivityCareerCompareBin
 
     @Override
     protected void initView() {
-        mBinding.toolbar.setNavigationIcon(R.drawable.ic_arrow_back_filterrable);
-        mBinding.toolbar.getNavigationIcon().setColorFilter(getResources().getColor(R.color.dark_grey), PorterDuff.Mode.SRC_ATOP);
-        mBinding.toolbar.setNavigationOnClickListener(v -> finish());
+        mBinding.actionbar.setOnBackListener(() -> onBackPressed());
+        mBinding.actionbar.setOnMenuItemListener(menuId -> {
+            switch (menuId) {
+                case R.id.menu_compare:
+                    showPlayerCompare();
+                    break;
+            }
+        });
 
         mBinding.tvTitleKing.setTextColor(AppConstants.USER_KING_LINE_COLOR);
         mBinding.tvTitleFla.setTextColor(AppConstants.USER_FLAMENCO_LINE_COLOR);
@@ -132,6 +137,12 @@ public class CareerCompareActivity extends MvvmActivity<ActivityCareerCompareBin
             }
         });
         mBinding.chartWeek.scrollToEnd();
+    }
+
+    private void showPlayerCompare() {
+        Intent intent = new Intent();
+        intent.setClass(this, PlayerCompActivity.class);
+        startActivity(intent);
     }
 
 }

@@ -1,4 +1,4 @@
-package com.king.app.tcareer.page.record.complex;
+package com.king.app.tcareer.page.compare;
 
 import android.app.Application;
 import android.arch.lifecycle.MutableLiveData;

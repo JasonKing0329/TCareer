@@ -22,6 +22,9 @@ public class PlayerCompFragment extends MvvmFragment<FragmentComparePlayerBindin
     private static final String ARG_LEVEL1 = "level1";
     private static final String ARG_LEVEL2 = "level2";
 
+    private TwoLineAdapter twoLineAdapter;
+    private SubTotalAdapter subTotalAdapter;
+
     public static PlayerCompFragment newInstance(long playerId) {
         PlayerCompFragment fragment = new PlayerCompFragment();
         Bundle bundle = new Bundle();
@@ -55,6 +58,19 @@ public class PlayerCompFragment extends MvvmFragment<FragmentComparePlayerBindin
 
     @Override
     protected void onCreateData() {
+
+        mModel.twoLineList.observe(this, list -> {
+            twoLineAdapter = new TwoLineAdapter();
+            twoLineAdapter.setList(list);
+            mBinding.rvContent.setAdapter(twoLineAdapter);
+        });
+
+        mModel.subTotalList.observe(this, list -> {
+            subTotalAdapter = new SubTotalAdapter();
+            subTotalAdapter.setList(list);
+            mBinding.rvContent.setAdapter(subTotalAdapter);
+        });
+
         mModel.loadPlayer(getArguments().getLong(ARG_PLAYER_ID));
         onArgumentsChanged();
     }

@@ -47,10 +47,24 @@
                     android:id="@+id/toolbar"
                     android:layout_width="match_parent"
                     android:layout_height="?attr/actionBarSize"
-                    app:title="Career Compare"
                     app:layout_collapseMode="pin"
-                    app:navigationIcon="@drawable/ic_arrow_back_white_24dp"
-                    app:popupTheme="@style/HomeTheme.PopupOverlay" />
+                    app:contentInsetStart="0dp"
+                    app:contentInsetLeft="0dp"
+                    app:popupTheme="@style/HomeTheme.PopupOverlay">
+                    <com.king.app.jactionbar.JActionbar
+                        android:id="@+id/actionbar"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        app:menu="@menu/compare"
+                        app:title="Career Compare"
+                        app:titleColor="@color/text_second"
+                        app:iconColor="@color/text_second"
+                        app:iconSize="@dimen/actionbar_icon_size"
+                        app:iconPadding="@dimen/actionbar_icon_padding"
+                        app:showIconBack="true"
+                        app:rippleColor="@color/ripple_actionbar_icon"
+                        app:maxShowIcon="5" />
+                </android.support.v7.widget.Toolbar>
 
             </android.support.design.widget.CollapsingToolbarLayout>
 

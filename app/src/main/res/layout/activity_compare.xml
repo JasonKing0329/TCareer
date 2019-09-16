@@ -23,32 +23,37 @@
             app:maxShowIcon="5"
             app:title="Achievement"/>
 
-        <Spinner
-            android:id="@+id/sp_level1"
-            android:layout_width="160dp"
+        <!-- 这里很奇怪只有用LinearLayout(而且只能是LinearLayout)包裹一层才能让两个Spinner对齐，constrain约束始终无法使上端对齐 -->
+        <LinearLayout
+            android:id="@+id/ll_sp"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="8dp"
-            android:entries="@array/compare_level1"
+            android:orientation="horizontal"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/action_bar" />
+            app:layout_constraintTop_toBottomOf="@id/action_bar"
+            app:layout_constraintEnd_toEndOf="parent">
+            <Spinner
+                android:id="@+id/sp_level1"
+                android:layout_width="160dp"
+                android:layout_height="wrap_content"
+                android:entries="@array/compare_level1" />
 
-        <Spinner
-            android:id="@+id/sp_level2"
-            android:layout_width="160dp"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="16dp"
-            android:layout_marginTop="8dp"
-            android:entries="@array/compare_gs_round"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/action_bar" />
+            <Spinner
+                android:id="@+id/sp_level2"
+                android:layout_width="160dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:entries="@array/compare_gs_round" />
+        </LinearLayout>
 
         <ScrollView
             android:layout_width="0dp"
             android:layout_height="0dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/sp_level1"
+            app:layout_constraintTop_toBottomOf="@+id/ll_sp"
             app:layout_constraintBottom_toBottomOf="parent">
             <LinearLayout
                 android:layout_width="match_parent"

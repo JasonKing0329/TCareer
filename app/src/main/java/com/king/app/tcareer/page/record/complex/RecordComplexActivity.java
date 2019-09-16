@@ -13,7 +13,7 @@ import android.view.View;
 import com.king.app.tcareer.R;
 import com.king.app.tcareer.base.mvvm.MvvmActivity;
 import com.king.app.tcareer.databinding.ActivityRecordComplexBinding;
-import com.king.app.tcareer.page.compare.PlayerCompActivity;
+import com.king.app.tcareer.page.compare.CareerCompareActivity;
 import com.king.app.tcareer.page.record.editor.RecordEditorActivity;
 import com.king.app.tcareer.page.record.list.OnItemMenuListener;
 import com.king.app.tcareer.page.record.list.RecordItem;
@@ -109,8 +109,7 @@ public class RecordComplexActivity extends MvvmActivity<ActivityRecordComplexBin
 
     private void showCareerCompare() {
         Intent intent = new Intent();
-//        intent.setClass(this, CareerCompareActivity.class);
-        intent.setClass(this, PlayerCompActivity.class);
+        intent.setClass(this, CareerCompareActivity.class);
         startActivity(intent);
     }
 

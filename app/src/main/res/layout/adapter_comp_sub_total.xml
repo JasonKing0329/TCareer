@@ -4,6 +4,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <data>
+        <import type="android.view.View"/>
         <variable
             name="bean"
             type="com.king.app.tcareer.page.compare.SubTotalBean" />
@@ -28,7 +29,7 @@
             android:id="@+id/cover"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:background="#33000000"
+            android:background="@color/compare_sec_cover"
             app:layout_constraintBottom_toBottomOf="@+id/iv_image"
             app:layout_constraintEnd_toEndOf="@+id/iv_image"
             app:layout_constraintStart_toStartOf="@+id/iv_image"
@@ -43,10 +44,11 @@
             android:textSize="28dp"
             android:textStyle="bold"
             app:layout_constraintHorizontal_chainStyle="packed"
+            app:layout_constraintVertical_chainStyle="packed"
             app:layout_constraintEnd_toStartOf="@+id/tv_total"
             app:layout_constraintStart_toStartOf="@+id/iv_image"
             app:layout_constraintTop_toTopOf="@+id/iv_image"
-            app:layout_constraintBottom_toBottomOf="@+id/iv_image" />
+            app:layout_constraintBottom_toTopOf="@+id/tv_under" />
 
         <TextView
             android:id="@+id/tv_total"
@@ -59,6 +61,20 @@
             app:layout_constraintBottom_toBottomOf="@+id/tv_num"
             app:layout_constraintEnd_toEndOf="@+id/iv_image"
             app:layout_constraintStart_toEndOf="@+id/tv_num" />
+
+        <TextView
+            android:id="@+id/tv_under"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@{bean.under}"
+            android:textColor="@color/white"
+            android:textSize="12dp"
+            android:textStyle="bold"
+            android:visibility="@{bean.under == null ? View.GONE:View.VISIBLE}"
+            app:layout_constraintBottom_toBottomOf="@+id/iv_image"
+            app:layout_constraintEnd_toEndOf="@+id/iv_image"
+            app:layout_constraintStart_toStartOf="@+id/iv_image"
+            app:layout_constraintTop_toBottomOf="@+id/tv_num" />
 
     </android.support.constraint.ConstraintLayout>
 </layout>

@@ -138,7 +138,7 @@
             android:screenOrientation="portrait"
             android:theme="@style/NoActionBarTheme" />
         <activity
-            android:name=".page.record.complex.CareerCompareActivity"
+            android:name=".page.compare.CareerCompareActivity"
             android:screenOrientation="portrait"
             android:theme="@style/RecordTheme" />
         <activity

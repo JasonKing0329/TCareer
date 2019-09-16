@@ -138,4 +138,5 @@
     <color name="ripple_actionbar_icon">#33111111</color>
     <color name="player_page_cover_text">#dfdfdf</color>
     <color name="player_page_cover_bg">#66000000</color>
+    <color name="compare_sec_cover">#66000000</color>
 </resources>

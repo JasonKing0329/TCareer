@@ -198,18 +198,25 @@
 
 	<array name="compare_level1" translatable="false">
 		<item>Grand Slam</item>
+		<item>Master 1000</item>
 		<item>Court</item>
-		<item>Champions</item>
 	</array>
 
 	<array name="compare_gs_round" translatable="false">
 		<item>胜负场</item>
 		<item>冠军</item>
 		<item>亚军</item>
-		<item>决赛</item>
 		<item>四强</item>
 		<item>八强</item>
 		<item>第四轮</item>
+	</array>
+
+	<array name="compare_master_round" translatable="false">
+		<item>胜负场</item>
+		<item>冠军</item>
+		<item>亚军</item>
+		<item>四强</item>
+		<item>八强</item>
 	</array>
 
 	<array name="compare_court" translatable="false">
