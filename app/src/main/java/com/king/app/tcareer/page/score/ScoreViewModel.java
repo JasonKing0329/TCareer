@@ -384,6 +384,8 @@ public class ScoreViewModel extends BaseViewModel {
         List<ScoreBean> list500 = new ArrayList<>();
         List<ScoreBean> list250 = new ArrayList<>();
         List<ScoreBean> listOther = new ArrayList<>();
+        // atp cup归在other类，但是可计入总分
+        List<ScoreBean> listAtpCup = new ArrayList<>();
 
         // 加上罚分赛事
         for (int i = 0; i < countPunish; i ++) {
@@ -405,12 +407,16 @@ public class ScoreViewModel extends BaseViewModel {
                     list250.add(bean);
                 }
                 else {
+                    // 可算作积分的atp杯归为other类
+                    if (level.equals(arrLevel[7])) {// ATP杯
+                        listAtpCup.add(bean);// 这个list仅用于算作积分
+                    }
                     listOther.add(bean);
                 }
             }
-            // 留在replace里的也要检测是否是属于other的
+            // 留在replace里的排除无积分的赛事（戴维斯杯、奥运会）
             else {
-                if (level.equals(arrLevel[5]) || level.equals(arrLevel[6])) {// 戴维斯杯，2016奥运会
+                if (level.equals(arrLevel[5]) || level.equals(arrLevel[6])) {// 戴维斯杯，奥运会
                     listOther.add(bean);
                 }
             }
@@ -440,6 +446,7 @@ public class ScoreViewModel extends BaseViewModel {
         availableList.addAll(list1000);
         availableList.addAll(list500);
         availableList.addAll(list250);
+        availableList.addAll(listAtpCup);
 
         for (ScoreBean bean:availableList) {
             if (bean.getMatchBean() == null) {

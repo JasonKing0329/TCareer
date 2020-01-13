@@ -249,4 +249,18 @@ public class MatchManageViewModel extends BaseViewModel {
         mKeyword = words;
         loadMatches();
     }
+
+    public void setWeekOffset(String week) {
+        try {
+            int offset = Integer.parseInt(week);
+            List<MatchBean> list = getDaoSession().getMatchBeanDao().loadAll();
+            for (MatchBean bean:list) {
+                bean.setWeek(bean.getWeek() + offset);
+            }
+            getDaoSession().getMatchBeanDao().updateInTx(list);
+            getDaoSession().getMatchBeanDao().detachAll();
+        } catch (Exception e) {
+            messageObserver.setValue("输入有误");
+        }
+    }
 }

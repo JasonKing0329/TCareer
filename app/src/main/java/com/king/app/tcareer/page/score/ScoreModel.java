@@ -21,7 +21,6 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -117,6 +116,7 @@ public class ScoreModel {
         List<ScoreBean> scoreList = new ArrayList<>();
 
         ScoreBean masterCupBean = null;
+        ScoreBean atpCupBean = null;
         Map<Long, ScoreBean> recMap = new HashMap<>();
         for (int i = 0; i < list.size(); i ++) {
             Record record = list.get(i);
@@ -127,6 +127,13 @@ public class ScoreModel {
                     masterCupBean = new ScoreBean();
                 }
                 addScoreBean(scoreList, masterCupBean, year, weekOfLastYear, weekOfYear, record);
+            }
+            // ATP杯积分不走通用情况
+            else if (arrLevel[7].equals(record.getMatch().getMatchBean().getLevel())) {
+                if (atpCupBean == null) {
+                    atpCupBean = new ScoreBean();
+                }
+                addScoreBean(scoreList, atpCupBean, year, weekOfLastYear, weekOfYear, record);
             }
             else {
                 ScoreBean bean = recMap.get(record.getMatch().getMatchId());
@@ -147,6 +154,9 @@ public class ScoreModel {
         }
         if (masterCupBean != null && masterCupBean.getMatchBean() != null) {
             scoreList.add(masterCupBean);
+        }
+        if (atpCupBean != null && atpCupBean.getMatchBean() != null) {
+            scoreList.add(atpCupBean);
         }
         return scoreList;
     }
@@ -191,19 +201,19 @@ public class ScoreModel {
             bean.setChampion(arrRound[0].equals(record.getRound()) && record.getWinnerFlag() == AppConstants.WINNER_USER);
             bean.setCompleted(matchNameBean.getMatchBean().getWeek() < thisWeek);
 
-            // 大师杯积分不走通用情况，这里只累计积分
+            // 大师杯积分不走通用情况，累计积分
             if (arrLevel[1].equals(record.getMatch().getMatchBean().getLevel())) {
                 // 按照ATP的规则，只有胜才积分，负没有分
                 if (record.getWinnerFlag() == AppConstants.WINNER_USER) {
-                    if (arrRound[7].equals(record.getRound())) {// group, 一场200
-                        bean.setScore(bean.getScore() + 200);
-                    }
-                    if (arrRound[1].equals(record.getRound())) {// semi final胜多加400
-                        bean.setScore(bean.getScore() + 400);
-                    }
-                    if (arrRound[0].equals(record.getRound())) {// final胜多加500
-                        bean.setScore(bean.getScore() + 500);
-                    }
+                    bean.setScore(bean.getScore() + ScoreTable.getMasterCupScore(record.getRound()));
+                }
+            }
+            // ATP杯积分不走通用情况，累计积分
+            else if (arrLevel[7].equals(record.getMatch().getMatchBean().getLevel())) {
+                // 按照ATP的规则，只有胜才积分，负没有分
+                if (record.getWinnerFlag() == AppConstants.WINNER_USER) {
+                    // 不同轮次参照ATP杯积分表
+                    bean.setScore(bean.getScore() + ScoreTable.getAtpCupScore(record.getRound(), record.getRankCpt()));
                 }
             }
             else {
@@ -363,6 +373,7 @@ public class ScoreModel {
         List<ScoreBean> scoreList = new ArrayList<>();
 
         ScoreBean masterCupBean = null;
+        ScoreBean atpCupBean = null;
         Map<Long, ScoreBean> recMap = new HashMap<>();
         for (int i = 0; i < list.size(); i ++) {
             Record record = list.get(i);
@@ -373,6 +384,13 @@ public class ScoreModel {
                     masterCupBean = new ScoreBean();
                 }
                 parseScoreFrom(scoreList, masterCupBean, record);
+            }
+            // ATP杯积分不走通用情况
+            else if (arrLevel[7].equals(record.getMatch().getMatchBean().getLevel())) {
+                if (atpCupBean == null) {
+                    atpCupBean = new ScoreBean();
+                }
+                parseScoreFrom(scoreList, atpCupBean, record);
             }
             else {
                 ScoreBean bean = recMap.get(record.getMatch().getMatchId());
@@ -393,6 +411,9 @@ public class ScoreModel {
         }
         if (masterCupBean != null && masterCupBean.getMatchBean() != null) {
             scoreList.add(masterCupBean);
+        }
+        if (atpCupBean != null && atpCupBean.getMatchBean() != null) {
+            scoreList.add(atpCupBean);
         }
         return scoreList;
     }
@@ -416,15 +437,14 @@ public class ScoreModel {
         if (arrLevel[1].equals(record.getMatch().getMatchBean().getLevel())) {
             // 按照ATP的规则，只有胜才积分，负没有分
             if (record.getWinnerFlag() == AppConstants.WINNER_USER) {
-                if (arrRound[7].equals(record.getRound())) {// group, 一场200
-                    bean.setScore(bean.getScore() + 200);
-                }
-                if (arrRound[1].equals(record.getRound())) {// semi final胜多加400
-                    bean.setScore(bean.getScore() + 400);
-                }
-                if (arrRound[0].equals(record.getRound())) {// final胜多加500
-                    bean.setScore(bean.getScore() + 500);
-                }
+                bean.setScore(bean.getScore() + ScoreTable.getMasterCupScore(record.getRound()));
+            }
+        }
+        // ATP杯积分不走通用情况，这里只累计积分
+        else if (arrLevel[7].equals(record.getMatch().getMatchBean().getLevel())) {
+            // 按照ATP的规则，只有胜才积分，负没有分
+            if (record.getWinnerFlag() == AppConstants.WINNER_USER) {
+                bean.setScore(bean.getScore() + ScoreTable.getAtpCupScore(record.getRound(), record.getRankCpt()));
             }
         }
         else {
@@ -529,8 +549,8 @@ public class ScoreModel {
                     tempList.add(bean);
                 }
             }
-            // ATP250
-            else if (level.equals(arrLevel[4])) {
+            // ATP250，ATP杯都算作可积分的非强制赛事
+            else if (level.equals(arrLevel[4]) || level.equals(arrLevel[7])) {
                 tempList.add(bean);
             }
             else {

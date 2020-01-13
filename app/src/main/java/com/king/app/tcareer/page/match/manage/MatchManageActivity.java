@@ -18,6 +18,7 @@ import com.king.app.tcareer.model.bean.MatchImageBean;
 import com.king.app.tcareer.model.db.entity.MatchNameBean;
 import com.king.app.tcareer.page.match.common.MatchCommonActivity;
 import com.king.app.tcareer.page.setting.SettingProperty;
+import com.king.app.tcareer.view.dialog.SimpleDialogs;
 import com.king.app.tcareer.view.dialog.frame.FrameDialogFragment;
 
 import java.util.List;
@@ -141,6 +142,9 @@ public class MatchManageActivity extends MvvmActivity<ActivityMatchManageBinding
                     }
                     refreshList();
                     break;
+                case R.id.menu_manage_offset:
+                    setWeekOffset();
+                    break;
             }
         });
         mBinding.actionbar.setOnConfirmListener(actionId -> {
@@ -189,6 +193,13 @@ public class MatchManageActivity extends MvvmActivity<ActivityMatchManageBinding
             return popupMenu;
         });
         mBinding.actionbar.setOnSearchListener(words -> mModel.filterMatches(words));
+    }
+
+    private void setWeekOffset() {
+        new SimpleDialogs().openInputDialog(this, "设置全部赛事周数偏移量", week -> {
+            mModel.setWeekOffset(week);
+            refreshList();
+        });
     }
 
     @Override

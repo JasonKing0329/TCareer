@@ -26,4 +26,8 @@
         android:title="Edit"
         android:icon="@drawable/ic_edit_white_24dp"
         app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/menu_manage_offset"
+        android:title="Set week offset"
+        app:showAsAction="never" />
 </menu>

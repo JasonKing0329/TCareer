@@ -67,7 +67,8 @@ public class AppConstants {
             "ATP500",
             "ATP250",
             "Davi\'s Cup",
-            "Olympic Games"
+            "Olympic Games",
+            "ATP Cup"
     };
 
     public static final String[] RECORD_MATCH_COURTS = new String[] {
