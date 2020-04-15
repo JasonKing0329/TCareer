@@ -4,10 +4,13 @@ import android.app.Application;
 import android.arch.lifecycle.MutableLiveData;
 import android.databinding.ObservableField;
 import android.support.annotation.NonNull;
+import android.view.View;
 
 import com.king.app.tcareer.base.TApplication;
 import com.king.app.tcareer.base.mvvm.BaseViewModel;
 import com.king.app.tcareer.conf.AppConstants;
+import com.king.app.tcareer.model.db.entity.FrozenScore;
+import com.king.app.tcareer.model.db.entity.FrozenScoreDao;
 import com.king.app.tcareer.model.db.entity.MatchBean;
 import com.king.app.tcareer.model.db.entity.MatchBeanDao;
 import com.king.app.tcareer.model.db.entity.MatchNameBean;
@@ -56,6 +59,8 @@ public class ScoreViewModel extends BaseViewModel {
 
     public ObservableField<Integer> totalScoreVisibility = new ObservableField<>();
     public ObservableField<String> totalScoreText = new ObservableField<>();
+    public ObservableField<Integer> frozenScoreVisibility = new ObservableField<>();
+    public ObservableField<String> frozenScoreText = new ObservableField<>();
     public ObservableField<String> rankText = new ObservableField<>();
     public ObservableField<String> matchCountText = new ObservableField<>();
 
@@ -140,6 +145,13 @@ public class ScoreViewModel extends BaseViewModel {
 
     private void updateContent(ScorePageData data) {
         totalScoreText.set(String.valueOf(data.getCountScore()));
+        if (data.getFrozenScore() > 0) {
+            frozenScoreVisibility.set(View.VISIBLE);
+            frozenScoreText.set("Frozen(" + data.getFrozenScore() + ")");
+        }
+        else {
+            frozenScoreVisibility.set(View.GONE);
+        }
         if (data.getRank() == 0) {
             rankText.set("--");
         }
@@ -478,6 +490,17 @@ public class ScoreViewModel extends BaseViewModel {
                 countHard += bean.getScore();
             }
         }
+
+        // 冻结积分(2020-03月开始疫情影响)
+        int frozenScore = 0;
+        List<FrozenScore> frozenList = TApplication.getInstance().getDaoSession().getFrozenScoreDao().queryBuilder()
+                .where(FrozenScoreDao.Properties.UserId.eq(mUser.getId()))
+                .build().list();
+        for (FrozenScore fs:frozenList) {
+            frozenScore += fs.getScore();
+        }
+        scorePageData.setFrozenScore(frozenScore);
+        countScore += frozenScore;
 
         scorePageData.setCountScore(countScore);
         scorePageData.setCountScoreClay(countClay);

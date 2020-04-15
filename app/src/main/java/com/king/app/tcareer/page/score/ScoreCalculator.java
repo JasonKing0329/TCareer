@@ -167,12 +167,15 @@ public class ScoreCalculator extends FrameContentFragment<FragmentScoreCalculato
 
                         mValidScore = validScores;
 
-                        StringBuffer lineScore = new StringBuffer("有效积分（");
+                        StringBuffer lineScore = new StringBuffer("有效积分(");
                         lineScore.append(validScores.getValidList().size())
-                                .append("站）： ")
+                                .append("站)： ")
                                 .append(validScores.getValidScore());
                         if (validScores.getStartScore() > 0) {
-                            lineScore.append("  起记分：").append(validScores.getStartScore());
+                            lineScore.append("，起记分：").append(validScores.getStartScore());
+                        }
+                        if (validScores.getFrozenScore() > 0) {
+                            lineScore.append("，冻结积分：").append(validScores.getFrozenScore());
                         }
                         showScore(lineScore.toString());
 

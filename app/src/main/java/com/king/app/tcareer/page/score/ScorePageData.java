@@ -23,6 +23,7 @@ public class ScorePageData {
     private List<ScoreBean> atp250List;
     private List<ScoreBean> replaceList;
     private List<ScoreBean> otherList;
+    private int frozenScore;
 
     private int rank;
 
@@ -152,5 +153,13 @@ public class ScorePageData {
 
     public void setRank(int rank) {
         this.rank = rank;
+    }
+
+    public int getFrozenScore() {
+        return frozenScore;
+    }
+
+    public void setFrozenScore(int frozenScore) {
+        this.frozenScore = frozenScore;
     }
 }

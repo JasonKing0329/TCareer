@@ -9,7 +9,7 @@
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-        <RelativeLayout
+        <android.support.constraint.ConstraintLayout
             android:id="@+id/rl_basic"
             android:layout_width="0dp"
             android:layout_height="@dimen/player_basic_head_height"
@@ -18,91 +18,115 @@
             app:layout_constraintTop_toTopOf="parent">
             <ImageView
                 android:id="@+id/iv_flag_bg"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
                 android:src="@drawable/flag_france"
-                android:scaleType="fitXY"/>
-            <LinearLayout
+                android:scaleType="fitXY"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"/>
+            <TextView
+                android:id="@+id/tv_country"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:layout_alignParentRight="true"
-                android:paddingRight="15dp"
-                android:gravity="right">
-                <TextView
-                    android:id="@+id/tv_country"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@{model.countryText}"
-                    android:textSize="20dp"
-                    android:textColor="#e9ffe4"
-                    android:layout_marginTop="50dp"/>
-                <TextView
-                    android:id="@+id/tv_birthday"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@{model.birthdayText}"
-                    android:textSize="20dp"
-                    android:textColor="#e1ffff"
-                    android:layout_marginTop="10dp"/>
-                <TextView
-                    android:id="@+id/tv_height"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@{model.heightText}"
-                    android:textSize="16dp"
-                    android:textColor="#e6f7ff"
-                    android:layout_marginTop="10dp"/>
-                <TextView
-                    android:id="@+id/tv_match_number"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@{model.matchCountText}"
-                    android:textSize="17dp"
-                    android:textColor="#ababc3"
-                    android:layout_marginTop="10dp"/>
-            </LinearLayout>
+                android:text="@{model.countryText}"
+                android:textSize="20dp"
+                android:textColor="#e9ffe4"
+                android:layout_marginRight="16dp"
+                android:layout_marginBottom="10dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toTopOf="@+id/tv_birthday"/>
+            <TextView
+                android:id="@+id/tv_birthday"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@{model.birthdayText}"
+                android:textSize="20dp"
+                android:textColor="#e1ffff"
+                android:layout_marginBottom="10dp"
+                app:layout_constraintEnd_toEndOf="@id/tv_country"
+                app:layout_constraintBottom_toTopOf="@+id/tv_height"/>
+            <TextView
+                android:id="@+id/tv_height"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@{model.heightText}"
+                android:textSize="16dp"
+                android:textColor="#e6f7ff"
+                android:layout_marginBottom="10dp"
+                app:layout_constraintEnd_toEndOf="@id/tv_country"
+                app:layout_constraintBottom_toTopOf="@+id/tv_match_number"/>
+            <TextView
+                android:id="@+id/tv_match_number"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@{model.matchCountText}"
+                android:textSize="17dp"
+                android:textColor="#ababc3"
+                android:layout_marginBottom="20dp"
+                app:layout_constraintEnd_toEndOf="@id/tv_country"
+                app:layout_constraintBottom_toBottomOf="parent"/>
             <TextView
                 android:id="@+id/tv_player"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_centerHorizontal="true"
                 android:text="@{model.nameText}"
                 android:textSize="27dp"
                 android:textColor="#f9f0f1"
                 android:shadowColor="#4d3279"
                 android:shadowRadius="3"
-                android:layout_marginTop="10dp"/>
-            <TextView
-                android:id="@+id/tv_num"
-                android:layout_width="wrap_content"
-                android:layout_height="40dp"
-                android:layout_centerHorizontal="true"
-                android:layout_below="@id/tv_player"
                 android:layout_marginTop="10dp"
-                android:visibility="@{model.totalScoreVisibility}"
-                android:text="@{model.totalScoreText}"
-                android:textSize="25dp"
-                android:textColor="#e2e0f6"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"/>
+            <LinearLayout
+                android:id="@+id/ll_score"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minHeight="40dp"
+                android:orientation="vertical"
                 android:background="@drawable/shape_score_total_bg"
-                android:gravity="center_vertical"
+                android:gravity="center"
                 android:paddingLeft="10dp"
                 android:paddingRight="10dp"
                 android:paddingTop="5dp"
-                android:paddingBottom="5dp"/>
+                android:paddingBottom="5dp"
+                android:layout_marginTop="10dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_player">
+                <TextView
+                    android:id="@+id/tv_num"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:visibility="@{model.totalScoreVisibility}"
+                    android:text="@{model.totalScoreText}"
+                    android:textSize="25dp"
+                    android:textColor="#e2e0f6"/>
+                <TextView
+                    android:id="@+id/tv_frozen"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:visibility="@{model.frozenScoreVisibility}"
+                    android:text="@{model.frozenScoreText}"
+                    android:textSize="14dp"
+                    android:textColor="#e2e0f6"/>
+            </LinearLayout>
             <TextView
                 android:id="@+id/tv_rank"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignBottom="@id/iv_flag_bg"
                 android:layout_marginLeft="60dp"
                 android:layout_marginBottom="40dp"
                 android:text="@{model.rankText}"
                 android:textSize="35dp"
                 android:textColor="#f9f0f1"
                 android:shadowColor="#ffff00"
-                android:shadowRadius="5" />
-        </RelativeLayout>
+                android:shadowRadius="5"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent" />
+        </android.support.constraint.ConstraintLayout>
 
         <LinearLayout
             android:id="@+id/ll_group_by"

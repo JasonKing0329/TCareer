@@ -2,6 +2,8 @@ package com.king.app.tcareer.page.score;
 
 import com.king.app.tcareer.base.TApplication;
 import com.king.app.tcareer.conf.AppConstants;
+import com.king.app.tcareer.model.db.entity.FrozenScore;
+import com.king.app.tcareer.model.db.entity.FrozenScoreDao;
 import com.king.app.tcareer.model.db.entity.MatchBean;
 import com.king.app.tcareer.model.db.entity.MatchBeanDao;
 import com.king.app.tcareer.model.db.entity.MatchNameBean;
@@ -482,7 +484,7 @@ public class ScoreModel {
                     }
                 } catch (DaoException exception) {}
 
-                ValidScores validScores = pickScores(list, isTo30, calendar.get(Calendar.YEAR), calendar.get(Calendar.WEEK_OF_YEAR));
+                ValidScores validScores = pickScores(userId, list, isTo30, calendar.get(Calendar.YEAR), calendar.get(Calendar.WEEK_OF_YEAR));
                 e.onNext(validScores);
             }
         });
@@ -493,13 +495,14 @@ public class ScoreModel {
      // 4大满贯+年终总决赛+8站强制ATP1000+6站最好
      // 上一年年终top30的有500赛强制罚分，必须参加4项500赛，且有一项是美网后（蒙卡算500赛），只要参加即刻，可以不计入6站最好（比如6个250夺冠，就不计算4个500赛首轮游）
      // 非top30 按照取18站最好成绩的做法，若参加了大满贯和8站强制1000赛需要强制计入
+     // 2020-3月开始的疫情影响，引入冻结积分
      * @param list
      * @param isTo30
      * @param targetYear 周期结束的年份
      * @param weekOfYear 周期结束的周数
      * @return
      */
-    private ValidScores pickScores(List<ScoreBean> list, boolean isTo30, int targetYear, int weekOfYear) {
+    private ValidScores pickScores(long userId, List<ScoreBean> list, boolean isTo30, int targetYear, int weekOfYear) {
         ValidScores scores = new ValidScores();
         scores.setAllList(list);
 
@@ -638,11 +641,22 @@ public class ScoreModel {
             }
         }
 
+        // 冻结积分
+        int frozenScore = 0;
+        List<FrozenScore> frozenList = TApplication.getInstance().getDaoSession().getFrozenScoreDao().queryBuilder()
+                .where(FrozenScoreDao.Properties.UserId.eq(userId))
+                .build().list();
+        for (FrozenScore fs:frozenList) {
+            frozenScore += fs.getScore();
+        }
+        scores.setFrozenScore(frozenScore);
+
         // 计算总积分
         int sum = 0;
         for (ScoreBean bean:validList) {
             sum += bean.getScore();
         }
+        sum += frozenScore;
         scores.setValidScore(sum);
 
         return scores;

@@ -10,6 +10,7 @@ import com.king.app.tcareer.conf.AppConfig;
 import com.king.app.tcareer.model.db.entity.DaoMaster;
 import com.king.app.tcareer.model.db.entity.DaoSession;
 import com.king.app.tcareer.model.db.entity.EarlierAchieveDao;
+import com.king.app.tcareer.model.db.entity.FrozenScoreDao;
 import com.king.app.tcareer.model.db.entity.PlayerAtpBeanDao;
 import com.king.app.tcareer.model.db.entity.PlayerBeanDao;
 import com.king.app.tcareer.model.db.entity.RankWeekDao;
@@ -115,6 +116,9 @@ public class TApplication extends Application {
 					db.execSQL("ALTER TABLE " + PlayerBeanDao.TABLENAME + " ADD COLUMN " + PlayerBeanDao.Properties.AtpId.columnName + " TEXT;");
 				case 4:
 					RetireDao.createTable(db, true);
+					break;
+				case 5:
+					FrozenScoreDao.createTable(db, true);
 					break;
 			}
 		}

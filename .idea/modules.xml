@@ -2,13 +2,13 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/MPChartLib/MPChartLib.iml" filepath="$PROJECT_DIR$/MPChartLib/MPChartLib.iml" />
-      <module fileurl="file://$PROJECT_DIR$/TCareer.iml" filepath="$PROJECT_DIR$/TCareer.iml" />
-      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/boommenu/boommenu.iml" filepath="$PROJECT_DIR$/boommenu/boommenu.iml" />
-      <module fileurl="file://$PROJECT_DIR$/expandablerecycleradapter/expandablerecycleradapter.iml" filepath="$PROJECT_DIR$/expandablerecycleradapter/expandablerecycleradapter.iml" />
-      <module fileurl="file://$PROJECT_DIR$/libtool/libtool.iml" filepath="$PROJECT_DIR$/libtool/libtool.iml" />
-      <module fileurl="file://$PROJECT_DIR$/shapimageview/shapimageview.iml" filepath="$PROJECT_DIR$/shapimageview/shapimageview.iml" />
+      <module fileurl="file://$PROJECT_DIR$/MPChartLib/MPChartLib.iml" filepath="$PROJECT_DIR$/MPChartLib/MPChartLib.iml" group="TCareer/MPChartLib" />
+      <module fileurl="file://$PROJECT_DIR$/TCareer.iml" filepath="$PROJECT_DIR$/TCareer.iml" group="TCareer" />
+      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" group="TCareer/app" />
+      <module fileurl="file://$PROJECT_DIR$/boommenu/boommenu.iml" filepath="$PROJECT_DIR$/boommenu/boommenu.iml" group="TCareer/boommenu" />
+      <module fileurl="file://$PROJECT_DIR$/expandablerecycleradapter/expandablerecycleradapter.iml" filepath="$PROJECT_DIR$/expandablerecycleradapter/expandablerecycleradapter.iml" group="TCareer/expandablerecycleradapter" />
+      <module fileurl="file://$PROJECT_DIR$/libtool/libtool.iml" filepath="$PROJECT_DIR$/libtool/libtool.iml" group="TCareer/libtool" />
+      <module fileurl="file://$PROJECT_DIR$/shapimageview/shapimageview.iml" filepath="$PROJECT_DIR$/shapimageview/shapimageview.iml" group="TCareer/shapimageview" />
     </modules>
   </component>
 </project>

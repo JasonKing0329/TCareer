@@ -49,6 +49,10 @@ public class BaseViewModel extends AndroidViewModel {
         clearComposite();
     }
 
+    public CompositeDisposable getCompositeDisposable() {
+        return compositeDisposable;
+    }
+
     protected void clearComposite() {
         if (compositeDisposable != null) {
             compositeDisposable.clear();

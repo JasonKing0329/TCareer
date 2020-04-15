@@ -20,6 +20,11 @@ public class ValidScores {
     private int startScore;
 
     /**
+     * 冻结积分（赛事停摆造成的冻结分数，如2020-03月开始疫情影响）
+     */
+    private int frozenScore;
+
+    /**
      * 周期内的全部赛事
      */
     private List<ScoreBean> allList;
@@ -85,5 +90,13 @@ public class ValidScores {
 
     public void setOtherList(List<ScoreBean> otherList) {
         this.otherList = otherList;
+    }
+
+    public int getFrozenScore() {
+        return frozenScore;
+    }
+
+    public void setFrozenScore(int frozenScore) {
+        this.frozenScore = frozenScore;
     }
 }

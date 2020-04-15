@@ -14,6 +14,7 @@ import com.king.app.tcareer.base.mvvm.MvvmFragment;
 import com.king.app.tcareer.databinding.FragmentScoreBinding;
 import com.king.app.tcareer.model.FlagProvider;
 import com.king.app.tcareer.page.match.MatchDialog;
+import com.king.app.tcareer.view.dialog.frame.FrameDialogFragment;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -68,8 +69,20 @@ public class ScoreFragment extends MvvmFragment<FragmentScoreBinding, ScoreViewM
     protected void onCreate(View view) {
         mBinding.setModel(mModel);
 
+        mBinding.tvNum.setOnClickListener(v -> showFrozenScore());
+
         chartHelper = new ChartHelper(getActivity());
         initRecyclerView();
+    }
+
+    private void showFrozenScore() {
+        FrozenFragment content = new FrozenFragment();
+        content.setUserId(getUserId());
+        content.setOnDataChangedListener(() -> refreshPage());
+        FrameDialogFragment dialog = new FrameDialogFragment();
+        dialog.setTitle("Frozen Score");
+        dialog.setContentFragment(content);
+        dialog.show(getChildFragmentManager(), "FrozenFragment");
     }
 
     private void initRecyclerView() {
@@ -87,6 +100,10 @@ public class ScoreFragment extends MvvmFragment<FragmentScoreBinding, ScoreViewM
         mModel.userObserver.observe(this, user -> mBinding.ivFlagBg.setImageResource(FlagProvider.getFlagRes(user.getCountry())));
         mModel.pageDataObserver.observe(this, data -> onPageDataLoaded(data));
 
+        refreshPage();
+    }
+
+    private void refreshPage() {
         pageMode = getArguments().getInt(KEY_MODE);
         if (pageMode == FLAG_YEAR) {
             mModel.queryYearRecords(getUserId());
