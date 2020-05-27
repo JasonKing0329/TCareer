@@ -50,7 +50,9 @@ public class ScoreModel {
         return Observable.create(new ObservableOnSubscribe<List<ScoreBean>>() {
             @Override
             public void subscribe(ObservableEmitter<List<ScoreBean>> e) throws Exception {
-                e.onNext(getYearRecords(userId, year));
+                List<ScoreBean> list = getYearRecords(userId, year);
+                addFrozenScores(userId, list, year, 0, year, 52);
+                e.onNext(list);
             }
         });
     }
@@ -78,16 +80,24 @@ public class ScoreModel {
         return scoreList;
     }
 
-    public Observable<List<ScoreBean>> query52WeekRecords(final long userId, final int year) {
+    public Observable<List<ScoreBean>> query52WeekRecords(final long userId) {
         return Observable.create(new ObservableOnSubscribe<List<ScoreBean>>() {
             @Override
             public void subscribe(ObservableEmitter<List<ScoreBean>> e) throws Exception {
-                e.onNext(get52WeekRecords(userId, year));
+                List<ScoreBean> list = get52WeekRecords(userId);
+                Calendar calendar = Calendar.getInstance();
+                calendar.setTime(new Date());
+                int endWeek = calendar.get(Calendar.WEEK_OF_YEAR) - 1;
+                int endYear = calendar.get(Calendar.YEAR);
+                int startYear = endYear - 1;
+                int startWeek = endWeek + 1;
+                addFrozenScores(userId, list, startYear, startWeek, endYear, endWeek);
+                e.onNext(list);
             }
         });
     }
 
-    public List<ScoreBean> get52WeekRecords(long userId, int year) {
+    public List<ScoreBean> get52WeekRecords(long userId) {
 
         long minTime = getLastYearMinTime();
         long maxTime = getMonthMaxTime();
@@ -325,11 +335,50 @@ public class ScoreModel {
         return time;
     }
 
+    /**
+     * 2020-3月开始疫情影响
+     *
+     * @param userId
+     * @param list
+     * @param startYear
+     * @param startWeek
+     * @param endYear
+     * @param endWeek
+     * @return
+     */
+    private void addFrozenScores(long userId, List<ScoreBean> list, int startYear, int startWeek, int endYear, int endWeek) {
+        // 冻结积分
+        List<FrozenScore> frozenList = TApplication.getInstance().getDaoSession().getFrozenScoreDao().queryBuilder()
+                .where(FrozenScoreDao.Properties.UserId.eq(userId))
+                .build().list();
+        for (FrozenScore fs:frozenList) {
+            // 积分取得的实际年份
+            int realYear = Integer.parseInt(fs.getMatchDate().split("-")[0]);
+            // 冻结年份
+            int frozenYear = realYear + 1;
+            int week = fs.getMatchNameBean().getMatchBean().getWeek();
+            // 判断是否在积分周期内
+            if (startYear == frozenYear && week >= startWeek
+                || endYear == frozenYear && week <= endWeek) {
+                ScoreBean bean = new ScoreBean();
+                bean.setFrozen(true);
+                bean.setScore(fs.getScore());
+                bean.setMatchBean(fs.getMatchNameBean());
+                bean.setCompleted(true);
+                // 年份设置为year
+                bean.setYear(frozenYear);
+                bean.setTitle(fs.getMatchNameBean().getName() + "(Frozen)");
+                list.add(bean);
+            }
+        }
+    }
+
     public Observable<List<ScoreBean>> queryScoreToDate(final String strDate, final long userId) {
         return Observable.create(new ObservableOnSubscribe<List<ScoreBean>>() {
             @Override
             public void subscribe(ObservableEmitter<List<ScoreBean>> e) throws Exception {
-                e.onNext(getScoresByDate(strDate, userId));
+                List<ScoreBean> list = getScoresByDate(strDate, userId);
+                e.onNext(list);
             }
         });
     }
@@ -363,7 +412,9 @@ public class ScoreModel {
                         " (T.date_str like ? AND m.week >= ?))\n" +
                         " ORDER BY T.date_str DESC, m.week DESC"
             , args);
-        return countFromList(list);
+        List<ScoreBean> result = countFromList(list);
+        addFrozenScores(userId, result, startYear, startWeek, endYear, endWeek);
+        return result;
     }
 
     /**
@@ -641,23 +692,17 @@ public class ScoreModel {
             }
         }
 
-        // 冻结积分
-        int frozenScore = 0;
-        List<FrozenScore> frozenList = TApplication.getInstance().getDaoSession().getFrozenScoreDao().queryBuilder()
-                .where(FrozenScoreDao.Properties.UserId.eq(userId))
-                .build().list();
-        for (FrozenScore fs:frozenList) {
-            frozenScore += fs.getScore();
-        }
-        scores.setFrozenScore(frozenScore);
-
         // 计算总积分
         int sum = 0;
+        int frozenScore = 0;
         for (ScoreBean bean:validList) {
             sum += bean.getScore();
+            if (bean.isFrozen()) {
+                frozenScore += bean.getScore();
+            }
         }
-        sum += frozenScore;
         scores.setValidScore(sum);
+        scores.setFrozenScore(frozenScore);
 
         return scores;
     }

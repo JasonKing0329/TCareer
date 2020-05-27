@@ -15,6 +15,7 @@ public class ScoreBean {
     private boolean isCompleted;
     private Record record;
     private MatchNameBean matchBean;
+    private boolean isFrozen;
 
     private String title;
     private boolean isTitle;
@@ -81,5 +82,13 @@ public class ScoreBean {
 
     public void setTitle(boolean title) {
         isTitle = title;
+    }
+
+    public boolean isFrozen() {
+        return isFrozen;
+    }
+
+    public void setFrozen(boolean frozen) {
+        isFrozen = frozen;
     }
 }

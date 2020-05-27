@@ -43,9 +43,9 @@ public class ScoreItemAdapter extends HeadChildBindingAdapter<AdapterScoreTitleB
 
     @Override
     protected void onBindItem(AdapterScoreItemBinding binding, int position, ScoreBean bean) {
+        binding.tvName.setText(bean.getTitle());
         if (bean.getMatchBean() == null) {// 500 赛罚分
             binding.ivWinner.setVisibility(View.INVISIBLE);
-            binding.tvName.setText("500赛罚分");
             binding.tvName.setTextColor(binding.tvName.getResources().getColor(R.color.text_normal));
             binding.tvScore.setText("0");
             binding.tvComplete.setVisibility(View.INVISIBLE);
@@ -65,7 +65,6 @@ public class ScoreItemAdapter extends HeadChildBindingAdapter<AdapterScoreTitleB
                 binding.tvName.setTextColor(binding.tvName.getResources().getColor(R.color.text_normal));
             }
             binding.ivWinner.setVisibility(bean.isChampion() ? View.VISIBLE:View.INVISIBLE);
-            binding.tvName.setText(bean.getMatchBean().getName());
             binding.tvScore.setText(String.valueOf(bean.getScore()));
             binding.tvComplete.setVisibility(bean.isCompleted() ? View.VISIBLE:View.INVISIBLE);
         }

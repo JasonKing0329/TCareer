@@ -9,8 +9,6 @@ import android.view.View;
 import com.king.app.tcareer.base.TApplication;
 import com.king.app.tcareer.base.mvvm.BaseViewModel;
 import com.king.app.tcareer.conf.AppConstants;
-import com.king.app.tcareer.model.db.entity.FrozenScore;
-import com.king.app.tcareer.model.db.entity.FrozenScoreDao;
 import com.king.app.tcareer.model.db.entity.MatchBean;
 import com.king.app.tcareer.model.db.entity.MatchBeanDao;
 import com.king.app.tcareer.model.db.entity.MatchNameBean;
@@ -171,7 +169,7 @@ public class ScoreViewModel extends BaseViewModel {
                 .flatMap(user -> {
                     mUser = user;
                     userObserver.postValue(user);
-                    return scoreModel.query52WeekRecords(user.getId(), currentYear);
+                    return scoreModel.query52WeekRecords(user.getId());
                 })
                 .flatMap(list -> createPageData(list))
                 .observeOn(AndroidSchedulers.mainThread())
@@ -208,6 +206,7 @@ public class ScoreViewModel extends BaseViewModel {
             if (isForce) {// 强制计0
                 scoreBean = new ScoreBean();
                 scoreBean.setMatchBean(matchList.get(i));
+                scoreBean.setTitle(matchList.get(i).getName());
                 scoreBean.setScore(0);
                 scoreBean.setChampion(false);
                 setScoreBeanDetail(scoreBean);
@@ -491,17 +490,14 @@ public class ScoreViewModel extends BaseViewModel {
             }
         }
 
-        // 冻结积分(2020-03月开始疫情影响)
         int frozenScore = 0;
-        List<FrozenScore> frozenList = TApplication.getInstance().getDaoSession().getFrozenScoreDao().queryBuilder()
-                .where(FrozenScoreDao.Properties.UserId.eq(mUser.getId()))
-                .build().list();
-        for (FrozenScore fs:frozenList) {
-            frozenScore += fs.getScore();
+        for (ScoreBean bean:list) {
+            if (bean.isFrozen()) {
+                frozenScore += bean.getScore();
+            }
         }
-        scorePageData.setFrozenScore(frozenScore);
-        countScore += frozenScore;
 
+        scorePageData.setFrozenScore(frozenScore);
         scorePageData.setCountScore(countScore);
         scorePageData.setCountScoreClay(countClay);
         scorePageData.setCountScoreGrass(countGrass);
@@ -526,6 +522,7 @@ public class ScoreViewModel extends BaseViewModel {
     private ScoreBean getPunishScoreBean() {
         ScoreBean bean = new ScoreBean();
         bean.setYear(currentYear);
+        bean.setTitle("500赛罚分");
         bean.setMatchBean(null);
         bean.setCompleted(false);
         bean.setChampion(false);
