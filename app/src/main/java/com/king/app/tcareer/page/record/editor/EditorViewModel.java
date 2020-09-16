@@ -55,6 +55,7 @@ public class EditorViewModel extends BaseViewModel {
     public ObservableField<String> matchLevelText = new ObservableField<>();
     public ObservableField<String> matchCourtText = new ObservableField<>();
     public ObservableField<String> matchImageUrl = new ObservableField<>();
+    public ObservableField<String> matchMonthText = new ObservableField<>();
     public ObservableInt matchVisibility = new ObservableInt(View.GONE);
     public ObservableField<String> winnerText = new ObservableField<>();
     public ObservableField<String> scoreText = new ObservableField<>();
@@ -92,6 +93,8 @@ public class EditorViewModel extends BaseViewModel {
     private String[] arr_round;
     private String[] arr_year;
     protected int cur_year = 2, cur_round = 0;// 记录当前spinner选项
+    // 修改的月份
+    protected int mUpdateMonth;
 
     public EditorViewModel(@NonNull Application application) {
         super(application);
@@ -352,6 +355,10 @@ public class EditorViewModel extends BaseViewModel {
         this.cur_year = cur_year;
     }
 
+    public void setUpdateMonth(int position) {
+        mUpdateMonth = position + 1;
+    }
+
     public void initMatchPage() {
         // 修改
         if (isEditMode) {
@@ -409,6 +416,7 @@ public class EditorViewModel extends BaseViewModel {
         matchCourtText.set(bean.getMatchBean().getCourt());
         matchCountryText.set(bean.getMatchBean().getCountry());
         matchCityText.set(bean.getMatchBean().getCity());
+        matchMonthText.set(bean.getMatchBean().getMonth() + "月");
         matchVisibility.set(View.VISIBLE);
     }
 
@@ -572,12 +580,17 @@ public class EditorViewModel extends BaseViewModel {
         mRecord.setMatchNameId(mMatchNameBean.getId());
         mRecord.setRound(arr_round[cur_round]);
         int cur_month = 0;
-        try {
-            cur_month = mMatchNameBean.getMatchBean().getMonth() - 1;
-        } catch (Exception e) {
-            e.printStackTrace();
+        if (mUpdateMonth != 0) {
+            cur_month = mUpdateMonth;
         }
-        String month = (1 + cur_month) < 10 ? ("0" + (1 + cur_month)) : ("" + (1 + cur_month));
+        else {
+            try {
+                cur_month = mMatchNameBean.getMatchBean().getMonth();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        String month = cur_month < 10 ? ("0" + cur_month) : ("" + cur_month);
         int year = 2010 + cur_year;
         String dateStr = year + "-" + month;
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM");
