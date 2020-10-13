@@ -352,24 +352,40 @@ public class ScoreModel {
                 .where(FrozenScoreDao.Properties.UserId.eq(userId))
                 .build().list();
         for (FrozenScore fs:frozenList) {
+            boolean isRepeat = false;
+            for (ScoreBean score:list) {
+                // 如果存在相同的matchNameId，取最高值（如2019-5月的法网与2020-9月的法网，取最高积分）
+                if (fs.getMatchNameId() == score.getMatchBean().getId()) {
+                    if (fs.getScore() > score.getScore()) {
+                        score.setFrozen(true);
+                        score.setTitle(fs.getMatchNameBean().getName() + "(Frozen)");
+                        score.setScore(fs.getScore());
+                    }
+                    isRepeat = true;
+                    break;
+                }
+            }
+            if (isRepeat) {
+                continue;
+            }
             // 积分取得的实际年份
             int realYear = Integer.parseInt(fs.getMatchDate().split("-")[0]);
             // 冻结年份
             int frozenYear = realYear + 1;
-            int week = fs.getMatchNameBean().getMatchBean().getWeek();
-            // 判断是否在积分周期内
-            if (startYear == frozenYear && week >= startWeek
-                || endYear == frozenYear && week <= endWeek) {
-                ScoreBean bean = new ScoreBean();
-                bean.setFrozen(true);
-                bean.setScore(fs.getScore());
-                bean.setMatchBean(fs.getMatchNameBean());
-                bean.setCompleted(true);
-                // 年份设置为year
-                bean.setYear(frozenYear);
-                bean.setTitle(fs.getMatchNameBean().getName() + "(Frozen)");
-                list.add(bean);
-            }
+            // 解冻时间尚不明朗，全部算作有效
+//            // 判断是否在积分周期内
+//            int week = fs.getMatchNameBean().getMatchBean().getWeek();
+//            if (startYear == frozenYear && week >= startWeek
+//                || endYear == frozenYear && week <= endWeek) {
+//            }
+            ScoreBean bean = new ScoreBean();
+            bean.setFrozen(true);
+            bean.setScore(fs.getScore());
+            bean.setMatchBean(fs.getMatchNameBean());
+            bean.setCompleted(true);
+            bean.setYear(frozenYear);
+            bean.setTitle(fs.getMatchNameBean().getName() + "(Frozen)");
+            list.add(bean);
         }
     }
 
