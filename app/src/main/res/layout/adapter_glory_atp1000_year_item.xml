@@ -18,94 +18,40 @@
                 android:gravity="center"/>
             <TextView
                 android:id="@+id/tv_iw"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="wrap_content"
-                android:paddingTop="12dp"
-                android:paddingBottom="12dp"
-                android:layout_margin="1px"
-                android:background="@drawable/selector_table_gs_item_hard"
-                android:gravity="center"/>
+                style="@style/textGloryAtp1000"
+                android:background="@drawable/selector_table_gs_item_hard" />
             <TextView
                 android:id="@+id/tv_mm"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="wrap_content"
-                android:paddingTop="12dp"
-                android:paddingBottom="12dp"
-                android:layout_margin="1px"
-                android:background="@drawable/selector_table_gs_item_hard"
-                android:gravity="center"/>
+                style="@style/textGloryAtp1000"
+                android:background="@drawable/selector_table_gs_item_hard"/>
             <TextView
                 android:id="@+id/tv_mc"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="wrap_content"
-                android:paddingTop="12dp"
-                android:paddingBottom="12dp"
-                android:layout_margin="1px"
-                android:background="@drawable/selector_table_gs_item_clay"
-                android:gravity="center"/>
+                style="@style/textGloryAtp1000"
+                android:background="@drawable/selector_table_gs_item_clay"/>
             <TextView
                 android:id="@+id/tv_md"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="wrap_content"
-                android:paddingTop="12dp"
-                android:paddingBottom="12dp"
-                android:layout_margin="1px"
-                android:background="@drawable/selector_table_gs_item_clay"
-                android:gravity="center"/>
+                style="@style/textGloryAtp1000"
+                android:background="@drawable/selector_table_gs_item_clay"/>
             <TextView
                 android:id="@+id/tv_ro"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="wrap_content"
-                android:paddingTop="12dp"
-                android:paddingBottom="12dp"
-                android:layout_margin="1px"
-                android:background="@drawable/selector_table_gs_item_clay"
-                android:gravity="center"/>
+                style="@style/textGloryAtp1000"
+                android:background="@drawable/selector_table_gs_item_clay"/>
             <TextView
                 android:id="@+id/tv_rc"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="wrap_content"
-                android:paddingTop="12dp"
-                android:paddingBottom="12dp"
-                android:layout_margin="1px"
-                android:background="@drawable/selector_table_gs_item_hard"
-                android:gravity="center"/>
+                style="@style/textGloryAtp1000"
+                android:background="@drawable/selector_table_gs_item_hard"/>
             <TextView
                 android:id="@+id/tv_cc"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="wrap_content"
-                android:paddingTop="12dp"
-                android:paddingBottom="12dp"
-                android:layout_margin="1px"
-                android:background="@drawable/selector_table_gs_item_hard"
-                android:gravity="center"/>
+                style="@style/textGloryAtp1000"
+                android:background="@drawable/selector_table_gs_item_hard"/>
             <TextView
                 android:id="@+id/tv_sh"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="wrap_content"
-                android:paddingTop="12dp"
-                android:paddingBottom="12dp"
-                android:layout_margin="1px"
-                android:background="@drawable/selector_table_gs_item_hard"
-                android:gravity="center"/>
+                style="@style/textGloryAtp1000"
+                android:background="@drawable/selector_table_gs_item_hard"/>
             <TextView
                 android:id="@+id/tv_pa"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="wrap_content"
-                android:paddingTop="12dp"
-                android:paddingBottom="12dp"
-                android:layout_margin="1px"
-                android:background="@drawable/selector_table_gs_item_hard"
-                android:gravity="center"/>
+                style="@style/textGloryAtp1000"
+                android:background="@drawable/selector_table_gs_item_hard"/>
         </LinearLayout>
 
     </RelativeLayout>

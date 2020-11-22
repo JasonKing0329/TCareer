@@ -55,7 +55,7 @@ public class TargetFragment extends BaseGloryPageFragment<FragmentGloryTargetBin
 
             refreshList(getMainViewModel().getGloryTitle().getTargetList());
         });
-        mBinding.tvAll.setOnClickListener(v -> {
+        mBinding.tvWin.setOnClickListener(v -> {
             SettingProperty.setGloryTargetWin(true);
             mBinding.tvAll.setSelected(false);
             mBinding.tvWin.setSelected(true);

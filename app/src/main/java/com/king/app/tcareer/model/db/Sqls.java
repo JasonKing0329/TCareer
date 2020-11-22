@@ -327,6 +327,6 @@ public class Sqls {
                 " JOIN match_names ON match_records.match_name_id=match_names._id\n" +
                 " JOIN matches ON match_names.match_id=matches._id\n" +
                 " WHERE match_records.user_id=" + userId + " AND matches.level='" + level + "' \n" +
-                " GROUP BY matches._id,match_records.date_str";
+                " AND (match_records.winner_flag=1 OR round='Final')";
     }
 }
