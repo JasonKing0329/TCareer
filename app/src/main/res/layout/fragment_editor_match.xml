@@ -131,33 +131,22 @@
 
                 <Spinner
                     android:id="@+id/sp_year"
-                    android:layout_width="100dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="match_parent" />
 
                 <Spinner
                     android:id="@+id/sp_month"
-                    android:layout_width="0dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:entries="@array/month"/>
 
-                <TextView
-                    android:id="@+id/tv_month"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:text="@{model.matchMonthText}"
-                    android:visibility="@{model.matchVisibility}"
-                    android:paddingLeft="@dimen/margin_10"
-                    android:paddingRight="@dimen/margin_10"
-                    android:drawableRight="@drawable/ic_mode_edit_black_18dp"/>
-
-                <Spinner
-                    android:id="@+id/sp_round"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_marginLeft="10dp"
-                    android:layout_weight="1" />
             </LinearLayout>
+
+            <Spinner
+                android:id="@+id/sp_round"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginTop="5dp" />
 
             <LinearLayout
                 android:id="@+id/ll_score"

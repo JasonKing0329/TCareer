@@ -55,7 +55,6 @@ public class EditorViewModel extends BaseViewModel {
     public ObservableField<String> matchLevelText = new ObservableField<>();
     public ObservableField<String> matchCourtText = new ObservableField<>();
     public ObservableField<String> matchImageUrl = new ObservableField<>();
-    public ObservableField<String> matchMonthText = new ObservableField<>();
     public ObservableInt matchVisibility = new ObservableInt(View.GONE);
     public ObservableField<String> winnerText = new ObservableField<>();
     public ObservableField<String> scoreText = new ObservableField<>();
@@ -73,6 +72,7 @@ public class EditorViewModel extends BaseViewModel {
     public ObservableInt playerVisibility = new ObservableInt(View.GONE);
 
     public MutableLiveData<Integer> matchYearSelection = new MutableLiveData<>();
+    public MutableLiveData<Integer> matchMonthSelection = new MutableLiveData<>();
     public MutableLiveData<Integer> matchRoundSelection = new MutableLiveData<>();
     public MutableLiveData<Boolean> insertSuccess = new MutableLiveData<>();
     public MutableLiveData<Boolean> updateSuccess = new MutableLiveData<>();
@@ -92,9 +92,7 @@ public class EditorViewModel extends BaseViewModel {
 
     private String[] arr_round;
     private String[] arr_year;
-    protected int cur_year = 2, cur_round = 0;// 记录当前spinner选项
-    // 修改的月份
-    protected int mUpdateMonth;
+    protected int cur_year = 2, cur_round = 0, cur_month = 0;// 记录当前spinner选项
 
     public EditorViewModel(@NonNull Application application) {
         super(application);
@@ -356,7 +354,7 @@ public class EditorViewModel extends BaseViewModel {
     }
 
     public void setUpdateMonth(int position) {
-        mUpdateMonth = position + 1;
+        this.cur_month = position;
     }
 
     public void initMatchPage() {
@@ -375,6 +373,7 @@ public class EditorViewModel extends BaseViewModel {
                 long matchId = autoFill.getMatchId();
                 queryMatch(matchId);
                 matchYearSelection.setValue(autoFill.getIndexYear());
+                matchMonthSelection.setValue(autoFill.getIndexMonth());
                 matchRoundSelection.setValue(getRoundIndex(autoFill.getRound()));
             }
         }
@@ -405,8 +404,11 @@ public class EditorViewModel extends BaseViewModel {
 
     private void bindRecordMatch() {
         matchRoundSelection.setValue(getRoundIndex(mRecord.getRound()));
-        int year = Integer.parseInt(mRecord.getDateStr().split("-")[0]);
+        String[] array = mRecord.getDateStr().split("-");
+        int year = Integer.parseInt(array[0]);
+        int month = Integer.parseInt(array[1]);
         matchYearSelection.setValue(getYearIndex(year));
+        matchMonthSelection.setValue(month - 1);
     }
 
     private void bindMatch(MatchNameBean bean) {
@@ -416,7 +418,6 @@ public class EditorViewModel extends BaseViewModel {
         matchCourtText.set(bean.getMatchBean().getCourt());
         matchCountryText.set(bean.getMatchBean().getCountry());
         matchCityText.set(bean.getMatchBean().getCity());
-        matchMonthText.set(bean.getMatchBean().getMonth() + "月");
         matchVisibility.set(View.VISIBLE);
     }
 
@@ -579,18 +580,8 @@ public class EditorViewModel extends BaseViewModel {
         }
         mRecord.setMatchNameId(mMatchNameBean.getId());
         mRecord.setRound(arr_round[cur_round]);
-        int cur_month = 0;
-        if (mUpdateMonth != 0) {
-            cur_month = mUpdateMonth;
-        }
-        else {
-            try {
-                cur_month = mMatchNameBean.getMatchBean().getMonth();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-        String month = cur_month < 10 ? ("0" + cur_month) : ("" + cur_month);
+        int tarMonth = cur_month + 1;
+        String month = tarMonth < 10 ? ("0" + tarMonth) : ("" + tarMonth);
         int year = 2010 + cur_year;
         String dateStr = year + "-" + month;
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM");
@@ -612,6 +603,7 @@ public class EditorViewModel extends BaseViewModel {
             AutoFillMatchBean item = new AutoFillMatchBean();
             item.setMatchId(mMatchNameBean.getId());
             item.setIndexYear(cur_year);
+            item.setIndexMonth(cur_month);
             item.setRound(arr_round[cur_round]);
             SettingProperty.setAutoFillMatch(item);
         }

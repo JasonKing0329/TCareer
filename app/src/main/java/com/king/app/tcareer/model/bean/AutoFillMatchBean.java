@@ -10,6 +10,7 @@ public class AutoFillMatchBean {
     private long matchId;
     private String round;
     private int indexYear;
+    private int indexMonth;
 
     public long getMatchId() {
         return matchId;
@@ -33,5 +34,13 @@ public class AutoFillMatchBean {
 
     public void setIndexYear(int indexYear) {
         this.indexYear = indexYear;
+    }
+
+    public int getIndexMonth() {
+        return indexMonth;
+    }
+
+    public void setIndexMonth(int indexMonth) {
+        this.indexMonth = indexMonth;
     }
 }

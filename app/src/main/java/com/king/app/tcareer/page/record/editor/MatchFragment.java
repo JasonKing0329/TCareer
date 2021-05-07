@@ -87,9 +87,6 @@ public class MatchFragment extends MvvmFragment<FragmentEditorMatchBinding, Base
             });
             recordScoreDialog.show(getChildFragmentManager(), "RecordScoreDialog");
         });
-        mBinding.tvMonth.setOnClickListener(v -> {
-            mBinding.spMonth.performClick();
-        });
         mBinding.spMonth.setOnItemSelectedListener(spinnerListener);
     }
 
@@ -97,6 +94,7 @@ public class MatchFragment extends MvvmFragment<FragmentEditorMatchBinding, Base
     protected void onCreateData() {
 
         parentViewModel.matchYearSelection.observe(this, selection -> mBinding.spYear.setSelection(selection));
+        parentViewModel.matchMonthSelection.observe(this, selection -> mBinding.spMonth.setSelection(selection));
         parentViewModel.matchRoundSelection.observe(this, selection -> mBinding.spRound.setSelection(selection));
         parentViewModel.recentMatchesObserver.observe(this, list -> showRecentMatches(list));
         parentViewModel.initMatchPage();
@@ -142,7 +140,6 @@ public class MatchFragment extends MvvmFragment<FragmentEditorMatchBinding, Base
             } else if (parent == mBinding.spRound) {
                 parentViewModel.setCurRound(position);
             } else if (parent == mBinding.spMonth) {
-                mBinding.tvMonth.setText(mBinding.spMonth.getSelectedItem().toString());
                 parentViewModel.setUpdateMonth(position);
             }
         }
